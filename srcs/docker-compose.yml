@@ -1,0 +1,83 @@
+# naming conventions:
+#   - volume names SHOULD end by "_db"
+#   - services CAN have full name
+#   - every service/volume/network name SHOULD be lowercase
+#   - any hidden service/volume/network SHOULD be named in a different way (e.g.: ".servicename")
+
+
+# notices:
+#   - EVERY service MUST depend on the logger
+
+
+
+# sample volume
+  # logger:
+  #   driver: local
+  #   name: logger
+  #   driver_opts:
+  #     o: bind
+  #     device: /home/leonardo/data/logger
+  #     type: none
+
+
+# sample container: receiver
+  # receiver:																# container
+  #   container_name: receiver							# coniainer name (alias)
+  #   build: ./requirements/receiver				# Dockerfile directory
+  #   image: mariadb:42
+  #   depends_on:														# container is built after ...
+  #     - logger
+  #   networks:															# connected to networks ...
+  #     - app-network
+  #   env_file:															# path to .env
+  #     - .env
+  #   volumes:															# accessible volumes
+  #     - wp:/var/www/html
+  #   ports:																# communication ports with outer environment
+  #     - "443:443"
+  #   command: ["bash", "echo"]							# execute a command outside (?) container
+  #   restart: always												# in case of crash restarts service
+
+
+version: "3.5"
+
+networks:
+  app-network:
+    name: app-network
+    driver: bridge
+
+
+volumes:
+  logger_db:
+    driver: local
+    name: lg
+    driver_opts:
+      o: bind
+      device: /home/leonardo/data/logger
+      type: none
+
+
+services:
+
+  logger:                                             # logger service
+    build: ./logger
+    restart: always
+    volumes:
+      - logger_db:/var/www/log
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+  lolservice1:                                        # test service. Sends a short message to logger
+    build: ./lol1
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - logger
+    networks:
+      - app-network
+    env_file:
+      - .env
