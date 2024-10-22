@@ -1,5 +1,3 @@
 #!/bin/bash
 
-echo kajhsdkahsdjkahsdkjhadshjh | nc logger 8080        # send a message to another container
-
-echo message sent
+printf "HTTP/1.1 200 OK\r\n\r\nVeryLolIsLol" | nc -l 9090
