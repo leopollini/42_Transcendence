@@ -1,4 +1,4 @@
-srcs/req*/
+srcs/requirements*/
 ..*
 */..*
 */*/..*
