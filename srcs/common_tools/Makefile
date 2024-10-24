@@ -3,7 +3,7 @@
 # Each script CAN begin by importing the .env file via the following line:
 #	export -a "$(cat $2 | grep -v '#' | xargs)"
 
-FILES			= Ports
+FILES			= 
 DIR				= scripts
 TOOLSDIR		= tools
 ENV				= .env
@@ -15,7 +15,6 @@ STUFF			= $(addprefix $(TOOLSDIR)/, $(FILES:=.rb))
 all: $(STUFF)
 re: clean all
 clean:
-	rm -rf $(TOOLSDIR)
 	@echo "Cleaning complete"
 
 $(STUFF):$(TOOLSDIR)/%.rb: $(DIR)/%.sh
