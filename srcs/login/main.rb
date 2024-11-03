@@ -8,14 +8,10 @@ if !(File.file?("../common_tools/tools/Ports.rb") || File.file?("/var/www/common
 	exit -1
 end
 
-SERVICE_NAME = "request_manager"
+SERVICE_NAME = login
 
-def manage_req(client, server)
-	client.print "HTTP/1.1 200 OK\r\n\r\nHehelolboedy\r\n"
-	sleep 1
-	client.close
+def login(client, server)
+	
 end
 
-puts "lolresponse active"
-
-(SimpleServer::SimplerTCP.new PortFinder::FindPort.new(SERVICE_NAME).getPort, :manage_req).start_loop
+(SimpleServer::SimplerTCP.new PortFinder::FindPort.new(SERVICE_NAME).getPort, :login).start_loop

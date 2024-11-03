@@ -1,8 +1,6 @@
-FROM debian:buster
-COPY logger.sh /var/www/
-RUN chmod +x /var/www/logger.sh
-RUN apt-get update
-RUN apt-get install -y netcat
-EXPOSE 8080
-ENTRYPOINT [ "/var/www/logger.sh" ]
-# CMD ["bash", "/var/www/logger.sh"]
+FROM ruby:3.3
+COPY main.rb /var/www/
+RUN chmod +x /var/www/main.rb
+EXPOSE $PORT_LOGGER
+CMD [ "ruby", "/var/www/main.rb" ]
+# CMD ["ls", "/var/www/common"]

@@ -54,8 +54,17 @@ volumes:
     name: lg
     driver_opts:
       o: bind
-      device: /home/leonardo/data/logger
+      device: ./logger
       type: none
+
+  pages_db:
+    driver: local
+    name: pg
+    driver_opts:
+      o: bind
+      device: ./pages
+      type: none
+
   common_tools:
     driver: local
     name: ct
@@ -67,51 +76,66 @@ volumes:
 
 services:
 
+  postgres:                                           # database service
+    build: ./postgres
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - logger_db:/var/www/logger
+      - pages_db:/var/www/pages
+      - /var/run/docker.sock:/var/run/docker.sock
+      - common_tools:/var/www/common
+    networks:
+      - app-network
+    ports:
+      - "9001:9001"
+
   # logger:                                             # logger service
   #   build: ./logger
   #   restart: always
   #   volumes:
   #     - logger_db:/var/www/log
   #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - common_tools:/var/common
+  #     - common_tools:/var/www/common
+  #   depends_on:
+  #     - postgres
   #   networks:
   #     - app-network
   #   env_file:
   #     - .env
+  #   ports:
+  #     - "8000:8000"
 
-
-  receiver:                                             # net open service. Creates gatewayss
-    build: ./receiver
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - common_tools:/var/www/common
-    # depends_on:
-      # - logger
-    networks:
-      - app-network
-    env_file:
-      - .env
-    ports:
-      - "8080:8080"
-
-  request_manager:
-    build: ./request_manager
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - common_tools:/var/www/common
-    depends_on:
-      - receiver
-    networks:
-      - app-network
-    env_file:
-      - .env
-    ports:
-      - "9000:9000"
-
-  # database:
-  #   image: postgres
+  # receiver:                                             # net open service. Creates gateways
+  #   build: ./receiver
   #   restart: always
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - common_tools:/var/www/common
+  #   depends_on:
+  #     - logger
+  #     - postgres
+  #   networks:
+  #     - app-network
   #   env_file:
   #     - .env
+  #   ports:
+  #     - "8008:8008"
+
+  # request_manager:
+  #   build: ./request_manager
+  #   restart: always
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - common_tools:/var/www/common
+  #   depends_on:
+  #     - receiver
+  #     - logger
+  #   networks:
+  #     - app-network
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "9000:9000"
+
