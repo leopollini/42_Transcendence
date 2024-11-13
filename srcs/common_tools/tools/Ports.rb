@@ -2,28 +2,22 @@
 
 # creates debug module if outside container
 # if File.file?("../common_tools/tools/Ports.rb")
-#   module Ports
-#     HASH = {
-#       # sample:
-#       #"method" => ["service_to_call", port_to_service]
-#       "GET" => ["localhost", 9000],
-#       "HEAD" => ["localhost", 9090],
-#       "log" => ["localhost", 8000]
-#     }
-#     MAX_MSG_LEN = 100000
-#   end
-# else
 module Ports
   HASH = {
     # sample:
     #"method" => ["service_to_call", port_to_service]
-    "GET" => ["request_manager", 9000],
+    # "GET" => ["localhost", 9000],
+    # "HEAD" => ["localhost", 9090],
+    # "log" => ["localhost", 8000],
+
+    "GET" => ["request_manager", 9001],
+    "POST" => ["request_manager", 9000],
     "HEAD" => ["request_manager", 9090],
     "log" => ["logger", 8000]
+#   }
   }
   MAX_MSG_LEN = 100000
 end
-# end
 
 module FastLogger
   class LogThis
@@ -60,19 +54,22 @@ module SimpleServer
 		@@server
     @@function
     @@tokens
-		def initialize(port, funct = nil)
+		def initialize(port, funct = nil, logs = false)
 			@@server = TCPServer.new port
 			@@function = funct
+      @@logs = logs
 		end
     def start_loop
       loop {
         Thread.start(@@server.accept) do |client|
           begin
             method(@@function).call(client, self)
-          rescue => r
-						puts "Catched: " + r.to_s if DEBUG_MODE
-            client.close if !client.closed?
-            FastLogger::LogThis.new "Receiver catched: " + r.to_s
+          # rescue => r
+					# 	puts "Catched: " + r.to_s + "(" + r.class.to_s + ")" if DEBUG_MODE
+          #   client.close if !client.closed?
+          #   if @@logs
+          #     FastLogger::LogThis.new "Receiver catched: " + r.to_s
+          #   end
           end
           client.close if !client.closed?
           puts "Connection concluded" if DEBUG_MODE
@@ -86,3 +83,4 @@ module SimpleServer
 end
 
 DEBUG_MODE = true
+CLOSE_EVERY_SERVICE_END = true

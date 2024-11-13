@@ -1,3 +1,5 @@
 #!/bin/bash
 
-service postgres start
+
+
+postgres

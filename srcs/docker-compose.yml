@@ -76,66 +76,67 @@ volumes:
 
 services:
 
-  postgres:                                           # database service
-    build: ./postgres
+  postgres:                                            # database service
+    # build: ./postgres
+    image: postgres
     restart: always
     env_file:
       - .env
     volumes:
       - logger_db:/var/www/logger
-      - pages_db:/var/www/pages
+      - pages_db:/var/lib/postgresql/pages
       - /var/run/docker.sock:/var/run/docker.sock
       - common_tools:/var/www/common
     networks:
       - app-network
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+
+  logger:                                             # logger service
+    build: ./logger
+    restart: always
+    volumes:
+      - logger_db:/var/www/log
+      - /var/run/docker.sock:/var/run/docker.sock
+      - common_tools:/var/www/common
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+    env_file:
+      - .env
     ports:
-      - "9001:9001"
+      - "8000:8000"
 
-  # logger:                                             # logger service
-  #   build: ./logger
-  #   restart: always
-  #   volumes:
-  #     - logger_db:/var/www/log
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - common_tools:/var/www/common
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - app-network
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "8000:8000"
+  receiver:                                             # net open service. Creates gateways
+    build: ./receiver
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - common_tools:/var/www/common
+    depends_on:
+      - logger
+      - postgres
+    networks:
+      - app-network
+    env_file:
+      - .env
+    ports:
+      - "8008:8008"
 
-  # receiver:                                             # net open service. Creates gateways
-  #   build: ./receiver
-  #   restart: always
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - common_tools:/var/www/common
-  #   depends_on:
-  #     - logger
-  #     - postgres
-  #   networks:
-  #     - app-network
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "8008:8008"
-
-  # request_manager:
-  #   build: ./request_manager
-  #   restart: always
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - common_tools:/var/www/common
-  #   depends_on:
-  #     - receiver
-  #     - logger
-  #   networks:
-  #     - app-network
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "9000:9000"
+  request_manager:
+    build: ./request_manager
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - common_tools:/var/www/common
+    depends_on:
+      - receiver
+      - logger
+    networks:
+      - app-network
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
 
