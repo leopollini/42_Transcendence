@@ -6,7 +6,9 @@ down:
 
 re: prep_dirs
 	make -C srcs/common_tools/ re
-	@docker-compose -f srcs/docker-compose.yml up --build
+	@docker stop $$(docker ps -qa);
+	@docker rm $$(docker ps -qa);
+	@docker-compose -f ./srcs/docker-compose.yml up --build
 
 prep_dirs:
 	@# Create all directories for databases and services

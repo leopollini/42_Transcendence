@@ -49,7 +49,7 @@ def manage_req(client, server)
 	end
 
   if bobj["method"] == "exec"
-    USR.exec bobj["client_command"] rescue r
+    puts USR.exec bobj["client_command"] rescue r
   end
 end
 
