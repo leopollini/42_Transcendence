@@ -77,7 +77,6 @@ volumes:
 services:
 
   postgres:                                            # database service
-    # build: ./postgres
     image: postgres
     restart: always
     env_file:
@@ -93,12 +92,13 @@ services:
     tty: true        # docker run -t
 
   logger:                                             # logger service
-    build: ./logger
+    image: ruby:latest
     restart: always
     volumes:
       - logger_db:/var/www/log
       - /var/run/docker.sock:/var/run/docker.sock
       - common_tools:/var/www/common
+      - ./logger:/var/www
     depends_on:
       - postgres
     networks:
@@ -107,13 +107,16 @@ services:
       - .env
     ports:
       - "8000:8000"
+    entrypoint: /var/www/init.sh
+    working_dir: /var/www
 
   receiver:                                             # net open service. Creates gateways
-    build: ./receiver
+    image: ruby:latest
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - common_tools:/var/www/common
+      - ./receiver:/var/www
     depends_on:
       - logger
       - postgres
@@ -123,13 +126,16 @@ services:
       - .env
     ports:
       - "8008:8008"
+    entrypoint: ruby /var/www/main.rb
+    working_dir: /var/www
 
   request_manager:
-    build: ./request_manager
+    image: ruby:latest
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - common_tools:/var/www/common
+      - ./request_manager:/var/www
     depends_on:
       - receiver
       - logger
@@ -139,4 +145,6 @@ services:
       - .env
     ports:
       - "9000:9000"
+    entrypoint: /var/www/init.sh
+    working_dir: /var/www
 

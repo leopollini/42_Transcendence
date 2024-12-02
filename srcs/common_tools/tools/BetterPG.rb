@@ -1,6 +1,7 @@
 # BetterPG.rb
 
 require 'pg'
+require 'timeout'
 
 module BetterPG
   class EmptyNameRequest < StandardError
@@ -15,15 +16,16 @@ module BetterPG
   end
   
   class SimplePG
-    def initialize(name = "")
+    def initialize(name="", columns=[])
       name ||= ""
-      @pg = PG.connect("host=172.19.0.2 port=5432 password=pwd_postgres user=databaser")
+      Timeout::timeout(5) {
+        @pg = PG.connect("host=172.18.0.2 port=5432 password=pwd_postgres user=databaser")
+      }
       @name = name
       @columns = []
       puts "Succesfully connected to database."
 
-      checkoutTable name if name
-      createTable if name
+      checkoutTable name, columns if name
     end
     
     def updateColumns()
@@ -33,7 +35,6 @@ module BetterPG
           @columns.append key
         end
       rescue PG::UndefinedTable, IndexError => r
-        puts "failel"
         return []
       end
       return @columns
@@ -42,23 +43,26 @@ module BetterPG
       return @columns
     end
 
-    def checkoutTable(newname = "")                         # change target table
+  # change target table
+    def checkoutTable(newname="", columns=[])
       newname ||= ""
       if newname == ""
         raise EmptyNameRequest
       end
       @name = newname
-      createTable
+      createTable columns
       updateColumns
     end
 
-    def createTable(columns=[], rewrite=false)               # returns true if creation was succesful, false if table already exists. Ensires requested columns are created if not present
+    # returns true if creation was succesful, false if table already exists. Ensires requested columns are created if not present
+    def createTable(columns=[], rewrite=false)
       if rewrite
         puts "overwriting table " + @name
         dropTable
       end
       begin
         exec "CREATE TABLE ", @name, " (", columns.join(", "), ");"
+        puts "Created new table " + @name# if Ports::DEBUG_MODE
       rescue PG::DuplicateTable => r
         addColumns *columns
         return false
@@ -66,21 +70,24 @@ module BetterPG
       return true
     end
 
-    def addColumns(*columns)                                # add columns to current table
+    # add columns to current table
+    def addColumns(*columns)
+      print "Creating columns "# if Ports::DEBUG_MODE
       columns.each do |c|
         begin
           exec "ALTER TABLE ", @name, " ADD ", c
-        rescue => r
-          puts r
+          print c.to_s, ' '# if Ports::DEBUG_MODE
+        rescue PG::DuplicateColumn => r
         end
       end
+      puts ""# if Ports::DEBUG_MODE
       if columns.size != 0
         updateColumns
       end
     end
 
-    
-    def select(cols=[], keys=[], fullkeys=[])               # perform select for data fetching
+    # perform select for data fetching
+    def select(cols=[], keys=[], fullkeys=[])
       cols = updateColumns if cols == []
       req = []
       begin
@@ -92,7 +99,27 @@ module BetterPG
           req.append "WHERE " + k
         end
         res = exec req
-        return res if res[0]
+        return res if res
+      rescue PG::UndefinedColumn, IndexError => r
+        puts r
+        return [{}]
+      end
+    end
+
+    def delete(cols=[], keys=[], fullkeys=[])
+      cols = updateColumns if cols == []
+      req = []
+      begin
+        req = ["DELETE FROM", @name]
+        keys.each_with_index do |k, i|
+          req.append "WHERE " + cols[i] + "=" + k if k
+        end
+        fullkeys.each do |k|
+          req.append "WHERE " + k
+        end
+        res = exec req
+        puts "Deleted from " + @name
+        return res if res
       rescue PG::UndefinedColumn, IndexError => r
         puts r
         return [{}]
@@ -100,13 +127,18 @@ module BetterPG
     end
 
     def addValues(vals=[], format=[])
+      format = getColumns[0, vals.size] if format == []
       exec "INSERT INTO", @name, (format.size != 0 ? "(" + format.join(", ") + ")" : ""), "VALUES", '(', vals.join(", "), ')'
+      puts "Added " + vals.to_s + " as " + format.to_s + " to " + @name
     end
-    
-    def dropColumns(*columns)                               # drop column from current table
+
+    # drop column from current table
+    def dropColumns(columns=[])
+      columns ||= getColumns
       columns.each do |c|
         begin
           exec "ALTER TABLE", @name, "DROP COLUMN", c
+          puts "Dropping " + c.to_s
         rescue => r
           puts r
         end

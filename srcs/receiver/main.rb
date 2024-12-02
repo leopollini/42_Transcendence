@@ -1,24 +1,25 @@
 require 'socket'
 require 'timeout'
-load '/var/www/common/Ports.rb' if File.file?("/var/www/common/Ports.rb")
-load '../common_tools/tools/Ports.rb' if File.file?("../common_tools/tools/Ports.rb")
 
-if !(File.file?("../common_tools/tools/Ports.rb") || File.file?("/var/www/common/Ports.rb"))
-	puts "load file not found"
-	exit -1
-end
+load ((File.file? '/var/www/common/Ports.rb') ? '/var/www/common/Ports.rb' : '../common_tools/tools/Ports.rb')
+
+load ((File.file? '/var/www/common/RequestUnpacker.rb') ? '/var/www/common/RequestUnpacker.rb' : '../common_tools/tools/RequestUnpacker.rb')
+
+$stdout.sync = true
+SERVICE_NAME = "receiver"
 
 class SimpleGateway
 	def initialize(method, client, msg)
 		@client = client
 		begin
-			puts "looking for method " + method + " at " + Ports::HASH[method][0] if DEBUG_MODE
-			puts "at port " + Ports::HASH[method][1].to_s if DEBUG_MODE
+			puts "looking for method " + method + " at service " + Ports::HASH[method][0] + "at port " + Ports::HASH[method][1].to_s if DEBUG_MODE
 			@socket = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
 			@socket.write(msg)
 			self.loops
 		rescue => r
-      client.print "HTTP/1.1 500 Internal Server Error\r\n\r\nError: internal server error: " + r.to_s + "\n" if (!client.closed? && (!defined?(@socket) || socket.closed)) rescue r
+			if !client.closed? && (!defined?(@socket) || @socket.closed?)
+        client.print "HTTP/1.1 500 Internal Server Error\r\n\r\nError: internal server error: " + r.to_s + "\n" rescue r
+			end
 			puts "gateway closed (" + r.class.to_s + ")" if DEBUG_MODE
 			@socket.close if defined?(@socket) && !@socket.closed?
 			raise r if client.closed?
@@ -59,15 +60,15 @@ def sorter(client, server)
 			client.close
 			raise "Method Not Allowed"
 		end
-		FastLogger::LogThis.new "Received " + method.to_s + " request from " + client.addr(true)[2].to_s
-		SimpleGateway.new method, client, msg
+		# FastLogger::LogThis.new "Received " + method.to_s + " request from " + client.addr(true)[2].to_s
+		print (t = RequestUnpacker::Unpacker.new.unpack msg).to_json
+		SimpleGateway.new method, client, t.to_json
 		if CLOSE_EVERY_SERVICE_END
 			return
 		end
 	end
 end
 
-$stdout.sync = true
 puts "Starting server!"
 s = SimpleServer::SimplerTCP.new 8008, :sorter
 s.start_loop

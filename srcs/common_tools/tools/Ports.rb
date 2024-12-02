@@ -1,20 +1,17 @@
 # Ports.rb
 
-# creates debug module if outside container
-# if File.file?("../common_tools/tools/Ports.rb")
 module Ports
   HASH = {
     # sample:
     #"method" => ["service_to_call", port_to_service]
-    # "GET" => ["localhost", 9000],
+    # "GET" => ["localhost", 9001],
     # "HEAD" => ["localhost", 9090],
-    # "log" => ["localhost", 8000],
+    # "log" => ["localhost", 8001],
 
     "GET" => ["request_manager", 9001],
     "POST" => ["request_manager", 9000],
     "HEAD" => ["request_manager", 9090],
     "log" => ["logger", 8000]
-#   }
   }
   MAX_MSG_LEN = 100000
 end
