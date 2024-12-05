@@ -1,1 +1,5 @@
-srcs/req*/
+srcs/requirements*/
+..*
+*/..*
+*/*/..*
+.vscode

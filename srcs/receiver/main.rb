@@ -1,88 +1,74 @@
 require 'socket'
 require 'timeout'
-load '/var/www/common/Ports.rb'
-# load 'Ports.rb'
 
-module TCPIOUtils
-	class SimpleGateway
-		@@client
-		@@socket
-		def initialize(sockname, client, msg)
-			@@client = client
-			# check if port is available
-			begin
-        puts "looking for socket called " + sockname
-        puts "at port " + Ports::hash[sockname].to_s
-				@@socket = TCPSocket.new sockname, Ports::hash[sockname]
-				@@socket.write(msg)
-				self.loops
-			rescue => r
-        puts r
-				@@client.print "HTTP/1.1 500 Internal Server Error\r\n\r\nError: internal server error: " + r.to_s
+load ((File.file? '/var/www/common/Ports.rb') ? '/var/www/common/Ports.rb' : '../common_tools/tools/Ports.rb')
+
+load ((File.file? '/var/www/common/RequestUnpacker.rb') ? '/var/www/common/RequestUnpacker.rb' : '../common_tools/tools/RequestUnpacker.rb')
+
+$stdout.sync = true
+SERVICE_NAME = "receiver"
+
+class SimpleGateway
+	def initialize(method, client, msg)
+		@client = client
+		begin
+			puts "looking for method " + method + " at service " + Ports::HASH[method][0] + "at port " + Ports::HASH[method][1].to_s if DEBUG_MODE
+			@socket = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
+			@socket.write(msg)
+			self.loops
+		rescue => r
+			if !client.closed? && (!defined?(@socket) || @socket.closed?)
+        client.print "HTTP/1.1 500 Internal Server Error\r\n\r\nError: internal server error: " + r.to_s + "\n" rescue r
 			end
-			puts "loop endend"
-			@@socket.close
-			@@client.close
+			puts "gateway closed (" + r.class.to_s + ")" if DEBUG_MODE
+			@socket.close if defined?(@socket) && !@socket.closed?
+			raise r if client.closed?
 		end
-		def loops
-			puts "starting gateway"
-			loop do
-				s = IO::select([@@client, @@socket])[0][0]
-				break if @@socket.nil? || @@socket.closed?
-				break if @@client.nil? || @@client.closed?
-				msg = s.read_nonblock(10000)
-				break if msg == ''
-				puts "sendick back '" + msg.to_s + "'"
-				if s == @@socket
-					@@client.write(msg)
-				else
-					@@socket.write(msg)
-				end
+		puts "gateway closed" if DEBUG_MODE
+	end
+	def loops
+		puts "starting gateway" if DEBUG_MODE
+		loop do
+			s = IO::select([@client, @socket])[0][0]
+			break if @socket.nil? || @socket.closed? || @client.nil? || @client.closed?
+			msg = s.read_nonblock(Ports::MAX_MSG_LEN)
+			break if msg == ''
+			if s == @socket
+				@client.write(msg)
+			else
+				@socket.write(msg)
 			end
-		end
-		def finalize
-			@@socket.close
 		end
 	end
-
-	class SimplerTCP
-		@@server
-    @@function
-		def initialize(port)
-			@@server = TCPServer.new port
-		end
-    def start_loop
-      loop {
-        Thread.start(@@server.accept) do |client|
-          begin
-            method(@@function).call(client, self)
-          rescue => r
-            @@client.print "HTTP/1.1 500 Internal Server Error\r\n\r\nError: internal server error: " + r.to_s
-          end
-          client.close
-        end
-      }
-		end
-    def setFunction(server_side_function)
-      @@function = server_side_function
-    end
+	def finalize
+		@socket.close
 	end
 end
-
 
 def sorter(client, server)
-  sleep(0.1)
-  msg = ""
-  while (t = client.read_nonblock(10000)).size == 10000 do
-    msg += t
-  end
-  msg += t
-  method = msg[0, msg.index(' ')]
-  TCPIOUtils::SimpleGateway.new "lolservice1", client, msg
+	loop do
+  	msg = ""
+		IO::select([client])
+		return if client.closed?
+		while (t = client.read_nonblock(Ports::MAX_MSG_LEN)).size == Ports::MAX_MSG_LEN do
+			msg += t
+		end
+		msg += t
+		method = msg[0, msg.index(' ').to_i]
+		if (!Ports::HASH.include? method)
+			client.print "HTTP/1.1 405 Method Not Allowed\r\n\r\nError: Method not allowed\n" if !client.closed?
+			client.close
+			raise "Method Not Allowed"
+		end
+		# FastLogger::LogThis.new "Received " + method.to_s + " request from " + client.addr(true)[2].to_s
+		print (t = RequestUnpacker::Unpacker.new.unpack msg).to_json
+		SimpleGateway.new method, client, t.to_json
+		if CLOSE_EVERY_SERVICE_END
+			return
+		end
+	end
 end
 
-puts "Server started"
-s = TCPIOUtils::SimplerTCP.new 8080
-s.setFunction(:sorter)
+puts "Starting server!"
+s = SimpleServer::SimplerTCP.new 8008, :sorter
 s.start_loop
-
