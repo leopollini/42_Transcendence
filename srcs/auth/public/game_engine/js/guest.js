@@ -48,18 +48,5 @@ function updateUIForGuest() {
     const container = document.getElementById('newButtonsContainer');
     container.classList.remove('hidden');
     container.classList.add('show-new-buttons');
-
-    // Mostra un messaggio generico di accesso
-    const message = document.createElement('p');
-    message.textContent = `Welcome, ${guestName}! Enjoy your time in guest mode.`;
-
-    // Verifica che il container esista prima di inserire il messaggio
-    const parent = container && container.parentNode;
-    if (parent) {
-        // Se il container esiste, inseriamo il messaggio prima del container
-        parent.insertBefore(message, container);
-    } else {
-        // Se il container non esiste, inserisci il messaggio direttamente nel body
-        document.body.appendChild(message);
-    }
+    console.log("Guest name:", guestName);
 }

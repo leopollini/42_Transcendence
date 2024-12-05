@@ -5,19 +5,24 @@ require 'logger'
 
 Dotenv.load
 
-# Crea un nuovo logger
+# Crea un nuovo logger per mostrare error e warning 
 logger = Logger.new(STDOUT)
 logger.level = Logger::INFO
+set :bind, '0.0.0.0'
 
-# Usa il logger personalizzato in Sinatra
+# Usa il nuovo logger disabilitando il vecchio
 configure do
   set :logger, logger
-  # Disabilita Rack::Logger (evita il warning)
   set :logging, false
 end
 
-ENV['REDIRECT_URI'] ||= 'http://localhost:4567/callback'
+redirect_uri = ENV['REDIRECT_URI']
 
+if redirect_uri.nil? || redirect_uri.empty?
+  raise "REDIRECT_URI non configurato nel file .env"
+end
+
+# Creo un CLIENT con id, secret, sito URL per l'autenticazione e il token ottenuto una volta essermi autenticato
 CLIENT = OAuth2::Client.new(
   ENV['CLIENT_ID'],
   ENV['CLIENT_SECRET'],
@@ -26,8 +31,9 @@ CLIENT = OAuth2::Client.new(
   token_url: "/oauth/token"
 )
 
-def exchange_code_for_token(code)
-  # Scambia il codice con il token di accesso
-  token = CLIENT.auth_code.get_token(code, redirect_uri: ENV['REDIRECT_URI'])
-  return token.to_hash  # Restituisce i dati del token, inclusi access_token, refresh_token, ecc.
-end
+# Genera l'URL di autorizzazione da inviare al frontend
+auth_url = CLIENT.auth_code.authorize_url(
+  redirect_uri: redirect_uri,  # Usa il redirect URI configurato
+  scope: 'public',              # Puoi personalizzare lo scope
+  state: 'state_value'          # Se hai bisogno di un valore per lo stato
+)
