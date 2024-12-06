@@ -47,61 +47,49 @@ get '/logout' do
 end
 
 get '/callback' do
-  # Ottieni il codice di autorizzazione dalla query string
   code = params[:code]
   if code.nil? || code.empty?
     content_type :json
     { success: false, error: "No authorization code received" }.to_json
     return
   end
+
   redirect_uri = ENV['REDIRECT_URI']
   begin
-    # Scambia il codice di autorizzazione per il token
+    # Ottieni il token
     token = CLIENT.auth_code.get_token(code, redirect_uri: redirect_uri)
     session[:access_token] = token.token
 
-    # Ora recuperiamo i dati dell'utente da 42
-    uri = URI.parse("https://api.intra.42.fr/v2/me")
-    request = Net::HTTP::Get.new(uri)
-    request["Authorization"] = "Bearer #{token.token}"
+    # Rispondi con un JSON che segnala il successo
+    content_type :json
+    # Mostra una pagina HTML con il messaggio di successo
+    html_content = <<-HTML
+      <html>
+        <head><title>Accesso Consentito</title></head>
+        <body>
+          <h1>Accesso consentito</h1>
+          <p>Clicca continua per finire l'autenticazione.</p>
+          <button id="continueButton">Continua</button>
+          <script>
+            document.getElementById('continueButton').addEventListener('click', function() {
+                if (window.opener) {
+                    window.opener.postMessage({ authenticated: true }, window.location.origin);
+                    window.close(); // Chiude la popup
+                } else {
+                    console.error('window.opener non trovato');
+                }
+            });
+          </script>
+        </body>
+      </html>
+    HTML
 
-    # Esegui la richiesta
-    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(request) }
+    # Restituisci la pagina HTML
+    content_type :html
+    body html_content
 
-    if response.is_a?(Net::HTTPSuccess)
-      user_data = JSON.parse(response.body)
-
-      # Verifica se l'utente esiste nel nostro "database" (hash globale)
-      user = find_or_create_user(user_data)
-
-      # Puoi aggiungere logica per associare l'utente al suo account
-      session[:user_id] = user[:id]  # Memorizza l'ID dell'utente nella sessione
-
-      content_type :json
-      { success: true, access_token: token.token, user: user_data }.to_json
-    else
-      content_type :json
-      { success: false, error: "Failed to fetch user data", response: response.body }.to_json
-    end
   rescue OAuth2::Error => e
     content_type :json
     { success: false, error: e.message, response: e.response.body }.to_json
   end
-end
-
-# Funzione per trovare o creare l'utente nel nostro "database" (hash globale)
-def find_or_create_user(user_data)
-  # Usa l'email come chiave unica per ogni utente
-  user = $users[user_data['email']]
-  if user.nil?
-    # Se l'utente non esiste, crealo
-    user = {
-      id: SecureRandom.uuid,  # Usa un UUID per simulare un ID univoco
-      email: user_data['email'],
-      username: user_data['login'],
-      full_name: user_data['name']
-    }
-    $users[user_data['email']] = user
-  end
-  user
 end
