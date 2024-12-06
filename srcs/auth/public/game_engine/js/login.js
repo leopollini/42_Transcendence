@@ -1,61 +1,39 @@
-// Funzione per gestire il login tramite popup
+let success = localStorage.getItem('authenticated') === 'true'; // Recupera lo stato di autenticazione dal localStorage
+
 function performLogin() {
+    // Se l'utente è già autenticato, non fare nulla
+    if (success) {
+        renderAuthenticatedPage(); // Mostra la UI autenticata
+        return;
+    }
+
+    // Procedura di login se l'utente non è autenticato
     fetch('/auth/login')
-        .then(response => response.json())
+        .then(response => response.json()) // Parsing della risposta
         .then(data => {
-            console.log('Risposta dal server:', data); // Log per vedere cosa ricevi dal server
-            if (data.auth_url) {
-                // Log per vedere l'URL di autenticazione ricevuto
-                console.log('URL di autenticazione:', data.auth_url);
+            const popup = window.open(data.auth_url, 'Login', 'width=600,height=400');
 
-                // Apri il popup con l'URL di login
-                const popup = window.open(data.auth_url, 'Login', 'width=600,height=400');
-                
-                const checkPopup = setInterval(() => {
-                    if (popup.closed) {
-                        console.log('Popup chiuso, procedendo con il recupero del codice');
-                        clearInterval(checkPopup);
-                    }
-                }, 500);
-            } else {
-                console.error('URL di autenticazione non ricevuto.');
-            }
+            // Aggiungi un listener per il messaggio dalla popup quando "Continua" viene premuto
+            window.addEventListener('message', function(event) {
+                if (event.data.authenticated) {
+                    success = true;
+                    localStorage.setItem('authenticated', 'true'); // Salva lo stato di autenticazione
+                    renderAuthenticatedPage(); // Aggiorna la UI principale
+                    popup.close(); // Chiudi la popup
+                }
+            });
         })
         .catch(error => {
-            console.error('Errore nel recupero dell\'URL di autenticazione:', error);
-        });
-}
-
-// Funzione per recuperare il token di accesso dal backend
-function getAccessToken(code) {
-    if (!code) return;
-    console.log("Codice ricevuto:", code); // Aggiungi questo log per vedere se il codice viene ricevuto correttamente
-    console.log('URL di callback:', `/callback?code=${code}`);
-    fetch(`/callback?code=${code}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Dati ricevuti dalla callback:', data); // Log per vedere la risposta della callback
-            if (data.success && data.access_token) {
-                console.log('Token ricevuto:', data.access_token); // Aggiungi questo log per vedere se il token viene restituito
-                sessionStorage.setItem('access_token', data.access_token);
-                console.log('Token salvato nel sessionStorage:', data.access_token); // Aggiungi questo log
-                renderAuthenticatedPage(); // Aggiorna la UI per mostrare i pulsanti di gioco
-            } else {
-                console.error('Errore nella risposta della callback:', data.error || 'Errore sconosciuto.');
-            }
-        })
-        .catch(error => {
-            console.error('Errore nella callback:', error);
+            console.error('Errore nella richiesta di login:', error);
         });
 }
 
 // Funzione per aggiornare la UI dopo l'autenticazione
 function renderAuthenticatedPage() {
-    // Nasconde i pulsanti di login
-    console.log('Aggiornamento UI per autenticato');
+    // Nasconde il contenitore con i pulsanti di login
     document.getElementById('authButtonsContainer').classList.add('hidden');
 
-    // Mostra i pulsanti del gioco
+    // Mostra il contenitore con i nuovi pulsanti di gioco
     const container = document.getElementById('newButtonsContainer');
     container.classList.remove('hidden');
     container.classList.add('show-new-buttons');
@@ -63,23 +41,14 @@ function renderAuthenticatedPage() {
 
 // Funzione per controllare lo stato di autenticazione
 function checkAuthentication() {
-    const token = sessionStorage.getItem('access_token');
-    console.log('Token salvato:', sessionStorage.getItem('access_token'));
-    if (token) {
-        renderAuthenticatedPage();
+    if (success) {
+        renderAuthenticatedPage(); // Mostra la pagina autenticata se il token esiste
     }
 }
 
-// Esegui il controllo dello stato al caricamento
+// Esegui il controllo dello stato al caricamento della pagina
 window.onload = () => {
-    checkAuthentication();
-    const code = new URLSearchParams(window.location.search).get('code');
-    console.log('Codice nella URL:', code); // Verifica se il codice è presente nell'URL
-    if (code) {
-        history.replaceState(null, '', window.location.pathname); // Rimuove il parametro "code" dall'URL
-        getAccessToken(code); // Recupera il token senza redirect
-    }
+    checkAuthentication(); // Verifica lo stato di autenticazione
 };
 
-// Gestione del click sul pulsante di login
 document.getElementById('loginButton').addEventListener('click', performLogin);
