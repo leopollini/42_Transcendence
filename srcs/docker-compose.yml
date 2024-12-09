@@ -90,6 +90,8 @@ services:
       - app-network
     stdin_open: true # docker run -i
     tty: true        # docker run -t
+    ports:
+      - "5433:5432"
 
   logger:                                             # logger service
     image: ruby:latest
