@@ -54,15 +54,23 @@ def sorter(client, server)
 			msg += t
 		end
 		msg += t
-		method = msg[0, msg.index(' ').to_i]
-		if (!Ports::HASH.include? method)
-			client.print "HTTP/1.1 405 Method Not Allowed\r\n\r\nError: Method not allowed\n" if !client.closed?
-			client.close
-			raise "Method Not Allowed"
-		end
+
+		t = RequestUnpacker::Unpacker.new.unpack msg
+		
+		puts t["header"]["Cookie"].to_s if DEBUG_MODE
+
+		# if (!Ports::HASH.include? t["method"])
+		# 	client.print "HTTP/1.1 405 Method Not Allowed\r\n\r\nError: Method not allowed\n" if !client.closed?
+		# 	client.close
+		# 	raise "Method Not Allowed"
+		# end
+
 		# FastLogger::LogThis.new "Received " + method.to_s + " request from " + client.addr(true)[2].to_s
-		print (t = RequestUnpacker::Unpacker.new.unpack msg).to_json
-		SimpleGateway.new method, client, t.to_json
+		if t["method"] == "GET"
+			SimpleGateway.new t["method"], client, msg
+		else
+			SimpleGateway.new t["method"], client, t.to_json
+		end
 		if CLOSE_EVERY_SERVICE_END
 			return
 		end

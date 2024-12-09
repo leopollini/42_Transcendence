@@ -11,7 +11,7 @@ load ((File.file? '/var/www/common/BetterPG.rb') ? '/var/www/common/BetterPG.rb'
 
 
 $stdout.sync = true
-SERVICE_NAME = "tikenizer"
+SERVICE_NAME = "tokenizer"
 
 TOKEN_TIMEOUT = 30
 
@@ -80,7 +80,7 @@ def tokenization(client, server)
   if !defined?(obj)
     token = token_please(nil)
   elsif obj.nil?
-    token = token_please({"failed_format"=>"true", "msg"=>msg})
+    token = token_please {"failed_format"=>"true", "msg"=>msg}
   elsif obj["token_check"].to_s == "yes"
     token = token_check obj
   else

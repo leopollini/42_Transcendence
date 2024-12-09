@@ -19,7 +19,8 @@ module BetterPG
     def initialize(name="", columns=[])
       name ||= ""
       Timeout::timeout(5) {
-        @pg = PG.connect("host=172.18.0.2 port=5432 password=pwd_postgres user=databaser")
+        # @pg = PG.connect("host=172.18.0.2 port=5432 password=pwd_postgres user=databaser")
+        @pg = PG.connect("host=localhost port=5433 password=pwd_postgres user=databaser")
       }
       @name = name
       @columns = []
@@ -93,7 +94,7 @@ module BetterPG
       begin
         req = ["SELECT", cols.join(", "), "FROM", @name]
         keys.each_with_index do |k, i|
-          req.append "WHERE " + cols[i] + "=" + k if k
+          req.append "WHERE " + cols[i] + "=" + k if k && k.to_s != ""
         end
         fullkeys.each do |k|
           req.append "WHERE " + k

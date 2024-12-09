@@ -7,7 +7,7 @@ module RequestUnpacker
   class Unpacker
     def initialize()
     end
-    DEFAULT_RETURN_PAGE = {"method" => "request_page", "page" => "index.html"}
+    DEFAULT_RETURN_PAGE = {"method" => "GET", "page" => "/"}
     def query_string_json(qs="")
       obj = {}
       vars = qs.split("&")
@@ -45,21 +45,29 @@ module RequestUnpacker
 
     def unpack(msg)
       (request, url, query_string) = get_req_details(msg[0,msg.index("\n")])
+      bodyobj = {}
     
       puts "request: '" + request.to_s + "'" + " for " + url +". QS: '" + query_string.to_s + "'" if DEBUG_MODE
       head = msg[msg.index("\r\n") + 2..msg.index("\r\n\r\n").to_i - 1] if msg.index("\r\n")
       begin
         bodyobj = JSON.parse msg[msg.index("\r\n\r\n").to_i + 4..]
       rescue JSON::ParserError => r
-        bodyobj = DEFAULT_RETURN_PAGE
-        bodyobj["body_text"] = msg[msg.index("\r\n\r\n").to_i + 4..]
+        bodyobj["method"] = (request ? request.to_s : "GET")
+        bodyobj["body_text"] = msg[msg.index("\r\n\r\n").to_i + 4..] if msg.index("\r\n\r\n")
+        bodyobj["page"] = (!url || url.to_s == "/" ? "index.html" : url)
+        # puts bodyobj.to_s
       end
-      print "\n\n"
+      # print "\n\n"
       bodyobj["query_string"] = query_string_json(query_string) if query_string
       bodyobj["header"] = header_json(head) if head
-      puts
-      puts bodyobj["header"]
-      print "\n\n"
+      # puts
+      # puts bodyobj["header"].to_s
+      # puts bodyobj["method"].to_s
+      # print "\n\n"
+      if bodyobj["method"].to_s == "OPTIONS"
+        bodyobj["method"] = bodyobj["header"]["Access-Control-Request-Method"].to_s
+        puts "new method: " + bodyobj["method"] if DEBUG_MODE
+      end rescue r
       return bodyobj
     end
   end
