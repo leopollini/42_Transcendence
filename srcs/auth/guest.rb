@@ -1,7 +1,6 @@
 require 'sinatra'
 require 'securerandom'
 
-# Abilita la gestione delle sessioni
 enable :sessions
 set :session_secret, SecureRandom.hex(64)
 

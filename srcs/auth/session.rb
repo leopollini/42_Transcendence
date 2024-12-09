@@ -1,16 +1,19 @@
 require 'sinatra'
 require_relative 'config'
 require 'json'
+require 'oauth2'
+require 'net/http'
 
 # Abilita la gestione delle sessioni
 enable :sessions
 set :session_secret, SecureRandom.hex(64)
 
+# Hash globale per memorizzare gli utenti in memoria (prova)
+$users = {}
+
 # Route principale (home)
 get '/' do
-  puts "tryin to send index.html..."
   send_file File.join(__dir__, '/public/', 'index.html')
-  puts "Sent index.html"
 end
 
 get '/auth/login' do
@@ -20,14 +23,10 @@ get '/auth/login' do
   else
     redirect_uri = ENV['REDIRECT_URI']
     auth_url = CLIENT.auth_code.authorize_url(redirect_uri: redirect_uri)
+
     content_type :json
     { auth_url: auth_url }.to_json
   end
-end
-
-get '/auth/callback' do
-  content_type :json
-  { success: true }.to_json
 end
 
 # Endpoint per verificare se l'utente è autenticato
@@ -48,22 +47,49 @@ get '/logout' do
 end
 
 get '/callback' do
-  auth_code = params[:code]
+  code = params[:code]
+  if code.nil? || code.empty?
+    content_type :json
+    { success: false, error: "No authorization code received" }.to_json
+    return
+  end
+
   redirect_uri = ENV['REDIRECT_URI']
-
   begin
-    # Recupera il token usando il codice di autorizzazione
-    token = CLIENT.auth_code.get_token(auth_code, redirect_uri: redirect_uri)
-
-    # Salva il token nella sessione
+    # Ottieni il token
+    token = CLIENT.auth_code.get_token(code, redirect_uri: redirect_uri)
     session[:access_token] = token.token
 
-    # Invia la risposta JSON senza fare un redirect
+    # Rispondi con un JSON che segnala il successo
     content_type :json
-    { success: true, access_token: token.token }.to_json
+    # Mostra una pagina HTML con il messaggio di successo
+    html_content = <<-HTML
+      <html>
+        <head><title>Accesso Consentito</title></head>
+        <body>
+          <h1>Accesso consentito</h1>
+          <p>Clicca continua per finire l'autenticazione.</p>
+          <button id="continueButton">Continua</button>
+          <script>
+            document.getElementById('continueButton').addEventListener('click', function() {
+                if (window.opener) {
+                    window.opener.postMessage({ authenticated: true }, window.location.origin);
+                    window.close(); // Chiude la popup
+                } else {
+                    console.error('window.opener non trovato');
+                }
+            });
+          </script>
+        </body>
+      </html>
+    HTML
+
+    # Restituisci la pagina HTML
+    content_type :html
+    body html_content
+
   rescue OAuth2::Error => e
-    # In caso di errore nell'autenticazione, invia un messaggio di errore
     content_type :json
-    { success: false, error: e.message }.to_json
+    { success: false, error: e.message, response: e.response.body }.to_json
   end
 end

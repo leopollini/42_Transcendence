@@ -121,7 +121,7 @@ export class Ball {
         this.y = canvas.height / 2; 
         
         bounceAngle = Math.random() * 1.6 - 0.8;
-        console.log("scorer: " + scorer);
+        //console.log("scorer: " + scorer);
         
         this.speedX = (Math.abs(canvas.width * 0.005) * (scorer === 1 ? 1 : -1));
        

@@ -5,15 +5,16 @@ require_relative 'guest'
 
 $stdout.sync = true
 
-# Avvia il server WEBrick per servire i file statici del gioco
+#cartella file statici pagina e altro
 ia_path = File.expand_path('', __dir__ + "/public")
 
+#server webrick per il gioco
 game_server = WEBrick::HTTPServer.new(
   Port: 8005,
   DocumentRoot: ia_path
 )
 
-# Monta la cartella del gioco (serve staticamente)
+# wbrick servira i file nella cartella public quando l'utente fare una richiesta url /
 game_server.mount('/', WEBrick::HTTPServlet::FileHandler, ia_path)
 
 # Gestisci l'interruzione del server con CTRL+C
