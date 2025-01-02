@@ -31,31 +31,33 @@ def manage_req(client, server)
     raise r
   end
 
+	client.puts "HTTP/1.1 200 OK\r\n\r\nYou ashked fors " + bobj["page"].to_s + "!"
+	client.puts bobj
 
-	case (bobj["method"])
-  when "exec"
-	  client.puts "HTTP/1.1 200 OK\r\n\r\n"
+	if bobj["method"].to_s == "new_user"
+		if bobj["username"] && bobj["password"]
+			id = (USR.select ["MAX(id)"])[0]["max"].to_i
+			puts id
+			USR.addValues [id + 1, bobj["username"], bobj["password"]]
+			client.puts "Added user " + bobj["username"] + "!"
+			puts *(USR.select)
+			puts 
+		end
+	end
+	if bobj["method"] == "show_users"
+		client.puts *(USR.select)
+	end
+
+  if bobj["method"] == "exec"
     puts USR.exec bobj["client_command"] rescue r
-  when "GET"
-    content = File.readlines(File.join(__dir__, '/public/', bobj['page'].to_s)).join() rescue r
-    if content
-	    client.puts "HTTP/1.1 200 OK\r\n\r\n"
-      client.puts content
-    else
-	    client.puts "HTTP/1.1 404 Not Found\r\n\r\n"
-    end
-    puts "requested " + bobj['page']
-  else
-    client.puts msg
   end
-
 end
 
 puts "WARNING: Client commands are active and accessible by sending a \"client_command\" field (content will be space joined)"
 
-print "lolresponse active at port ", PortFinder::FindPort.new(SERVICE_NAME).getPort, "\n"
-(SimpleServer::SimplerTCP.new PortFinder::FindPort.new(SERVICE_NAME).getPort, :manage_req).start_loop
+# print "lolresponse active at port ", PortFinder::FindPort.new(SERVICE_NAME).getPort, "\n"
+# (SimpleServer::SimplerTCP.new PortFinder::FindPort.new(SERVICE_NAME).getPort, :manage_req).start_loop
 
-# print "lolresponse active at port ", 9001, "\n"
-# (SimpleServer::SimplerTCP.new 9001, :manage_req).start_loop
+print "lolresponse active at port ", 9001, "\n"
+(SimpleServer::SimplerTCP.new 9001, :manage_req).start_loop
 

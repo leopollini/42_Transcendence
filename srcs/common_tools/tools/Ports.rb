@@ -4,15 +4,14 @@ module Ports
   HASH = {
     # sample:
     #"method" => ["service_to_call", port_to_service]
-    "GET" => ["localhost", 8005],
-    "HEAD" => ["localhost", 9090],
+    # "GET" => ["localhost", 9001],
+    # "HEAD" => ["localhost", 9090],
     # "log" => ["localhost", 8001],
 
-    "show_users" => ["localhost", 9001],
-    # "POST" => ["request_manager", 9000],
-    # "HEAD" => ["request_manager", 9090],
-    # "log" => ["logger", 8000]
-    "asdasd" => ["request_manager", 9001],
+    "GET" => ["request_manager", 9001],
+    "POST" => ["request_manager", 9000],
+    "HEAD" => ["request_manager", 9090],
+    "log" => ["logger", 8000]
   }
   MAX_MSG_LEN = 100000
 end
