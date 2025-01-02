@@ -5,6 +5,7 @@ require_relative 'session'
 
 logger = Logger.new(STDOUT)
 logger.level = Logger::ERROR
+$stdout.sync = true
 
 # Creazione dell'oggetto WebApp con OAuth client e logger
 app = App.new(OAuthClient.new, logger)

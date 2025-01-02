@@ -3,7 +3,7 @@ require 'pg'
 require 'colorize'
 load ((File.file? '/var/www/common/BetterPG.rb') ? '/var/www/common/BetterPG.rb' : '../../common_tools/tools/BetterPG.rb')
 
-login = BetterPG::SimplePG.new "users", ["login_name TEXT", "name TEXT", "email TEXT", "image TEXT", "token TEXT"]
+LOGIN = BetterPG::SimplePG.new "users", ["login_name TEXT", "name TEXT", "email TEXT", "image TEXT", "token TEXT"]
 
 module Other_logic
   def not_found(response)
@@ -40,8 +40,9 @@ module Other_logic
     if image.nil? || image.empty?
       image = 'nulla'
     end
+    STDERR.puts "adding to database: " + [login_name, name, email, image, token].to_s
+    # LOGIN.addValues([login_name, name, email, image, token], ["login_name", "name", "email", "image", "token"])
+    LOGIN.addValues ["'"+login_name.to_s+"'", "'"+name.to_s+"'", "'"+email.to_s+"'", "'"+token.to_s+"'"], ["login_name", "name", "email", "token"]
     return { 'login_name' => login_name, 'name' => name, 'email' => email, 'avatar_url' => image }
-
-    login.addValues([login_name, name, email, image, token], ["login_name", "name", "email", "image", "token"])
   end
 end
