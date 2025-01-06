@@ -1,4 +1,4 @@
-all: stop_containers prep_dirs
+all: prep_dirs stop_containers
 	make -C ./srcs/common_tools/ all
 	@docker-compose -f ./srcs/docker-compose.yml up
 

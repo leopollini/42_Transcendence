@@ -44,9 +44,12 @@ module RequestUnpacker
     end
 
     def unpack(msg)
+      if msg.index("\r\n\r\n").nil?   #parsing normal message. No need for fancy stuff
+        return JSON.parse msg
+      end
       (request, url, query_string) = get_req_details(msg[0,msg.index("\n")])
     
-      puts "request: '" + request.to_s + "'" + " for " + url +". QS: '" + query_string.to_s + "'" if DEBUG_MODE
+      puts "request: '" + request.to_s + "'" + " for " + url.to_s + ". QS: '" + query_string.to_s + "'" if DEBUG_MODE
       head = msg[msg.index("\r\n") + 2..msg.index("\r\n\r\n").to_i - 1] if msg.index("\r\n")
       begin
         bodyobj = JSON.parse msg[msg.index("\r\n\r\n").to_i + 4..]
@@ -54,12 +57,10 @@ module RequestUnpacker
         bodyobj = DEFAULT_RETURN_PAGE
         bodyobj["body_text"] = msg[msg.index("\r\n\r\n").to_i + 4..]
       end
-      print "\n\n"
-      bodyobj["query_string"] = query_string_json(query_string) if query_string
-      bodyobj["header"] = header_json(head) if head
-      puts
-      puts bodyobj["header"]
-      print "\n\n"
+      # bodyobj["query_string"] = query_string_json(query_string) if query_string
+      bodyobj.merge! query_string_json(query_string).clone if query_string
+      # bodyobj["header"] = header_json(head) if head
+      bodyobj.merge! header_json(head).clone if head
       return bodyobj
     end
   end

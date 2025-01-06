@@ -138,6 +138,7 @@ services:
       - ./request_manager:/var/www
     depends_on:
       - receiver
+      - postgres
       - logger
     networks:
       - app-network
@@ -145,6 +146,26 @@ services:
       - .env
     ports:
       - "9000:9000"
+    entrypoint: /var/www/init.sh
+    working_dir: /var/www
+
+  game_manager:
+    image: ruby:latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - common_tools:/var/www/common
+      - ./game_manager:/var/www
+    depends_on:
+      - receiver
+      - postgres
+      - logger
+    networks:
+      - app-network
+    env_file:
+      - .env
+    ports:
+      - "8998:8998"
     entrypoint: /var/www/init.sh
     working_dir: /var/www
 

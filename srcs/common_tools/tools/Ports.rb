@@ -11,7 +11,8 @@ module Ports
     "GET" => ["request_manager", 9001],
     "POST" => ["request_manager", 9000],
     "HEAD" => ["request_manager", 9090],
-    "log" => ["logger", 8000]
+    "log" => ["logger", 8000],
+    "game_manager" => ["game_manamger", 8998]
   }
   MAX_MSG_LEN = 100000
 end
@@ -56,19 +57,21 @@ module SimpleServer
 			@@function = funct
       @@logs = logs
 		end
-    def start_loop
+    def start_loop(close_at_end_of_thread = true)
       loop {
         Thread.start(@@server.accept) do |client|
           begin
             method(@@function).call(client, self)
           # rescue => r
-					# 	puts "Catched: " + r.to_s + "(" + r.class.to_s + ")" if DEBUG_MODE
+					# 	# puts "Catched: " + r.to_s + "(" + r.class.to_s + ")" if DEBUG_MODE
+          #   puts r
+          #   client.puts r
           #   client.close if !client.closed?
           #   if @@logs
           #     FastLogger::LogThis.new "Receiver catched: " + r.to_s
           #   end
           end
-          client.close if !client.closed?
+          client.close if !client.closed? && close_at_end_of_thread
           puts "Connection concluded" if DEBUG_MODE
         end
       }
