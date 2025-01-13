@@ -1,18 +1,53 @@
 #!/bin/bash
 
-gem install "sinatra" "webrick" "securerandom" "json" "oauth2" "dotenv" "logger" "rackup" "puma"
-# ruby -exec bundle add "rackup" "puma"
+echo "==============================="
+echo "Controllo installazione di Ruby..."
+if ruby --version &>/dev/null; then
+    echo "✅ Ruby è già installato."
+else
+    echo "❌ Ruby non è installato. Installare Ruby prima di continuare."
+    exit 1
+fi
 
-# GEMS=("sinatra" "webrick" "securerandom" "json" "oauth2" "dotenv" "logger")
+echo "==============================="
+echo "Controllo installazione di Bundler..."
+if bundler --version &>/dev/null; then
+    echo "✅ Bundler è già installato."
+else
+    echo "❌ Bundler non è installato. Tentativo di installazione..."
+    gem install bundler || { echo "❌ Errore durante l'installazione di Bundler."; exit 1; }
+    echo "✅ Bundler installato correttamente."
+fi
 
-# for gm in ${GEMS[@]}
-# do
-#     if [ -z "$(gem list | grep $gm)" ]; then
-#         gem install $gm
-#     fi
-#     echo "Installed $gm!"
-# done
+echo "==============================="
+echo "Pulizia delle gemme..."
+if gem cleanup &>/dev/null; then
+    echo "✅ Pulizia delle gemme completata."
+else
+    echo "❌ Errore durante la pulizia delle gemme."
+fi
 
-echo "finished installing"
+cd authentication/
+echo "==============================="
+echo "Aggiornamento delle gemme con Bundler..."
+if bundle update &>/dev/null; then
+    echo "✅ Aggiornamento completato."
+else
+    echo "❌ Errore durante l'aggiornamento delle gemme."
+    echo "Verificare la versione di Ruby e le dipendenze delle gemme."
+fi
 
-ruby auth.rb
+echo "==============================="
+echo "Installazione delle gemme..."
+if bundle install &>/dev/null; then
+    echo "✅ Gemme installate correttamente."
+else
+    echo "❌ Errore durante l'installazione delle gemme."
+    echo "Ecco i dettagli dell'errore:"
+    bundle install
+fi
+
+echo "==============================="
+echo "Script completato.avvio server..."
+
+bundle exec ruby server.rb
