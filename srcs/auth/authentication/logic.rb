@@ -2,6 +2,7 @@ require 'net/http'
 require 'uri'
 require 'json'
 require 'cgi'
+require 'erb'
 require_relative 'other_logic'
 
 module AuthMethods
@@ -25,7 +26,6 @@ module AuthMethods
     end
   
     token = client.get_token(code)
-    
     response.set_cookie('access_token', {
       value: token.token,
       path: '/',
@@ -33,8 +33,9 @@ module AuthMethods
       secure: true,    # Solo su HTTPS
       httponly: true   # Non accessibile tramite JavaScript
     })
-    
+  
     request.session[:authenticated] = true
+    request.session[:token] = token.token
   
     user_data = get_user_data_from_oauth_provider(token.token)
   
@@ -43,15 +44,23 @@ module AuthMethods
       response.write({ success: false, error: "Failed to fetch user data" }.to_json)
       return
     end
-
     name = CGI.escapeHTML(user_data['name'])
     email = CGI.escapeHTML(user_data['email'])
-    image = CGI.escapeHTML(user_data['avatar_url'].to_s)
+    image = CGI.escapeHTML(user_data['image'].to_s)
+    login_name = CGI.escapeHTML(user_data['login_name'])
+    user_data_js = {
+      name: name,
+      email: email,
+      image: image,
+      login_name: login_name
+    }
     
-  
-    html_content = File.read('../login_module/auth_page.html')
-  
+    html_content = File.read('./login_module/auth_page.html')
+    erb = ERB.new(html_content)
+    html_output = erb.result(binding)
+    
     response.content_type = 'text/html'
-    response.write(html_content)
-  end 
+    response.write(html_output)
+  end
+  
 end

@@ -3,9 +3,12 @@ GEM
   specs:
     base64 (0.2.0)
     bigdecimal (3.1.9)
+    cgi (0.4.1)
     colorize (1.1.0)
     did_you_mean (1.6.3)
     dotenv (3.1.7)
+    erb (4.0.4)
+      cgi (>= 0.3.3)
     faraday (2.12.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
@@ -16,7 +19,7 @@ GEM
     json (2.9.1)
     jwt (2.10.1)
       base64
-    logger (1.6.4)
+    logger (1.6.5)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
     net-http (0.6.0)
@@ -38,13 +41,16 @@ GEM
     webrick (1.9.1)
 
 PLATFORMS
+  ruby
   x86_64-linux
 
 DEPENDENCIES
   bundler
+  cgi
   colorize
   did_you_mean (~> 1.0)
   dotenv
+  erb
   json
   oauth2
   pg
@@ -52,4 +58,4 @@ DEPENDENCIES
   webrick
 
 BUNDLED WITH
-   2.5.22
+   2.6.2

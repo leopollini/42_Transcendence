@@ -1,13 +1,14 @@
+
 require 'json'
 require 'pg'
 require 'colorize'
 load ((File.file? '/var/www/common/BetterPG.rb') ? '/var/www/common/BetterPG.rb' : '../../common_tools/tools/BetterPG.rb')
 
-LOGIN = BetterPG::SimplePG.new "users", ["login_name TEXT", "name TEXT", "email TEXT", "image TEXT", "token TEXT"]
+LOGIN = BetterPG::SimplePG.new "users", ["login_name TEXT", "name TEXT", "email TEXT", "image TEXT"]
 
 module Other_logic
   def not_found(response)
-    response.status = 404
+    response.status = 404 
     response.content_type = 'application/json'
     response.write({ success: false, error: "Not Found" }.to_json)
   end
@@ -27,22 +28,11 @@ module Other_logic
       puts "Errore API 42: #{response.code}"
       return nil
     end
-
         name = user_data['usual_full_name']
         email = user_data['email']
-        image = user_data['image']
+        image = user_data['image']['link']
         login_name = user_data['login']
-        puts "\nDati ricevuti dall'API di 42:".green
-        puts "       name: #{name}".green
-        puts "       email: #{email}".green
-        puts "       image: #{image}".green
-        puts "  login_name: #{login_name}".green
-    if image.nil? || image.empty?
-      image = 'nulla'
-    end
-    STDERR.puts "adding to database: " + [login_name, name, email, image, token].to_s
-    # LOGIN.addValues([login_name, name, email, image, token], ["login_name", "name", "email", "image", "token"])
-    LOGIN.addValues ["'"+login_name.to_s+"'", "'"+name.to_s+"'", "'"+email.to_s+"'", "'"+token.to_s+"'"], ["login_name", "name", "email", "token"]
-    return { 'login_name' => login_name, 'name' => name, 'email' => email, 'avatar_url' => image }
+    LOGIN.addValues ["'" + login_name.to_s + "'", "'" + name.to_s+ "'" , "'" + email.to_s + "'"], ["login_name", "name", "email"]
+    return { 'login_name' => login_name, 'name' => name, 'email' => email, 'image' => image }
   end
 end

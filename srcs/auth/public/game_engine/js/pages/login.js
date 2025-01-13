@@ -1,5 +1,5 @@
 import { guest_login } from "../../login/guest_logic.js";
-import { performLogin, popupOpened} from "../../login/login_logic.js";
+import { performLogin, popupOpened } from "../../login/login_logic.js";
 
 export default function Login() {
     return `
@@ -28,21 +28,35 @@ export default function Login() {
     `;
 }
 
-// Gestori per la pagina di login
+export let let_me_in = false
+
+export function update_state(status)
+{
+    let_me_in = status;
+}
+
 export const addLoginPageHandlers = () => {
     const loginButton = document.getElementById("loginButton");
     const guestButton = document.getElementById("guestButton");
 
     if (loginButton && guestButton) {
         loginButton.addEventListener("click", () => {
+            if (popupOpened === true)
+                alert("popup already open finish authentication before continuing")
+            else
+            {
+                update_state(true);
                 performLogin();
+            }
         });
-
         guestButton.addEventListener("click", () => {
             if (popupOpened === true)
                 alert("Authenticating in progress....\nPlease wait.");
             else
+            {
+                update_state(false);
                 guest_login();
+            }
         });
     }
 };
