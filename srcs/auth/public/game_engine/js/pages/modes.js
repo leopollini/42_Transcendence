@@ -23,21 +23,7 @@ export function change_name(name) {
     }, 100);
 }
 
-export default function Modes()
-{
-    let isForward = false;
-    window.addEventListener("popstate", (event) => {
-        if (event.state === null)
-            isForward = true;
-        else
-            isForward = false;
-        if (!isForward)
-            history.pushState(null, "", location.href);
-    });
-    
-    if (window.history && window.history.pushState)
-        window.history.pushState(null, null, location.href);
-
+export default function Modes() {
     return `
     <h1 class="text">
     <span class="letter letter-1">S</span>
@@ -68,7 +54,10 @@ export default function Modes()
     <button class="button-style" id="tournamentButton"><span class="text-animation">TOURNAMENT</span></button>
     </div>
     <div class="mode-button-container">
-    <button class="button-style" id="aiButton"><span class="text-animation">AI Wars</span></button>
+    <button class="button-style" id="aiButton"><span class="text-animation">AI WARS</span></button>
+    </div>
+    <div class="mode-button-container">
+    <button class="button-style" id="forza4Button"><span class="text-animation">FORZA 4</span></button>
     </div>
     </div>
     <span id="avatarName">Default</span>
@@ -86,6 +75,7 @@ export const addModesPageHandlers = () => {
     const classicButton = document.getElementById('classicButton');
     const aiButton = document.getElementById('aiButton');
     const tournamentButton = document.getElementById('tournamentButton');
+    const forza4Button = document.getElementById('forza4Button');
     const avatarImage = document.getElementById('avatarImage');
     const menuContainer = document.querySelector('.menu-container');
     
@@ -101,6 +91,9 @@ export const addModesPageHandlers = () => {
         navigate("/tournament", "Modalità Torneo");
     });
 
+    forza4Button?.addEventListener('click', () => {
+        navigate("/forza4", "Modalità Forza 4");
+    })
     avatarImage.addEventListener("click", (event) => {
         menuContainer.classList.toggle("visible");
     });
