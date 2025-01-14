@@ -28,7 +28,7 @@ export function Forza4() {
         </div>
     </div>
     <div id="f4grid-container">
-        <div id="f4board"></div> <!-- Griglia di gioco -->
+        <div id="f4board"></div> <!-- Aggiunto per rappresentare la board -->
     </div>
     <div id="f4message"></div>
     <button id="f4ReplayMatchButton" style="display: none; margin: 0 auto;">Replay Match</button>
@@ -84,7 +84,7 @@ function createGrid() {
             // When the mouse hovers over a cell, highlight the column
             cell.addEventListener('mouseover', () => highlightColumn(col, true));
             cell.addEventListener('mouseout', () => highlightColumn(col, false));
-            cell.addEventListener('click', checkGrid);
+            cell.addEventListener('click', handleClick);
 
             boardElement.appendChild(cell);
         }
@@ -191,7 +191,7 @@ function calculateLevelF4Players(data, winner, loser) {
             
 }
 
-function checkGrid(event) {
+function handleClick(event) {
     if (gameEnded) return;
     const col = +event.target.dataset.col;
     for (let row = rows - 1; row >= 0; row--) {
@@ -204,7 +204,7 @@ function checkGrid(event) {
                     message.textContent = `${p1} vince!`;
                 else
                     message.textContent = `${p2} vince!`;
-                grid.removeEventListener('click', checkGrid, true);
+                grid.removeEventListener('click', handleClick, true);
                 if (f4ReplayButton && f4BackToMenuButton) {
                     //f4ReplayButton.style.display = 'block';
                     f4BackToMenuButton.style.display = 'block';
@@ -238,46 +238,21 @@ function checkWin(row, col) {
 
 function checkDirection(row, col, rowDir, colDir) {
     let count = 1;
-    const winningCells = [{ row, col }]; // Inizializziamo l'array con la cella di partenza
-    count += countInDirection(row, col, rowDir, colDir, winningCells);
-    count += countInDirection(row, col, -rowDir, -colDir, winningCells);
-
-    if (count >= 4) {
-        // A questo punto `winningCells` contiene tutte le celle della serie vincente
-        highlightWinningCells(winningCells);
-        return true;
-    }
-    return false;
+    count += countInDirection(row, col, rowDir, colDir);
+    count += countInDirection(row, col, -rowDir, -colDir);
+    return count >= 4;
 }
 
-
-function countInDirection(row, col, rowDir, colDir, winningCells) {
+function countInDirection(row, col, rowDir, colDir) {
     let r = row + rowDir;
     let c = col + colDir;
     let count = 0;
     while (r >= 0 && r < rows && c >= 0 && c < cols && board[r][c] === currentPlayer) {
-        winningCells.push({ row: r, col: c });  // Aggiungi la cella alla lista delle celle vincenti
         count++;
         r += rowDir;
         c += colDir;
     }
     return count;
-}
-
-function highlightWinningCells(winningCells) {
-    winningCells.forEach(cell => {
-        const cellElement = document.querySelector(`.cell[data-row="${cell.row}"][data-col="${cell.col}"]`);
-        if (cellElement) {
-            cellElement.style.border = '5px solid gold'; // Cambia il bordo in dorato per evidenziare la cella
-        }
-    });
-}
-
-function resetCellBorders() {
-    const cells = document.querySelectorAll('.cell');
-    cells.forEach(cell => {
-        cell.style.border = '1px solid #fff'; // Ripristina il bordo a quello iniziale
-    });
 }
 
 export function startforza4Game() {
@@ -307,8 +282,8 @@ export function startforza4Game() {
     p1Name.textContent = p1 + ":";
     p2Name.textContent = p2 + ":";
 
-    //console.log("token 1 color: ", token1Color);
-    //console.log("token 2 color: ", token2Color);
+    console.log("token 1 color: ", token1Color);
+    console.log("token 2 color: ", token2Color);
 
     createGrid();
     printPlayerTurnMessage();
@@ -316,7 +291,6 @@ export function startforza4Game() {
     f4ReplayButton.addEventListener('click', () => {
         gameEnded = false;
         board = Array.from({ length: rows }, () => Array(cols).fill(null));
-        resetCellBorders();
         f4ReplayButton.style.display = 'none';
         f4BackToMenuButton.style.display = 'none';
         currentPlayer = 'token1';
@@ -326,7 +300,6 @@ export function startforza4Game() {
     f4BackToMenuButton.addEventListener('click', (event) => {
         gameEnded = false;
         board = Array.from({ length: rows }, () => Array(cols).fill(null));
-        resetCellBorders();
         navigate("/forza4", "Forza 4 Home");
     });
 }
