@@ -1,5 +1,7 @@
 #!/bin/bash
 
+/var/common/setup_tools.sh
+
 echo "==============================="
 echo "Controllo installazione di Ruby..."
 if ruby --version &>/dev/null; then
@@ -50,4 +52,4 @@ fi
 echo "==============================="
 echo "Script completato.avvio server..."
 
-bundle exec ruby server.rb
+ruby server.rb

@@ -3,6 +3,8 @@
 require 'pg'
 require 'timeout'
 
+DEBUG_PG_ADDRESS = "172.26.0.2" if !defined? DEBUG_PG_ADDRESS
+
 module BetterPG
   class EmptyNameRequest < StandardError
     def initialize(msg="Empty table name requested")
@@ -19,7 +21,12 @@ module BetterPG
     def initialize(name="", columns=[])
       name ||= ""
       Timeout::timeout(5) {
-        @pg = PG.connect("host=172.18.0.2 port=5432 password=pwd_postgres user=databaser")
+        r = nil
+        Timeout::timeout(1) {
+          @pg = PG.connect("host=postgres port=5432 password=pwd_postgres user=databaser")
+        } rescue r
+         @pg = PG.connect("host=" + DEBUG_PG_ADDRESS + " port=5432 password=pwd_postgres user=databaser") if r.nil?
+        
       }
       @name = name
       @columns = []
