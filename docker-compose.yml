@@ -145,3 +145,21 @@ services:
       - "7890:7890"
     entrypoint: /var/www/init.sh
     working_dir: /var/www
+
+  user_manager:
+    image: ruby:latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./srcs/common_tools/tools:/var/common
+      - ./srcs/user_manager:/var/www
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+    env_file:
+      - .env
+    ports:
+      - "7080:7080"
+    entrypoint: /var/www/init.sh
+    working_dir: /var/www

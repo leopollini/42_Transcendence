@@ -4,11 +4,11 @@ require 'pg'
 require 'colorize'
 load ((File.file? '/var/common/BetterPG.rb') ? '/var/common/BetterPG.rb' : '../../common_tools/tools/BetterPG.rb')
 
-LOGIN = BetterPG::SimplePG.new "users", ["login_name TEXT", "name TEXT", "email TEXT", "image TEXT"]
+LOGIN = BetterPG::SimplePG.new "users", ["login_name TEXT", "name TEXT", "email TEXT", "image TEXT", "bio TEXT", "id INT"]
 
 module Other_logic
   def not_found(response)
-    response.status = 404 
+    response.status = 404
     response.content_type = 'application/json'
     response.write({ success: false, error: "Not Found" }.to_json)
   end

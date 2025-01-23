@@ -59,8 +59,5 @@ end
 
 puts "WARNING: Client commands are active and accessible by sending a \"client_command\" field (content will be space joined)"
 
-# print "lolresponse active at port ", PortFinder::FindPort.new(SERVICE_NAME).getPort, "\n"
-# (SimpleServer::SimplerTCP.new PortFinder::FindPort.new(SERVICE_NAME).getPort, :manage_req).start_loop
-
 print "lolresponse active at port ", PORT, "\n"
 (SimpleServer::SimplerTCP.new PORT, :manage_req).start_loop

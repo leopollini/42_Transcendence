@@ -100,10 +100,10 @@ module BetterPG
       begin
         req = ["SELECT", cols.join(", "), "FROM", @name]
         keys.each_with_index do |k, i|
-          req.append "WHERE " + cols[i] + "=" + k if k
+          req.append "WHERE " + cols[i] + "=" + k.to_s if k && !k.to_s.empty?
         end
         fullkeys.each do |k|
-          req.append "WHERE " + k
+          req.append "WHERE " + k.to_s if k && !k.to_s.empty?
         end
         res = exec req
         return res if res

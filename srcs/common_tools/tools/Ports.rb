@@ -13,8 +13,10 @@ module Ports
     "HEAD" => ["request_manager", 9000],
     "show_users" => ["request_manager", 9000],
     "TOKEN" => ["tokenizer", 7890],
-    "log" => ["logger", 8000],
-    "" => ["receiver", 8008]
+    "" => ["receiver", 8008],
+    "add_user" => ["user_manager", 7080],
+    "get_user" => ["user_manager", 7080],
+    "set_user" => ["user_manager", 7080]
   }
   MAX_MSG_LEN = 100000
 end
@@ -79,7 +81,7 @@ module SimpleServer
           begin
             method(@@function).call(client, self)
           rescue => r
-						puts "Catched: " + r.to_s + "(" + r.class.to_s + ")" if DEBUG_MODE
+						puts "Catched: " + r.to_s + "(" + r.class.to_s + ")\n" + r.backtrace.join("\n") if DEBUG_MODE
             client.close if !client.closed?
           end
           client.close if !client.closed?

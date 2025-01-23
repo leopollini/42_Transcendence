@@ -59,7 +59,7 @@ def token_please(json_obj)
 end
 
 def token_check(json_obj)
-  puts "CHECKING TOKEN"
+  puts "CHECKING TOKEN" if DEBUG_MODE
   token = json_obj["token"]
   if token.to_s == ""
     return {"valid"=>"false", "status"=>"bad request"}

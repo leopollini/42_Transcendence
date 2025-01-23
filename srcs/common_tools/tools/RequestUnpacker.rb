@@ -44,15 +44,18 @@ module RequestUnpacker
     end
 
     def unpack(msg)
+      r = nil
+      req_info = JSON.parse msg.to_s rescue r
+      return req_info if req_info
       req_info = {}
       (request, path, query_string) = get_req_details(msg[0,msg.index("\n")])
     
-      puts "unpacked: '" + request.to_s + "'" + " for " + path +". QS: '" + query_string.to_s + "'" if DEBUG_MODE
+      puts "unpacked: '" + request.to_s + "'" + " for " + path.to_s + ". QS: '" + query_string.to_s + "'" if DEBUG_MODE
       head = msg[msg.index("\r\n") + 2..msg.index("\r\n\r\n").to_i - 1] if msg.index("\r\n")
       begin
-        req_info["body"] = JSON.parse msg[msg.index("\r\n\r\n").to_i + 4..]
+        req_info.merge! JSON.parse msg[msg.index("\r\n\r\n").to_i + 4..].to_s
       rescue JSON::ParserError => r
-        req_info["body_text"] = msg[msg.index("\r\n\r\n").to_i + 4..]
+        req_info["body_text"] = msg[msg.index("\r\n\r\n").to_i + 4..].to_s
       end
       req_info["query_string"] = query_string_json(query_string) if query_string
       req_info["header"] = header_json(head) if head

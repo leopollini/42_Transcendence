@@ -13,16 +13,14 @@ load ((File.file? '/var/common/BetterPG.rb') ? '/var/common/BetterPG.rb' : '../c
 
 $stdout.sync = true
 SERVICE_NAME = "sample_service"
+PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
-USR = BetterPG::SimplePG.new "users", ["id INT", "username TEXT", "password TEXT", "token TEXT"]
+LOGIN = BetterPG::SimplePG.new "users", ["login_name TEXT", "name TEXT", "email TEXT", "image TEXT", "bio TEXT"]
 
 def sample_service_loop(client, server)
 
 end
 
-PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
-print "lolresponse active at port ", PORT, "\n"
-(SimpleServer::SimplerTCP.new PORT, :sample_service_loop).start_loop
-
-
+print "lolresponse active at port ", PORT.to_s, "\n"
+(SimpleServer::SimplerTCP.new PORT, :tokenization).start_loop

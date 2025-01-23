@@ -1,4 +1,4 @@
-CONTAINERS	= tokenizer receiver postgres request_manager auth
+CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager
 
 # ========================================= #
 SHELL:=/bin/bash
@@ -47,6 +47,7 @@ prep_dirs:
 	@mkdir -p ./srcs/receiver
 	@mkdir -p ./srcs/request_manager
 	@mkdir -p ./srcs/auth
+	@mkdir -p ./srcs/user_manager
 	@chmod +x ./srcs/auth/init.sh
 	@chmod +x ./srcs/request_manager/init.sh
 
