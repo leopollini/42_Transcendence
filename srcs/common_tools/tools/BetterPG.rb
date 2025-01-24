@@ -69,7 +69,7 @@ module BetterPG
       end
       begin
         exec "CREATE TABLE ", @name, " (", columns.join(", "), ");"
-        puts "Created new table " + @name# if Ports::DEBUG_MODE
+        puts "Created new table " + @name #if Ports::DEBUG_MODE
       rescue PG::DuplicateTable => r
         addColumns *columns
         return false
@@ -93,20 +93,32 @@ module BetterPG
       end
     end
 
+    def better_return(obj)
+      r = nil
+      reslst = []
+      obj.each do | lol |
+        reslst.append lol rescue r
+      end
+      return reslst
+    end
+
     # perform select for data fetching
     def select(cols=[], keys=[], fullkeys=[])
       cols = updateColumns if cols == []
       req = []
       begin
-        req = ["SELECT", cols.join(", "), "FROM", @name]
+        req = ["SELECT * FROM", @name]
+        # req = ["SELECT", cols.join(", "), "FROM", @name]
+        t = []
         keys.each_with_index do |k, i|
-          req.append "WHERE " + cols[i] + "=" + k.to_s if k && !k.to_s.empty?
+          t.append cols[i] + "='" + k.to_s + "'" if cols[i] && k && !k.to_s.empty?
         end
+        req.append("WHERE " + t.join(" AND ")) if !t.empty?
         fullkeys.each do |k|
           req.append "WHERE " + k.to_s if k && !k.to_s.empty?
         end
         res = exec req
-        return res if res
+        return better_return res
       rescue PG::UndefinedColumn, IndexError => r
         puts r
         return [{}]
@@ -135,7 +147,7 @@ module BetterPG
 
     def addValues(vals=[], format=[])
       format = getColumns[0, vals.size] if format == []
-      exec "INSERT INTO", @name, (format.size != 0 ? "(" + format.join(", ") + ")" : ""), "VALUES", '(', vals.join(", "), ')'
+      exec "INSERT INTO", @name, (format.size != 0 ? "(" + format.join(", ") + ")" : ""), "VALUES", "('" + vals.join("', '") + "')"
       puts "Added " + vals.to_s + " as " + format.to_s + " to " + @name
     end
 
@@ -162,6 +174,7 @@ module BetterPG
     end
 
     def exec(*strs)
+      puts strs.join(' ')
       if strs.size != 0
         return @pg.exec(strs.join(' '))
       else

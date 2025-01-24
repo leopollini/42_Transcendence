@@ -33,9 +33,9 @@ def manage_req(client, server)
 
   puts "object not jsoned :(" if !bobj
 
-	client.puts "HTTP/1.1 200 OK\r\n\r\nYou ashked fors " + bobj["page"].to_s + "!"
-	client.puts bobj
-  puts 
+# 	client.puts "HTTP/1.1 200 OK\r\n\r\nYou ashked fors " + bobj["page"].to_s + "!"
+# 	client.puts bobj
+#   puts 
 
 	if bobj["method"].to_s == "new_user"
 		if bobj["username"] && bobj["password"]
@@ -53,7 +53,12 @@ def manage_req(client, server)
 	end
 
   if bobj["method"] == "exec"
-    puts USR.exec bobj["client_command"] rescue r
+	puts "executing " + bobj["client_command"].to_s
+    res = USR.exec bobj["client_command"].to_s
+	client.puts res.to_json
+	puts res
+	puts res[0]
+	
   end
 end
 
