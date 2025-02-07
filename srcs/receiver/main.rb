@@ -71,5 +71,4 @@ def sorter(client, server)
 end
 
 puts "Starting server at port " + PORT.to_s + "!"
-s = SimpleServer::SimplerTCP.new PORT, :sorter
-s.start_loop
+(SimpleServer::SimplerTCP.new PORT, :sorter).start_loop

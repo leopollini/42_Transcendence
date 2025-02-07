@@ -16,7 +16,10 @@ module Ports
     "" => ["receiver", 8008],
     "add_user" => ["user_manager", 7080],
     "get_user" => ["user_manager", 7080],
-    "update_user" => ["user_manager", 7080]
+    "drop_users" => ["user_manager", 7080],
+    "update_user" => ["user_manager", 7080],
+    "game_manager" => ["game_manager", 7878],
+    "history_manager" => ["history_manager", 7701]
   }
   MAX_MSG_LEN = 100000
 end
@@ -82,7 +85,7 @@ module SimpleServer
             method(@@function).call(client, self)
           # rescue => r
 					# 	puts "Catched: " + r.to_s + "(" + r.class.to_s + ")\n" + r.backtrace.join("\n") if DEBUG_MODE
-          #   client.close if !client.closed?
+            client.close if !client.closed?
           end
           client.close if !client.closed?
           puts "Connection concluded" if DEBUG_MODE
