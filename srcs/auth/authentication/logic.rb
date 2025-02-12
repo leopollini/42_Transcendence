@@ -3,7 +3,6 @@ require 'uri'
 require 'json'
 require 'cgi'
 require 'erb'
-require 'colorize'
 require_relative 'other_logic'
 
 module AuthMethods
@@ -56,7 +55,7 @@ module AuthMethods
       login_name: login_name
     }
     
-    html_content = File.read('./pages_auth/auth_page.html')
+    html_content = File.read('./login_module/auth_page.html')
     erb = ERB.new(html_content)
     html_output = erb.result(binding)
     
