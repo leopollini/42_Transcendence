@@ -2,20 +2,17 @@
 require 'json'
 require 'pg'
 require 'colorize'
-require 'logger'
-#load ((File.file? '/var/common/BetterPG.rb') ? '/var/common/BetterPG.rb' : '../../common_tools/tools/BetterPG.rb')
+load ((File.file? '/var/www/common/BetterPG.rb') ? '/var/www/common/BetterPG.rb' : '../../common_tools/tools/BetterPG.rb')
 
-#LOGIN = BetterPG::SimplePG.new "users", ["login_name TEXT", "name TEXT", "email TEXT", "image TEXT", "bio TEXT", "id INT"]
+LOGIN = BetterPG::SimplePG.new "users", ["login_name TEXT", "name TEXT", "email TEXT", "image TEXT"]
 
 module Other_logic
-
-  def page_not_found(response)
-    response.status = 200
-    html_content = File.read('./pages_auth/no_page.html')
-    response.content_type = 'text/html  '
-    response.write(html_content)
+  def not_found(response)
+    response.status = 404 
+    response.content_type = 'application/json'
+    response.write({ success: false, error: "Not Found" }.to_json)
   end
-  
+
   def get_user_data_from_oauth_provider(token)
     uri = URI("https://api.intra.42.fr/v2/me")
     request = Net::HTTP::Get.new(uri)
@@ -35,7 +32,7 @@ module Other_logic
         email = user_data['email']
         image = user_data['image']['link']
         login_name = user_data['login']
-    #LOGIN.addValues ["'" + login_name.to_s + "'", "'" + name.to_s+ "'" , "'" + email.to_s + "'"], ["login_name", "name", "email"]
+    LOGIN.addValues ["'" + login_name.to_s + "'", "'" + name.to_s+ "'" , "'" + email.to_s + "'"], ["login_name", "name", "email"]
     return { 'login_name' => login_name, 'name' => name, 'email' => email, 'image' => image }
   end
 end

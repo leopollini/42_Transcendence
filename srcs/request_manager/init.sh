@@ -1,7 +1,5 @@
 #!/bin/bash
 
-/var/common/setup_tools.sh
-
 GEMS=("pg" "digest")
 
 for gm in $GEMS
@@ -10,5 +8,9 @@ do
         gem install $gm
     fi
 done
+
+# if [ -z "$(gem list | grep digest)" ]; then
+#     gem install digest
+# fi
 
 ruby main.rb
