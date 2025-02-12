@@ -1,7 +1,5 @@
 #!/bin/bash
 
-/var/common/setup_tools.sh
-
 echo "==============================="
 echo "Controllo installazione di Ruby..."
 if ruby --version &>/dev/null; then
@@ -32,7 +30,7 @@ fi
 cd authentication/
 echo "==============================="
 echo "Aggiornamento delle gemme con Bundler..."
-if bundle update &>/dev/null; then
+if bundle update && &>/dev/null; then
     echo "✅ Aggiornamento completato."
 else
     echo "❌ Errore durante l'aggiornamento delle gemme."
@@ -52,4 +50,4 @@ fi
 echo "==============================="
 echo "Script completato.avvio server..."
 
-ruby server.rb
+bundle exec ruby -v server.rb

@@ -164,38 +164,16 @@ services:
     entrypoint: /var/www/init.sh
     working_dir: /var/www
 
-  game_manager:
-    image: ruby:latest
+  nginx:
+    image: nginx:latest
+    container_name: nginx-server
     restart: always
+    ports:
+      - "8443:443"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./srcs/common_tools/tools:/var/common
-      - ./srcs/game_manager:/var/www
-    depends_on:
-      - postgres
+      - ./srcs/nginx/:/var/www/nginx
+      - ./srcs/auth/public:/usr/share/nginx/html:ro
     networks:
       - app-network
-    env_file:
-      - .env
-    ports:
-      - "7878:7878"
-    entrypoint: /var/www/init.sh
-    working_dir: /var/www
-
-  history_manager:
-    image: ruby:latest
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./srcs/common_tools/tools:/var/common
-      - ./srcs/history_manager:/var/www
-    depends_on:
-      - postgres
-    networks:
-      - app-network
-    env_file:
-      - .env
-    ports:
-      - "7701:7701"
-    entrypoint: /var/www/init.sh
+    entrypoint: bash /var/www/nginx/server.sh
     working_dir: /var/www
