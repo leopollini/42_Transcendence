@@ -28,7 +28,7 @@ module BetterPG
           Timeout.timeout(1) do
             @pg = PG.connect('host=postgres port=5432 password=pwd_postgres user=databaser')
           end
-        rescue StandardError
+        rescue StandardError => r
           @pg = PG.connect('host=' + DEBUG_PG_ADDRESS + ' port=5432 password=pwd_postgres user=databaser') if r.nil?
         end
       end

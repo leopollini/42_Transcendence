@@ -70,11 +70,14 @@ def sorter(client, _server)
     puts msg
     client.puts 'HTTP/1.1 200 OK', 'Connection: close', 'Access-Control-Allow-Origin: *',
                 'Access-Control-Allow-Methods: *', ''
-
+    if method == 'OPTIONS'
+      t = msg[msg.index('Access-Control-Request-Method: ').to_i..]
+      method = t[32, t.index('\r\n').to_i]
+    end
     unless Ports::HASH.include? method
-      client.print "HTTP/1.1 405 Method Not Allowed\r\n\r\nError: Method not allowed\n" unless client.closed?
+      # client.print "HTTP/1.1 405 Method Not Allowed\r\n\r\nError: Method not allowed\n" unless client.closed?
       client.close
-      raise 'Method Not Allowed'
+      raise "Method Not Allowed (#{method})"
     end
     # FastLogger::LogThis.new "Received " + method.to_s + " request from " + client.addr(true)[2].to_s
     SimpleGateway.new method, client, msg # t.to_json
