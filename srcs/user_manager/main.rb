@@ -123,7 +123,7 @@ def user_manager(client, _server)
   msg = client.read_nonblock 10_000
   bobj = RequestUnpacker::Unpacker.new.unpack msg
   puts bobj
-  client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
+  # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
   case bobj['method'].to_s
   when 'add_user'
     res = add_user client, bobj
