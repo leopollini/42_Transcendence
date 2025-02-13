@@ -30,8 +30,8 @@ module BetterPG
           end
         rescue StandardError
           r
+          @pg = PG.connect('host=' + DEBUG_PG_ADDRESS + ' port=5432 password=pwd_postgres user=databaser') if r.nil?
         end
-        @pg = PG.connect('host=' + DEBUG_PG_ADDRESS + ' port=5432 password=pwd_postgres user=databaser') if r.nil?
       end
       @name = name
       puts 'Succesfully connected to database.'
