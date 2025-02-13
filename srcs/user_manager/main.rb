@@ -19,8 +19,10 @@ SERVICE_NAME = 'user_manager'
 PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
-                               ['id INT', 'login_name TEXT', 'name TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-                                'created NUMERIC']
+                               ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
+                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]']
+
+# REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image type]
 
 def add_user(_client, obj = nil)
   puts 'add_user called' if DEBUG_MODE
@@ -29,21 +31,29 @@ def add_user(_client, obj = nil)
   rescue StandardError => e
     max = { 'max' => 0 }
   end
-  data = obj['data']
-  if !data || !data['login_name'] || !data['name'] || !data['email']
-    return { 'status' => 'missing required params',
-             'success' => 'false' }
-  end
+  data = obj # ['data']
+
+  return { 'status' => 'missing realname', 'success' => 'false' } if data['realname'].nil?
 
   begin
-    if (LOGIN.select ['login_name'], [data['login_name']])[0]
+    if (LOGIN.select ['realname'], [data['realname']])[0]
       return { 'status' => 'user with same login_name already in database', 'success' => 'false' }
     end
   rescue StandardError
     e
   end
-  LOGIN.addValues [max['max'].to_i + 1, data['login_name'], data['name'], data['email'], Time.now.to_i.to_s],
-                  %w[id login_name name email created]
+
+  fields = LOGIN.getColumns
+  values = {}
+
+  fields.each do |f|
+    values[f] = data[f] if data[f]
+  end
+  values['id'] = max['max'].to_i
+  puts values
+  LOGIN.addValues values.values, values.keys
+  # LOGIN.addValues [max['max'].to_i + 1, data['login_name'], data['name'], data['email'], Time.now.to_i.to_s],
+  #                 %w[id login_name name email created]
   DEFAULT_SUCCESS_RES
 end
 
@@ -74,8 +84,14 @@ def get_user(_client, obj = nil)
       end
     end
     res = DEFAULT_SUCCESS_RES
-    res['status'] = 'no users found' if lst == []
+    res['status'] = 'no users found' if lst.empty?
     res['user'] = lst
+  end
+  if params.empty?
+    users = LOGIN.select
+    res = DEFAULT_SUCCESS_RES
+    res['status'] = 'no users found' if users.empty?
+    res['user'] = users
   end
   res
 end
@@ -106,8 +122,8 @@ def update_user(_client, obj = nil)
   DEFAULT_SUCCESS_RES
 end
 
-def drop_users(_client, obj = nil)
-  does = obj['reallysure']
+def drop_users(_client, _obj = nil)
+  does = 'yesiam' #obj['reallysure']
   if does.to_s == 'yesiam'
     LOGIN.zeroTable
     return DEFAULT_SUCCESS_RES

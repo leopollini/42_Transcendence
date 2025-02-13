@@ -40,7 +40,7 @@ module BetterPG
     def better_columns(colols)
       res = []
       colols.each do |c|
-        res.append c[0..c.rindex(' ').to_i]
+        res.append c[0..c.rindex(' ').to_i - 1]
       end
       res
     end
