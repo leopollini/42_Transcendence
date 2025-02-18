@@ -100,25 +100,25 @@ def update_user(_client, obj = nil)
   puts 'update_user called' if DEBUG_MODE
   r = nil
   res = DEFAULT_ERROR_RES
-  return res if !obj || !(params = obj['new_params']) || !(lname = obj['login_name'])
-  return { 'status' => 'Invalid login name change request', 'success' => 'false' } if params.include? 'login_name'
+  return res if !obj || !(params = obj['new_params']) || !(lname = obj['display_name'])
+  return { 'status' => 'Invalid login name change request', 'success' => 'false' } if params.include? 'display_name'
 
-  # (LOGIN.select ["login_name"], [lname])[0] rescue r
+  # (LOGIN.select ["display_name"], [lname])[0] rescue r
   usr = begin
-    (LOGIN.select ['login_name'], [lname])[0]
+    (LOGIN.select ['display_name'], [lname])[0]
   rescue StandardError
     r
   end
-  return { 'status' => 'login name not found', 'success' => 'false' } if r || usr.nil?
+  return { 'status' => 'display_name not found', 'success' => 'false' } if r || usr.nil?
 
-  cols = []
+  cols = []display_name
   keys = []
   params.each do |key, val|
     cols.append key.to_s
     keys.append val.to_s
   end
 
-  LOGIN.update cols, keys, "login_name = '" + lname + "'"
+  LOGIN.update cols, keys, "display_name = '" + lname + "'"
   DEFAULT_SUCCESS_RES
 end
 
@@ -151,6 +151,7 @@ def user_manager(client, _server)
     res = drop_users client, bobj
   else
     res['status'] = 'bad method: ' + bobj['method'].to_s
+    puts 'no method called'
     # raise "What the hell"
   end
   client.puts res.to_json

@@ -69,10 +69,12 @@ def announceAddress
 end
 
 module SimpleServer
+  # JSON object (not in string form)
   def self.method_req(method, msg = '', do_close = true)
     raise "Bad method request (#{method})" if Ports::HASH[method].nil?
 
     service = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
+    msg['method'] = method
     service.write msg if msg
     IO.select [service], [], [], 1
     res = service.read_nonblock Ports::MAX_MSG_LEN
