@@ -9,117 +9,152 @@ require 'json'
 
 # load ((File.file? '/var/common/BetterPG.rb') ? '/var/common/BetterPG.rb' : '../common_tools/tools/BetterPG.rb')
 
-Dir["/var/common/*.rb"].each { |file| require file }
+Dir['/var/common/*.rb'].each { |file| require file }
 
-DEFAULT_ERROR_RES = {"status"=>"failed", "success"=>"false"}
-DEFAULT_SUCCESS_RES = {"status"=>"success", "success"=>"true"}
+DEFAULT_ERROR_RES = { 'status' => 'failed', 'success' => 'false' }
+DEFAULT_SUCCESS_RES = { 'status' => 'success', 'success' => 'true' }
 
 $stdout.sync = true
-SERVICE_NAME = "user_manager"
+SERVICE_NAME = 'user_manager'
 PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
-LOGIN = BetterPG::SimplePG.new "users", ["id INT", "login_name TEXT", "name TEXT", "email TEXT", "image TEXT", "bio TEXT", "created NUMERIC"]
+LOGIN = BetterPG::SimplePG.new 'users',
+                               ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
+                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'entered INT', 'type TEXT']
 
-def add_user(client, obj = nil)
-  r = nil
-  puts "add_user called" if DEBUG_MODE
+# REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image type]
+
+def add_user(_client, obj = nil)
+  puts 'add_user called' if DEBUG_MODE
   begin
-    max = (LOGIN.exec "SELECT MAX(id) FROM users")[0]
-  rescue => r
-    max = {"max"=>0}
+    max = (LOGIN.exec 'SELECT MAX(id) FROM users')[0]
+  rescue StandardError => e
+    max = { 'max' => 0 }
   end
-  data = obj["data"]
-  return {"status"=>"missing required params", "success"=>"false"} if !data || !data["login_name"] || !data["name"] || !data["email"]
-  if (LOGIN.select ["login_name"], [data["login_name"]])[0]
-    return {"status"=>"user with same login_name already in database","success"=>"false"}
-  end rescue r
-  LOGIN.addValues [max["max"].to_i + 1, data["login_name"], data["name"], data["email"], (Time.now).to_i.to_s], ["id", "login_name", "name", "email", "created"]
-  return DEFAULT_SUCCESS_RES
+  data = obj # ['data']
+
+  return { 'status' => 'missing realname', 'success' => 'false' } if data['realname'].nil?
+
+  begin
+    if (LOGIN.select ['realname'], [data['realname']])[0]
+      return { 'status' => 'user with same login_name already in database', 'success' => 'false' }
+    end
+  rescue StandardError
+    e
+  end
+
+  fields = LOGIN.getColumns
+  values = {}
+
+  fields.each do |f|
+    values[f] = data[f] if data[f]
+  end
+  values['id'] = max['max'].to_i
+  puts values
+  LOGIN.addValues values.values, values.keys
+  # LOGIN.addValues [max['max'].to_i + 1, data['login_name'], data['name'], data['email'], Time.now.to_i.to_s],
+  #                 %w[id login_name name email created]
+  DEFAULT_SUCCESS_RES
 end
 
-def get_user(client, obj = nil)
-  puts "get_user called" if DEBUG_MODE
+def get_user(_client, obj = nil)
+  puts 'get_user called' if DEBUG_MODE
   res = DEFAULT_ERROR_RES
-  return res if !obj
+  return res unless obj
+
   lst = []
-  res["status"] = "invalid request"
-  params = obj["params"]
-  params = [params] if params.class.to_s == "Hash"
-  if params.class.to_s == "Array"
-    puts "looking for users with " + params.to_s if DEBUG_MODE
-    params.each do | p |
+  res['status'] = 'invalid request'
+  params = obj['params']
+  params = [params] if params.class.to_s == 'Hash'
+  if params.class.to_s == 'Array'
+    puts 'looking for users with ' + params.to_s if DEBUG_MODE
+    params.each do |p|
       cols = []
       keys = []
-      p.each do | key, val |
+      p.each do |key, val|
         return DEFAULT_ERROR_RES if key.nil? || key.empty?
+
         cols.append key.to_s
         keys.append val.to_s
       end
       users = LOGIN.select cols, keys
       users = [] if users == [{}]
-      users.each do | usr |
+      users.each do |usr|
         lst.append usr
       end
     end
     res = DEFAULT_SUCCESS_RES
-    res["status"] = "no users found" if lst == []
-    res["user"] = lst
+    res['status'] = 'no users found' if lst.empty?
+    res['user'] = lst
   end
-  return res
+  if params.empty?
+    users = LOGIN.select
+    res = DEFAULT_SUCCESS_RES
+    res['status'] = 'no users found' if users.empty?
+    res['user'] = users
+  end
+  res
 end
 
-def update_user(client, obj = nil)
-  puts "update_user called" if DEBUG_MODE
+def update_user(_client, obj = nil)
+  puts 'update_user called' if DEBUG_MODE
   r = nil
   res = DEFAULT_ERROR_RES
-  return res if !obj || !(params = obj["new_params"]) || !(lname = obj["login_name"])
-  return {"status"=>"Invalid login name change request", "success"=>"false"} if params.include? "login_name"
+  return res if !obj || !(params = obj['new_params']) || !(lname = obj['login_name'])
+  return { 'status' => 'Invalid login name change request', 'success' => 'false' } if params.include? 'login_name'
+
   # (LOGIN.select ["login_name"], [lname])[0] rescue r
-  usr = (LOGIN.select ["login_name"], [lname])[0] rescue r
-  return {"status"=>"login name not found","success"=>"false"} if r || usr.nil?
-  
+  usr = begin
+    (LOGIN.select ['login_name'], [lname])[0]
+  rescue StandardError
+    r
+  end
+  return { 'status' => 'login name not found', 'success' => 'false' } if r || usr.nil?
+
   cols = []
   keys = []
-  params.each do | key, val |
+  params.each do |key, val|
     cols.append key.to_s
     keys.append val.to_s
   end
 
   LOGIN.update cols, keys, "login_name = '" + lname + "'"
-  return DEFAULT_SUCCESS_RES
+  DEFAULT_SUCCESS_RES
 end
 
-def drop_users(client, obj = nil)
-  r = nil
-  does = obj["reallysure"]
-  if does.to_s == "yesiam"
+def drop_users(_client, _obj = nil)
+  does = 'yesiam' #obj['reallysure']
+  if does.to_s == 'yesiam'
     LOGIN.zeroTable
     return DEFAULT_SUCCESS_RES
   end
-  return DEFAULT_ERROR_RES
+  DEFAULT_ERROR_RES
 end
 
-def user_manager(client, server)
+def user_manager(client, _server)
   res = DEFAULT_ERROR_RES
-  # client.puts "HTTP/1.1 200 OK\r\n\r\n"
-  select [client], [], [], 200 # waits for client, a few seconds
-  msg = client.read_nonblock 10000
+  t = select [client], [], [], 20 # waits for client, a few seconds
+  return if t[0].empty?
+
+  msg = client.read_nonblock 10_000
   bobj = RequestUnpacker::Unpacker.new.unpack msg
-  case bobj["method"].to_s
-  when "add_user"
+  puts bobj
+  # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
+  case bobj['method'].to_s
+  when 'add_user'
     res = add_user client, bobj
-  when "get_user"
+  when 'get_user'
     res = get_user client, bobj
-  when "update_user"
+  when 'update_user'
     res = update_user client, bobj
-  when "drop_users"
+  when 'drop_users'
     res = drop_users client, bobj
   else
-    res["status"] = "bad method: " + bobj["method"].to_s
+    res['status'] = 'bad method: ' + bobj['method'].to_s
     # raise "What the hell"
   end
   client.puts res.to_json
 end
 
-puts "user_manager active at port " + PORT.to_s + "\n"
+puts 'user_manager active at port ' + PORT.to_s + "\n"
 (SimpleServer::SimplerTCP.new PORT, :user_manager).start_loop

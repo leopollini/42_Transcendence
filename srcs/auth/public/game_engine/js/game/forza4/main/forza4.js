@@ -3,6 +3,7 @@ import { token1Color, token2Color, boardBackground, f4matchData, powerUpMode} fr
 import { createGrid } from "../board/forza4_grid.js";
 import { updateTimer, resetTimer } from "../other/forza4_timer.js";
 import { activatePowerup } from "../board/forza4_powerup.js";
+import { current_user, change_name, update_image} from "../../../pages/modes.js";
 
 let backImageButton;
 
@@ -107,16 +108,18 @@ class Forza4Game {
 
     checkPowerups() {
         if (!powerUpMode) {
-            document.getElementById('p1PowerupButton').hidden = true;
-            document.getElementById('p2PowerupButton').hidden = true;
+            document.getElementById('p1PowerupButton').style.display = "none";
+            document.getElementById('p2PowerupButton').style.display = "none";
             
         }
         else
         {
-            this.p1PowerupUsed = false;
-            this.p2PowerupUsed = false;
+            document.getElementById('p1PowerupButton').style.display = "block";
+            document.getElementById('p2PowerupButton').style.display = "block";
             document.getElementById('p1PowerupButton').disabled = false;
             document.getElementById('p2PowerupButton').disabled = false;
+            this.p1PowerupUsed = false;
+            this.p2PowerupUsed = false;
     
             // Aggiungi i listener per i pulsanti dei power-up
             document.getElementById('p1PowerupButton').addEventListener('click', () => activatePowerup(this, 'token1'));

@@ -1,5 +1,6 @@
 import { navigate } from "../../main.js";
-import { current_user, change_name, update_image} from "../modes.js";
+import { current_user} from "../modes.js";
+import { access_denied } from "../../game/pong/main/modes_logic.js";
 export default function Tournament() {
     return `
         <img id="backImageButton" src="../game_engine/images/home.png" alt="Back" class="back-button">
@@ -48,6 +49,8 @@ export default function Tournament() {
 }
 
 export const addTournamentPageHandlers = () => {
+    if (current_user === null)
+        access_denied();
     const knockoutTournament = document.getElementById('knockoutTournament');
     const roundrobinTournament = document.getElementById('roundrobinTournament');
     const userStatisticsButton = document.getElementById('userStatisticsButton');
@@ -62,12 +65,10 @@ export const addTournamentPageHandlers = () => {
     });
 
     userStatisticsButton?.addEventListener('click', () => {
-        navigate("/tournament/userstats", "Userstats");
+            navigate("/tournament/userstats", "Userstats");
     });
 
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");
-        change_name(current_user.display_name);
-        update_image(current_user.image);
     });
 };

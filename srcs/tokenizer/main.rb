@@ -83,6 +83,7 @@ def tokenization(client, server)
   msg = nil
   msg = client.read_nonblock 10000 rescue r
   obj = JSON.parse msg rescue r if msg
+  # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
   if msg && (msg.empty? || msg.to_s == '\n')
     token = {"status"=>"no_body_to_hash", "success"=>"false", "token"=>""}
   elsif !defined?(obj)

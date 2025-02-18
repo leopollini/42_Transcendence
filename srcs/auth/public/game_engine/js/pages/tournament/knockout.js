@@ -1,5 +1,6 @@
 import { navigate } from "../../main.js";
-import { current_user, change_name, update_image} from "../modes.js";
+import { current_user} from "../modes.js";
+import { access_denied } from "../../game/pong/main/modes_logic.js";
 
 export default function Knockout() {
     return `
@@ -44,6 +45,8 @@ export default function Knockout() {
 }
 
 export const addKnockoutPageHandlers = () => {
+    if (current_user === null)
+        access_denied();
     const radioButtons = document.querySelectorAll("input[name='players']");
     const backImageButton = document.getElementById('backImageButton');
     
@@ -62,8 +65,6 @@ export const addKnockoutPageHandlers = () => {
     });
     
     backImageButton?.addEventListener('click', () => {
-        navigate("/modes", "Return to Game Mode");
-        change_name(current_user.display_name);
-        update_image(current_user.image);
+        navigate("/modes", "Return to Game Mode");        
     });
 };

@@ -1,5 +1,6 @@
 import { navigate } from "../../main.js";
-import { current_user, change_name, update_image} from "../modes.js";
+import { current_user} from "../modes.js";
+import { access_denied } from "../../game/pong/main/modes_logic.js";
 
 // Funzione che restituisce la struttura HTML del torneo con un canvas per disegnare il tabellone
 export default function Bracket() {
@@ -249,6 +250,8 @@ export function backToBracket(winner) {
 
 // Aggiunge gli eventi per il pulsante di personalizzazione
 export const addBracketPageHandlers = () => {
+    if (current_user === null)
+        access_denied();
     const backImageButton = document.getElementById('backImageButton');
 
     knockoutMatchButton?.addEventListener('click', () => {
@@ -261,7 +264,5 @@ export const addBracketPageHandlers = () => {
 
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");
-        change_name(current_user.display_name);
-        update_image(current_user.image);
     });
 };
