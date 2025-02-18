@@ -30,11 +30,11 @@ module Other_logic
       return nil
     end
     puts "user_data: #{user_data}".green
-    name = user_data['usual_full_name']
+    realname = user_data['usual_full_name']
     email = user_data['email']
     image = user_data['image']['link']
-    login_name = user_data['login']
-    payload = { name: name, email: email, image: image, login_name: login_name, entered: 1}
+    display_name = user_data['login']
+    payload = { realname: realname, email: email, image: image, display_name: display_name, entered: 1}
 
     SimpleServer.method_req("add_user", payload)
   end

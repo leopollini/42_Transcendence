@@ -75,7 +75,7 @@ module SimpleServer
 
     service = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
     msg['method'] = method
-    service.write msg if msg
+    service.write msg.to_json if msg
     IO.select [service], [], [], 1
     res = service.read_nonblock Ports::MAX_MSG_LEN
     service.close if do_close

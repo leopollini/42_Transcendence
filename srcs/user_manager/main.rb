@@ -37,6 +37,7 @@ def add_user(_client, obj = nil)
 
   begin
     if (LOGIN.select ['realname'], [data['realname']])[0]
+      puts "user already present (#{data['realname']})".red
       return { 'status' => 'user with same login_name already in database', 'success' => 'false' }
     end
   rescue StandardError
@@ -50,7 +51,7 @@ def add_user(_client, obj = nil)
     values[f] = data[f] if data[f]
   end
   values['id'] = max['max'].to_i
-  puts values
+  puts "inserting new user: #{values}"
   LOGIN.addValues values.values, values.keys
   # LOGIN.addValues [max['max'].to_i + 1, data['login_name'], data['name'], data['email'], Time.now.to_i.to_s],
   #                 %w[id login_name name email created]
@@ -89,6 +90,7 @@ def get_user(_client, obj = nil)
   end
   if params.nil? || params.empty?
     users = LOGIN.select
+    # puts "####", users
     res = DEFAULT_SUCCESS_RES
     res['status'] = 'no users found' if users.empty?
     res['user'] = users
