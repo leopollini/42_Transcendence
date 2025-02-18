@@ -164,6 +164,22 @@ services:
     entrypoint: /var/www/init.sh
     working_dir: /var/www
 
+  chat:
+    image: ruby:latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./srcs/common_tools/tools:/var/common
+      - ./srcs/chat:/var/www
+    networks:
+      - app-network
+    env_file:
+      - .env
+    ports:
+      - "6087:6087"
+    entrypoint: /var/www/init.sh
+    working_dir: /var/www
+
   # nginx:
   #   image: nginx:latest
   #   container_name: nginx-server

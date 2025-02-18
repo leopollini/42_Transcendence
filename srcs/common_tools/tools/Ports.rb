@@ -19,7 +19,8 @@ module Ports
     'drop_users' => ['user_manager', 7080],
     'update_user' => ['user_manager', 7080],
     'game_manager' => ['game_manager', 7878],
-    'history_manager' => ['history_manager', 7701]
+    'history_manager' => ['history_manager', 7701],
+    'chat' => ['chat', 6087]
   }
   MAX_MSG_LEN = 100_000
 end
@@ -83,11 +84,11 @@ module SimpleServer
 
   class SimplerTCP
     include FastLogger
-    def initialize(port, funct = nil, logs = false)
+    def initialize(port, funct = nil, close = true)
       announceAddress
       @@server = TCPServer.new port
       @@function = funct
-      @@logs = logs
+      @@close = close
     end
 
     def start_loop
@@ -97,9 +98,9 @@ module SimpleServer
             method(@@function).call(client, self)
             # rescue => r
             # 	puts "Catched: " + r.to_s + "(" + r.class.to_s + ")\n" + r.backtrace.join("\n") if DEBUG_MODE
-            client.close unless client.closed?
+            client.close if @@close && client.closed?
           end
-          client.close unless client.closed?
+          client.close if @@close && client.closed?
           puts 'Connection concluded' if DEBUG_MODE
         end
       end
