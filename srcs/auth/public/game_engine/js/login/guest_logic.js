@@ -1,18 +1,50 @@
 import { navigate } from "../main.js";
-import { Guest } from "./user.js";
-import { update_image, change_name, current_user, updateUserProfile } from "../pages/modes.js";
+import { user, profile} from "./user.js";
+import { update_image, change_name, updateUserProfile } from "../pages/modes.js";
 
-export let guests = JSON.parse(localStorage.getItem('guests')) || [];
-export let currentGuestId = null;
+export let guest = JSON.parse(localStorage.getItem('guest')) || [];
 
-window.addEventListener('storage', (event) => {
-    if (event.key === 'guests') {
-        guests = JSON.parse(localStorage.getItem('guests')) || [];
-    }
+window.addEventListener("beforeunload", () => {
+    localStorage.clear();
 });
 
-export function guest_login() {
-    updateLocalStorage();
+window.addEventListener('storage', (event) => {
+    if (event.key === 'guest')
+        guest = JSON.parse(localStorage.getItem('guest')) || [];
+});
+
+export function user_name(name)
+{
+    console.log("name = " + name);
+    fetch("http://localhost:8008",
+    {
+        method: "get_user",
+        body: '{"params":{"display_name": "name"}}',
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("data = ", data);
+        if (data.status === "no users found" || !data.user || data.user.length === 0)
+        {
+            console.log("hi enter here\n");
+            if (data.user === user)
+                return 0;
+            else
+                return 1
+        }
+    })
+    .catch(error => console.error("Fetch error:", error));
+}
+
+export function guest_login()
+{
+    if (localStorage.getItem("guest") || localStorage.getItem("your_profile"))
+    {
+        alert("user already logged in");
+        return;
+    }
+
+    localStorage.setItem('guest', JSON.stringify(guest));
     let name = prompt("Enter your guest name:");
     if (!name) {
         alert('No name. Please try again');
@@ -28,7 +60,8 @@ export function guest_login() {
         alert('Name too long.');
         return;
     }
-    if (guests.some(guest => guest.name === name)) {
+    if (user_name(name) === 1)
+    {
         alert('Name already taken.');
         return;
     }
@@ -36,62 +69,30 @@ export function guest_login() {
 }
 
 function addGuest(name) {
-    const guestId = generateUniqueId();
-    let newGuest = new Guest("game_engine/images/guest.jpg", name, null, guestId);
-    guests.push(newGuest);
-    currentGuestId = guestId;
-    updateLocalStorage();
-    sessionStorage.setItem('currentGuestId', guestId);
-    updateUIForGuest(newGuest);
-}
-
-function updateUIForGuest(guest) {
+    let curr_guest = new user("game_engine/images/guest.jpg", name, null, null, null);
+    localStorage.setItem('guest', JSON.stringify(curr_guest));
     navigate("/modes", "Modalità di gioco");
-    update_guest(guest);
+    update_guest(curr_guest);
 }
 
-window.addEventListener("beforeunload", () => {
-    const guestId = sessionStorage.getItem('currentGuestId');
-    if (guestId !== null) {
-        removeGuest(guestId);
-        updateLocalStorage();
-        sessionStorage.removeItem('currentGuestId');
-    }
-});
-
-function removeGuest(guestId) {
-    guests = guests.filter(guest => guest.id !== guestId);
-}
-
-function updateLocalStorage() {
-    localStorage.setItem('guests', JSON.stringify(guests));
-}
-
-function generateUniqueId() {
-    return '_' + Math.random().toString(36).slice(2, 11);
-}
-
-function updateGuestDataFromSession() {
-    const guestId = sessionStorage.getItem('currentGuestId');
-    if (guestId)
-    {
-        const guest = guests.find(guest => guest.id === guestId);
-        if (guest)
-            update_guest(guest);
-    }
-}
-
-updateGuestDataFromSession();
-
-
-function update_guest(guest)
+function update_guest(curr_guest)
 {
-    guest.email = null;
-    change_name(guest.name);
-    update_image(guest.image);
-    current_user.image = guest.image;
-    current_user.display_name = guest.name;
-    current_user.type = "guest";
+    change_name(curr_guest.name);
+    update_image(curr_guest.image);
+    let current_user = new profile(
+        null,
+        curr_guest.name,
+        null,
+        curr_guest.bio,
+        curr_guest.image,
+        "guest"
+    );
+    fetch("http://localhost:8008", {method: "add_user", 
+    body: JSON.stringify(current_user)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
     updateUserProfile(current_user);
-
 }

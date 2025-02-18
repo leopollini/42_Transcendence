@@ -20,7 +20,7 @@ PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
                                ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]']
+                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'entered INT', 'type TEXT']
 
 # REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image type]
 
