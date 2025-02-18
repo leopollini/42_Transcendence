@@ -87,7 +87,7 @@ def get_user(_client, obj = nil)
     res['status'] = 'no users found' if lst.empty?
     res['user'] = lst
   end
-  if params.empty?
+  if params.nil? || params.empty?
     users = LOGIN.select
     res = DEFAULT_SUCCESS_RES
     res['status'] = 'no users found' if users.empty?
@@ -111,7 +111,7 @@ def update_user(_client, obj = nil)
   end
   return { 'status' => 'display_name not found', 'success' => 'false' } if r || usr.nil?
 
-  cols = []display_name
+  cols = []
   keys = []
   params.each do |key, val|
     cols.append key.to_s
@@ -123,7 +123,7 @@ def update_user(_client, obj = nil)
 end
 
 def drop_users(_client, _obj = nil)
-  does = 'yesiam' #obj['reallysure']
+  does = 'yesiam' # obj['reallysure']
   if does.to_s == 'yesiam'
     LOGIN.zeroTable
     return DEFAULT_SUCCESS_RES

@@ -79,7 +79,7 @@ module SimpleServer
     IO.select [service], [], [], 1
     res = service.read_nonblock Ports::MAX_MSG_LEN
     service.close if do_close
-    return [service, res] if do_close
+    return [service, res] unless do_close
 
     res
   end
