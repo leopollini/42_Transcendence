@@ -5,8 +5,10 @@ echo "Controllo installazione di Ruby..."
 if ruby --version &>/dev/null; then
     echo "✅ Ruby è già installato."
 else
-    echo "❌ Ruby non è installato. Installare Ruby prima di continuare."
-    exit 1
+    echo "❌ Ruby non è installato. Installazione Ruby..."
+    sudo apt update
+    sudo apt install ruby-full
+    echo "✅ ruby installato correttamente."
 fi
 
 echo "==============================="
@@ -48,11 +50,20 @@ else
 fi
 
 echo "==============================="
+echo "installazione ufw..."
+
+if ufw --version &>/dev/null; then
+    echo "✅ ufw è già installato."
+else
+    echo "❌ ufw non è installato. Installazione ufw..."
+    apt update  
+    apt install -y ufw
+    echo "✅ ufw installato correttamente."
+fi
+
+echo "==============================="
 echo "Script completato. Avvio server..."
 
-#sudo apt update
-#sudo apt install -y ufw
-#
 #IP=$(hostname -I | awk '{print $1}')
 #if [[ -z "$IP" ]]; then
 #    echo "❌ Impossibile rilevare l'indirizzo IP. Verifica la configurazione di rete."
