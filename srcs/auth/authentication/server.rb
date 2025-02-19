@@ -1,6 +1,5 @@
 require 'webrick'
 require 'colorize'
-require 'socket'
 require_relative 'Oauth'
 require_relative 'session'
 require_relative 'error_logger'

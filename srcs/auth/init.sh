@@ -49,14 +49,6 @@ else
 fi
 
 echo "==============================="
-echo "Configurazione del firewall con iptables..."
-
-# Verifica e configura iptables (se non usi ufw)
-iptables -A INPUT -p tcp --dport 9292 -j ACCEPT
-
-echo "Firewall configurato correttamente con iptables."
-
-echo "==============================="
 echo "Installazione ufw..."
 
 if ufw --version &>/dev/null; then

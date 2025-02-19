@@ -122,6 +122,8 @@ services:
       - ./srcs/auth:/var/www
     depends_on:
       - postgres
+    networks:
+      - app-network
     env_file:
       - .env
     ports:

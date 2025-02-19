@@ -14,6 +14,7 @@ module Other_logic
     response.content_type = 'text/html  '
     response.write(html_content)
   end
+
   def get_user_data_from_oauth_provider(token)
     uri = URI("https://api.intra.42.fr/v2/me")
     request = Net::HTTP::Get.new(uri)
@@ -22,20 +23,20 @@ module Other_logic
     response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
       http.request(request)
     end
-
     if response.code.to_i == 200
       user_data = JSON.parse(response.body)
     else
       puts "Errore API 42: #{response.code}"
       return nil
     end
-    puts "user_data: #{user_data}".green
     realname = user_data['usual_full_name']
     email = user_data['email']
     image = user_data['image']['link']
     display_name = user_data['login']
     payload = { realname: realname, email: email, image: image, display_name: display_name, entered: 1}
+    puts "finished with user data".green
 
     SimpleServer.method_req("add_user", payload)
+    puts "proseguing login".green
   end
 end

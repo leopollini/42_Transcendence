@@ -99,12 +99,6 @@ function get_data()
     .catch(error => console.error("Errore nel fetch:", error));
 }
 
-function logging(authData)
-{
-    const popup = window.open(authData.auth_url, 'Login', 'width=800,height=800');
-    popupHandling(popup);
-}
-
 export function performLogin()
 {
     if (!checkLoginRestrictions())
@@ -112,7 +106,8 @@ export function performLogin()
     fetch('/auth/login')
     .then(response => response.json())
     .then(data => {
-        logging(data);
+        const popup = window.open(data.auth_url, 'Login', 'width=800,height=800');
+        popupHandling(popup);
     })
     .catch(error => {
         console.error("Errore di rete:", error);
