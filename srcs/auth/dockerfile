@@ -3,11 +3,12 @@ FROM ruby:latest
 RUN apt-get update -y && \
     apt-get install -y \
     lsof \
+    apt-get update && apt-get install -y sudo \
     build-essential \
     libpq-dev \
-    nodejs \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 ENV TERM xterm-256color
 
