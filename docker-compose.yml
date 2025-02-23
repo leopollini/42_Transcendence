@@ -180,6 +180,24 @@ services:
     entrypoint: /var/www/init.sh
     working_dir: /var/www
 
+  game_data_manager:
+    image: ruby:latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./srcs/common_tools/tools:/var/common
+      - ./srcs/game_data_manager:/var/www
+    depends_on:
+      - user_manager
+    networks:
+      - app-network
+    env_file:
+      - .env
+    ports:
+      - "8790:8790"
+    entrypoint: /var/www/init.sh
+    working_dir: /var/www
+
   # nginx:
   #   image: nginx:latest
   #   container_name: nginx-server
