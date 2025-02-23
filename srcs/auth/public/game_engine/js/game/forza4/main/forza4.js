@@ -1,46 +1,37 @@
 import { navigate } from "../../../main.js";
 import { token1Color, token2Color, boardBackground, f4matchData, powerUpMode} from "../data/forza4_game_global.js";
-import { createGrid } from "../board/forza4_grid.js";
+import { createGrid, redrawGrid } from "../board/forza4_grid.js";
 import { updateTimer, resetTimer } from "../other/forza4_timer.js";
 import { activatePowerup } from "../board/forza4_powerup.js";
-import { current_user, change_name, update_image} from "../../../pages/modes.js";
 
 let backImageButton;
 
+
 export function Forza4() {
-    return `
-        <div id="forza4Game">
-            <h1>Forza 4</h1>
+        return `
+            <div id="forza4Game">
             <div id="f4players">
                 <div id="p1" class="f4player-info">
-                    <span class="name" id="p1Name"></span>&nbsp<span class="color token1" id="p1Color"></span>   
+                    <span class="f4-name" id="p1Name"></span>&nbsp;<span class="f4-token color token1" id="p1Color"></span>   
                 </div>
-                <button id="p1PowerupButton" class="button-style" disabled>Power-up</button>
+                <button id="p1PowerupButton" class="f4-button-style" disabled>Power-up</button>
                 <div id="p2" class="f4player-info">
-                    <span class="name" id="p2Name"></span>&nbsp<span class="color token2" id="p2Color"></span>  
+                    <span class="f4-name" id="p2Name"></span>&nbsp;<span class="f4-token color token2" id="p2Color"></span>  
                 </div>
-                <button id="p2PowerupButton" class="button-style" disabled>Power-up</button>            </div>
-            <div id="f4powerupinfo" style="color: #fff; margin-top: 10px; font-size: 30px; font-family: 'Liberty';"></div>
-            <div id="f4timer" style="color: #fff; margin-top: 10px; font-size: 30px; font-family: 'Liberty';">00:00</div>
+                <button id="p2PowerupButton" class="f4-button-style" disabled>Power-up</button>
+            </div>
+            <div id="f4powerupinfo"></div>
+            <div id="f4timer">00:00</div>
             <div id="f4grid-container">
                 <div id="f4board"></div> <!-- Griglia di gioco -->
             </div>
-            <div id="f4message" style="color: #fff; margin-top: 10px; font-size: 30px; font-family: 'Liberty';"></div>
-            <button id="f4BackToMenuButton" class="button-style" style="display: none; margin: 20px auto;">Back to Menu</button>
+            <div id="f4message"></div>
+            <button id="f4BackToMenuButton" class="button-style">Back to Menu</button>
         </div>
         <div class="avatar-container">
             <img id="backImageButton" src="../game_engine/images/home.png" alt="Back" class="back-button">
         </div>
-        <style>
-            
-
-        .button-style:disabled {
-            color: #054d3e;
-            border: 2px solid #054d3e;
-            cursor: not-allowed;
-        }
-        </style>
-    `;
+        `;
 }
 
 export function startForza4Game() {
@@ -131,16 +122,28 @@ class Forza4Game {
 
     addEventListeners() {
         f4BackToMenuButton.addEventListener('click', (event) => {
+            document.getElementById("app").style.background = 
+            "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
             resetTimer(this);
             navigate("/forza4", "Forza 4 Home");
         });
     
         backImageButton?.addEventListener('click', () => {
+             document.getElementById("app").style.background = 
+    "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
             resetTimer(this);
             navigate("/modes", "Return to Game Mode");
         });
         window.addEventListener("popstate", (event) => {
+            document.getElementById("app").style.background = 
+            "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
            resetTimer(this);
+        });
+        
+        // Ricalcola la griglia al ridimensionamento della finestra
+        window.addEventListener('resize', () => {
+            createGrid(this);
+            redrawGrid(this, this.rows, this.cols);
         });
     }
 }

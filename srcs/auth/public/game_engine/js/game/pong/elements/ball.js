@@ -19,7 +19,7 @@ export class Ball {
         this.trailColor = trailColor;
         this.maxAngle = Math.PI / 4;
         this.trail = [];
-        this.trailLength = 1;
+        this.trailLength = 0;
         this.hits = 0;
         this.hide = false;
         this.out = false;
@@ -76,7 +76,7 @@ export class Ball {
         }
     }
     
-    update(game, paddle1, paddle2, powerup, wallThickness) {
+    /*update(game, paddle1, paddle2, powerup, wallThickness) {
         let relativeY;
         let bounceAngle;
 
@@ -99,7 +99,7 @@ export class Ball {
         }
 
         //Wall up
-        else if(this.y - this.radius < wallThickness) {
+        else if (this.y - this.radius < wallThickness) {
             this.y = wallThickness + this.radius;
             this.speedY *= -1;
             addParticles(game, this.x, this.y, 30);
@@ -127,7 +127,7 @@ export class Ball {
             this.hits++;
             relativeY = (this.y - (paddle2.y + paddle2.height / 2)) / (paddle2.height / 2)
             bounceAngle = relativeY * this.maxAngle;
-            console.log("bounceAngle: " + bounceAngle);
+            //console.log("bounceAngle: " + bounceAngle);
             this.speedY = Math.sin(bounceAngle) * Math.abs(this.speedX)
             addParticles(game, this.x, this.y, 20);
             if (Math.abs(this.speedX) < this.maxSpeed) {
@@ -175,6 +175,88 @@ export class Ball {
         }
 
 
+    }*/
+
+    update(game, paddle1, paddle2, powerup, wallThickness) {
+        const canvasWidth = this.canvas.width;
+        const canvasHeight = this.canvas.height;
+    
+        if (game.deltaTime > 0.1) return;
+    
+        this.x += this.speedX * game.deltaTime;
+        this.y += this.speedY * game.deltaTime;
+
+         //this.trail.push({ x: this.x, y: this.y }); // Save ball trail position
+        //if (this.trail.length > this.trailLength) this.trail.shift(); // Remove old trail positions
+    
+        // Wall collisions
+        if (this.y + this.radius > canvasHeight - wallThickness) {
+            this.y = canvasHeight - wallThickness - this.radius;
+            this.speedY *= -1;
+            addParticles(game, this.x, this.y, 10);
+        } else if (this.y - this.radius < wallThickness) {
+            this.y = wallThickness + this.radius;
+            this.speedY *= -1;
+            addParticles(game, this.x, this.y, 10);
+        }
+    
+        // Paddle collisions
+        if (this.collidesWith(paddle1)) {
+            this.x = paddle1.x + paddle1.width + this.radius;
+            this.speedX *= -1;
+            this.hits++;
+            const relativeY = (this.y - (paddle1.y + paddle1.height / 2)) / (paddle1.height / 2);
+            const bounceAngle = relativeY * this.maxAngle;
+            this.speedY = Math.sin(bounceAngle) * Math.abs(this.speedX);
+            addParticles(game, this.x, this.y, 20);
+            if (Math.abs(this.speedX) < this.maxSpeed) {
+                this.speedX *= (1 + this.speedIncreaseFactor);
+                this.speedY *= (1 + this.speedIncreaseFactor);
+            }
+        } else if (this.collidesWith(paddle2)) {
+            this.x = paddle2.x - this.radius;
+            this.speedX *= -1;
+            this.hits++;
+            const relativeY = (this.y - (paddle2.y + paddle2.height / 2)) / (paddle2.height / 2);
+            const bounceAngle = relativeY * this.maxAngle;
+            this.speedY = Math.sin(bounceAngle) * Math.abs(this.speedX);
+            addParticles(game, this.x, this.y, 20);
+            if (Math.abs(this.speedX) < this.maxSpeed) {
+                this.speedX *= (1 + this.speedIncreaseFactor);
+                this.speedY *= (1 + this.speedIncreaseFactor);
+            }
+        }
+    
+        // Power-up collision
+        if (powerup && this.collidesWith(powerup)) {
+            game.powerup.splice(0, 1);
+            game.powerUpTimerStarted = false;
+            if (powerup.type === "shrinker") {
+                if (this.speedX < 0) paddle1.shrink(); else paddle2.shrink();
+                setTimeout(() => {
+                    paddle1.reset();
+                    paddle2.reset();
+                }, 5000);
+            } else if (powerup.type === "invisible") {
+                this.hide = true;
+                setTimeout(() => this.hide = false, 1500);
+            } else if (powerup.type === "teleport") {
+                this.prevSpeedX = this.speedX;
+                this.prevSpeedY = this.speedY;
+                this.y = this.respawnToRandomPos(50, canvasHeight - 50);
+                if (this.speedX > 0) {
+                    this.x = this.respawnToRandomPos(canvasWidth / 1.5, canvasWidth / 1.3);
+                } else {
+                    this.x = this.respawnToRandomPos(canvasWidth / 3, canvasWidth / 3.3);
+                }
+                this.speedX = 0;
+                this.speedY = 0;
+                setTimeout(() => {
+                    this.speedX = this.prevSpeedX;
+                    this.speedY = this.prevSpeedY;
+                }, 1500);
+            }
+        }
     }
 
     respawnToRandomPos(min, max) {
@@ -222,12 +304,14 @@ export class Ball {
     }
 
     collidesWith(object) {
-            return (
-                this.x - this.radius < object.x + object.width &&
-                this.x + this.radius > object.x &&
-                this.y + this.radius > object.y &&
-                this.y - this.radius < object.y + object.height
-            );
+        const objectRight = object.x + object.width;
+        const objectBottom = object.y + object.height;
+        return (
+            this.x - this.radius < objectRight &&
+            this.x + this.radius > object.x &&
+            this.y + this.radius > object.y &&
+            this.y - this.radius < objectBottom
+        );
     }
 
     reset(scorer) {
@@ -236,10 +320,9 @@ export class Ball {
         this.y = this.canvas.height / 2; 
         this.hits = 0;
         bounceAngle = Math.random() * 0.5;
-        console.log("scorer: " + scorer);
-        
+
         this.speedX = (Math.abs(this.canvas.width * this.speedPercentage) * (scorer === 1 ? 1 : -1));
         this.speedY = Math.sin(bounceAngle) * Math.abs(this.speedX);
         //this.speedY = (Math.random() * - 1);
-    }
+    }   
 }

@@ -1,3 +1,5 @@
+import { redrawGrid } from "./forza4_grid.js";
+
 export function activatePowerup(game, player) {
     if (game.gameEnded) return;
 
@@ -48,7 +50,11 @@ export function activatePowerup(game, player) {
             // Elimina la pedina
             game.board[row][col] = null;
             if (row > 0)
+            {
                 moveDownUpperTokens(game, row, col);
+                redrawGrid(game, game.rows, game.cols);
+            }
+                
             const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
             cell.style.backgroundColor = 'rgba(240, 240, 240, 0.5)'; // Ripristina il colore della cella
             

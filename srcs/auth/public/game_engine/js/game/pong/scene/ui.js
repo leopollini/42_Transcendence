@@ -1,20 +1,27 @@
 import { updateTimer } from '../other/timer.js';
 import { matchData } from '../data/game_global.js';
+
 export class UI {
     constructor(p1, p2, canvas, ctx) {
         this.player1Name = p1;
         this.player2Name = p2;
         this.canvas = canvas;
         this.ctx = ctx;
-        this.originalFontSize = 50;
-        this.fontSize = (this.originalFontSize / 1600) * this.canvas.width;
+        this.originalFontSize = 80;
+        // Usa il minimo tra larghezza e altezza per il calcolo del font size
+        this.fontSize = (this.originalFontSize / 1600) * Math.min(this.canvas.width, this.canvas.height);
         this.isCountingDown = false;
         this.countdownValue = 3;
     }
 
     updateFontSize() {
-        this.fontSize = (this.originalFontSize / 1600) * this.canvas.width;
+        // Usa il minimo tra larghezza e altezza per il calcolo del font size
+        this.fontSize = (this.originalFontSize / 1600) * Math.min(this.canvas.width, this.canvas.height);
         this.ctx.font = `${this.fontSize}px Liberty`;
+    }
+
+    getTextHeight() {
+        return this.fontSize * 1.2; 
     }
 
     render(pong, scoreP1, scoreP2) {
@@ -23,7 +30,7 @@ export class UI {
     
         const player1X = this.canvas.width * 0.05; // 5% from left
         const player2X = this.canvas.width * 0.95 - (this.ctx.measureText(this.player2Name).width); // 5% from right
-        const scoreY = this.canvas.height * 0.08 + 10; // 10% from top
+        const scoreY = (this.canvas.height * 0.07) + this.getTextHeight() / 2; // 10% from top
     
         // Draw scores
         this.ctx.fillText(scoreP1, this.canvas.width * 0.4, scoreY); 
@@ -36,18 +43,23 @@ export class UI {
         this.ctx.fillStyle = '#02BFB9';
         // Draw pause message
         if (pong.gamePaused && !pong.gameEnd && !pong.backToGameTimer) {
-            this.ctx.fillText("GAME PAUSED", this.canvas.width / 2 - (this.fontSize * 3.4), this.canvas.height / 2);
+            const pauseText = "GAME PAUSED";
+            const pauseTextWidth = this.ctx.measureText(pauseText).width;
+            const pauseTextY = this.canvas.height / 2 + this.getTextHeight() / 2; // Centred
+            this.ctx.fillText(pauseText, (this.canvas.width - pauseTextWidth) / 2, pauseTextY);
         }
         else if (pong.backToGameTimer && !pong.gameEnd) {
             // Show countdown
-            this.ctx.fillText(this.countdownValue, this.canvas.width / 2, this.canvas.height / 2);
+            const countdownText = this.countdownValue.toString();
+            const countdownTextWidth = this.ctx.measureText(countdownText).width;
+            const countdownTextY = this.canvas.height / 2 + this.getTextHeight() / 2; // Centred
+            this.ctx.fillText(countdownText, (this.canvas.width - countdownTextWidth) / 2, countdownTextY);
         }
         else if (pong.gameEnd) {
-            if (scoreP1 > scoreP2) {
-                this.ctx.fillText(this.player1Name + " WIN!", this.canvas.width / 2 - (this.fontSize * 3.4), this.canvas.height / 2);
-            } else {
-                this.ctx.fillText(this.player2Name + " WIN!", this.canvas.width / 2 - (this.fontSize * 3.4), this.canvas.height / 2);
-            }
+            const winnerText = scoreP1 > scoreP2 ? this.player1Name + " WIN!" : this.player2Name + " WIN!";
+            const winnerTextWidth = this.ctx.measureText(winnerText).width;
+            const winnerTextY = this.canvas.height / 2 + this.getTextHeight() / 2; // Centred
+            this.ctx.fillText(winnerText, (this.canvas.width - winnerTextWidth) / 2, winnerTextY);
         }
     }     
 

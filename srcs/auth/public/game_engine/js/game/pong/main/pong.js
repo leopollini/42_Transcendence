@@ -30,9 +30,7 @@ export function startPongGame(matchPlayers, gameMode) {
     backToMenuButton = document.getElementById('backToMenuButton');
     
     // Hide the buttons when the game starts
-    if (!backToBracketButton && !backToRobinButton && !backToMenuButton)
-        return ;
-    backToBracketButton.hidden = true;
+    backToBracketButton.hidden = true; 
     backToRobinButton.hidden = true;
     backToMenuButton.hidden = true;
     
@@ -79,7 +77,7 @@ export class PongGame {
         this.ball = new Ball(this.canvas, this.ctx, this.canvas.width / 2, this.canvas.height / 2, ballColor, ballTrailColor);
         this.paddle1 = new Paddle(this.canvas, this.wallThickness + 20, 'w', 's', paddleColor);
         this.paddle2 = new Paddle(this.canvas ,this.canvas.width - this.wallThickness - 20, 'ArrowUp', 'ArrowDown', paddleColor);
-        this.particlePool = new ParticlePool(this, 100);
+        this.particlePool = new ParticlePool(this, 20);
         this.ui = new UI(this.p1Name, this.p2Name, this.canvas, this.ctx);
         this.screenShake = new ScreenShake();
         
@@ -101,7 +99,7 @@ export class PongGame {
         this.newCanvasWidth = 0;
         this.newCanvasHeight = 0;
         
-        this.starsNumber = 100;
+        this.starsNumber = 30;
         createStarsBackground(this, this.starsNumber);
         this.addEventListeners();
         //this.renderBackground();
@@ -118,7 +116,6 @@ export class PongGame {
             const now = performance.now();
             this.deltaTime = (now - this.lastTime) / 1000; // Converti in secondi
             this.lastTime = now;
-
             this.update();
             this.render();
             requestAnimationFrame(() => this.loop());
@@ -139,7 +136,7 @@ export class PongGame {
             else
                 this.paddle2.update(this);
             updateParticles(this);
-            this.screenShake.update();
+            //this.screenShake.update();
             this.ball.checkPosition(this);
             if (powerUpActive) 
                 handlePowerups(this);
@@ -191,15 +188,23 @@ export class PongGame {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.wallThickness = this.canvas.width * 0.008;
+    
         renderBackground(this);
-        if (this.ball != null)
+    
+        // Controlla se gli oggetti esistono prima di chiamare il metodo resize
+        if (this.ball) 
             this.ball.resize(this);
-        this.paddle1.resize(this);
-        this.paddle2.resize(this);
-        this.ui.resize(this, this.ui.scoreP1, this.ui.scoreP2);
+        if (this.paddle1) 
+            this.paddle1.resize(this);
+        if (this.paddle2)
+            this.paddle2.resize(this);
+        if (this.ui) 
+            this.ui.resize(this, this.ui.scoreP1, this.ui.scoreP2);
+    
         this.stars = [];
         createStarsBackground(this, this.starsNumber);
-        this.ui.render(this, this.scoreP1, this.scoreP2); 
+        // if (this.ui)
+        //     this.ui.render(this, this.scoreP1, this.scoreP2);
     }
 
     stop() {
@@ -228,7 +233,8 @@ export class PongGame {
         this.particlePool = null;
     
         cancelAnimationFrame(this.animationFrameId);
-        document.getElementById('gameCanvas').remove();
+        if (document.getElementById('gameCanvas'))  
+            document.getElementById('gameCanvas').remove();
     }
 
     addEventListeners() {
@@ -283,7 +289,8 @@ export class PongGame {
 
         window.addEventListener('resize', () => this.resize());
         window.addEventListener("popstate", (event) => {
-            clearInterval(matchData.timer);
+            //clearInterval(matchData.timer);
+            this.destroy();
         });
     } 
 }

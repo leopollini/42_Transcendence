@@ -113,7 +113,6 @@ export class Paddle {
         }
     }
     
-
     render(ctx) {
         ctx.fillStyle = this.color;
         this.drawRoundedRect(ctx);
