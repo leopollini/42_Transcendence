@@ -8,7 +8,8 @@
 @import url('game-section/game-customization.css');
 @import url('game-section/forza4_statistics.css');
 @import url('backTomenu.css');
-@import url('user-profile.css');
+@import url('profile-menu.css');
+@import url('profile.css');
 
 
 * {
@@ -38,7 +39,7 @@ body {
     user-select: none;
     position: relative;
     background: 
-        linear-gradient(35deg, #b97070, #134946),
+        linear-gradient(35deg, #491f1f, #134946),
         radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%);
     background-size: cover;
 }
