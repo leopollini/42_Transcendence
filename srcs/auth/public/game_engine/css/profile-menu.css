@@ -4,19 +4,19 @@
     right: 2%;
     cursor: pointer;
     z-index: 500;
-    display: inline-block;
-    width: clamp(30px, 4vw, 50px);
+    display: flex;         
+    align-items: center;
+    gap: 0.8rem;
 }
 
 #avatarName {
-    position: absolute;
     font-family: 'Liberty', sans-serif;
-    right: 99px;
-    top: 57px;
-    font-size: 25px;
+    font-size: clamp(15px, 2vw, 25px);
     color: #09a09b;
-    text-shadow: 0 0 5px rgba(9, 160, 155, 0.5), 0 0 10px rgba(9, 160, 155, 0.3), 0 0 15px #014C4A;
-    z-index: 8;
+    text-shadow: 0 0 5px rgba(9, 160, 155, 0.5),
+                    0 0 10px rgba(9, 160, 155, 0.3),
+                    0 0 15px #014C4A;
+    position: relative;
 }
 
 .avatar-image {
