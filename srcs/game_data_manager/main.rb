@@ -35,7 +35,8 @@ def save_pong(obj)
   obj['winner'] = obj['player1'] if obj['score1'].to_i > obj['score2'].to_i
   obj['winner'] = obj['player2'] if obj['score1'].to_i < obj['score2'].to_i
   obj['winner'] ||= 'tie'
-  obj['duration'] = Time.now.to_i - obj['begin_time'].to_i
+  # obj['duration'] = Time.now.to_i - obj['begin_time'].to_i
+  obj['duration'] = obj['begin_time']
   obj = obj.slice(*(obj.keys & GAMES_PONG.getColumns))
   GAMES_PONG.addValues obj.values, obj.keys
 
@@ -53,7 +54,8 @@ end
 def save_f4(obj)
   puts 'save_f4 called'
   return {'status' => 'missing game params', 'success' => 'false'} unless (%w[player1 player2 winner moves begin_time] - obj.keys).empty?
-  obj['duration'] = Time.now.to_i - obj['begin_time'].to_i
+  # obj['duration'] = Time.now.to_i - obj['begin_time'].to_i
+  obj['duration'] = obj['begin_time']
   obj = obj.slice(*(obj.keys & GAMES_F4.getColumns))
   GAMES_F4.addValues obj.values, obj.keys
 
@@ -85,7 +87,7 @@ def game_data_manager(client, _server)
     get_pong bobj
   when 'save_pong_game'
     save_pong bobj
-  when 'get_f4_game'
+  when 'get_f4_games'
     get_f4 bobj
   when 'save_f4_game'
     save_f4 bobj

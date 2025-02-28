@@ -100,6 +100,7 @@ export class PongGame {
         this.newCanvasHeight = 0;
         
         this.starsNumber = 30;
+        //this.beginTime = new Date().getTime();
         createStarsBackground(this, this.starsNumber);
         this.addEventListeners();
         //this.renderBackground();
