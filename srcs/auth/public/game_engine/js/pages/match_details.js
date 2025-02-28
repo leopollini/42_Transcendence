@@ -23,18 +23,7 @@ export default function MatchDetails() {
         <div id="matchDetailsContainer">
         </div>
     </div>
-
-        <style>
-            #matchDetailsContainer {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                color: #fff;
-                font-family: "Liberty", sans-serif;
-                margin-top: 2px;
-            }
-        </style>
+    
     `;
 }
 
