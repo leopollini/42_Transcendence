@@ -1,4 +1,4 @@
-CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager game_manager history_manager nginx chat
+CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager history_manager nginx chat game_data_manager
 
 # ========================================= #
 SHELL:=/bin/bash
@@ -63,5 +63,8 @@ clean:
 	# @docker network ls -q | awk '!$(echo bridge|host|none) {print}' | xargs -r docker network rm
 	# Destroy all directories
 	rm -rf /data/wordpress
+
+clean_imgs:
+	@docker images -qa | xargs -r docker rmi -f
 
 .PHONY: all stop_containers down re clean remove_all
