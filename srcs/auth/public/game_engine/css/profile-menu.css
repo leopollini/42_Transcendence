@@ -12,10 +12,8 @@
 #avatarName {
     font-family: 'Liberty', sans-serif;
     font-size: clamp(15px, 2vw, 25px);
-    color: #09a09b;
-    text-shadow: 0 0 5px rgba(9, 160, 155, 0.5),
-                    0 0 10px rgba(9, 160, 155, 0.3),
-                    0 0 15px #014C4A;
+    color: #ffffff;
+    text-shadow: 0 0 5px rgb(255 255 255 / 50%), 0 0 10px rgb(255 255 255 / 30%), 0 0 15px #ffffff;
     position: relative;
 }
 
@@ -74,7 +72,7 @@
 }
 
 .menu-item:hover {
-    background-color: #FF590D;
+    background-color: #ffffff;
 }
 
 .menu-item:nth-child(1) {

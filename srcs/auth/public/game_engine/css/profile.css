@@ -81,7 +81,7 @@
     text-align: center;
     margin-bottom: var(--spacing-medium);
     font-size: 1.8rem;
-    color: var(--primary-color);
+    color: #ffffff;
 }
 
 /* Campi del form con spaziatura e margini interni */
@@ -96,7 +96,7 @@
 .form-group label {
     font-weight: bold;
     font-size: 1rem;
-    color: var(--primary-color);
+    color: #ffffff;
 }
 
 .input-field {

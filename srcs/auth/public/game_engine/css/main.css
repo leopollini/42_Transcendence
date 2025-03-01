@@ -10,6 +10,14 @@
 @import url('backTomenu.css');
 @import url('profile-menu.css');
 @import url('profile.css');
+@import url("live-chat/reset.css");
+@import url("live-chat/variables.css");
+@import url("live-chat/layout.css");
+@import url("live-chat/chat.css");
+@import url("live-chat/mini-profile.css");
+@import url("live-chat/context.css");
+@import url("live-chat/responsive.css");
+@import url("live-chat/friends.css");
 
 
 * {
@@ -20,6 +28,7 @@ html, body {
     text-align: center;
     height: 100%;
     margin: 0;
+    font-family: 'Liberty', sans-serif;
 }
 
 body {
