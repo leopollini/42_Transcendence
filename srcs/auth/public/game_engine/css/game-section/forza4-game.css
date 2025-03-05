@@ -14,15 +14,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    margin: 0.5vw;
 }
 
 .f4player-info {
     display: flex;
     align-items: center;
     gap: 5px;
-    font-size: 20px;
+    font-size: 3vh;
     font-weight: bold;
 }
 
@@ -31,8 +30,8 @@
 }
 
 .f4-token {
-    width: 20px;
-    height: 20px;
+    width: 2vw;
+    height: 2vw;
     display: inline-block;
     border-radius: 50%;
 }
@@ -50,8 +49,8 @@
 /* Informazioni di gioco */
 #f4powerupinfo, #f4timer, #f4message {
     color: #fff;
-    margin-top: 10px;
-    font-size: 30px;
+    margin-top: 1vh;
+    font-size: 2vw;
     font-family: 'Liberty', sans-serif;
     text-align: center;
 }
@@ -60,7 +59,9 @@
 #f4grid-container {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 2vh;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 
@@ -68,15 +69,24 @@
 /* Pulsante per tornare al menu */
 #f4BackToMenuButton {
     display: none;
-    margin: 20px auto;
+    margin: 1vh;
+    width: 2vh;
+    height: 2vh;
 }
 
+
+#backImageButton {
+    position: absolute;
+    margin: 0.2vw;
+    width: 3vw;
+    height: 3vw;
+}
 
 /* Pulsanti power-up*/
 
 .f4-button-style {
     font-family: 'Liberty', sans-serif;
-    font-size: clamp(0.8rem, 1.4vw + 0.5rem, 1.3rem);
+    font-size: 2.5vh;
     padding: 0.75em 1.5em;
     color: #0fffcf;
     background-color: transparent;
@@ -86,7 +96,8 @@
     transition: all 0.4s ease-in-out;
     outline: none;
     margin: 12px;
-    width: clamp(160px, 18vw, 240px);
+    width: 16vw;
+    height: 8vh;
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
     display: inline-flex;
     justify-content: center;

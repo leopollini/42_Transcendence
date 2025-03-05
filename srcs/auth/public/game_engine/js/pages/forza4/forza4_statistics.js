@@ -1,5 +1,6 @@
 import { navigate } from "../../main.js";
 import { userName } from "../user_data.js";
+import { formatTime } from "../../game/pong/other/timer.js";
 import { current_user, change_name, update_image} from "../modes.js";
 
 let wins = 0;
@@ -43,6 +44,10 @@ export function Forza4UserStats() {
                         <div class="stat-item">
                             <dt>Total matches played:</dt>
                             <dd id="totalMatches" aria-live="polite">-</dd>
+                        </div>
+                         <div class="stat-item">
+                            <dt>Points:</dt>
+                            <dd id="points" aria-live="polite">-</dd>
                         </div>
                         <div class="stat-item">
                             <dt>Wins:</dt>
@@ -129,15 +134,19 @@ async function forza4CalculateUserStatistics() {
     const totalTies = ties || 0;
 
     // Calcola la vittoria rate (percentuale di vittorie)
-    const victoryRate = totalMatches > 0 ? ((totalWins / totalMatches) * 100).toFixed(2) + "%" : "0%";
+    const victoryRate = totalMatches > 0 ? ((totalWins / totalMatches) * 100).toFixed(2) : 0;
+
+    const rankPoints = totalMatches + (totalWins * 10) - (totalLosses * 5);
+    if (rankPoints < 0)
+        rankPoints = 0;
 
     // Calcola la media delle mosse per partita
-    const averageMoves = totalMatches > 0 ? (totalMoves / totalMatches).toFixed(2) : 0;
+    const averageMoves = totalMatches > 0 ? (totalMoves / totalMatches).toFixed(1) : 0;
 
 
     
     console.log("total time = " +totalTime);
-    const averageTime = totalMatches > 0 ? (totalTime / totalMatches).toFixed(2) + " seconds" : "0 seconds";
+    const averageTime = totalMatches > 0 ? (totalTime / totalMatches).toFixed(2) : 0;
     console.log("average time = " + averageTime);
 
     return {
@@ -146,6 +155,7 @@ async function forza4CalculateUserStatistics() {
         totalLosses,
         totalTies,
         victoryRate,
+        rankPoints,
         averageMoves,
         averageTime,
     };
@@ -167,9 +177,10 @@ export async function forza4ShowUserStatistics() {
     document.getElementById('totalWins').textContent = stats.totalWins;
     document.getElementById('totalLosses').textContent = stats.totalLosses;
     document.getElementById('totalTies').textContent = stats.totalTies;
-    document.getElementById('victoryRate').textContent = stats.victoryRate;
+    document.getElementById('victoryRate').textContent = stats.victoryRate + '%';
     document.getElementById('averageMoves').textContent = stats.averageMoves;
-    document.getElementById('averageTime').textContent = stats.averageTime;
+    document.getElementById('averageTime').textContent = formatTime(stats.averageTime);
+    document.getElementById('points').textContent = stats.rankPoints; 
 
 }
 
@@ -200,6 +211,7 @@ export function addForza4StatsPageHandlers() {
 
 export function forza4ShowMatchDetails() {
     const f4MatchDetailsContainer = document.getElementById("f4MatchDetailsContainer");
+    
     f4MatchDetailsContainer.innerHTML = "";
     
 
@@ -207,8 +219,23 @@ export function forza4ShowMatchDetails() {
         userData.forEach(match => {
             const opponent = match.player1 === userName ? match.player2 : match.player1;
             const isWinner = match.winner === userName;
-            const resultText = isWinner ? "Victory" : "Defeat";
-            const resultClass = isWinner ? "win" : "loss";
+            let resultText;
+            let resultClass;
+
+            let isTie = false;
+            if (match.winner === 'tie')
+            {
+                isTie = true;
+                resultText = "Tie";
+                resultClass = "tie";
+            }
+            else
+            {
+                resultText = isWinner ? "Victory" : "Defeat";
+                resultClass = isWinner ? "win" : "loss";
+            }
+         
+            const matchTime = formatTime(match.begin_time);
             //const matchDate = new Date(match.date).toLocaleDateString();
 
             const matchHtml = `
@@ -226,7 +253,7 @@ export function forza4ShowMatchDetails() {
                         </div>
                         <div class="detail-item">
                             <span>Duration:</span>
-                            <span>${match.begin_time}</span>
+                            <span>${matchTime}</span>
                         </div>
                     </div>
                 </div>

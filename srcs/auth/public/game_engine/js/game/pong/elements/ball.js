@@ -284,7 +284,6 @@ export class Ball {
     }
 
     render(game) {
-        if (!this.hide) {
             this.ctx.fillStyle = this.trailColor;
             for (let i = 0; i < this.trail.length; i++) {
                 const pos = this.trail[i];
@@ -295,12 +294,14 @@ export class Ball {
                 this.ctx.fill();
             }
             this.ctx.globalAlpha = 1;
+            if (this.hide)
+                this.ctx.globalAlpha = 0.05;
             this.ctx.beginPath();
             this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             this.ctx.fillStyle = this.color;
             this.ctx.fill();
-            this.ctx.closePath();
-        }   
+            this.ctx.closePath();  
+            this.ctx.globalAlpha = 1;
     }
 
     collidesWith(object) {

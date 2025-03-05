@@ -2,7 +2,7 @@ import { navigate } from "../../main.js";
 import { current_user} from "../modes.js";
 import { access_denied } from "../../game/pong/main/modes_logic.js";
 
-// Funzione che restituisce la struttura HTML del torneo con un canvas per disegnare il tabellone
+
 export default function Bracket() {
     return `
         <img id="backImageButton" src="../../game_engine/images/home.png" alt="Back" class="back-button">
@@ -36,7 +36,7 @@ export default function Bracket() {
     `;
 }
 
-// Dimensioni delle caselle
+
 const boxWidth = 100; 
 const boxHeight = 50; 
 const roundGap = 200; // Distanza tra i round

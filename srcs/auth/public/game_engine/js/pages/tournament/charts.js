@@ -1,5 +1,6 @@
 import { navigate } from "../../main.js";
 import { userName } from "../user_data.js";
+import { formatTime } from "../../game/pong/other/timer.js";
 import { current_user, change_name, update_image} from "../modes.js";
 
 let data;
@@ -11,6 +12,24 @@ let losses = 0;
 export function Charts() {
     return `
         <img id="backImageButton" src="../game_engine/images/home.png" alt="Back" class="back-button">
+        <h1 class="text h1_margin">
+            <span class="letter letter-1">P</span>
+            <span class="letter letter-2">o</span>
+            <span class="letter letter-3">n</span>
+            <span class="letter letter-4">g</span>
+            <span class="letter letter-5"> </span>
+            <span class="letter letter-6"> </span>
+            <span class="letter letter-7">S</span>
+            <span class="letter letter-8">t</span>
+            <span class="letter letter-9">a</span>
+            <span class="letter letter-10">t</span>
+            <span class="letter letter-11">i</span>
+            <span class="letter letter-12">s</span>
+            <span class="letter letter-13">t</span>
+            <span class="letter letter-14">i</span>
+            <span class="letter letter-15">c</span>
+            <span class="letter letter-16">s</span>
+        </h1>
         <div class="charts-page">
             <div id="noMatchesMessage" class="no-matches-message">
                 <h2>No matches played</h2>
@@ -23,8 +42,8 @@ export function Charts() {
                     <h1 id="matchesPlayed"></h1>
                     <h2>Average Match Duration</h2>
                     <h1 id="avgMatchTime"></h1>
-                    <h2>Rank</h2>
-                    <h1 id="rank"></h1>
+                    <h2>Points</h2>
+                    <h1 id="points"></h1>
                 </div>
                 <div class="chart-item"><canvas id="xpProgressChart"></canvas></div>
             </div>
@@ -37,7 +56,8 @@ export function Charts() {
                 </div>
             </div>
         </div>
-        
+        <div id="pongMatchDetailsContainer" class="hidden1">
+        </div>
     `;
 }
 
@@ -175,17 +195,12 @@ function drawWinLossHistoryChart(matchesData) {
   }
   
 
-function formatTimeSeconds(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-}
 
 function matchesTimeRank() {
     const matchesPlayed = wins + losses;
     const matchesPlayedLabel = document.getElementById('matchesPlayed');
     const avgMatchTimeLabel = document.getElementById('avgMatchTime');
-    const rankLabel = document.getElementById('rank');
+    const pointsLabel = document.getElementById('points');
 
     let totalSeconds = 0;
     matchesPlayedLabel.textContent = matchesPlayed;
@@ -194,11 +209,15 @@ function matchesTimeRank() {
         totalSeconds += Number(match.begin_time);
     })
     console.log("total seconds = " +totalSeconds);
-    const totalTime = formatTimeSeconds(totalSeconds / matchesPlayed);
+    const totalTime = formatTime(totalSeconds / matchesPlayed);
     avgMatchTimeLabel.textContent = totalTime;
     const totalMatches = wins + losses;
     const victoryRate = wins / (totalMatches) * 100;
-    rankLabel.textContent = Math.floor(victoryRate * totalMatches);
+
+    const rankPoints = totalMatches + (wins * 10) - (losses * 5);
+    if (rankPoints < 0)
+        rankPoints = 0;
+    pointsLabel.textContent = rankPoints;
 }
 
 export async function showCharts() {
