@@ -18,22 +18,28 @@ export function initializeGameCanvas() {
     gameCanvas.height = window.innerHeight;
     gameCanvas.style.display = "block";
 
-    setTimeout(() => {
-        if (path === "/V.S._AI") {
-            players = [current_user.display_name, "AI"];
-            startPongGame(players, "ai");
-        } 
-        else if (path === "/classic") {
-            players = [current_user.display_name, "Player 2"];
-            startPongGame(players, "classic");
-        }
-        else {
-            players = JSON.parse(sessionStorage.getItem('matchPlayers')) || ["Player 1", "Player 2"];
-            const mode = path.includes("knockout") ? "knockout" : "roundrobin";
-            startPongGame(players, mode);
-        }
+    if (current_user)
+    {
+        setTimeout(() => {
 
-        gameInstance = new PongGame();
-        gameInstance.start();
-    }, 50);
+            if (path === "/V.S._AI") {
+                players = [current_user.display_name, "AI"];
+                startPongGame(players, "ai");
+            } 
+            else if (path === "/classic") {
+                players = [current_user.display_name, "Player 2"];
+                startPongGame(players, "classic");
+            }
+            else {
+                players = JSON.parse(sessionStorage.getItem('matchPlayers')) || ["Player 1", "Player 2"];
+                const mode = path.includes("knockout") ? "knockout" : "roundrobin";
+                startPongGame(players, mode);
+            }
+            
+            gameInstance = new PongGame();
+            gameInstance.start();
+        }, 50);
+    }
+    else
+        alert("no curr_user");
 }

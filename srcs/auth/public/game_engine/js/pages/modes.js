@@ -60,47 +60,19 @@ export let current_user = JSON.parse(localStorage.getItem('your_profile'));
 
 const storedGuest = JSON.parse(localStorage.getItem("guest"));
 
-if (storedGuest)
-{
-    current_user = new profile(
-        null,
-        storedGuest.name,
-        null,
-        storedGuest.bio,
-        storedGuest.image,
-        "guest"
-    );
-    current_user.entered = 1;
-}
-else
-{
-    fetch("http://localhost:8008",
-    {
-        method: "get_user",
-        body:{"params": {}}
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("data = ", data);
-        current_user = data;
-    })
-    .catch(error => console.error("Fetch error:", error));
-}
-
-
 export function refresh_reload_var()
 {
     fetch("http://localhost:8008",
     {
         method: "get_user",
-        body:{"params": {}}
+        body:{"params": {"entered":"1"}}
     })
     .then(response => response.json())
-    .then(data => {
-        console.log("data = ", data[0]);
+    .then(data =>
+    {
+        console.log("curr_user data = ", data);
         current_user = data[0];
     })
-    .catch(error => console.error("Fetch error:", error));
 }
 
 history.pushState(null, null, location.href);
@@ -122,23 +94,6 @@ window.addEventListener('storage', (event) => {
             current_user = JSON.parse(event.newValue);
     }
 });
-
-window.addEventListener("beforeunload", () => {
-    localStorage.clear();
-    sessionStorage.clear();
-    /*fetch("http://localhost:8008",
-    {
-        method: "drop_table",
-        body: JSON.stringify(type === "guest"),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("data = ", data);
-    })
-    .catch(error => console.error("Fetch error:", error));
-    */
-});
-
 
 window.addEventListener('popstate', (event) => {
     let storedUser = localStorage.getItem('your_profile');
@@ -189,8 +144,8 @@ export function updateUserProfile(newUserData) {
         newUserData.type
     );
     current_user.entered = 1;
-    setUserName("Samir");
-    //localStorage.setItem("your_profile", JSON.stringify(current_user));
+    //setUserName("Samir");
+    localStorage.setItem("your_profile", JSON.stringify(current_user));
 }
 
 function updateProfileUI(profile) {

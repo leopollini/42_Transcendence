@@ -9,7 +9,7 @@ export default function Profile() {
       <div class="profile-card">
         <!-- Immagine cliccabile -->
         <div id="profileImageSection" class="profile-image-container">
-          <img id="profileImage" src="null" alt="Profile Image" onclick="document.getElementById('imageUploadInput').click()">
+          <img id="profileImage" src="null" alt="Profile Image">
           <input type="file" id="imageUploadInput" accept="image/*">
         </div>
         <!-- Informazioni -->

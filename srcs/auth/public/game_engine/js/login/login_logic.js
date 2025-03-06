@@ -33,26 +33,9 @@ function popupHandling(popup)
             clearInterval(popupMonitor);
             localStorage.setItem('popup_opened', 'false');
             popupOpened = false;
-            try
-            {
-                get_data();
-                navigate("/modes", "Modalità di gioco");
-                alert("You are logged in successfully.\nTo change user, close this tab first!");
-            }
-            catch (error)
-            {
-                console.error("Errore nel recupero dati:", error);
-            }
-            try
-            {
-                get_data();
-                navigate("/modes", "Modalità di gioco");
-                alert("You are logged in successfully.\nTo change user, close this tab first!");
-            }
-            catch (error)
-            {
-                console.error("Errore nel recupero dati:", error);
-            }
+            get_data();
+            navigate("/modes", "Modalità di gioco");
+            alert("You are logged in successfully.\nTo change user, close this tab first!");
         }
     }, 500);
 }
@@ -61,46 +44,35 @@ function get_data()
 {
     fetch("http://localhost:8008", {
         method: "get_user",
-        body: JSON.stringify({params: { display_name: "sgalli" }})
+        body: {"params": {"entered":"1"}}
     })
-    .then(response => {
-        console.log("Response status:", response.status);
-        if (!response.ok)
-            throw new Error(`Errore nella risposta dal server: ${response.status}`);
-        return response.text();
-    })
-    .then(text => {
-        try {
-            const data = JSON.parse(text);
-            console.log("Parsed data:", data);
-            
-            if (data.status === "no users found" || !data.user || data.user.length === 0)
-                console.log("No user found");
-            else {
-                new_user.email = data.user[0].email;
-                new_user.login_name = data.user[0].display_name;
-                new_user.realname = data.user[0].realname;
-                new_user.image = data.user[0].image;
-                new_user.bio = data.user[0].bio;
-                new_user.type = "login";
-                change_name(new_user.login_name);
-                update_image(new_user.image);
-                let current_user = new profile(
-                    new_user.email,
-                    new_user.login_name,
-                    new_user.realname,
-                    new_user.bio,
-                    new_user.image,
-                    new_user.type
-                );
-                updateUserProfile(current_user);
-            }
-        } catch (error)
+    .then(response => response.json())
+    .then(data =>
+    {
+        console.log("login data:", data);    
+        if (data.status === "no users found" || !data.user || data.user.length === 0)
+            console.log("No user found");
+        else
         {
-            console.error("Errore durante il parsing dei dati:", error);
+            new_user.email = data.user[0].email;
+            new_user.login_name = data.user[0].display_name;
+            new_user.realname = data.user[0].realname;
+            new_user.image = data.user[0].image;
+            new_user.bio = data.user[0].bio;
+            new_user.type = "login";
+            change_name(new_user.login_name);
+            update_image(new_user.image);
+            let current_user = new profile(
+                new_user.email,
+                new_user.login_name,
+                new_user.realname,
+                new_user.bio,
+                new_user.image,
+                new_user.type
+            );
+            updateUserProfile(current_user);
         }
     })
-    .catch(error => console.error("Errore nel fetch:", error));
 }
 
 export function performLogin()

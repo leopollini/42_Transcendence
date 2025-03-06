@@ -1,5 +1,5 @@
 import Login, { addLoginPageHandlers } from "./pages/profile/login.js";
-import Modes, {//refresh_reload_var,
+import Modes, {refresh_reload_var,
 addModesPageHandlers, change_name, update_image, current_user} from "./pages/modes.js";
 import { access_denied } from "./game/pong/main/modes_logic.js";
 import Tournament, { addTournamentPageHandlers } from "./pages/tournament/tournament.js";
@@ -91,7 +91,7 @@ function restoreBackground() {
 
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
-    //refresh_reload_var()
+    refresh_reload_var()
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
