@@ -3,7 +3,7 @@ GEM
   specs:
     base64 (0.2.0)
     bigdecimal (3.1.9)
-    cgi (0.4.1)
+    cgi (0.4.2)
     colorize (1.1.0)
     did_you_mean (2.0.0)
     dotenv (3.1.7)
@@ -30,7 +30,7 @@ GEM
       snaky_hash (~> 2.0)
       version_gem (~> 1.1)
     pg (1.5.9)
-    rack (3.1.10)
+    rack (3.1.11)
     rack-session (2.1.0)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -38,8 +38,8 @@ GEM
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
-    uri (1.0.2)
-    version_gem (1.1.4)
+    uri (1.0.3)
+    version_gem (1.1.6)
     webrick (1.9.1)
 
 PLATFORMS

@@ -39,7 +39,6 @@ module AuthMethods
     get_user_data_from_oauth_provider(token.token)
 
     html_content = File.read('./pages_auth/auth_page.html')
-    puts "getting html file...".yellow
     response.content_type = 'text/html'
     response.write(html_content)
   end

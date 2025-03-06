@@ -34,9 +34,7 @@ module Other_logic
     image = user_data['image']['link']
     display_name = user_data['login']
     payload = { realname: realname, email: email, image: image, display_name: display_name, entered: 1}
-    puts "finished with user data".green
 
     SimpleServer.method_req("add_user", payload)
-    puts "proseguing login".green
   end
 end
