@@ -5,6 +5,7 @@ import { user, profile} from "./user.js";
 
 export let popupOpened = false;
 export let new_user = new user();
+export let new_user = new user();
 
 export function pop_false()
 {
@@ -24,8 +25,13 @@ function checkLoginRestrictions()
 
 function popupHandling(popup)
 {
+function popupHandling(popup)
+{
     popupOpened = true;
     localStorage.setItem('popup_opened', 'true');
+
+    let popupMonitor = setInterval(() => {
+        if (popup.closed)
 
     let popupMonitor = setInterval(() => {
         if (popup.closed)
@@ -43,10 +49,21 @@ function popupHandling(popup)
             {
                 console.error("Errore nel recupero dati:", error);
             }
+            try
+            {
+                get_data();
+                navigate("/modes", "Modalità di gioco");
+                alert("You are logged in successfully.\nTo change user, close this tab first!");
+            }
+            catch (error)
+            {
+                console.error("Errore nel recupero dati:", error);
+            }
         }
     }, 500);
 }
 
+function get_data()
 function get_data()
 {
     let startTime = performance.now();
