@@ -1,5 +1,6 @@
 import { navigate } from "../../../main.js";
 import { pop_false } from "../../../login/login_logic.js";
+import { current_user } from "../../../pages/modes.js";
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
         statIcon, friends, history, logout)

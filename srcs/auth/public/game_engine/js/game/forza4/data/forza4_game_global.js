@@ -1,7 +1,7 @@
 
 export let token1Color = '#ff0000';
 export let token2Color = '#0000ff';
-export let boardBackground = 'classic';
+export let boardBackground = 'bg1';
 export let powerUpMode = false;
 
 export let f4matchData = {

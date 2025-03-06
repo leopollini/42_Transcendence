@@ -23,54 +23,45 @@ function saveUserStatsData(matchData) {
     const longestRally = matchData.longestRally;
     const data = JSON.parse(localStorage.getItem('game_data')) || { players: {} };
 
-    //console.log("matchdata player 1: " +player1);
-    //console.log("matchdata player 2: " + player2);
-    
-    // Initialize data if no players
-    if (!data.players[player1]) {
-        data.players[player1] = { wins: 0, losses: 0, xp: 0, level: 1, pointsToLoseLevel: 0, pointsToNextLevel: 100, xpHistory: [], matches: [] };
-    }
-    if (!data.players[player2]) {
-        data.players[player2] = { wins: 0, losses: 0, xp: 0, level: 1, pointsToLoseLevel: 0, pointsToNextLevel: 100, xpHistory: [], matches: [] };
-    }
 
-    // Who wins?
-    let winner;
-    let loser;
-    if (score1 > score2) {
-        winner = player1;
-        loser = player2;
-        data.players[player1].wins += 1;
-        data.players[player2].losses += 1;
-    } else {
-        winner = player2;
-        loser = player1;
-        data.players[player2].wins += 1;
-        data.players[player1].losses += 1;
-    }
-    
-    // Calculate XP Points gained by match players
-    calculateXpPlayers(data, winner, loser);
-    calculateLevelPlayers(data, winner, loser);
+    // calculateXpPlayers(data, winner, loser);
+    // calculateLevelPlayers(data, winner, loser);
 
-    // Create match details to store on player's data
-    const matchDetails = {
-        player1,
-        player2,
-        score1,
-        score2,
-        winner,
-        longestRally,
-        matchTime,
-        date: new Date().toISOString() // Data del match
-    };
-    data.players[player1].matches.push(matchDetails);
-    data.players[player2].matches.push(matchDetails);
 
-    console.log(data.players[player1].matches);
-    // Save in local (TODO -> Change with storage in Postgres DB)
-    localStorage.setItem('game_data', JSON.stringify(data));
-    //console.log("Dati aggiornati:", data);
+    fetch("http://localhost:8008", {
+        method: "save_pong_game",
+        body: JSON.stringify({
+            player1: player1,
+            player2: player2,
+            score1: score1,
+            score2: score2,
+            begin_time: matchTime,
+            longest_rally: longestRally
+        }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
+        }
+        return response.status === 204 ? {} : response.json();
+    })
+    .then(data => {
+        console.log("saving...");
+        console.log("Save Pong Game response: ", data);
+
+        // Ora esegui la seconda chiamata fetch solo dopo che la prima ha avuto successo
+        return fetch("http://localhost:8008", {
+            method: "get_pong_games",
+            body: JSON.stringify({
+                realname: player1,
+            }),
+        });
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Get Pong Game response: ", data);
+    })
+    .catch(error => console.error("Fetch error:", error));
 }
 
 export function resetMatchStatsData() {
