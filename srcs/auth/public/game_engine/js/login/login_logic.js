@@ -5,7 +5,6 @@ import { user, profile} from "./user.js";
 
 export let popupOpened = false;
 export let new_user = new user();
-export let new_user = new user();
 
 export function pop_false()
 {
@@ -25,13 +24,8 @@ function checkLoginRestrictions()
 
 function popupHandling(popup)
 {
-function popupHandling(popup)
-{
     popupOpened = true;
     localStorage.setItem('popup_opened', 'true');
-
-    let popupMonitor = setInterval(() => {
-        if (popup.closed)
 
     let popupMonitor = setInterval(() => {
         if (popup.closed)
@@ -64,9 +58,7 @@ function popupHandling(popup)
 }
 
 function get_data()
-function get_data()
 {
-    let startTime = performance.now();
     fetch("http://localhost:8008", {
         method: "get_user",
         body: JSON.stringify({params: { display_name: "sgalli" }})
@@ -78,22 +70,19 @@ function get_data()
         return response.text();
     })
     .then(text => {
-        console.log("Raw response text:", text);
         try {
             const data = JSON.parse(text);
             console.log("Parsed data:", data);
             
-            if (data.status === "no users found" || !data.user || data.user.length === 0) {
+            if (data.status === "no users found" || !data.user || data.user.length === 0)
                 console.log("No user found");
-            } else {
-                console.log("User data found", data.user);
+            else {
                 new_user.email = data.user[0].email;
                 new_user.login_name = data.user[0].display_name;
                 new_user.realname = data.user[0].realname;
                 new_user.image = data.user[0].image;
                 new_user.bio = data.user[0].bio;
                 new_user.type = "login";
-                console.log("user = ",new_user);
                 change_name(new_user.login_name);
                 update_image(new_user.image);
                 let current_user = new profile(
@@ -105,7 +94,6 @@ function get_data()
                     new_user.type
                 );
                 updateUserProfile(current_user);
-                console.log("time elapsed: ", startTime());
             }
         } catch (error)
         {

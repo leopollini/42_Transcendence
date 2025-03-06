@@ -4,7 +4,6 @@ GEM
     base64 (0.2.0)
     bigdecimal (3.1.9)
     cgi (0.4.2)
-    cgi (0.4.2)
     colorize (1.1.0)
     did_you_mean (2.0.0)
     dotenv (3.1.7)

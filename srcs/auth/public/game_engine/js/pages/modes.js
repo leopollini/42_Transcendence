@@ -71,38 +71,37 @@ if (storedGuest)
     );
     current_user.entered = 1;
 }
-/* User loggato/guest
 else
 {
     fetch("http://localhost:8008",
     {
         method: "get_user",
-        body: JSON.stringify({type === "guest" || type === "login"}),
+        body:{"params": {}}
     })
     .then(response => response.json())
     .then(data => {
         console.log("data = ", data);
-        currentuser = data;
+        current_user = data;
     })
     .catch(error => console.error("Fetch error:", error));
-}*/
+}
 
-/*
+
 export function refresh_reload_var()
 {
     fetch("http://localhost:8008",
     {
         method: "get_user",
-        body: JSON.stringify({type === "guest" || type === "login"}),
+        body:{"params": {}}
     })
     .then(response => response.json())
     .then(data => {
-        console.log("data = ", data);
-        currentuser = data;
+        console.log("data = ", data[0]);
+        current_user = data[0];
     })
     .catch(error => console.error("Fetch error:", error));
 }
-*/
+
 history.pushState(null, null, location.href);
 
 window.onpopstate = function () {
