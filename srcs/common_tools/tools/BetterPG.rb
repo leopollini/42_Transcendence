@@ -118,7 +118,7 @@ module BetterPG
         better_return exec(req)
       rescue PG::UndefinedColumn, IndexError => e
         puts e
-        [{}]
+        []
       end
     end
 
@@ -137,7 +137,7 @@ module BetterPG
         res if res
       rescue PG::UndefinedColumn, IndexError => e
         puts e
-        [{}]
+        []
       end
     end
 

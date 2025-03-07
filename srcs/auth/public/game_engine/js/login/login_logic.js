@@ -100,7 +100,7 @@ function get_data()
             );
             console.log("current_user = ", current_user);
             updateUserProfile(current_user);
-                console.log("time elapsed: ", startTime());
+                console.log("time elapsed: ", startTime);
         }
         catch (error)
         {
