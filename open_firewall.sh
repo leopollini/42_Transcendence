@@ -9,6 +9,8 @@ else
     echo "ufw è già installato."
 fi
 
+echo -e "\e[32mil primo ip e l'usabile $(hostname -I)\e[0m"
+
 echo "Configurando il firewall per consentire il traffico sulla porta 9292..."
 sudo ufw allow 9292
 sudo ufw reload
