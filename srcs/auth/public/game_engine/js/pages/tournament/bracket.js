@@ -36,25 +36,20 @@ export default function Bracket() {
     `;
 }
 
+let boxColor = 'black'; 
 
-const boxWidth = 100; 
-const boxHeight = 50; 
-const roundGap = 200; // Distanza tra i round
-let boxColor = 'black'; // Colore della casella
-let matchBoxPos = []; // Posizioni delle caselle
-let yOffset = 60; // Offset verticale
-
-let matchesPerRound = 8; // Numero di partite per round
+let matchBoxPos = []; 
+let matchesPerRound = 8;
 let matchesThisRound;
-let rounds = 4; // Numero di round
+
+let rounds = 4;
 let currentMatch = 0;
 let currentRound = 0;
-let firstDraw = true; // Controllo per il primo disegno
-let bracketPlayers; // Giocatori nel torneo
-let bracketCanvas; // Canvas per il disegno
-let bracketCtx; // Contesto del canvas
+let firstDraw = true;
+let bracketPlayers;
+let bracketCanvas; 
+let bracketCtx; 
 
-// Funzione per mescolare l'array dei giocatori
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -63,7 +58,6 @@ function shuffleArray(array) {
     return array;
 }
 
-// Funzione per disegnare una linea tra due punti
 function drawLine(x1, y1, x2, y2, bracketCtx) {
     bracketCtx.beginPath();
     bracketCtx.moveTo(x1, y1);
@@ -72,41 +66,43 @@ function drawLine(x1, y1, x2, y2, bracketCtx) {
     bracketCtx.stroke();
 }
 
-// Funzione per disegnare una casella con i nomi dei giocatori
+// Draw Match Box
 function drawRectangle(x, y, width, height, player1, player2, boxColor, bracketCtx) {
-    bracketCtx.strokeStyle = boxColor; // Colore del bordo
-    bracketCtx.strokeRect(x, y, width, height); // Disegna il rettangolo
-
+    bracketCtx.strokeStyle = boxColor; 
+    bracketCtx.strokeRect(x, y, width, height); // Draw Rectangle
     bracketCtx.fillStyle = 'white'; 
     bracketCtx.textAlign = 'center';
 
     const vsOffset = 1;
     const playerOffset = 15;
 
-    bracketCtx.font = '14px Liberty'; // Font per il primo giocatore
+    // Player 1
+    bracketCtx.font = '14px Liberty'; 
     bracketCtx.textBaseline = 'bottom'; 
     if (player1) 
         bracketCtx.fillText(player1, x + width / 2, y + height / 2 - playerOffset); 
-
-    bracketCtx.font = '12px Liberty'; // Font per il "vs"
+    
+    // VS
+    bracketCtx.font = '12px Liberty';
     bracketCtx.textBaseline = 'middle';
     bracketCtx.fillText('vs', x + width / 2, y + height / 2 - vsOffset);
 
-    bracketCtx.font = '14px Liberty'; // Font per il secondo giocatore
+    // Player 2
+    bracketCtx.font = '14px Liberty';
     bracketCtx.textBaseline = 'top';
     if (player2) 
         bracketCtx.fillText(player2, x + width / 2, y + height / 2 + playerOffset); 
 }
 
-// Funzione per inizializzare i giocatori del torneo
+
 function initializeBracket() {
     bracketPlayers = new Array(rounds);
     for (let i = 0; i < rounds; i++) {
-        bracketPlayers[i] = new Array(matchesPerRound * 2); // Ogni round avrà due volte il numero di partite
+        bracketPlayers[i] = new Array(matchesPerRound * 2);
     }
 }
 
-// Funzione per disegnare il tabellone
+// Draw
 export function drawBracket(players) {
     bracketCanvas = document.getElementById('bracketCanvas');
     bracketCtx = bracketCanvas.getContext('2d');
@@ -114,30 +110,32 @@ export function drawBracket(players) {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
     //console.log("giocatori: " + players); 
-    // Impostazioni di scaling in base alla larghezza e altezza dello schermo
-    const boxWidth = screenWidth * 0.12;  // Larghezza casella
-    const boxHeight = screenHeight * 0.07;  // Altezza casella
-    const roundGap = screenWidth * 0.2;  // Distanza tra i round
-    const yOffset = boxHeight + 10;  // Offset verticale per le partite
+
+    // Bracket settings based on screen size
+    const boxWidth = screenWidth * 0.12;
+    const boxHeight = screenHeight * 0.07;
+    const roundGap = screenWidth * 0.2; 
+    const yOffset = boxHeight + 10; 
     const dynamicOffset = roundGap * 0.25;
 
-    // Calcoliamo il numero di partite e round
+    // Calculate rounds
     matchesPerRound = players.length / 2;
     rounds = Math.log2(players.length);
     matchBoxPos = [];
 
-    // Calcoliamo le dimensioni del canvas
+    // Calculate canvas size
     const padding = 120; // Padding
-    const totalWidth = (rounds - 1) * roundGap + boxWidth + 2 * padding;  // Larghezza totale del canvas
-    const totalHeight = matchesPerRound * yOffset + 2 * padding;  // Altezza totale del canvas
+    const totalWidth = (rounds - 1) * roundGap + boxWidth + 2 * padding;
+    const totalHeight = matchesPerRound * yOffset + 2 * padding;
 
-    bracketCanvas.width = totalWidth;  // Imposta la larghezza del canvas
-    bracketCanvas.height = totalHeight;  // Imposta l'altezza del canvas
+    bracketCanvas.width = totalWidth;
+    bracketCanvas.height = totalHeight;
 
     bracketCanvas.style.display = 'block';
     bracketCtx.font = '14px Liberty';
 
-    let xOffset = padding;  // Posizione iniziale per il primo round
+    // Calculate starting position
+    let xOffset = padding;
     let yStart = padding;
 
     if (firstDraw) {
@@ -145,11 +143,14 @@ export function drawBracket(players) {
         knockoutMatchButton.style.display = 'block';
         matchesThisRound = matchesPerRound;
         initializeBracket(rounds);
-        bracketPlayers[0] = shuffleArray(players);  // Mescola i giocatori
+        bracketPlayers[0] = shuffleArray(players);
     }
+
     //console.log("bracket players => " + bracketPlayers)
+
     matchBoxPos[0] = [];
-    // Disegna le partite del primo round
+
+    // Draw first round matches
     for (let i = 0; i < matchesPerRound; i++) {
         let x = xOffset;
         let y = yStart + yOffset * i;
@@ -167,7 +168,7 @@ export function drawBracket(players) {
 
     xOffset += roundGap;
 
-    // Disegna i round successivi
+    // Draw other rounds
     for (let round = 1; round < rounds; round++) {
         matchesPerRound /= 2;
         matchBoxPos[round] = [];
@@ -193,19 +194,18 @@ export function drawBracket(players) {
             let prevCenterY2 = prevY2 + boxHeight / 2;
             let midY = (prevCenterY1 + prevCenterY2) / 2;
 
-            // Disegna le linee tra le partite
+            // Draw lines between match boxes
             drawLine(prevCenterX, prevCenterY1, prevCenterX + roundGap / 4, prevCenterY1, bracketCtx);
             drawLine(prevCenterX, prevCenterY2, prevCenterX + roundGap / 4, prevCenterY2, bracketCtx);
             drawLine(prevCenterX + roundGap / 4, prevCenterY1, prevCenterX + roundGap / 4, prevCenterY2, bracketCtx);
             drawLine(prevCenterX + roundGap / 2 - dynamicOffset, midY, centerX, centerY, bracketCtx);
         }
 
-        // Per ogni round successivo, sposta xOffset verso destra
+        // For every next round add dynamic offset
         xOffset += roundGap;
     }
 }
 
-// Funzione per resettare lo stato del torneo
 export function resetBracketState() {
     //console.log("reset bracket state");
     currentMatch = 0;
@@ -214,8 +214,9 @@ export function resetBracketState() {
     matchBoxPos = [];
 }
 
+// When a match ends...
 export function backToBracket(winner) {
-    console.log("winz: ", winner);
+    //console.log("winz: ", winner);
     if (winner === null){
         drawBracket(bracketPlayers[0]);
         return;
@@ -234,12 +235,8 @@ export function backToBracket(winner) {
     else {
         //console.log("winner: " + winner);
         drawBracket(bracketPlayers[0]);
-
         knockoutMatchButton.hidden = true;
         knockoutMatchButton.style.display = 'none';
-        //gameCustomizeButton.hidden = true;
-        //gameCustomizeButton.style.display = 'none';
-
         bracketCtx.font = '30px Liberty';
         bracketCtx.fillStyle = 'white'; 
         bracketCtx.textAlign = 'center';
@@ -248,7 +245,7 @@ export function backToBracket(winner) {
     }
 }
 
-// Aggiunge gli eventi per il pulsante di personalizzazione
+// Event listeners
 export const addBracketPageHandlers = () => {
     if (current_user === null)
         access_denied();
