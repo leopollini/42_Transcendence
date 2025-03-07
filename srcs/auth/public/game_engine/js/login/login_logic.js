@@ -64,6 +64,7 @@ function get_data()
         method: "get_user",
         body: JSON.stringify({params: { display_name: "sgalli" }})
     })
+    
     .then(response => {
         console.log("Response status:", response.status);
         if (!response.ok)

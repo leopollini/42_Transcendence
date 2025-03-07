@@ -12,8 +12,6 @@ export function savef4StatsData(game, isTie) {
             winner = game.p1;
         else 
             winner = game.p2;
-        // calculateXpF4Players(f4data, winner, loser);
-        // calculateLevelF4Players(f4data, winner, loser);
      }
      console.log("elapsed time: " + game.elapsedTime);
     fetch("http://localhost:8008", {
