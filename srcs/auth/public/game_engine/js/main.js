@@ -22,6 +22,9 @@ import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
 import { Forza4UserStats, forza4ShowUserStatistics, forza4ShowMatchDetails, addForza4StatsPageHandlers } from "./pages/forza4/forza4_statistics.js";
 import Friends from "./pages/friends.js";
 import Access_Denied from "./pages/access_denied.js";
+import LiveChat from "./pages/live-chat.js";
+import ChatApp from "./pages/live-chat/ChatApp.js";
+
 let buttonTitle;
 let winner;
 
@@ -262,10 +265,26 @@ const loadContent = async () => {
     }
     else
         app.innerHTML = "<h1 class='text'>404 - Pagina non trovata</h1>"; // Pagina non trovata
+
+    const chatRoutes = ["/modes"]; // aggiungi qui le rotte dove vuoi visualizzare la chat
+    if (chatRoutes.includes(path)) {
+        initChat();
+    } else {
+        // Se non serve, svuota il container della chat
+        document.getElementById("chatApp").innerHTML = "";
+    }
 };
 
     // Gestione dei pulsanti "Indietro" e "Avanti" nel browser
 window.addEventListener("popstate", loadContent);
+
+function initChat() {
+    const chatContainer = document.getElementById("chatApp");
+    // Inserisce il template della chat
+    chatContainer.innerHTML = LiveChat();
+    // Inizializza la logica della chat creando una nuova istanza di ChatApp
+    new ChatApp();
+}
 
 // Inizializzazione dell'app
 document.addEventListener("DOMContentLoaded", loadContent);

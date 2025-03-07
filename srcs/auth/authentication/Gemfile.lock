@@ -38,8 +38,13 @@ GEM
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
+<<<<<<< HEAD
     uri (1.0.3)
     version_gem (1.1.6)
+=======
+    uri (1.0.2)
+    version_gem (1.1.5)
+>>>>>>> origin/rbakhaye
     webrick (1.9.1)
 
 PLATFORMS
