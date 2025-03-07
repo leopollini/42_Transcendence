@@ -2,7 +2,8 @@
     font-family: 'Liberty', sans-serif;
     font-size: clamp(0.8rem, 1.4vw + 0.5rem, 1.3rem);
     padding: 0.75em 1.5em;
-    color: #0fffcf;
+    color: #ffffff;
+    text-shadow: 0 0 5px rgb(255 255 255 / 50%), 0 0 1px rgb(255 255 255 / 30%), 0 0 3px #ffffff;
     background-color: transparent;
     border: 2px solid #0fffcf;
     border-radius: 5px;
@@ -21,7 +22,7 @@
 }
 
 .button-style:hover {
-    color: #fff;
+    color: #ffffff;
     transform: scale(1.05);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
     background-color: rgba(0, 255, 255, 0.2);

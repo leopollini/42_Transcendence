@@ -8,7 +8,16 @@
 @import url('game-section/game-customization.css');
 @import url('game-section/forza4_statistics.css');
 @import url('backTomenu.css');
-@import url('user-profile.css');
+@import url('profile-menu.css');
+@import url('profile.css');
+@import url("live-chat/reset.css");
+@import url("live-chat/variables.css");
+@import url("live-chat/layout.css");
+@import url("live-chat/chat.css");
+@import url("live-chat/mini-profile.css");
+@import url("live-chat/context.css");
+@import url("live-chat/responsive.css");
+@import url("live-chat/friends.css");
 
 
 * {
@@ -19,6 +28,7 @@ html, body {
     text-align: center;
     height: 100%;
     margin: 0;
+    font-family: 'Liberty', sans-serif;
 }
 
 body {
@@ -38,11 +48,11 @@ body {
     user-select: none;
     position: relative;
     background: 
-        linear-gradient(35deg, #b97070, #134946),
+        linear-gradient(35deg, #491f1f, #134946),
         radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%);
     background-size: cover;
 }
 
 .no-background {
-    background: none !important; /* Disabilita lo sfondo */
+    background: none !important;
 }

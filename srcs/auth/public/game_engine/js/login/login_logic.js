@@ -1,8 +1,10 @@
+
 import { navigate } from "../main.js";
 import { update_image, change_name, updateUserProfile, current_user} from "../pages/modes.js";
 import { user, profile} from "./user.js";
 
 export let popupOpened = false;
+export let new_user = new user();
 export let new_user = new user();
 
 export function pop_false()
@@ -23,8 +25,13 @@ function checkLoginRestrictions()
 
 function popupHandling(popup)
 {
+function popupHandling(popup)
+{
     popupOpened = true;
     localStorage.setItem('popup_opened', 'true');
+
+    let popupMonitor = setInterval(() => {
+        if (popup.closed)
 
     let popupMonitor = setInterval(() => {
         if (popup.closed)
@@ -42,18 +49,28 @@ function popupHandling(popup)
             {
                 console.error("Errore nel recupero dati:", error);
             }
+            try
+            {
+                get_data();
+                navigate("/modes", "Modalità di gioco");
+                alert("You are logged in successfully.\nTo change user, close this tab first!");
+            }
+            catch (error)
+            {
+                console.error("Errore nel recupero dati:", error);
+            }
         }
     }, 500);
 }
 
 function get_data()
+function get_data()
 {
     let startTime = performance.now();
     fetch("http://localhost:8008", {
         method: "get_user",
-        body: JSON.stringify({ params: { display_name: "sgalli" } })
+        body: JSON.stringify({params: { display_name: "sgalli" }})
     })
-    
     .then(response => {
         console.log("Response status:", response.status);
         if (!response.ok)
@@ -98,12 +115,6 @@ function get_data()
     .catch(error => console.error("Errore nel fetch:", error));
 }
 
-function logging(authData)
-{
-    const popup = window.open(authData.auth_url, 'Login', 'width=800,height=800');
-    popupHandling(popup);
-}
-
 export function performLogin()
 {
     if (!checkLoginRestrictions())
@@ -111,7 +122,8 @@ export function performLogin()
     fetch('/auth/login')
     .then(response => response.json())
     .then(data => {
-        logging(data);
+        const popup = window.open(data.auth_url, 'Login', 'width=800,height=800');
+        popupHandling(popup);
     })
     .catch(error => {
         console.error("Errore di rete:", error);
