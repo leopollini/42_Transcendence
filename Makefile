@@ -52,7 +52,7 @@ prep_dirs:
 	@mkdir -p ./srcs/common_tools/tools
 	@mkdir -p ./srcs/receiver
 	@mkdir -p ./srcs/request_manager
-	@mkdir -p ./srcs/auth
+	@mkdir -p ./srcs/trascendence
 	@mkdir -p ./srcs/user_manager
 	@chmod +x ./srcs/trascendence/init.sh
 	@chmod +x ./srcs/request_manager/init.sh
