@@ -40,25 +40,13 @@ export function savename(me, yourDataSection)
         return ("Error: name already taken(" + newname + ")\n");
 }
 
-export function emailHandler(me, yourDataSection)
-{
+export function emailHandler(me, yourDataSection) {
     const emailInput = yourDataSection.querySelector('#emailInput');
-    const emailContainer = yourDataSection.querySelector('.email-container');
-    if (current_user.type === "login")
-    {
-        emailInput.value = me.email;
-        emailInput.disabled = true;
-        emailInput.style.fontSize = "0.5em"; 
-        emailInput.style.color =" #09a09b"
-    }
-    else
-    {
-        me.email = null;
-        emailContainer.style.display = 'none';
-        emailInput.style.display = 'none';
-    }    
-}
 
+    emailInput.value = me.email || "";
+    emailInput.disabled = false;
+    emailInput.style.fontSize = "1em";
+}
 
 export function saveimage(me, yourDataSection)
 {

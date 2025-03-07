@@ -17,29 +17,28 @@ export function Forza4UserStats() {
             <span class="letter letter-3">r</span>
             <span class="letter letter-4">z</span>
             <span class="letter letter-5">a</span>
-            <span class="letter letter-6"> </span>
+            <span class="letter letter-6">4</span>
             <span class="letter letter-7"> </span>
-            <span class="letter letter-8">4</span>
-            <span class="letter letter-9"> </span>
-            <span class="letter letter-10"> </span>
-            <span class="letter letter-11">S</span>
-            <span class="letter letter-12">t</span>
-            <span class="letter letter-13">a</span>
+            <span class="letter letter-8">S</span>
+            <span class="letter letter-9">t</span>
+            <span class="letter letter-10">a</span>
+            <span class="letter letter-11">t</span>
+            <span class="letter letter-12">i</span>
+            <span class="letter letter-13">s</span>
             <span class="letter letter-14">t</span>
             <span class="letter letter-15">i</span>
-            <span class="letter letter-16">s</span>
-            <span class="letter letter-17">t</span>
-            <span class="letter letter-18">i</span>
-            <span class="letter letter-19">c</span>
-            <span class="letter letter-20">s</span>
+            <span class="letter letter-16">c</span>
+            <span class="letter letter-17">s</span>
         </h1>
         <div id="forza4UserStats">
             <div class="stats-switcher">
-                <button id="showGeneralStats" class="button-style active">General Statistics</button>
+                <button id="showGeneralStats" class="button-style active">Forza4</button>
+                <button id="showPingPongStats" class="button-style">Ping Pong</button>
                 <button id="showMatchHistory" class="button-style">Match History</button>
             </div>
             <div class="stats-content-container">
-                <div class="stats-card visible" id="generalStatsSection">
+                <!-- Sezione statistiche Forza4 -->
+                <div class="stats-card visible" id="forza4StatsSection">
                     <dl class="stats-grid">
                         <div class="stat-item">
                             <dt>Total matches played:</dt>
@@ -75,8 +74,16 @@ export function Forza4UserStats() {
                         </div>
                     </dl>
                 </div>
+                <!-- Sezione test per Ping Pong -->
+                <div class="stats-card hidden1" id="pingPongTestSection">
+                    <div class="stat-item">
+                            <dt>Testo field</dt>
+                            <dd id="totalMatches" aria-live="polite">-</dd>
+                    </div>
+                </div>
+                <!-- Sezione Match History -->
                 <div id="f4MatchDetailsContainer" class="hidden1">
-
+                    <!-- I dettagli delle partite verranno inseriti qui -->
                 </div>
             </div>
         </div>
@@ -187,6 +194,7 @@ export async function forza4ShowUserStatistics() {
 export function addForza4StatsPageHandlers() {
     const backImageButton = document.getElementById('backImageButton');
     const generalStatsBtn = document.getElementById('showGeneralStats');
+    const pingPongBtn = document.getElementById('showPingPongStats');
     const matchHistoryBtn = document.getElementById('showMatchHistory');
 
     backImageButton?.addEventListener('click', () => {
@@ -194,18 +202,39 @@ export function addForza4StatsPageHandlers() {
     });
 
     generalStatsBtn?.addEventListener('click', () => {
-        document.getElementById('generalStatsSection').classList.remove('hidden1');
+        document.getElementById('forza4StatsSection').classList.remove('hidden1');
+        document.getElementById('pingPongTestSection').classList.add('hidden1');
         document.getElementById('f4MatchDetailsContainer').classList.add('hidden1');
+
         generalStatsBtn.classList.add('active');
+        pingPongBtn.classList.remove('active');
         matchHistoryBtn.classList.remove('active');
+
+        forza4ShowUserStatistics();
+    });
+
+    pingPongBtn?.addEventListener('click', () => {
+        document.getElementById('forza4StatsSection').classList.add('hidden1');
+        document.getElementById('pingPongTestSection').classList.remove('hidden1');
+        document.getElementById('f4MatchDetailsContainer').classList.add('hidden1');
+
+        pingPongBtn.classList.add('active');
+        generalStatsBtn.classList.remove('active');
+        matchHistoryBtn.classList.remove('active');
+
+        // Al momento non serve logica specifica per Ping Pong; il test field basta per verificare il cambio finestra
     });
 
     matchHistoryBtn?.addEventListener('click', () => {
-        document.getElementById('generalStatsSection').classList.add('hidden1');
+        document.getElementById('forza4StatsSection').classList.add('hidden1');
+        document.getElementById('pingPongTestSection').classList.add('hidden1');
         document.getElementById('f4MatchDetailsContainer').classList.remove('hidden1');
-        forza4ShowMatchDetails(); // Загружаем историю матчей при первом клике
+
         matchHistoryBtn.classList.add('active');
         generalStatsBtn.classList.remove('active');
+        pingPongBtn.classList.remove('active');
+
+        forza4ShowMatchDetails();
     });
 }
 
@@ -266,9 +295,7 @@ export function forza4ShowMatchDetails() {
                 this.classList.toggle('collapsed');
             });
         });
-    } 
-    else
-    {
+    } else {
         f4MatchDetailsContainer.innerHTML = `<p class="no-matches">No matches found</p>`;
     }
 }
