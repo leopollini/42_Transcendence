@@ -36,7 +36,7 @@ class App
     when '/'
       response.write(File.read(File.join(__dir__, '../public', 'index.html')))
       response.content_type = 'text/html'
-    when '/trascendence/login'
+    when '/auth/login'
       login(request, response, @client)
     when '/callback'
       callback(request, response, @client)

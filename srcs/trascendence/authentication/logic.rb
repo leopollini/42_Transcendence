@@ -38,7 +38,7 @@ module AuthMethods
     request.session[:token] = token.token
     get_user_data_from_oauth_provider(token.token)
 
-    html_content = File.read('./pages_trascendence/auth_page.html')
+    html_content = File.read('./pages_auth/auth_page.html')
     response.content_type = 'text/html'
     response.write(html_content)
   end

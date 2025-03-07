@@ -10,7 +10,7 @@ module Other_logic
 
   def page_not_found(response)
     response.status = 200
-    html_content = File.read('./pages_trascendence/no_page.html')
+    html_content = File.read('./pages_auth/no_page.html')
     response.content_type = 'text/html  '
     response.write(html_content)
   end

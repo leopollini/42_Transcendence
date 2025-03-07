@@ -15,8 +15,8 @@ class OAuthClient
       @client_id,
       @client_secret,
       site: "https://api.intra.42.fr",
-      authorize_url: "/otrascendence/authorize",
-      token_url: "/otrascendence/token"
+      authorize_url: "/oauth/authorize",
+      token_url: "/oauth/token"
     )
   end
 

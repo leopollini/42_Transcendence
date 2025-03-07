@@ -88,7 +88,7 @@ export function performLogin()
 {
     if (!checkLoginRestrictions())
         return;
-    fetch('/trascendence/login')
+    fetch('/auth/login')
     .then(response => response.json())
     .then(data => {
         const popup = window.open(data.auth_url, 'Login', 'width=800,height=800');
