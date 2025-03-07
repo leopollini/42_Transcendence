@@ -1,5 +1,6 @@
 import { userName } from "./user_data.js";
 
+let userData;
 export default function MatchDetails() {
     return `
     <div>
@@ -22,40 +23,47 @@ export default function MatchDetails() {
         <div id="matchDetailsContainer">
         </div>
     </div>
-
-        <style>
-            #matchDetailsContainer {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                color: #fff;
-                font-family: "Liberty", sans-serif;
-                margin-top: 2px;
-            }
-        </style>
+    
     `;
 }
 
 
-export function showMatchDetails() {
+export async function showMatchDetails() {
     const matchDetailsContainer = document.getElementById("matchDetailsContainer");
     matchDetailsContainer.innerHTML = "";
-    const playerName = userName;
-    const data = JSON.parse(localStorage.getItem('game_data')) || { players: {} };
-    const playerData = data.players[playerName];
+    //const playerName = userName;
+    // const data = JSON.parse(localStorage.getItem('game_data')) || { players: {} };
+    // const playerData = data.players[playerName];
 
-    if (playerData.matches && playerData.matches.length > 0) {
+    try {
+        const response = await fetch("http://localhost:8008", {
+            method: "get_pong_games",
+            body: JSON.stringify({
+            realname: userName,
+            }),
+        });
+        const data = await response.json();
+        console.log("Get Pong Game response: ", data);
+        if (data.games) {
+            userData = data.games;
+            console.log("userData aggiornata: ", userData);
+            // Ora puoi richiamare altre funzioni che usano userData qui dentro
+        }
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
+    
+
+    if (userData && userData.length > 0) {
         matchDetailsContainer.innerHTML += `<h3>Matches History</h3>`;
-        playerData.matches.forEach(match => {
-            const opponent = match.player1 === playerName ? match.player2 : match.player1;
+        userData.forEach(match => {
+            const opponent = match.player1 === userName ? match.player2 : match.player1;
 
             const matchHtml = `
                 <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
                     <p><strong>Match:</strong> ${match.player1} vs. ${match.player2}</p>
                     <p><strong>Score:</strong> ${match.score1} - ${match.score2}</p>
                     <p><strong>Winner:</strong> ${match.winner}</p>
-                    <p><strong>Date:</strong> ${new Date(match.date).toLocaleString()}</p>
                 </div>
             `;
             matchDetailsContainer.innerHTML += matchHtml;

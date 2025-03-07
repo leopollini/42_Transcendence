@@ -1,6 +1,7 @@
 import { navigate } from '../main.js';
 import { profile } from "../login/user.js";
 import { handle_modes_logic } from '../game/pong/main/modes_logic.js';
+import { setUserName } from './user_data.js';
 
 export default function Modes()
 {
@@ -189,7 +190,8 @@ export function updateUserProfile(newUserData) {
         newUserData.type
     );
     current_user.entered = 1;
-    localStorage.setItem("your_profile", JSON.stringify(current_user));
+    setUserName("Samir");
+    //localStorage.setItem("your_profile", JSON.stringify(current_user));
 }
 
 function updateProfileUI(profile) {
@@ -237,6 +239,7 @@ export function change_name(name) {
         if (avatarName)
         {
             avatarName.innerText = name;
+            setUserName(name);
             clearInterval(checknameInterval);
         }
     }, 100);

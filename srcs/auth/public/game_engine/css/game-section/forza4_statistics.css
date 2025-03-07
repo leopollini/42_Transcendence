@@ -159,6 +159,12 @@
     color: #f44336;
 }
 
+.match-summary.tie {
+    border-left: 6px solid #fff700;
+    color: #fff700;
+}
+
+
 .players {
     font-weight: 600;
     color: #ffffff;

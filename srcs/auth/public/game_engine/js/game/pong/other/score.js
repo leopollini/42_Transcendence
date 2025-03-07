@@ -18,6 +18,8 @@ export function checkScore(game, mode) {
             backToMenuButton.style.display = "block";
             backToMenuButton.hidden = false;
         }
+          
+
         game.ui.render(game, game.scoreP1, game.scoreP2); 
     }
 }

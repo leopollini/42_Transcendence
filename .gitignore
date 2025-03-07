@@ -1,2 +1,3 @@
 *.identifier.zone
 .vscode
+*.DS_Store
