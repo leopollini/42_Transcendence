@@ -5,6 +5,8 @@ SHELL:=/bin/bash
 
 all: prep_dirs #stop_containers
 	@clear
+	@echo "Configurando il firewall..."
+	./open_firewall.sh
 	make -C ./srcs/common_tools/ all
 	@if [ "$(DETATCH)" = "true" ]; then \
 		docker-compose -f ./docker-compose.yml up -d; \
@@ -38,6 +40,9 @@ down:
 
 re: clean prep_dirs
 
+	@echo "Configurando il firewall..."
+	chmod +x open_firewall.sh
+	./open_firewall.sh
 	make -C srcs/common_tools/ re
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
@@ -49,7 +54,7 @@ prep_dirs:
 	@mkdir -p ./srcs/request_manager
 	@mkdir -p ./srcs/auth
 	@mkdir -p ./srcs/user_manager
-	@chmod +x ./srcs/auth/init.sh
+	@chmod +x ./srcs/trascendence/init.sh
 	@chmod +x ./srcs/request_manager/init.sh
 
 clean:
