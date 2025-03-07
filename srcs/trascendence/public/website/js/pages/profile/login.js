@@ -35,10 +35,6 @@ export const addLoginPageHandlers = () => {
     if (loginButton && guestButton)
     {
         let user = current_user;
-        if (!user)
-            console.log("\n\nno user woopsie doopsie\n\n");
-        else
-            console.log("user in = ", user.entered);
         loginButton.addEventListener("click", () => {
             if (popupOpened === true)
                 alert("popup already open finish authentication before continuing")

@@ -4,13 +4,17 @@ export default function PongGame() {
     setTimeout(() => {
         history.pushState(null, "", location.href);
 
-        window.onpopstate = function()
-        {
+        function handlePopState() {
             navigate("/modes", "returning to modes...");
             alert("quitting game ....");
-        };
-    }, 100);
+        }
 
+        window.onpopstate = handlePopState;
+
+        window.addEventListener("beforeunload", () => {
+            window.onpopstate = null;
+        });
+    }, 100);
     return `
     <canvas id="gameCanvas"></canvas>
     <div style="margin-top: 100px;">

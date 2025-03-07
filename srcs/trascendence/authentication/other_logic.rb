@@ -33,8 +33,8 @@ module Other_logic
     email = user_data['email']
     image = user_data['image']['link']
     display_name = user_data['login']
-    payload = { realname: realname, email: email, image: image, display_name: display_name, entered: 1}
+    payload = { realname: realname, email: email, image: image, display_name: display_name, type: "login", entered: 1}
 
-    SimpleServer.method_req("add_user", payload)
+    SimpleServer.method_req("add_user", payload)  
   end
 end

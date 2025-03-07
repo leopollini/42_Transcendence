@@ -49,12 +49,6 @@ function get_data()
     .then(response => response.json())
     .then(data =>
     {
-        console.log("login data:", data);    
-        if (data.status === "no users found" || !data.user || data.user.length === 0) {
-            alert("No user found");
-            return;
-        }
-    
         let user = data.user[0];
         let new_user = {
             email: user.email,

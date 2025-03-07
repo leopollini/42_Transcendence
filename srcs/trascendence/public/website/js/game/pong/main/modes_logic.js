@@ -89,8 +89,9 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             localStorage.clear();
             sessionStorage.clear();
             pop_false();
+            current_user.entered = 0;
             /*dorp_table fetch*/
-            navigate("/", "Userstats");
+            navigate("/", "Logout");
         });
     }
     else 

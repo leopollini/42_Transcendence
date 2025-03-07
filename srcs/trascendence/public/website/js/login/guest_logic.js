@@ -13,7 +13,7 @@ window.addEventListener('storage', (event) => {
         guest = JSON.parse(localStorage.getItem('guest')) || [];
 });
 
-export function guest_login()
+export async function guest_login()
 {
     if (localStorage.getItem("guest") || localStorage.getItem("your_profile"))
     {
@@ -21,7 +21,6 @@ export function guest_login()
         return;
     }
 
-    localStorage.setItem('guest', JSON.stringify(guest));
     let name = prompt("Enter your guest name:");
     if (!name) {
         alert('No name. Please try again');
@@ -37,7 +36,30 @@ export function guest_login()
         alert('Name too long.');
         return;
     }
-    addGuest(name);
+    fetch("http://localhost:8008",
+    {
+        method: "get_user",
+        body:{"params": [{"type":"login"}, {"type":"guest"}]}
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.user && Array.isArray(data.user)) {
+            const value = data.user.some(user => user.display_name === name) ? 1 : 0;
+            if (value === 1)
+            {
+                alert("Name already taken, try a different one");
+                return;
+            }
+            localStorage.setItem('guest', JSON.stringify(guest));
+            addGuest(name);
+        } else {
+            console.error("Error: data.user is not available or is not an array");
+            alert("Failed to check name. Please try again later.");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
 }
 
 function addGuest(name) {
@@ -66,5 +88,6 @@ function update_guest(curr_guest)
         body: JSON.stringify(current_user)
     })
     .then(response => response.json())
+    console.log("hi there")
     updateUserProfile(current_user);
 }

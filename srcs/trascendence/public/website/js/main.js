@@ -60,7 +60,7 @@ export const navigate = (path, title = "") => {
     history.pushState({ path }, title, path);
     buttonTitle = title;
     loadContent();
-    if (path !== "/" && path !== "/access_denied")
+    if (path === "/modes")
     {
         if (current_user !== null)
         {

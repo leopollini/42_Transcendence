@@ -70,13 +70,10 @@ export function refresh_reload_var()
     .then(response => response.json())
     .then(data =>
     {
-        if (data.status === "no users found" || !data.user || data.user.length === 0)
-        {
-            alert("No user found");
-            return;
-        }
-        console.log("curr_user data = ", data);
-        current_user = data[0];
+        console.log("data = ", data);
+        current_user = data.user[0];
+        change_name(current_user.display_name);
+        update_image(current_user.image);
     })
 }
 
