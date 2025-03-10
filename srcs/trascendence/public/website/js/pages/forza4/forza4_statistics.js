@@ -1,7 +1,7 @@
 import { navigate } from "../../main.js";
 import { userName } from "../user_data.js";
 import { formatTime } from "../../game/pong/other/timer.js";
-import { current_user, change_name, update_image } from "../modes.js";
+import { current_user, change_name, update_image} from "../modes.js";
 
 let wins = 0;
 let losses = 0;
@@ -179,7 +179,7 @@ export async function forza4ShowUserStatistics() {
 
     console.log("stats total matches" + stats.totalMatches);
 
-    // Popola il template con i dati
+    // Popola il template con i dati di Forza4
     document.getElementById('totalMatches').textContent = stats.totalMatches;
     document.getElementById('totalWins').textContent = stats.totalWins;
     document.getElementById('totalLosses').textContent = stats.totalLosses;

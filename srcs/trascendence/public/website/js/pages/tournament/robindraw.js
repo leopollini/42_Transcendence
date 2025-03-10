@@ -61,7 +61,6 @@ function findNextMatch(rankingRobinCtx) {
     let tiebreaker;
     attempts = 0;
 
-
     //console.log("find the next match");
     if (matchesListRobin.length === 0) {
         if (playerList[0].points == playerList[1].points)
@@ -152,13 +151,11 @@ export function robinDraw(players) {
     playRobinMatchButton.style.display = "block";
     rankingRobinCanvas.style.display = "block";
 
-
     if (!playerList)
         playerList = initializePlayers(players);
 
     playerList.sort((a, b) => b.points - a.points);
     
-
     // Ranking (Player name and points)
     for (var i = 0; i < playerList.length; i++) {
         rankingRobinCtx.font = '30px Liberty';
@@ -186,7 +183,6 @@ export const addRobinRankingPageHandlers = () => {
     const playRobinMatchButton = document.getElementById('playRobinMatchButton');
     const robinBackToMenuButton = document.getElementById('robinBackToMenuButton');
     const backImageButton = document.getElementById('backImageButton');
-
 
     playRobinMatchButton?.addEventListener('click', () => {
         const players = [];

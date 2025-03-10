@@ -3,8 +3,7 @@ import { userName } from "../user_data.js";
 import { formatTime } from "../../game/pong/other/timer.js";
 import { current_user, change_name, update_image} from "../modes.js";
 
-let data;
-let playerName;
+
 let userData;
 let wins = 0;
 let losses = 0;
@@ -61,19 +60,6 @@ export function Charts() {
     `;
 }
 
-// function getLastMatchesData() {
-    
-//     data = JSON.parse(localStorage.getItem('game_data')) || { players: {} };
-//     const playerData = data.players[playerName];
-
-
-//     console.log(playerData);
-//     const lastMatchesData = playerData.matches.slice(-10);
-    
-    
-//     return lastMatchesData;
-// }
-
 function drawRalliesChart(matchesData)
 {
     const longestRallies = matchesData.map(match => match.longest_rally);
@@ -83,7 +69,7 @@ function drawRalliesChart(matchesData)
     const ralliesData = {
         labels: opponents,
         datasets: [{
-            label: 'Longest Rallies',
+            label: 'Longest Rally',
             data: longestRallies,
             backgroundColor: '#02BFB9'
         }]
@@ -95,7 +81,7 @@ function drawRalliesChart(matchesData)
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                title: { display: true, text: 'Longest Rallies' }
+                title: { display: true, text: 'Matches Longest Rallies' }
             },
             scales: {
                 x: { title: { display: true, text: 'Opponents' } },
@@ -109,11 +95,10 @@ function drawWinLossChart() {
     wins = 0;
     losses = 0;
     userData.forEach(game => {
-    // Verifica che la partita coinvolga l'utente
     if (game.player1 === userName || game.player2 === userName) {
         if (game.winner === userName) {
             wins++;
-        } else { // Se la partita non è un pareggio
+        } else {
             losses++;
         }
     }
@@ -123,7 +108,7 @@ function drawWinLossChart() {
     const winLossData = {
         labels: ['Win', 'Loss'],
         datasets: [{
-            data: [wins, losses], // Numero di vittorie e sconfitte
+            data: [wins, losses],
             backgroundColor: ['#02BFB9', '#014C4A']
         }]
     };
@@ -134,7 +119,7 @@ function drawWinLossChart() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                title: { display: true, text: 'Win/Loss Ratio' }
+                title: { display: true, text: 'Victory Rate: ' + ((wins / (wins + losses)) * 100).toFixed(1) + '%' }
             }
         }
     });
@@ -143,40 +128,43 @@ function drawWinLossChart() {
 function drawWinLossHistoryChart(matchesData) {
     const ctx = document.getElementById('xpProgressChart').getContext('2d');
   
-    // Inizializza array per le etichette (es. "Match 1", "Match 2", ecc.) e la progressione cumulativa
+    // Initialize
     const labels = [];
     const progression = [];
     let cumulativeScore = 0;
+    let winStreak = 0;
+    let currentStreak = 0;
   
-    // Per ogni match, aggiorna il punteggio cumulativo in base al risultato
+    // Get result for every match
     matchesData.forEach((match, index) => {
-      // Costruisci l'etichetta per il match (ad esempio "Match 1", "Match 2", ...)
       labels.push("Match " + (index + 1));
       
-      // Se il giocatore corrente (playerName) ha vinto, incrementa il punteggio;
-      // se ha perso, lo decrementa; in caso di pareggio, non cambia.
       if (match.winner === userName) {
         cumulativeScore += 1;
+        currentStreak += 1;
+        winStreak = Math.max(winStreak, currentStreak);
       } else if (match.winner !== 'tie') {
         cumulativeScore -= 1;
+        currentStreak = 0; // Reset streak on loss
       }
+      
       progression.push(cumulativeScore);
     });
   
-    // Configura i dati per il grafico
+    // Set data for graph
     const winLossData = {
-      labels: labels, // Ad esempio "Match 1", "Match 2", ...
+      labels: labels,
       datasets: [{
-        label: 'Win/Loss Progression',
-        data: progression, // Punteggio cumulativo per ogni match
+        label: `Win Streak: ${winStreak}`,
+        data: progression, // Array of results
         borderColor: '#02BFB9',
         backgroundColor: '#014C4A',
         fill: false,
-        tension: 0 // Linea dritta
+        tension: 0
       }]
     };
   
-    // Crea il grafico a linee
+    // Create graph
     new Chart(ctx, {
       type: 'line',
       data: winLossData,
@@ -184,7 +172,7 @@ function drawWinLossHistoryChart(matchesData) {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          title: { display: true, text: 'Win/Loss Progression' }
+          title: { display: true, text: `Win/Loss Progression` }
         },
         scales: {
           x: { title: { display: true, text: 'Matches' } },
@@ -192,7 +180,8 @@ function drawWinLossHistoryChart(matchesData) {
         }
       }
     });
-  }
+}
+
   
 
 
@@ -204,15 +193,18 @@ function matchesTimeRank() {
 
     let totalSeconds = 0;
     matchesPlayedLabel.textContent = matchesPlayed;
+
     //const playerData = data.players[playerName];
+
     userData.forEach(match => {
         totalSeconds += Number(match.begin_time);
     })
-    console.log("total seconds = " +totalSeconds);
+    //console.log("total seconds = " +totalSeconds);
+
     const totalTime = formatTime(totalSeconds / matchesPlayed);
     avgMatchTimeLabel.textContent = totalTime;
     const totalMatches = wins + losses;
-    const victoryRate = wins / (totalMatches) * 100;
+    //const victoryRate = wins / (totalMatches) * 100;
 
     const rankPoints = totalMatches + (wins * 10) - (losses * 5);
     if (rankPoints < 0)
@@ -222,7 +214,6 @@ function matchesTimeRank() {
 
 export async function showCharts() {
     //playerName = userName;
-
     try {
         const response = await fetch("http://localhost:8008", {
           method: "get_pong_games",
@@ -235,30 +226,25 @@ export async function showCharts() {
         if (data.games) {
           userData = data.games;
           console.log("userData aggiornata: ", userData);
-          // Ora puoi richiamare altre funzioni che usano userData qui dentro
         }
       } catch (error) {
         console.error("Fetch error:", error);
-      }
-
-
-    // data = JSON.parse(localStorage.getItem('game_data')) || { players: {} };
-    // const playerData = data.players[playerName];
+    }
 
     const noMatchesMessage = document.getElementById('noMatchesMessage');
     const chartsContainer = document.querySelector('.charts-container');
     const chartsButtonContainer = document.querySelector('.charts-button-container');
 
     if (!userData || userData.length === 0) {
-        noMatchesMessage.style.display = 'block'; // Mostra il messaggio
-        chartsContainer.style.display = 'none'; // Nascondi i grafici
-        chartsButtonContainer.style.display = 'none'; // Nascondi i pulsanti
+        noMatchesMessage.style.display = 'block';
+        chartsContainer.style.display = 'none'; // If no matches don't show charts
+        chartsButtonContainer.style.display = 'none';
         return;
     }
 
-    noMatchesMessage.style.display = 'none'; // Nascondi il messaggio
-    chartsContainer.style.display = 'flex'; // Mostra i grafici
-    chartsButtonContainer.style.display = 'block'; // Mostra i pulsanti
+    noMatchesMessage.style.display = 'none';
+    chartsContainer.style.display = 'flex'; 
+    chartsButtonContainer.style.display = 'block';
 
     let lastMatchesData = userData.slice(-10);
 
@@ -270,7 +256,6 @@ export async function showCharts() {
     drawWinLossChart();
     matchesTimeRank(lastMatchesData);
     drawWinLossHistoryChart(lastMatchesData);
-    // drawXpProgressChart(lastMatchesData);
 }
 
 export const addChartsPageHandlers = () => {

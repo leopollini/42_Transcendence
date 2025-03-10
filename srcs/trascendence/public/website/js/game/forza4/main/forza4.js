@@ -41,8 +41,6 @@ export function startForza4Game() {
 
 }
 
-
-
 class Forza4Game {
 
     constructor() {

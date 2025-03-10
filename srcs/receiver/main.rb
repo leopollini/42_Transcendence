@@ -67,7 +67,7 @@ def sorter(client, _server)
     end
     msg += t
     method = msg[0, msg.index(' ').to_i]
-    puts msg
+    # puts msg
     client.puts 'HTTP/1.1 200 OK', 'Connection: close', 'Access-Control-Allow-Origin: *',
                 'Access-Control-Allow-Methods: *', ''
     if method == 'OPTIONS'

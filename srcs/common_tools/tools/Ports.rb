@@ -14,12 +14,15 @@ module Ports
     'HEAD' => ['request_manager', 9000],
     'show_users' => ['request_manager', 9000],
     'tokenizer' => ['tokenizer', 7890],
+
     'add_user' => ['user_manager', 7080],
     'get_user' => ['user_manager', 7080],
     'drop_users' => ['user_manager', 7080],
     'update_user' => ['user_manager', 7080],
     'game_manager' => ['game_manager', 7878],
-    'history_manager' => ['history_manager', 7701],
+    'login_user' => ['game_manager', 7878],
+    'logout_user' => ['game_manager', 7878],
+    
     'chat' => ['chat', 6087],
 
     'save_pong_game' => ['game_data_manager', 8790],

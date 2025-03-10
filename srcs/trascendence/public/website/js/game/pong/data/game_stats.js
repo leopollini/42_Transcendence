@@ -1,6 +1,5 @@
 import { matchData } from './game_global.js';
 import { formatTime } from '../other/timer.js';
-import { calculateXpPlayers, calculateLevelPlayers } from '../other/xp_level.js';
 
 export function saveMatchStatsData(p1Name, p2Name, scoreP1, scoreP2) {
     matchData.player1 = p1Name;
@@ -21,11 +20,6 @@ function saveUserStatsData(matchData) {
     const score2 = matchData.scorep2;
     const matchTime = matchData.seconds;
     const longestRally = matchData.longestRally;
-    const data = JSON.parse(localStorage.getItem('game_data')) || { players: {} };
-
-
-    // calculateXpPlayers(data, winner, loser);
-    // calculateLevelPlayers(data, winner, loser);
 
 
     fetch("http://localhost:8008", {

@@ -31,9 +31,6 @@ export default function MatchDetails() {
 export async function showMatchDetails() {
     const matchDetailsContainer = document.getElementById("matchDetailsContainer");
     matchDetailsContainer.innerHTML = "";
-    //const playerName = userName;
-    // const data = JSON.parse(localStorage.getItem('game_data')) || { players: {} };
-    // const playerData = data.players[playerName];
 
     try {
         const response = await fetch("http://localhost:8008", {
@@ -47,7 +44,6 @@ export async function showMatchDetails() {
         if (data.games) {
             userData = data.games;
             console.log("userData aggiornata: ", userData);
-            // Ora puoi richiamare altre funzioni che usano userData qui dentro
         }
         } catch (error) {
             console.error("Fetch error:", error);
@@ -57,7 +53,7 @@ export async function showMatchDetails() {
     if (userData && userData.length > 0) {
         matchDetailsContainer.innerHTML += `<h3>Matches History</h3>`;
         userData.forEach(match => {
-            const opponent = match.player1 === userName ? match.player2 : match.player1;
+            //const opponent = match.player1 === userName ? match.player2 : match.player1;
 
             const matchHtml = `
                 <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
