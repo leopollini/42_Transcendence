@@ -5,10 +5,6 @@ SHELL:=/bin/bash
 
 all: prep_dirs #stop_containers
 	@clear
-	@echo "Configurando il firewall..."
-	./setup/open_firewall.sh
-	@echo "Configurando nginx..."
-	./setup/ngnix.sh
 	make -C ./srcs/common_tools/ all
 	@if [ "$(DETATCH)" = "true" ]; then \
 		docker-compose -f ./docker-compose.yml up -d; \
@@ -41,10 +37,13 @@ down:
 	@docker-compose -f ./docker-compose.yml down
 
 re: clean prep_dirs
-
+	@clear
+	@sudo chmod +x ./setup/open_firewall.sh ./setup/ngnix.sh
 	@echo "Configurando il firewall..."
-	chmod +x open_firewall.sh
-	./open_firewall.sh
+	@sudo ./setup/open_firewall.sh
+	@echo "Configurando nginx..."
+	@sudo ./setup/ngnix.sh
+	@echo "fine configurazione ngnix e firewall"
 	make -C srcs/common_tools/ re
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
