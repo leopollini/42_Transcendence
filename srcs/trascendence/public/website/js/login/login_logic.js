@@ -37,7 +37,6 @@ function popupHandling(popup, data)
             messageReceived = true;
         } 
     });
-    console.log("sas");
     let popupMonitor = setInterval(() => {
         if (popup.closed) 
         {

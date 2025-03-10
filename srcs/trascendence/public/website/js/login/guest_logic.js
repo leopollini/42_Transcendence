@@ -90,5 +90,9 @@ function update_guest(curr_guest)
         body: JSON.stringify(current_user)
     })
     .then(response => response.json())
+    .then(data =>
+    {
+        console.log("data", data);
+    })
     updateUserProfile(current_user);
 }

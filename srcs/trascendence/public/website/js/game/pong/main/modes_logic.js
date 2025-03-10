@@ -89,7 +89,6 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             localStorage.clear();
             sessionStorage.clear();
             pop_false();
-            current_user.entered = 0;
             /*fetch("http://localhost:8008",
             {
                 method: "update_user", 
@@ -103,7 +102,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
                 drop_guests fetch
             }
             */
-            navigate("/", "Logout");
+            navigate("/", "login");
         });
     }
     else 
