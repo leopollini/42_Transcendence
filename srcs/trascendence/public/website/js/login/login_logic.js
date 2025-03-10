@@ -22,7 +22,7 @@ function checkLoginRestrictions()
     return true;
 }
 
-function popupHandling(popup)
+function popupHandling(popup, data)
 {
     popupOpened = true;
     localStorage.setItem('popup_opened', 'true');
@@ -37,14 +37,14 @@ function popupHandling(popup)
             messageReceived = true;
         } 
     });
-
+    console.log("sas");
     let popupMonitor = setInterval(() => {
         if (popup.closed) 
         {
             clearInterval(popupMonitor);
             localStorage.setItem('popup_opened', 'false');
             popupOpened = false;
-            if (messageReceived && log_succ) 
+            if (messageReceived === true && log_succ === true && data.authenticated === true) 
             {
                 get_data();
                 navigate("/modes", "Modalità di gioco");
@@ -104,6 +104,6 @@ export function performLogin()
     .then(response => response.json())
     .then(data => {
         const popup = window.open(data.auth_url, 'Login', 'width=800,height=800');
-        popupHandling(popup);
+        popupHandling(popup, data);
     })
 }

@@ -92,7 +92,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             current_user.entered = 0;
             /*fetch("http://localhost:8008",
             {
-                method: "add_user", 
+                method: "update_user", 
                 body: JSON.stringify(current_user)
             })
             .then(response => response.json())
@@ -100,7 +100,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             /*
             if (current_user.type === "guest")
             {
-                dorp_table fetch
+                drop_guests fetch
             }
             */
             navigate("/", "Logout");
