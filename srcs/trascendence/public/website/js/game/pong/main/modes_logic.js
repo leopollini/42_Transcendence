@@ -90,7 +90,19 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             sessionStorage.clear();
             pop_false();
             current_user.entered = 0;
-            /*dorp_table fetch*/
+            /*fetch("http://localhost:8008",
+            {
+                method: "add_user", 
+                body: JSON.stringify(current_user)
+            })
+            .then(response => response.json())
+            updateUserProfile(current_user);*/
+            /*
+            if (current_user.type === "guest")
+            {
+                dorp_table fetch
+            }
+            */
             navigate("/", "Logout");
         });
     }

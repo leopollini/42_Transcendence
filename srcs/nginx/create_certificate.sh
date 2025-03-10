@@ -1,7 +1,9 @@
-if [ -f .env ]; then
-    source .env
+#!/bin/bash
+
+if [ -f /var/www/nginx/.env ]; then
+    source /var/www/nginx/.env
 else
-    echo -e "$RED.env file not found!$RESET"
+    echo -e "🔴 .env file not found in /var/www/nginx!"
     exit 1
 fi
 

@@ -29,18 +29,22 @@
       <p>The page will close in <span id="timer">3</span> seconds.<br> Or you
         can close it.</p>
       <script>
-        
         let countdown = 3;
         const timerElement = document.getElementById('timer');
-        
+
         const timerInterval = setInterval(function() {
           countdown--;
           timerElement.textContent = countdown;
           
-          if (countdown === 0) {
+          if (countdown === 0)
+          {
             clearInterval(timerInterval);
             window.close();
           }
+          window.addEventListener("beforeunload", () => {
+            if (window.opener)
+              window.opener.postMessage({ access_granted: true }, "*");
+          });
         }, 1000);
       </script>
     </div>

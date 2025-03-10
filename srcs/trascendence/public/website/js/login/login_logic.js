@@ -27,15 +27,31 @@ function popupHandling(popup)
     popupOpened = true;
     localStorage.setItem('popup_opened', 'true');
 
+    let log_succ = false
+    let messageReceived = false;
+    window.addEventListener("message", (event) => {
+        log_succ = event.data.access_granted;
+        if (event.data.access_granted === true) 
+        {
+            log_succ = true;
+            messageReceived = true;
+        } 
+    });
+
     let popupMonitor = setInterval(() => {
-        if (popup.closed)
+        if (popup.closed) 
         {
             clearInterval(popupMonitor);
             localStorage.setItem('popup_opened', 'false');
             popupOpened = false;
-            get_data();
-            navigate("/modes", "Modalità di gioco");
-            alert("You are logged in successfully.\nTo change user, close this tab first!");
+            if (messageReceived && log_succ) 
+            {
+                get_data();
+                navigate("/modes", "Modalità di gioco");
+                alert("You are logged in successfully.\nTo change user, close this tab first!");
+            }
+            else
+                alert("Error: Unexpected popup closure, authentication failed.");
         }
     }, 500);
 }
@@ -49,6 +65,8 @@ function get_data()
     .then(response => response.json())
     .then(data =>
     {
+        /*if (data.status === "no users found" || !data.user || data.user.length === 0)
+            return;*/
         let user = data.user[0];
         let new_user = {
             email: user.email,
@@ -88,8 +106,4 @@ export function performLogin()
         const popup = window.open(data.auth_url, 'Login', 'width=800,height=800');
         popupHandling(popup);
     })
-    .catch(error => {
-        console.error("Errore di rete:", error);
-        localStorage.setItem('authenticated', 'false');
-    });
 }

@@ -70,8 +70,12 @@ export function refresh_reload_var()
     .then(response => response.json())
     .then(data =>
     {
-        console.log("data = ", data);
+        /*if (data.status === "no users found" || !data.user || data.user.length === 0)
+            return;*/
+        //console.log("data = ", data);
         current_user = data.user[0];
+        if (current_user === undefined)
+            return;
         change_name(current_user.display_name);
         update_image(current_user.image);
     })

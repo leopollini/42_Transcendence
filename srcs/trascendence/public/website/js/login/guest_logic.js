@@ -43,6 +43,8 @@ export async function guest_login()
     })
     .then(response => response.json())
     .then(data => {
+        /*if (data.status === "no users found" || !data.user || data.user.length === 0)
+            return;*/
         if (data.user && Array.isArray(data.user)) {
             const value = data.user.some(user => user.display_name === name) ? 1 : 0;
             if (value === 1)
@@ -88,6 +90,5 @@ function update_guest(curr_guest)
         body: JSON.stringify(current_user)
     })
     .then(response => response.json())
-    console.log("hi there")
     updateUserProfile(current_user);
 }

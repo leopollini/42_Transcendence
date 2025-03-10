@@ -4,10 +4,12 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80 443
 
-COPY ./srcs/nginx/crypted_data/* /etc/nginx/ssl/
-
-COPY ./srcs/nginx/nginx.conf /etc/nginx/http.d/
+COPY ./crypted_data/* /etc/nginx/ssl/
+COPY ./srcs/nginx/nginx.conf /etc/nginx/conf.d/
+COPY ./server.sh /etc/nginx/
+COPY ./nginix.sh /etc/nginx/
+COPY ./create_certificate.sh /etc/nginx/
 
 RUN chmod +x /server.sh
 
-CMD ["/bin/bash", "-c", "/server.sh && nginx -g 'daemon off;'"]
+RUN chmod +x /nginx.sh
