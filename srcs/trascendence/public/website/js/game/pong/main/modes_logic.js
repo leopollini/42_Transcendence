@@ -89,19 +89,19 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             localStorage.clear();
             sessionStorage.clear();
             pop_false();
-            /*fetch("http://localhost:8008",
+            fetch("http://localhost:8008",
             {
-                method: "update_user", 
-                body: JSON.stringify(current_user)
+                method: "logut_user",
+                body:{"username": JSON.parse(current_user.display_name)}
             })
             .then(response => response.json())
-            updateUserProfile(current_user);*/
-            /*
-            if (current_user.type === "guest")
+            /*if (current_user.type === "guest")
             {
-                drop_guests fetch
-            }
-            */
+                fetch("http://localhost:8008",
+                {
+                    method: "drop_guests"
+                }
+            }*/
             navigate("/", "login");
         });
     }

@@ -6,7 +6,9 @@ SHELL:=/bin/bash
 all: prep_dirs #stop_containers
 	@clear
 	@echo "Configurando il firewall..."
-	./open_firewall.sh
+	./setup/open_firewall.sh
+	@echo "Configurando nginx..."
+	./setup/ngnix.sh
 	make -C ./srcs/common_tools/ all
 	@if [ "$(DETATCH)" = "true" ]; then \
 		docker-compose -f ./docker-compose.yml up -d; \

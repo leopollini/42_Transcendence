@@ -7,14 +7,20 @@ else
     exit 1
 fi
 
+cd /etc/nginx/
 
-rm /etc/nginx/sites-enabled/finaltrascendence.conf
-ln -s /etc/nginx/sites-available/finaltrascendence.conf /etc/nginx/sites-enabled/
+mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled/
 
-echo -e "$YELLOW Testing Nginx configuration...$RESET"
-nginx -t || handle_error "Nginx configuration test failed."
+rm -f ./sites-enabled/nginx.conf
+ln -s ./sites-available/nginx.conf ./sites-enabled/
 
-echo -e "$YELLOW Restarting Nginx...$RESET"
-systemctl restart nginx || handle_error "$RED Failed to restart Nginx.$RESET"
+echo -e "🔧 Testing Nginx configuration..."
+nginx -t || { echo "Nginx configuration test failed."; exit 1; }
 
-echo -e "$GREEN Nginx restarted successfully.$RESET"
+echo -e "🧹 Cleaning up old PID file..."
+rm -f /var/run/nginx.pid
+
+echo -e "🔄 Restarting Nginx..."
+nginx -s reload || { echo "Failed to reload Nginx."; exit 1; }
+
+echo -e "✅ Nginx restarted successfully."
