@@ -51,7 +51,7 @@ function insert_user_data() {
 }
 
 export function profileHandler() {
-  if (current_user === null) {
+  if (current_user === null || current_user === undefined) {
     access_denied();
     return;
   }
@@ -94,6 +94,16 @@ function saveProfile(infoContainer) {
   } else {
     saving += "Error: Email input not found\n";
   }*/
+  let data = JSON.stringify({"display_name" : current_user.display_name, "image" : current_user.image, 
+  "bio" : current_user.bio});
+  fetch("http://localhost:8008",
+  {
+      method: "update_user",
+      body: data
+  })
+  .then(data =>{
+      console.log("data update user profile = ", data);
+  })
   alert(saving);
   updateUserProfile(current_user);
   history.back();
