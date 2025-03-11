@@ -1,7 +1,8 @@
 import { current_user, updateUserProfile } from "../modes.js";
-import { emailHandler } from "../../game/pong/other/profile_logic.js";
+//import { emailHandler } from "../../game/pong/other/profile_logic.js";
 import { profile, profiles } from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
+import { access_denied } from "../../game/pong/main/modes_logic.js";
 
 export default function Profile() {
   return `
@@ -63,7 +64,7 @@ export function profileHandler() {
   const infoContainer = card.querySelector("#yourData");
 
   updateDisplayNames(infoContainer);
-  emailHandler(me, infoContainer);
+  //emailHandler(me, infoContainer);
   
   // Pre-compila il campo bio se già salvato
   const bioInput = infoContainer.querySelector("#bioInput");

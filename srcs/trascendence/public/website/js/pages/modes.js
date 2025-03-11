@@ -58,8 +58,6 @@ export default function Modes()
 
 export let current_user = JSON.parse(localStorage.getItem('your_profile'));
 
-const storedGuest = JSON.parse(localStorage.getItem("guest"));
-
 export function refresh_reload_var()
 {
     fetch("http://localhost:8008",
@@ -72,7 +70,6 @@ export function refresh_reload_var()
     {
         /*if (data.status === "no users found" || !data.user || data.user.length === 0)
             return;*/
-        //console.log("data = ", data);
         current_user = data.user[0];
         if (current_user === undefined)
             return;

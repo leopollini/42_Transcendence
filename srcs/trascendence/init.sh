@@ -32,6 +32,7 @@ else
 fi
 
 cd authentication/
+rm Gemfile.lock
 echo "==============================="
 echo "Aggiornamento delle gemme con Bundler..."
 if bundle update; then

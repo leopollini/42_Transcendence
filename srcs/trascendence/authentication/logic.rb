@@ -24,7 +24,6 @@ module AuthMethods
       response.write({ success: false, error: "No authorization code received" }.to_json)
       return
     end
-  
     token = client.get_token(code)
     response.set_cookie('access_token', {
       value: token.token,
