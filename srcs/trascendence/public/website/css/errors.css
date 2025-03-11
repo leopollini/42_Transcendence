@@ -1,0 +1,24 @@
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 15vh;
+    text-align: center;
+    padding: 20px;
+    background: rgb(224, 151, 16);
+    border: 2px solid #f5c6cb;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Roboto', Arial, sans-serif;
+    flex-direction: column;
+}
+
+.error-container h1 {
+    font-size:40px;
+    color: #721c24;
+}
+
+.error-container p {
+    font-size: 30px;
+    color: #721c24;
+}

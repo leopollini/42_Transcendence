@@ -1,6 +1,6 @@
 import { navigate } from '../main.js';
 import { profile } from "../login/user.js";
-import { handle_modes_logic } from '../game/pong/main/modes_logic.js';
+import { access_denied, handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
 
 export default function Modes()
@@ -162,6 +162,11 @@ function updateProfileUI(profile) {
 }
 
 export const addModesPageHandlers = () => {
+    if (current_user === undefined || current_user === null)
+    {
+        access_denied();
+        return;
+    }
     const classicButton = document.getElementById('classicButton');
     const aiButton = document.getElementById('aiButton');
     const tournamentButton = document.getElementById('tournamentButton');
