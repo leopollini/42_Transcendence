@@ -36,15 +36,17 @@ export async function guest_login()
         alert('Name too long.');
         return;
     }
+    let data = JSON.stringify({"params" : [{"type" : "login"}, {"type" : "guest"}]});
     fetch("http://localhost:8008",
     {
         method: "get_user",
-        body:{"params": [{"type":"login"}, {"type":"guest"}]}
+        body: data
     })
     .then(response => response.json())
     .then(data => {
         /*if (data.status === "no users found" || !data.user || data.user.length === 0)
             return;*/
+        console.log("get name = ", data);
         if (data.user && Array.isArray(data.user)) {
             const value = data.user.some(user => user.display_name === name) ? 1 : 0;
             if (value === 1)
@@ -84,15 +86,16 @@ function update_guest(curr_guest)
         "guest"
         
     );
+    let data = JSON.stringify({ login_as_guest : true, username : current_user, do_create : true});
     fetch("http://localhost:8008",
     {
-        method: "add_user", 
-        body: JSON.stringify(current_user)
+        method: "login_user",
+        body: data
     })
     .then(response => response.json())
     .then(data =>
     {
-        console.log("data", data);
+        console.log("data guest = ", data);
     })
     updateUserProfile(current_user);
 }

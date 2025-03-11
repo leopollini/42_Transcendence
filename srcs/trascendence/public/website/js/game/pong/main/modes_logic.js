@@ -89,19 +89,28 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             localStorage.clear();
             sessionStorage.clear();
             pop_false();
-            fetch("http://localhost:8008",
-            {
-                method: "logut_user",
-                body:{"username": JSON.parse(current_user.display_name)}
-            })
-            .then(response => response.json())
-            /*if (current_user.type === "guest")
+            if (current_user.type === "guest")
             {
                 fetch("http://localhost:8008",
                 {
                     method: "drop_guests"
-                }
-            }*/
+                })
+                .then(data =>{
+                    console.log("data delete guest = ", data);
+                })
+            }
+            else
+            {
+                let data = JSON.stringify({"realname" : current_user.realname, "entered" : "0"})
+                fetch("http://localhost:8008",
+                {
+                    method: "update_user",
+                    body: data
+                })
+                .then(data =>{
+                    console.log("data update_guest = ", data);
+                })
+            }
             navigate("/", "login");
         });
     }

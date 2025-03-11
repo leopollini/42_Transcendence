@@ -57,13 +57,15 @@ function popupHandling(popup, data)
 
 function get_data()
 {
+    let data = JSON.stringify({"params" :{"type" : "login"}});
     fetch("http://localhost:8008", {
         method: "get_user",
-        body: {"params": {"entered":"1"}}
+        body: data
     })
     .then(response => response.json())
     .then(data =>
     {
+        console.log("data login = ", data);
         /*if (data.status === "no users found" || !data.user || data.user.length === 0)
             return;*/
         let user = data.user[0];

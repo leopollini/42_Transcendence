@@ -60,10 +60,11 @@ export let current_user = JSON.parse(localStorage.getItem('your_profile'));
 
 export function refresh_reload_var()
 {
+    let data = JSON.stringify({ "params" : {"entered" : "1"}})
     fetch("http://localhost:8008",
     {
         method: "get_user",
-        body:{"params": {"entered":"1"}}
+        body: data
     })
     .then(response => response.json())
     .then(data =>
