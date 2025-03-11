@@ -32,7 +32,10 @@ else
 fi
 
 cd authentication/
-rm Gemfile.lock
+if [ -f "Gemfile.lock" ]; then
+    rm Gemfile.lock
+fi
+
 echo "==============================="
 echo "Aggiornamento delle gemme con Bundler..."
 if bundle update; then
@@ -53,5 +56,4 @@ fi
 
 echo "==============================="
 echo "Script completato. Avvio server..."
-
 bundle exec ruby server.rb
