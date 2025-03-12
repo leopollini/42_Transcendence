@@ -69,8 +69,8 @@ function get_data()
     .then(data =>
     {
         console.log("data login = ", data);
-        if (data.status === "no users found" || !data.user || data.user.length === 0)
-            navigate("/", "login");
+        /*if (data.status === "no users found" || !data.user || data.user.length === 0)
+            navigate("/", "login");*/
         let user = data.user[0];
         let new_user = {
             email: user.email,

@@ -36,7 +36,9 @@ export async function guest_login()
         alert('Name too long.');
         return;
     }
-    let data = JSON.stringify({"params" : [{"type" : "login"}, {"type" : "guest"}]});
+    localStorage.setItem('guest', JSON.stringify(guest));
+    addGuest(name);
+    /*let data = JSON.stringify({"params" : {}});
     fetch("http://localhost:8008",
     {
         method: "get_user",
@@ -63,7 +65,7 @@ export async function guest_login()
     })
     .catch(error => {
         console.error("Error:", error);
-    });
+    });*/
 }
 
 function addGuest(name) {
@@ -84,9 +86,8 @@ function update_guest(curr_guest)
         curr_guest.bio,
         curr_guest.image,
         "guest"
-        
     );
-    let data = JSON.stringify({ login_as_guest : true, username : current_user, do_create : true});
+    let data = JSON.stringify({data : {username : current_user.display_name}, login_as_guest : "true"});
     fetch("http://localhost:8008",
     {
         method: "login_user",

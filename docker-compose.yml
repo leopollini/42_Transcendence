@@ -201,20 +201,20 @@ services:
     entrypoint: /var/www/init.sh
     working_dir: /var/www
 
-  nginx:
-    image: nginx:latest
-    container_name: nginx-server
-    restart: always
-    ports:
-      - "8443:443"
-      - "8080:8080"
-    volumes:
-      - ./srcs/nginx/:/var/www/nginx
-      - ./srcs/trascendence/public:/usr/share/nginx/html:ro
-      - ./srcs/nginx/.env:/var/www/nginx/.env
-    networks:
-      - app-network
-    entrypoint: bash /var/www/nginx/server.sh
-    environment:
-      - TERM=xterm
-    working_dir: /var/www
+  #nginx:
+  #  image: nginx:latest
+  #  container_name: nginx-server
+  #  restart: always
+  #  ports:
+  #    - "8443:443"
+  #    - "8080:8080"
+  #  volumes:
+  #    - ./srcs/nginx/:/var/www/nginx
+  #    - ./srcs/trascendence/public:/usr/share/nginx/html:ro
+  #    - ./srcs/nginx/.env:/var/www/nginx/.env
+  #  networks:
+  #    - app-network
+  #  entrypoint: bash /var/www/nginx/server.sh
+  #  environment:
+  #    - TERM=xterm
+  #  working_dir: /var/www

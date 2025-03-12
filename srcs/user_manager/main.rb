@@ -125,7 +125,7 @@ def get_user(_client, obj = nil)
     res['guest'] = lst_guest
 
     # In case no filter is given returns whole databases
-  elsif params.nil? || params.empty?
+  elsif params.nil? || params == [{}]
     puts 'Returning whole database'
     users = LOGIN.select
     # puts "####", users
@@ -200,6 +200,7 @@ def user_manager(client, _server)
     {'status' => 'bad method: ' + bobj['method'].to_s, 'success' => 'false'}
   end
   client.puts res.to_json
+  puts res.to_json
 end
 
 puts 'user_manager active at port ' + PORT.to_s + "\n"

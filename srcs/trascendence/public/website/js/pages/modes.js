@@ -60,7 +60,7 @@ export let current_user = JSON.parse(localStorage.getItem('your_profile'));
 
 export function refresh_reload_var()
 {
-    let data = JSON.stringify({ "params" : {"entered" : "1"}})
+    let data = JSON.stringify({ "params" : {}});
     fetch("http://localhost:8008",
     {
         method: "get_user",
@@ -69,9 +69,9 @@ export function refresh_reload_var()
     .then(response => response.json())
     .then(data =>
     {
-        if (data.status === "no users found" || !data.user || data.user.length === 0)
-            navigate("/", "login");
-        current_user = data.user[0];
+        /*if (data.status === "no users found" || !data.user || data.user.length === 0)
+            navigate("/", "login");*/
+        current_user = data.guest[0];
         if (current_user === undefined)
             return;
         change_name(current_user.display_name);

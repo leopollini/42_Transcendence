@@ -10,7 +10,7 @@ class GuestsList
   def add_guest(username)
     return DEFAULT_MISSING_PARAM.clone if username.class != "".class
     return {'status' => 'username already in use', 'success' => 'false'} if @guests[@index[username].to_i]
-
+    
     @counter = @counter % MAX_GUEST_COUNT + 1
     @index.delete @guests[@counter]['username'] if @guests[@counter]
     @index[username] = @counter

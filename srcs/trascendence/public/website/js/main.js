@@ -91,7 +91,7 @@ function restoreBackground() {
 
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
-    //refresh_reload_var()
+    refresh_reload_var()
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];

@@ -19,9 +19,8 @@ module Ports
     'get_user' => ['user_manager', 7080],
     'drop_users' => ['user_manager', 7080],
     'update_user' => ['user_manager', 7080],
-    'game_manager' => ['game_manager', 7878],
-    'login_user' => ['game_manager', 7878],
-    'logout_user' => ['game_manager', 7878],
+    'login_user' => ['user_manager', 7080],
+    'logout_user' => ['user_manager', 7080],
     
     'chat' => ['chat', 6087],
 
