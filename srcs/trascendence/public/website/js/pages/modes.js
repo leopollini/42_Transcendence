@@ -69,8 +69,11 @@ export function refresh_reload_var()
     .then(response => response.json())
     .then(data =>
     {
-        /*if (data.status === "no users found" || !data.user || data.user.length === 0)
-            navigate("/", "login");*/
+        console.log("data get guest/login", data);
+        if (!data.user || data.user.length === 0)
+            return;
+        if (data.status === "no users found")
+            navigate("/", "login");
         current_user = data.guest[0];
         if (current_user === undefined)
             return;

@@ -49,6 +49,8 @@ def add_user(_client, obj = nil)
   rescue StandardError
     max = { 'max' => 0 }
   end
+  ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
+  'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'entered INT', 'level FLOAT']
 
   fields = LOGIN.getColumns
   values = {}
@@ -99,6 +101,16 @@ def get_user(_client, obj = nil)
   res['status'] = 'invalid request'
   params = obj['params']
   params = [params] if params.class.to_s == 'Hash'
+  if params.nil? || params == [{}]
+    puts 'Returning whole database'
+    users = LOGIN.select
+    # puts "####", users
+    res = DEFAULT_SUCCESS_RES.clone
+    res['user'] = users
+    res['guest'] = GUEST.get_all_guests
+    res['status'] = 'no users found' if users.empty? && res['guest'].empty?
+    return res
+  end
   if params.class.to_s == 'Array'
     puts 'looking for users with ' + params.to_s if DEBUG_MODE
     params.each do |p|
@@ -125,20 +137,14 @@ def get_user(_client, obj = nil)
     res['guest'] = lst_guest
 
     # In case no filter is given returns whole databases
-  elsif params.nil? || params == [{}]
-    puts 'Returning whole database'
-    users = LOGIN.select
-    # puts "####", users
-    res = DEFAULT_SUCCESS_RES.clone
-    res['status'] = 'no users found' if users.empty? && lst_guest.empty?
-    res['user'] = users
-    res['guest'] = GUEST.get_all_guests
   end
   res
 end
 
 def update_user(_client, obj = nil)
   puts 'update_user called' if DEBUG_MODE
+  return 
+
   r = nil
   res = DEFAULT_ERROR_RES.clone
   return res if !obj || !(params = obj['new_params']) || !(lname = obj['display_name'])
@@ -199,8 +205,8 @@ def user_manager(client, _server)
   else
     {'status' => 'bad method: ' + bobj['method'].to_s, 'success' => 'false'}
   end
+
   client.puts res.to_json
-  puts res.to_json
 end
 
 puts 'user_manager active at port ' + PORT.to_s + "\n"

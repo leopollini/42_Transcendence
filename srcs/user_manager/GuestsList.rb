@@ -8,9 +8,10 @@ class GuestsList
   end
 
   def add_guest(username)
+    puts "creating new guest #{username}"
     return DEFAULT_MISSING_PARAM.clone if username.class != "".class
     return {'status' => 'username already in use', 'success' => 'false'} if @guests[@index[username].to_i]
-    
+
     @counter = @counter % MAX_GUEST_COUNT + 1
     @index.delete @guests[@counter]['username'] if @guests[@counter]
     @index[username] = @counter
@@ -40,5 +41,14 @@ class GuestsList
   def drop_guests()
     initialize
     DEFAULT_SUCCESS_RES.clone
+  end
+  def update_guest(username, new_data)
+    guest = (get_guests username, true)[0]
+    return {'status' => "user #{username} not found", 'success' => 'false'} if guest.nil?
+    return {'status' => "cannot change this info", 'success' => 'false'} if new_data['username'] || new_data['created'] || new_data['deleted']
+    return {'status' => 'changing invalid info', 'success' => 'false'} unless (new_data - ['bio', 'image']).empty?
+
+    guest['bio'] = new_data['bio'] if new_data['bio']
+    guest['image'] = new_data['image'] if new_data['image']
   end
 end
