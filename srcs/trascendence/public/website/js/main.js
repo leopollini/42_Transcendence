@@ -8,6 +8,7 @@ import Knockout, { addKnockoutPageHandlers } from "./pages/tournament/knockout.j
 import Customize, { addCustomizeGame } from "./pages/profile/customize.js";
 import Roundrobin, { addRoundRobinPageHandlers } from "./pages/tournament/roundrobin.js";
 import RobinRanking, { addRobinRankingPageHandlers, robinDraw, assignPointsToPlayer } from "./pages/tournament/robindraw.js";
+import LobbyRoom, { addLobbyPageHandlers, handleLobby } from "./pages/tournament/lobby.js";
 import { Charts, addChartsPageHandlers,showCharts } from "./pages/tournament/charts.js";
 import MatchDetails, {showMatchDetails } from "./pages/match_details.js";
 import Bracket, { addBracketPageHandlers, drawBracket, backToBracket, resetBracketState } from "./pages/tournament/bracket.js";
@@ -27,7 +28,7 @@ import ChatApp from "./pages/live-chat/ChatApp.js";
 
 let buttonTitle;
 let winner;
-
+let players;
 // Mappa delle rotte
 const routes = {
     "/": Login,
@@ -42,9 +43,11 @@ const routes = {
     "/settings/customizepong": Customize,
     "/settings/customizeforza4": Forza4Customize,
     "/tournament/knockout": Knockout,
+    "/tournament/knockout/lobby": LobbyRoom,
     "/tournament/roundrobin": Roundrobin,
     "/tournament/roundrobin/robinranking": RobinRanking,
     "/tournament/roundrobin/robinranking/game": PongGame,
+    "/tournament/roundrobin/lobby": LobbyRoom,
     "/tournament/userstats": Charts,
     "/tournament/userstats/matchdetails": MatchDetails,
     "/tournament/knockout/bracket": Bracket,
@@ -56,9 +59,10 @@ const routes = {
 };
 
 // Funzione universale per la navigazione
-export const navigate = (path, title = "") => {
+export const navigate = (path, title = "", lobbyPlayers) => {
     history.pushState({ path }, title, path);
     buttonTitle = title;
+    players = lobbyPlayers;
     loadContent();
     if (path === "/modes")
     {
@@ -95,14 +99,16 @@ const loadContent = async () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    let players;
+    
     let playerNames;
     let numPlayers = 4;
 
-    if (buttonTitle === "4" || buttonTitle === "5" || buttonTitle === "6" || buttonTitle === "7" || buttonTitle === "8" || buttonTitle === "16")
-        numPlayers = +buttonTitle;
+    if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
+        || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
+        numPlayers = parseInt(buttonTitle.replace(/\D/g, ""), 10);
 
-    players = createPlayersArray(numPlayers);
+    if (!players)
+        players = createPlayersArray(numPlayers);
 
     //console.log("Players? " +players);
     playerNames = players;  
@@ -167,6 +173,20 @@ const loadContent = async () => {
                     addKnockoutPageHandlers();
                     resetBracketState();
                 }
+                break;
+            case "/tournament/knockout/lobby":
+                if (current_user === null)
+                    access_denied();
+                else
+                    addLobbyPageHandlers();
+                handleLobby("Bracket", numPlayers);
+                break;
+            case "/tournament/roundrobin/lobby":
+                if (current_user === null)
+                    access_denied();
+                else
+                    addLobbyPageHandlers();
+                handleLobby("Robin", numPlayers);
                 break;
             case "/tournament/knockout/bracket":
                 if (current_user === null)

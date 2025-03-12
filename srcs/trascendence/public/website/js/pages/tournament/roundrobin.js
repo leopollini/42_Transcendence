@@ -105,7 +105,7 @@ export const addRoundRobinPageHandlers = () => {
 
     radioButtons.forEach(radioButton => {
         radioButton.addEventListener('change', (event) => {
-            navigate("/tournament/roundrobin/robinranking", radioButton.value);
+            navigate("/tournament/roundrobin/lobby", "Robin"+radioButton.value);  
         });
     });
 
