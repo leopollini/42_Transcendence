@@ -44,8 +44,8 @@ export async function guest_login()
     })
     .then(response => response.json())
     .then(data => {
-        /*if (data.status === "no users found" || !data.user || data.user.length === 0)
-            return;*/
+        if (data.status === "no users found" || !data.user || data.user.length === 0)
+            navigate("/", "login");
         console.log("get name = ", data);
         if (data.user && Array.isArray(data.user)) {
             const value = data.user.some(user => user.display_name === name) ? 1 : 0;

@@ -83,7 +83,6 @@ module SimpleServer
     raise "Bad method request (#{method})" if Ports::HASH[method].nil?
     puts "Resolving host: #{Ports::HASH[method][0]}".red
     service = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
-    msg['method'] = method
     service.write msg.to_json if msg
     IO.select [service], [], [], 1
     res = service.read_nonblock Ports::MAX_MSG_LEN

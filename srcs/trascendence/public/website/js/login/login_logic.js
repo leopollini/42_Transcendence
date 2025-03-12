@@ -43,7 +43,10 @@ function popupHandling(popup, data)
             clearInterval(popupMonitor);
             localStorage.setItem('popup_opened', 'false');
             popupOpened = false;
-            if (messageReceived === true && log_succ === true && data.authenticated === true) 
+            console.log("message recived = ", messageReceived);
+            console.log("acess granted = ", log_succ);
+            console.log("auhtentication success = ", data.authenticated);
+            if (messageReceived === true && log_succ === true) 
             {
                 get_data();
                 navigate("/modes", "Modalità di gioco");
@@ -66,8 +69,8 @@ function get_data()
     .then(data =>
     {
         console.log("data login = ", data);
-        /*if (data.status === "no users found" || !data.user || data.user.length === 0)
-            return;*/
+        if (data.status === "no users found" || !data.user || data.user.length === 0)
+            navigate("/", "login");
         let user = data.user[0];
         let new_user = {
             email: user.email,
