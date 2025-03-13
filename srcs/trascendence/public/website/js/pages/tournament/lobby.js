@@ -32,13 +32,13 @@ export default function LobbyRoom() {
             <div class="form" id="playerSearchForm">
                 <div>
                     <h2 id="playerText">Search for players</h2> 
-                    <input type="text" id="pongPlayerSearch" class="form__field" placeholder="Search a player...">
+                    <input type="text" id="pongPlayerSearch" class="form__field" placeholder="Search a player..." autocomplete="off">
                     <button id="toggleSearchUser" class="button-style">Search</button>
                 </div>
                 <div>
                     <h2 id="playerSearchResult">Waiting for User...</h2>
                     <button id="toggleInviteUser" class="button-style" disabled>Invite</button>
-                    <button id="toggleAddUserRaw" class="button-style">Add</button>
+                    <button id="toggleAddUserRaw" class="button-style">Add(test)</button>
                 </div>
 
             </div>

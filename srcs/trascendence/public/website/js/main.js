@@ -21,6 +21,7 @@ import { Forza4Home, showForza4HomeScreen, addForza4PageHandlers } from "./pages
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
 import { Forza4UserStats, forza4ShowUserStatistics, forza4ShowMatchDetails, addForza4StatsPageHandlers } from "./pages/forza4/forza4_statistics.js";
+import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import Friends from "./pages/friends.js";
 import Access_Denied from "./pages/access_denied.js";
 import LiveChat from "./pages/live-chat.js";
@@ -39,6 +40,7 @@ const routes = {
     "/forza4": Forza4Home,
     "/forza4/game": Forza4,
     "/forza4/userstats": Forza4UserStats,
+    "/forza4/findopponent": Forza4LobbyRoom,
     "/settings": Settings,
     "/settings/customizepong": Customize,
     "/settings/customizeforza4": Forza4Customize,
@@ -273,11 +275,18 @@ const loadContent = async () => {
                     forza4ShowUserStatistics();
                 }
                 break;
+            case "/forza4/findopponent":
+                if (current_user === null)
+                    access_denied();
+                else
+                    handleForza4Lobby(); 
+                    addForza4LobbyPageHandlers();
+                break;
             case "/forza4/game":
                 if (current_user === null)
                     access_denied();
                 else
-                    startForza4Game();
+                    startForza4Game(players);
                 break;
             default:
                 break;

@@ -39,37 +39,13 @@ export function showForza4HomeScreen() {
     const forza4StatsButton = document.getElementById('forza4StatsButton');
     
     forza4PlayButton.addEventListener('click', () => {
-        const players = [userName, "Poppi"];
-        /*let allNamesFilled = true;
+        //const players = [userName, "Poppi"];
         
-        for (let i = 1; i <= 2; i++) {
-
-            const playerInput = document.getElementById('player' + i + 'Name');
-            const playerName = playerInput.value;
-
-            if (playerName) {
-                players.push(playerName);
-            } 
-            else {
-                allNamesFilled = false;
-                break;
-            }
-        }
-
-        if (!allNamesFilled) {
-            alert('Please fill in all player names.');
-            return;
-        } 
-        else {
-            localStorage.removeItem('forza4players');
-            sessionStorage.setItem('forza4players', JSON.stringify(players));
-            //window.history.pushState({}, path, window.location.origin + path);
-            navigate("/forza4/game", "Forza 4 Game");
-        }*/
-        localStorage.removeItem('forza4players');
-        sessionStorage.setItem('forza4players', JSON.stringify(players));
+        //localStorage.removeItem('forza4players');
+        //sessionStorage.setItem('forza4players', JSON.stringify(players));
         //window.history.pushState({}, path, window.location.origin + path);
-        navigate("/forza4/game", "Forza 4 Game");
+        //navigate("/forza4/game", "Forza 4 Game");
+        navigate("/forza4/findopponent", "Forza 4 Find Opponent");
     });
     
 

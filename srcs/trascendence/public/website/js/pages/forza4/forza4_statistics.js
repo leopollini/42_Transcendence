@@ -111,19 +111,17 @@ async function forza4CalculateUserStatistics() {
             if (data.games) {
               userData = data.games;
               console.log("userData aggiornata: ", userData);
-              // Ora puoi richiamare altre funzioni che usano userData qui dentro
             }
           } catch (error) {
             console.error("Fetch error:", error);
           }
 
     if (!userData) {
-        return null; // Se il giocatore non ha dati, restituisci null
+        return null;
     }
       totalMoves = 0;
       totalTime = 0;
       userData.forEach(game => {
-        // Verifica che la partita coinvolga l'utente
         if (game.player1 === userName || game.player2 === userName) {
             if (game.winner === userName)
                 wins++;
@@ -140,14 +138,12 @@ async function forza4CalculateUserStatistics() {
     const totalLosses = losses || 0;
     const totalTies = ties || 0;
 
-    // Calcola la vittoria rate (percentuale di vittorie)
     const victoryRate = totalMatches > 0 ? ((totalWins / totalMatches) * 100).toFixed(2) : 0;
 
     const rankPoints = totalMatches + (totalWins * 10) - (totalLosses * 5);
     if (rankPoints < 0)
         rankPoints = 0;
 
-    // Calcola la media delle mosse per partita
     const averageMoves = totalMatches > 0 ? (totalMoves / totalMatches).toFixed(1) : 0;
 
 
