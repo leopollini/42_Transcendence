@@ -1,6 +1,7 @@
 import { navigate } from "../../../main.js";
 import { pop_false } from "../../../login/login_logic.js";
 import { current_user } from "../../../pages/modes.js";
+import { eraseCookie } from "../../../login/user.js";
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
         statIcon, friends, history, logout)
@@ -93,11 +94,12 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             {
                 fetch("http://localhost:8008",
                 {
-                    method: "drop_guests"
+                    method: "drop_users"
                 })
                 .then(data =>{
                     console.log("data delete guest = ", data);
                 })
+                eraseCookie("current_guest");
             }
             else
             {
@@ -108,7 +110,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
                     body: data
                 })
                 .then(data =>{
-                    console.log("data update_guest = ", data);
+                    console.log("data update logged user = ", data);
                 })
             }
             navigate("/", "login");

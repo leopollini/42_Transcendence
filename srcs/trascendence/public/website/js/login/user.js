@@ -34,3 +34,33 @@ export class Friend {
         this.status = status;
     }
 }
+
+export function saveCookie(name, element, days)
+{
+    let data = new Date();
+    data.setTime(data.getTime() + (days * 24 * 60 * 60 * 1000));
+    let scadenza = "expires=" + data.toUTCString();
+    document.cookie = name + "=" + encodeURIComponent(JSON.stringify(element)) + ";" + scadenza + ";path=/";
+}
+
+export function readCookie(name)
+{
+    let nameCookie = name + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let cookieArray = decodedCookie.split(';');
+    for (let i = 0; i < cookieArray.length; i++) {
+      let cookie = cookieArray[i];
+      while (cookie.charAt(0) == ' ') {
+        cookie = cookie.substring(1);
+      }
+      if (cookie.indexOf(nameCookie) == 0) {
+        return JSON.parse(cookie.substring(nameCookie.length, cookie.length));
+      }
+    }
+    return null;
+}
+
+export function eraseCookie(name)
+{
+    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+}

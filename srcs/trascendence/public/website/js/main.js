@@ -24,6 +24,7 @@ import Friends from "./pages/friends.js";
 import Access_Denied from "./pages/access_denied.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
+import { eraseCookie } from "./login/user.js";
 
 let buttonTitle;
 let winner;

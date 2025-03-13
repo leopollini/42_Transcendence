@@ -1,5 +1,5 @@
 import { navigate } from '../main.js';
-import { profile } from "../login/user.js";
+import { eraseCookie, profile, readCookie, saveCookie } from "../login/user.js";
 import { access_denied, handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
 
@@ -60,6 +60,8 @@ export let current_user = JSON.parse(localStorage.getItem('your_profile'));
 
 export function refresh_reload_var()
 {
+    let cookie = readCookie("current_guest");
+
     let data = JSON.stringify({ "params" : {}});
     fetch("http://localhost:8008",
     {
@@ -69,6 +71,21 @@ export function refresh_reload_var()
     .then(response => response.json())
     .then(data =>
     {
+        if (cookie)
+        {
+            console.log("enter me == ", cookie.entered);
+            console.log("guest in database == ", data.guest);
+            if (cookie.entered === 0 || !data.guest)
+            {
+                eraseCookie("current_guest");
+                console.log("user after deletion = ", readCookie("current_guest"));
+                return;
+            }
+            current_user = cookie;
+            change_name(current_user.display_name);
+            update_image(current_user.image);
+            return;
+        }
         console.log("data get guest/login", data);
         if (!data.user || data.user.length === 0)
             return;
@@ -151,6 +168,8 @@ export function updateUserProfile(newUserData) {
         newUserData.type
     );
     current_user.entered = 1;
+    if (current_user.type === "guest")
+        saveCookie("current_guest", current_user, 1);
     //setUserName("Samir");
     localStorage.setItem("your_profile", JSON.stringify(current_user));
 }

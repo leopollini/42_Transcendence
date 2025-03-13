@@ -96,7 +96,7 @@ function update_guest(curr_guest)
     .then(response => response.json())
     .then(data =>
     {
-        console.log("data guest = ", data);
+        //console.log("data guest = ", data);
     })
     updateUserProfile(current_user);
 }

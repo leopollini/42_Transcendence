@@ -1,5 +1,6 @@
 import { guest_login } from "../../login/guest_logic.js";
 import { performLogin, popupOpened } from "../../login/login_logic.js";
+import { eraseCookie, readCookie } from "../../login/user.js";
 import { current_user } from "../modes.js";
 
 export default function Login() {
@@ -34,6 +35,9 @@ export const addLoginPageHandlers = () => {
     const guestButton = document.getElementById("guestButton");
     if (loginButton && guestButton)
     {
+        let cookie = readCookie("current_guest");
+        if (cookie)
+            eraseCookie(cookie);
         let user = current_user;
         loginButton.addEventListener("click", () => {
             if (popupOpened === true)
@@ -49,7 +53,11 @@ export const addLoginPageHandlers = () => {
             else if (user && user.entered === 1)
                 alert("You've already logged in!");
             else
+            {
+                if (readCookie("current_guest"))
+                    eraseCookie("current_guest");
                 guest_login();
+            }
         });
     }
 };

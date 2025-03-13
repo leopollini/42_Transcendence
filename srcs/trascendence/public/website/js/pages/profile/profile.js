@@ -1,6 +1,6 @@
 import { current_user, updateUserProfile } from "../modes.js";
 //import { emailHandler } from "../../game/pong/other/profile_logic.js";
-import { profile, profiles } from "../../login/user.js";
+import { profile, profiles, saveCookie } from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
 import { access_denied } from "../../game/pong/main/modes_logic.js";
 
@@ -58,7 +58,11 @@ export function profileHandler() {
   insert_user_data();
   document.querySelector("#profileImage").src = me.image;
   document.getElementById("imageUploadInput").style.display = "none";
-  
+  if (current_user.type === "guest")
+  {
+    document.getElementById("changeDisplayName").style.display = "none";
+    document.getElementById("myName").style.display = "none";
+  }
   // Seleziono l'intera scheda e, all'interno, la sezione delle informazioni
   const card = document.querySelector(".profile-card");
   const infoContainer = card.querySelector("#yourData");
@@ -83,9 +87,11 @@ function saveProfile(infoContainer) {
   
   saving += savebio(me, infoContainer);
   current_user.bio = me.bio;
-  
-  saving += savename(me, infoContainer);
-  current_user.display_name = me.display_name;
+  if (current_user.type === "login")
+  {
+    saving += savename(me, infoContainer);
+    current_user.display_name = me.display_name;
+  }
   /*  const emailInput = infoContainer.querySelector("#emailInput");
   if (emailInput) {
     current_user.email = emailInput.value;
@@ -94,16 +100,24 @@ function saveProfile(infoContainer) {
   } else {
     saving += "Error: Email input not found\n";
   }*/
-  let data = JSON.stringify({"display_name" : current_user.display_name, "image" : current_user.image, 
-  "bio" : current_user.bio});
-  fetch("http://localhost:8008",
+  if (current_user.type === "guest")
   {
+    saveCookie("current_guest", current_user, 1);
+    console.log("updated guest yay");
+  }
+  else
+  {
+    let data = JSON.stringify({"display_name" : current_user.display_name, "image" : current_user.image, 
+    "bio" : current_user.bio});
+    fetch("http://localhost:8008",
+    {
       method: "update_user",
       body: data
-  })
-  .then(data =>{
+    })
+    .then(data =>{
       console.log("data update user profile = ", data);
-  })
+    })
+  }
   alert(saving);
   updateUserProfile(current_user);
   history.back();
