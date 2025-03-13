@@ -18,6 +18,7 @@ module Ports
     'add_user' => ['user_manager', 7080],
     'get_user' => ['user_manager', 7080],
     'drop_users' => ['user_manager', 7080],
+    'drop_guests' => ['user_manager', 7080],
     'update_user' => ['user_manager', 7080],
     'login_user' => ['user_manager', 7080],
     'logout_user' => ['user_manager', 7080],
