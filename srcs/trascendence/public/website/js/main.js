@@ -4,11 +4,12 @@ addModesPageHandlers, change_name, update_image, current_user} from "./pages/mod
 import { access_denied } from "./game/pong/main/modes_logic.js";
 import Tournament, { addTournamentPageHandlers } from "./pages/tournament/tournament.js";
 import PongGame from "./pages/pong_game.js";
+import ClassicPongLobbyRoom, { handleClassicPongLobby, addClassicPongLobbyPageHandlers } from "./pages/classic_pong_lobby.js";
 import Knockout, { addKnockoutPageHandlers } from "./pages/tournament/knockout.js";
 import Customize, { addCustomizeGame } from "./pages/profile/customize.js";
 import Roundrobin, { addRoundRobinPageHandlers } from "./pages/tournament/roundrobin.js";
 import RobinRanking, { addRobinRankingPageHandlers, robinDraw, assignPointsToPlayer } from "./pages/tournament/robindraw.js";
-import LobbyRoom, { addLobbyPageHandlers, handleLobby } from "./pages/tournament/lobby.js";
+import LobbyRoom, { addLobbyPageHandlers, handleLobby } from "./pages/tournament/tournament_lobby.js";
 import { Charts, addChartsPageHandlers,showCharts } from "./pages/tournament/charts.js";
 import MatchDetails, {showMatchDetails } from "./pages/match_details.js";
 import Bracket, { addBracketPageHandlers, drawBracket, backToBracket, resetBracketState } from "./pages/tournament/bracket.js";
@@ -35,6 +36,7 @@ const routes = {
     "/": Login,
     "/modes": Modes,
     "/classic": PongGame,
+    "/classic/lobby": ClassicPongLobbyRoom,
     "/V.S._AI": PongGame,
     "/tournament": Tournament,
     "/forza4": Forza4Home,
@@ -123,7 +125,7 @@ const loadContent = async () => {
                 access_denied();
                 return;
             }
-            initializeGameCanvas();
+            initializeGameCanvas(players);
             document.getElementById('app').classList.add('no-background');
         }
         else
@@ -155,6 +157,13 @@ const loadContent = async () => {
             case "/classic":
                 if (current_user === null)
                     access_denied();
+                break;
+            case "/classic/lobby":
+                if (current_user === null)
+                    access_denied();
+                else
+                    addClassicPongLobbyPageHandlers();
+                handleClassicPongLobby();
                 break;
             case "/modes":
                 addModesPageHandlers();

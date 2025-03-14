@@ -6,7 +6,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         statIcon, friends, history, logout)
 {
     classicButton?.addEventListener('click', () => {
-        navigate("/classic", "Modalità Classic");
+        navigate("/classic/lobby", "Classic Pong Lobby Room");
     });
     
     aiButton?.addEventListener('click', () => {

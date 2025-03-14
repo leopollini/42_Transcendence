@@ -29,12 +29,11 @@ export default function Forza4LobbyRoom() {
                 <div>
                     <h2 id="f4PlayerText">Search for opponent</h2> 
                     <input type="text" id="f4PlayerSearch" class="form__field" placeholder="Search a player..." autocomplete="off">
-                    <button id="f4ToggleSearchUser" class="button-style" disabled>Search</button>
+                    <button id="f4ToggleSearchUser" class="button-style">Search</button>
                 </div>
                 <div>
                     <h2 id="f4PlayerSearchResult">Waiting for User...</h2>
-                    <button id="f4ToggleAddUser" class="button-style">Add(test)</button>
-                    <button id="f4ToggleInviteUser" class="button-style" disabled>Invite</button>
+                    <button id="f4ToggleAddUser" class="button-style" disabled>Add</button>
                 </div>
                 <div>
                     <h2 id="f4PlayerInviteResult">Waiting for Response...</h2>
@@ -58,7 +57,7 @@ export default function Forza4LobbyRoom() {
 
 
 
-export function handleForza4Lobby(type, totPlayers) {
+export function handleForza4Lobby() {
     matchPlayers = [];
     matchPlayers.push(current_user.display_name);
     console.log("match players = " +matchPlayers[0]);
@@ -66,7 +65,7 @@ export function handleForza4Lobby(type, totPlayers) {
 
 function searchUser(username) {
     const f4PlayerSearchResult = document.getElementById("f4PlayerSearchResult");
-    const f4ToggleInviteUser = document.getElementById("f4ToggleInviteUser");
+    const f4ToggleAddUser = document.getElementById('f4ToggleAddUser');
     
     if (!username)
         return;
@@ -80,14 +79,16 @@ function searchUser(username) {
         .then(data =>
         {
             let user = data.user[0];
-            if (user) {
+            if (user) 
+            {
+                f4PlayerSearchResult.style.color = "green";
                 f4PlayerSearchResult.innerHTML = "User Found: " + user.display_name;
-                f4ToggleInviteUser.disabled = false;
-
+                f4ToggleAddUser.disabled = false;
             }
             else {
+                f4PlayerSearchResult.style.color = "red";
                 f4PlayerSearchResult.innerHTML = "User Not Found";
-                f4ToggleInviteUser.disabled = true;
+                f4ToggleAddUser.disabled = true;
             }
         })
         .catch(error => {
@@ -99,7 +100,6 @@ function searchUser(username) {
 export function addForza4LobbyPageHandlers() {
     const backImageButton = document.getElementById('backImageButton');
     const f4ToggleSearchUser = document.getElementById('f4ToggleSearchUser');
-    const f4ToggleInviteUser = document.getElementById('f4ToggleInviteUser');
     const f4PlayerSearch = document.getElementById('f4PlayerSearch');
     const f4ToggleStartGame = document.getElementById('f4ToggleStartGame');
     //const toggleAddUserRaw = document.getElementById('toggleAddUserRaw');
@@ -117,15 +117,10 @@ export function addForza4LobbyPageHandlers() {
         searchUser(f4PlayerSearch.value);
     });
 
-    f4ToggleInviteUser?.addEventListener('click', () => {
-        
-    });
-
     f4ToggleAddUser?.addEventListener('click', () => {
         const f4PlayerInviteResult = document.getElementById("f4PlayerInviteResult");
 
-        f4PlayerInviteResult.style.color = "green";
-        f4PlayerInviteResult.innerHTML = "Player Accepted";
+        f4PlayerInviteResult.innerHTML = "Player Added: " + f4PlayerSearch.value;
         f4ToggleStartGame.disabled = false;
         matchPlayers.push(f4PlayerSearch.value)
     });

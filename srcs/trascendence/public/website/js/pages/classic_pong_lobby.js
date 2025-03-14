@@ -1,0 +1,130 @@
+import { navigate } from "../main.js";
+import { current_user } from "./modes.js";
+import { access_denied } from "../game/pong/main/modes_logic.js";
+
+
+let matchPlayers = [];
+
+export default function ClassicPongLobbyRoom() {
+    return `
+        <img id="backImageButton" src="../../website/images/home.png" alt="Back" class="back-button">
+        <h1 class="text">
+            <span class="letter letter-1">P</span>
+            <span class="letter letter-2">o</span>
+            <span class="letter letter-3">n</span>
+            <span class="letter letter-4">g</span>
+            <span class="letter letter-5"> </span>
+            <span class="letter letter-6"> </span>
+            <span class="letter letter-7">g</span>
+            <span class="letter letter-8">a</span>
+            <span class="letter letter-9">m</span>
+            <span class="letter letter-10">e</span>
+        </h1>
+        <div id="pongLobbyRoom">
+            <div class="form" id="pongPlayerSearchForm">
+                <div>
+                    <h2 id="pongPlayerText">Search for opponent</h2> 
+                    <input type="text" id="pongPlayerSearch" class="form__field" placeholder="Search a player..." autocomplete="off">
+                    <button id="pongToggleSearchUser" class="button-style">Search</button>
+                </div>
+                <div>
+                    <h2 id="pongPlayerSearchResult">Waiting for User...</h2>
+                    <button id="pongToggleAddUser" class="button-style" disabled>Add</button>
+                </div>
+                <div>
+                    <h2 id="pongPlayerInviteResult">Waiting for Response...</h2>
+                    <button id="pongToggleStartGame" class="button-style" disabled>Start Game</button>
+                </div>
+            </div>
+        </div>`;
+}
+
+
+// export function handleLobby(tournamentType, totPlayers) {
+//     //console.log("total players = " + totPlayers);
+//     const canvas = document.getElementById('lobbyUsersCanvas');
+//     //const ctx = canvas.getContext('2d');
+//     canvas.width = window.innerWidth * 0.5; 
+//     canvas.height = window.innerHeight * 0.9; 
+
+//     const numPlayersLabel = document.getElementById("numPlayers");
+//     numPlayersLabel.innerHTML = "0/" + Number(totPlayers);
+// }
+
+
+
+export function handleClassicPongLobby() {
+    matchPlayers = [];
+    matchPlayers.push(current_user.display_name);
+    console.log("match players = " +matchPlayers[0]);
+}
+
+function searchUser(username) {
+    const pongPlayerSearchResult = document.getElementById("pongPlayerSearchResult");
+    const pongToggleAddUser = document.getElementById('pongToggleAddUser');
+    
+    if (!username)
+        return;
+    fetch("http://localhost:8008", {
+            method: "get_user",
+            body: JSON.stringify({ 
+                "params": { "display_name": username } 
+            }) 
+        })
+        .then(response => response.json())
+        .then(data =>
+        {
+            let user = data.user[0];
+            if (user) 
+            {
+                pongPlayerSearchResult.style.color = "green";
+                pongPlayerSearchResult.innerHTML = "User Found: " + user.display_name;
+                pongToggleAddUser.disabled = false;
+            }
+            else {
+                pongPlayerSearchResult.style.color = "red";
+                pongPlayerSearchResult.innerHTML = "User Not Found";
+                pongToggleAddUser.disabled = true;
+
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching user data:", error);
+        });
+}
+
+
+export function addClassicPongLobbyPageHandlers() {
+    const backImageButton = document.getElementById('backImageButton');
+    const pongToggleSearchUser = document.getElementById('pongToggleSearchUser');
+    const pongPlayerSearch = document.getElementById('pongPlayerSearch');
+    const pongToggleStartGame = document.getElementById('pongToggleStartGame');
+    //const toggleAddUserRaw = document.getElementById('toggleAddUserRaw');
+
+    if (current_user === null)
+        access_denied();
+    backImageButton?.addEventListener('click', () => {
+        navigate("/modes", "Return to Game Mode");   
+        matchPlayers = [];     
+    });
+
+    pongToggleSearchUser?.addEventListener('click', () => {
+        console.log("searching user...." +pongPlayerSearch.value);
+
+        searchUser(pongPlayerSearch.value);
+    });
+
+    pongToggleAddUser?.addEventListener('click', () => {
+        const pongPlayerInviteResult = document.getElementById("pongPlayerInviteResult");
+
+        pongPlayerInviteResult.innerHTML = "Player Added: " + pongPlayerSearch.value;
+        pongToggleStartGame.disabled = false;
+        matchPlayers.push(pongPlayerSearch.value)
+    });
+
+
+    pongToggleStartGame?.addEventListener('click', () => {
+       navigate( "/classic", "Forza 4 Game", matchPlayers);
+    });
+
+}

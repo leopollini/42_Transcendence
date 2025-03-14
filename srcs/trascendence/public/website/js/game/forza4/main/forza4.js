@@ -130,13 +130,13 @@ class Forza4Game {
     
         backImageButton?.addEventListener('click', () => {
              document.getElementById("app").style.background = 
-    "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
+    "linear-gradient(35deg, #491f1f, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
             resetTimer(this);
             navigate("/modes", "Return to Game Mode");
         });
         window.addEventListener("popstate", (event) => {
             document.getElementById("app").style.background = 
-            "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
+            "linear-gradient(35deg, #491f1f, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
            resetTimer(this);
         });
         
