@@ -110,6 +110,8 @@ export function handleLobby(type, totPlayers) {
     ctx.fillStyle = "white";
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Puliamo il canvas inizialmente
 
+    invitedPlayers.push(current_user.display_name);
+
     updateCanvas(); // Disegniamo gli utenti invitati
 }
 

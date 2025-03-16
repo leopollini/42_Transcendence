@@ -79,7 +79,12 @@ function searchUser(username) {
         .then(data =>
         {
             let user = data.user[0];
-            if (user) 
+            if (user && matchPlayers.includes(user.display_name)) {
+                f4PlayerSearchResult.style.color = "red";
+                f4PlayerSearchResult.innerHTML = "Cannot add urself as opponent"
+                f4ToggleAddUser.disabled = true;
+            }
+            else if (user) 
             {
                 f4PlayerSearchResult.style.color = "green";
                 f4PlayerSearchResult.innerHTML = "User Found: " + user.display_name;

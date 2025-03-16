@@ -75,7 +75,12 @@ function searchUser(username) {
         .then(data =>
         {
             let user = data.user[0];
-            if (user) 
+            if (user && matchPlayers.includes(user.display_name)) {
+                pongPlayerSearchResult.style.color = "red";
+                pongPlayerSearchResult.innerHTML = "Cannot add urself as opponent"
+                pongToggleAddUser.disabled = true;
+            }
+            else if (user) 
             {
                 pongPlayerSearchResult.style.color = "green";
                 pongPlayerSearchResult.innerHTML = "User Found: " + user.display_name;
