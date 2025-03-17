@@ -38,8 +38,7 @@ module Other_logic
         realname: realname,
         email: email,
         image: image,
-        display_name: display_name,
-        type: "login",
+        display_name: display_name
       }
     }
     SimpleServer.method_req("add_user", payload.to_json)
