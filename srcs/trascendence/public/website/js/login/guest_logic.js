@@ -105,7 +105,8 @@ function update_guest(curr_guest)
     .then(response => response.json())
     .then(data =>
     {
-        //console.log("data guest = ", data);
+        console.log("data guest = ", data);
+        saveCookie("token_guest", data.token);
     })
     console.log("saving logged");
     saveCookie("logged", 1, 1);
