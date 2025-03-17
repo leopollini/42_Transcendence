@@ -40,7 +40,6 @@ module Other_logic
         image: image,
         display_name: display_name,
         type: "login",
-        entered: 1
       }
     }
     SimpleServer.method_req("add_user", payload.to_json)

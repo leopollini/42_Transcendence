@@ -47,7 +47,7 @@ export default function Modes()
         <div class="menu-container hidden">
             <div class="menu-item"><img src="website/images/profile.png" alt="Profile" id="profileIcon"></div>
             <div class="menu-item"><img src="website/images/stats.png" alt="Settings" id="statIcon"></div>
-            <div class="menu-item"><img src="website/images/friends.jpg" alt="Settings" id="friends"></div>
+            <!-- <div class="menu-item"><img src="website/images/friends.jpg" alt="Settings" id="friends"></div> -->
             <div class="menu-item"><img src="website/images/history_match.png" alt="Settings" id="history"></div>
             <div class="menu-item" id="settings-link"><img src="website/images/settings.png" alt="Settings"></div>
             <div class="menu-item" id="logout"><img src="website/images/logout.png" alt="Settings"></div>
@@ -58,45 +58,46 @@ export default function Modes()
 
 export let current_user = JSON.parse(localStorage.getItem('your_profile'));
 
-export function refresh_reload_var()
-{
-    let cookie = readCookie("current_guest");
-
-    let data = JSON.stringify({ "params" : {}});
-    fetch("http://localhost:8008",
+export function load_user()
+{   
+    let cookie_guest = readCookie("current_guest");
+    if (!cookie_guest)
     {
-        method: "get_user",
-        body: data
-    })
-    .then(response => response.json())
-    .then(data =>
-    {
-        if (cookie)
+        eraseCookie("current_guest");
+        let data = JSON.stringify({ "params" : {}});
+        fetch("http://localhost:8008",
         {
-            console.log("enter me == ", cookie.entered);
-            console.log("guest in database == ", data.guest);
-            if (cookie.entered === 0 || !data.guest)
+            method: "get_user",
+            body: data
+        })
+        .then(response => response.json())
+        .then(data =>
+        {
+            console.log("data search ...= ", data);
+            if (data && data.status === "no users found")
             {
-                eraseCookie("current_guest");
-                console.log("user after deletion = ", readCookie("current_guest"));
+                nullify_user();
                 return;
             }
-            current_user = cookie;
-            change_name(current_user.display_name);
-            update_image(current_user.image);
-            return;
-        }
-        console.log("data get guest/login", data);
-        if (!data.user || data.user.length === 0)
-            return;
-        if (data.status === "no users found")
-            navigate("/", "login");
-        current_user = data.guest[0];
-        if (current_user === undefined)
-            return;
-        change_name(current_user.display_name);
-        update_image(current_user.image);
-    })
+            else if (data.user && data.user[0])
+                current_user = data.user[0];
+            else
+                console.log("no users found");
+            updateProfileUI(current_user);
+        })
+    }
+    else
+    {
+        current_user = cookie_guest;
+        console.log("loading guest =", current_user);
+        updateProfileUI(current_user);
+        return;
+    }
+}
+
+export function nullify_user()
+{
+    current_user = null;
 }
 
 history.pushState(null, null, location.href);
@@ -135,29 +136,6 @@ window.addEventListener('popstate', (event) => {
     }
 });
 
-window.addEventListener('load', () => {
-    let storedUser = localStorage.getItem('your_profile');
-    if (storedUser)
-        {
-            let parsedUser = JSON.parse(storedUser);
-            current_user = new profile(
-                parsedUser.email,
-                parsedUser.display_name,
-            parsedUser.realname,
-            parsedUser.bio,
-            parsedUser.image,
-            parsedUser.type
-        );
-        current_user.entered = 1;
-    }
-    else
-    {
-        current_user = new profile(null, null, null, null, null, null);
-        return ;
-    }
-    updateProfileUI(current_user);
-});
-
 export function updateUserProfile(newUserData) {
     current_user = new profile(
         newUserData.email,
@@ -167,28 +145,22 @@ export function updateUserProfile(newUserData) {
         newUserData.image,
         newUserData.type
     );
-    current_user.entered = 1;
     if (current_user.type === "guest")
         saveCookie("current_guest", current_user, 1);
-    //setUserName("Samir");
     localStorage.setItem("your_profile", JSON.stringify(current_user));
 }
 
 function updateProfileUI(profile) {
-    if (profile.display_name) {
-        change_name(profile.display_name);
-    }
-    if (profile.image) {
-        update_image(profile.image);
+    if (current_user !== undefined && current_user !== null)
+    {
+        if (profile.image)
+            update_image(profile.image);
+        if (profile.display_name)
+            change_name(profile.display_name);
     }
 }
 
 export const addModesPageHandlers = () => {
-    if (current_user === undefined || current_user === null)
-    {
-        access_denied();
-        return;
-    }
     const classicButton = document.getElementById('classicButton');
     const aiButton = document.getElementById('aiButton');
     const tournamentButton = document.getElementById('tournamentButton');
@@ -198,12 +170,12 @@ export const addModesPageHandlers = () => {
     const Settings = document.getElementById('settings-link');
     const profileIcon = document.getElementById("profileIcon");
     const statIcon = document.getElementById("statIcon");
-    const friends = document.getElementById("friends");
+    //const friends = document.getElementById("friends");
     const history = document.getElementById("history");
     const logout = document.getElementById("logout");
     handle_modes_logic(classicButton, aiButton, tournamentButton, 
     forza4Button, avatarImage, menuContainer, Settings, profileIcon,
-    statIcon, friends, history, logout);
+    statIcon, history, logout);
 };
 
 export function update_image(image)

@@ -1,4 +1,4 @@
-CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager history_manager nginx chat game_data_manager
+CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager history_manager chat game_data_manager
 
 # ========================================= #
 SHELL:=/bin/bash

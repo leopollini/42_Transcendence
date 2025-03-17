@@ -40,14 +40,6 @@ export function savename(me, yourDataSection)
         return ("Error: name already taken(" + newname + ")\n");
 }
 
-/*export function emailHandler(me, yourDataSection) {
-    const emailInput = yourDataSection.querySelector('#emailInput');
-
-    emailInput.value = me.email || "";
-    emailInput.disabled = false;
-    emailInput.style.fontSize = "1em";
-}*/
-
 export function saveimage(me, yourDataSection)
 {
     //const changeProfileImageBtn = yourDataSection.querySelector('#changeProfileImageBtn');

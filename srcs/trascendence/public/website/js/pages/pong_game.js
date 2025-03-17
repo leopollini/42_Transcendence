@@ -5,8 +5,12 @@ export default function PongGame() {
         history.pushState(null, "", location.href);
 
         function handlePopState() {
-            navigate("/modes", "returning to modes...");
-            alert("quitting game ....");
+            if (window.location.pathname.startsWith("/classic") ||
+            window.location.pathname.startsWith("/V.S._AI"))
+            {
+                navigate("/modes", "returning to modes...");
+                alert("quitting game ....");
+            }
         }
 
         window.onpopstate = handlePopState;

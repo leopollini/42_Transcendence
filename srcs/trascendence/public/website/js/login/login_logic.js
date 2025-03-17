@@ -2,7 +2,7 @@
 import { navigate } from "../main.js";
 import { update_image, change_name, updateUserProfile, current_user} from "../pages/modes.js";
 import { user, profile} from "./user.js";
-
+import { saveCookie } from "./user.js";
 export let popupOpened = false;
 export let new_user = new user();
 
@@ -43,9 +43,6 @@ function popupHandling(popup, data)
             clearInterval(popupMonitor);
             localStorage.setItem('popup_opened', 'false');
             popupOpened = false;
-            console.log("message recived = ", messageReceived);
-            console.log("acess granted = ", log_succ);
-            console.log("auhtentication success = ", data.authenticated);
             if (messageReceived === true && log_succ === true) 
             {
                 get_data();
@@ -92,7 +89,7 @@ function get_data()
             new_user.image,
             new_user.type
         );
-        
+        saveCookie("logged", 1, 1);
         updateUserProfile(current_user);
     })
     .catch(error => {

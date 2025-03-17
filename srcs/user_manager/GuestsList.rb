@@ -1,10 +1,14 @@
 MAX_GUEST_COUNT = 10
 
 class GuestsList
-  def initialize()
+  def set_zero()
     @guests = []
     @index = {}
     @counter = 0
+  end
+
+  def initialize()
+    set_zero
   end
 
   def add_guest(username)
@@ -39,7 +43,7 @@ class GuestsList
     @guests.count > 0 ? @guests[1..] : []
   end
   def drop_guests()
-    initialize
+    set_zero
     DEFAULT_SUCCESS_RES.clone
   end
   def update_guest(username, new_data)

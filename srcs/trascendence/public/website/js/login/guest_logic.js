@@ -1,7 +1,7 @@
 import { navigate } from "../main.js";
 import { user, profile} from "./user.js";
 import { update_image, change_name, updateUserProfile } from "../pages/modes.js";
-
+import { saveCookie } from "./user.js";
 export let guest = JSON.parse(localStorage.getItem('guest')) || [];
 
 window.addEventListener("beforeunload", () => {
@@ -56,6 +56,15 @@ export async function guest_login()
                 alert("Name already taken, try a different one");
                 return;
             }
+            else if (data.guest && Array.isArray(data.guest))
+            {
+                value = data.guest.some(guest => guest.display_name === name) ? 1 : 0;
+                if (value === 1)
+                {
+                    alert("Name already taken, try a different one");
+                    return;
+                }
+            }
             localStorage.setItem('guest', JSON.stringify(guest));
             addGuest(name);
         } else {
@@ -98,5 +107,7 @@ function update_guest(curr_guest)
     {
         //console.log("data guest = ", data);
     })
+    console.log("saving logged");
+    saveCookie("logged", 1, 1);
     updateUserProfile(current_user);
 }

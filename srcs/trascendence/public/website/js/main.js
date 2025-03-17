@@ -1,7 +1,5 @@
 import Login, { addLoginPageHandlers } from "./pages/profile/login.js";
-import Modes, {refresh_reload_var,
-addModesPageHandlers, change_name, update_image, current_user} from "./pages/modes.js";
-import { access_denied } from "./game/pong/main/modes_logic.js";
+import Modes, {addModesPageHandlers, current_user, nullify_user} from "./pages/modes.js";
 import Tournament, { addTournamentPageHandlers } from "./pages/tournament/tournament.js";
 import PongGame from "./pages/pong_game.js";
 import Knockout, { addKnockoutPageHandlers } from "./pages/tournament/knockout.js";
@@ -24,8 +22,9 @@ import Friends from "./pages/friends.js";
 import Access_Denied from "./pages/access_denied.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import { eraseCookie } from "./login/user.js";
-
+import { load_user } from "./pages/modes.js";
+import { eraseCookie, readCookie } from "./login/user.js";
+import { access_denied } from "./game/pong/main/modes_logic.js";
 let buttonTitle;
 let winner;
 
@@ -56,19 +55,29 @@ const routes = {
     "/access_denied": Access_Denied
 };
 
+export function log_user()
+{
+    if (readCookie("logged") && readCookie("current_guest"))
+        load_user();
+    else
+    {
+        eraseCookie("logged");
+        eraseCookie("current_guest");
+    }
+}
+
 // Funzione universale per la navigazione
 export const navigate = (path, title = "") => {
     history.pushState({ path }, title, path);
     buttonTitle = title;
-    loadContent();
-    if (path === "/modes")
+    if (path === "/" && !current_user && readCookie("logged") && readCookie("current_guest"))
     {
-        if (current_user !== null)
-        {
-            change_name(current_user.display_name);
-            update_image(current_user.image);
-        }
+        eraseCookie("logged");
+        eraseCookie("current_guest");
     }
+    if (path === "/modes")
+        load_user();
+    loadContent();
 };
 
 window.addEventListener("beforeunload", () => {
@@ -80,11 +89,10 @@ function createPlayersArray(numPlayers) {
         if (i === 1)
             players.push(userName);
         else
-            players.push(`Player ${i}`);
-    }
+        players.push(`Player ${i}`);
+}
     return players;
 }
-
 
 function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
@@ -92,17 +100,24 @@ function restoreBackground() {
 
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
-    refresh_reload_var()
+    if (readCookie("log-out") !== 1)
+    {
+        eraseCookie("current_guest");
+        eraseCookie("logged");
+        eraseCookie("log-out");
+        nullify_user();
+    }
+    if (!current_user)
+        log_user();
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
     let players;
     let playerNames;
     let numPlayers = 4;
-
     if (buttonTitle === "4" || buttonTitle === "5" || buttonTitle === "6" || buttonTitle === "7" || buttonTitle === "8" || buttonTitle === "16")
         numPlayers = +buttonTitle;
-
+    
     players = createPlayersArray(numPlayers);
 
     //console.log("Players? " +players);
@@ -111,11 +126,6 @@ const loadContent = async () => {
     if (component) {
         app.innerHTML = await component();
         if (path === "/classic" || path === "/V.S._AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
-            if (current_user === null)
-            {
-                access_denied();
-                return;
-            }
             initializeGameCanvas();
             document.getElementById('app').classList.add('no-background');
         }
@@ -123,45 +133,38 @@ const loadContent = async () => {
             restoreBackground();
         switch (path) {
             case "/":
+                if (readCookie("logged") && readCookie("current_guest"))
+                {
+                    eraseCookie("logged");
+                    eraseCookie("current_guest");
+                }   
                 addLoginPageHandlers();
                 break;
             case "/stats":
-                if (current_user === null)
-                    access_denied();
-                else
-                    ShowStats()
-                break;
-            case "/friends":
-                if (current_user === null)
-                    access_denied();
-                else if (current_user.type === "guest")
-                    alert("You must be logged to use this feature!");
-                else 
-                    Friendlists();
+                    if (!current_user)
+                        access_denied();
+                    else
+                        ShowStats()
                 break;
             case "/profile":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
                     profileHandler();
                 break;
-            case "/classic":
-                if (current_user === null)
-                    access_denied();
-                break;
             case "/modes":
-                addModesPageHandlers();
+                    addModesPageHandlers();
                 break;
             case "/tournament":
-                if (current_user === null)
-                    access_denied();
+                if (!current_user)
+                        access_denied();
                 else if (current_user.type === "guest")
                     alert("You must be logged to use this feature!");
                 else
                     addTournamentPageHandlers();
                 break;
             case "/tournament/knockout":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
                 {
@@ -170,7 +173,7 @@ const loadContent = async () => {
                 }
                 break;
             case "/tournament/knockout/bracket":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
                 {
@@ -187,15 +190,15 @@ const loadContent = async () => {
                 }
                 break;
             case "/tournament/roundrobin":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
                     addRoundRobinPageHandlers();
                 break;
             case "/tournament/roundrobin/robinranking":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
-                else
+                else    
                 {
                     addRobinRankingPageHandlers();
                     if (buttonTitle === "Return from Match") {
@@ -207,45 +210,49 @@ const loadContent = async () => {
                 }
                 break;
             case "/settings":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
                     addSettingsPageHandlers();
                 break;
             case "/settings/customizepong":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
                     addCustomizeGame();
                 break;
             case "/tournament/userstats":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
+                {
                     addChartsPageHandlers();
                     showCharts();
+                }
                 break;
             case "/tournament/userstats/matchdetails":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
-                else
+                else    
                     showMatchDetails();
                 break;
             case "/forza4":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
+                {
                     showForza4HomeScreen();
                     addForza4PageHandlers();
+                }
                 break;
             case "/settings/customizeforza4":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
                     forza4Config();
                 break;
             case "/forza4/userstats":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
                 {
@@ -255,7 +262,7 @@ const loadContent = async () => {
                 }
                 break;
             case "/forza4/game":
-                if (current_user === null)
+                if (!current_user)
                     access_denied();
                 else
                     startForza4Game();

@@ -1,4 +1,4 @@
-require 'webrick'
+require 'webrick/https'
 require 'colorize'
 require_relative 'Oauth'
 require_relative 'session'
@@ -36,13 +36,23 @@ logger.level = Logger::DEBUG
 
 app = App.new(OAuthClient.new, logger)
 
+cert_path = File.expand_path("ssl_certs/server.crt", __dir__)
+key_path = File.expand_path("ssl_certs/server.key", __dir__)
+
+cert = OpenSSL::X509::Certificate.new(File.read(cert_path))
+key = OpenSSL::PKey::RSA.new(File.read(key_path))
+
 server = WEBrick::HTTPServer.new(
-  Port: PORT,
+  Port: 443,
   BindAddress: '0.0.0.0',
   DocumentRoot: File.expand_path("../../public", __FILE__),
-  RequestCallback: proc { |req, res| res['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0' }
+  RequestCallback: proc { |req, res| res['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0' },
+  SSLEnable: true,
+  SSLCertificate: cert,
+  SSLPrivateKey: key,
+  SSLOptions: OpenSSL::SSL::OP_NO_SSLv3 | OpenSSL::SSL::OP_NO_SSLv2,
+  SSLVerifyClient: OpenSSL::SSL::VERIFY_NONE
 )
-
 
 server.mount_proc '/' do |req, res|
   status, headers, body = app.call(req.meta_vars)

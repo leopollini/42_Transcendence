@@ -23,7 +23,7 @@ PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
                                ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'entered INT', 'level FLOAT']
+                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT']
 
 
 GUEST = GuestsList.new
@@ -50,7 +50,7 @@ def add_user(_client, obj = nil)
     max = { 'max' => 0 }
   end
   ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-  'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'entered INT', 'level FLOAT']
+  'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT']
 
   fields = LOGIN.getColumns
   values = {}
@@ -59,7 +59,6 @@ def add_user(_client, obj = nil)
     values[f] = data[f] if data[f]
   end
   values['id'] = max['max'].to_i
-  values['entered'] = 'true'
   puts "inserting new user: #{values}"
   LOGIN.addValues values.values, values.keys
   puts 'Success!'
@@ -74,7 +73,7 @@ def login_user(client, obj)
 
   r = nil
   if (t = LOGIN.select ['realname'], [data['realname']])[0]
-    LOGIN.valueManipulation 'realname', data['realname'], "entered = true"
+    LOGIN.valueManipulation 'realname', data['realname']
     return t[0].merge({'status' => 'success', 'success' => 'true'})
   end rescue r
   return {'status' => 'bad request', 'success' => 'false'} unless r.nil?
@@ -87,7 +86,7 @@ def logout_user(client, obj)
   return DEFAULT_MISSING_PARAM.clone unless obj['username'] || obj['realname']
   return GUEST.del_guest obj['username'] if obj['username']
 
-  LOGIN.valueManipulation 'realname', obj['realname'], 'entered = false'
+  LOGIN.valueManipulation 'realname', obj['realname']
 end
 
 def get_user(_client, obj = nil)

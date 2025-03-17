@@ -1,10 +1,10 @@
 import { navigate } from "../../../main.js";
 import { pop_false } from "../../../login/login_logic.js";
-import { current_user } from "../../../pages/modes.js";
-import { eraseCookie } from "../../../login/user.js";
+import { current_user, nullify_user} from "../../../pages/modes.js";
+import { eraseCookie, saveCookie } from "../../../login/user.js";
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
-        statIcon, friends, history, logout)
+        statIcon, history, logout)
 {
     classicButton?.addEventListener('click', () => {
         navigate("/classic", "Modalità Classic");
@@ -58,19 +58,6 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     }
     else
         console.error("stat icon not found!");
-    if (friends)
-    {
-        friends.addEventListener("click", () => {
-            if (current_user.type == "guest")
-            {
-                alert("You must be logged to use this feature!");
-                return;
-            }
-            navigate("/friends", "Friends");
-        });
-    }
-    else
-        console.error("friend icon not found!");
     if (history)
     {
         history.addEventListener("click", () => {
@@ -90,20 +77,26 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             localStorage.clear();
             sessionStorage.clear();
             pop_false();
+            saveCookie("log-out", 1, 1);
+            if (!current_user)
+            {
+                navigate("/", "logout");
+                return;
+            }
             if (current_user.type === "guest")
             {
                 fetch("http://localhost:8008",
                 {
-                    method: "drop_users"
+                    method: "drop_guest"
                 })
                 .then(data =>{
-                    console.log("data delete guest = ", data);
+                    console.log("data delete from all users = ", data);
                 })
                 eraseCookie("current_guest");
             }
             else
             {
-                let data = JSON.stringify({"realname" : current_user.realname, "entered" : "0"})
+                let data = JSON.stringify({"realname" : current_user.realname})
                 fetch("http://localhost:8008",
                 {
                     method: "update_user",
@@ -113,6 +106,8 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
                     console.log("data update logged user = ", data);
                 })
             }
+            eraseCookie("logged");
+            nullify_user();
             navigate("/", "login");
         });
     }

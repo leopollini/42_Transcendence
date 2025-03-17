@@ -1,10 +1,11 @@
 import { startPongGame, PongGame } from "./pong.js";
 import { current_user } from "../../../pages/modes.js";
+import { access_denied } from "./modes_logic.js";
 let gameInstance;
 
 // Funzione per aggiungere il canvas di gioco
 export function initializeGameCanvas() {
-    console.log("Inizializzazione game canvas");
+    //console.log("Inizializzazione game canvas");
     const path = window.location.pathname;
     let players;
 
@@ -21,7 +22,6 @@ export function initializeGameCanvas() {
     if (current_user)
     {
         setTimeout(() => {
-
             if (path === "/V.S._AI") {
                 players = [current_user.display_name, "AI"];
                 startPongGame(players, "ai");
@@ -41,5 +41,5 @@ export function initializeGameCanvas() {
         }, 50);
     }
     else
-        alert("no curr_user");
+        access_denied();
 }

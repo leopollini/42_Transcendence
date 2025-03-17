@@ -54,6 +54,4 @@ else
     bundle install
 fi
 
-echo "==============================="
-echo "Script completato. Avvio server..."
-bundle exec ruby server.rb
+bash https.sh

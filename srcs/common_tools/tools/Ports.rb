@@ -9,7 +9,7 @@ module Ports
     # "log" => ["localhost", 8001],
 
     '' => ['receiver', 8008],
-    'GET' => ['auth', 9292],
+    'GET' => ['auth', 443],
     'POST' => ['request_manager', 9000],
     'HEAD' => ['request_manager', 9000],
     'show_users' => ['request_manager', 9000],

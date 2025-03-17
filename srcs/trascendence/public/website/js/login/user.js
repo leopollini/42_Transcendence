@@ -21,7 +21,7 @@ export class profile {
         this.type = type;
         this.num_friends = 0;
         this.myfriend = friend_list;
-        this.entered = 0;
+
     }
 }
 
@@ -35,12 +35,11 @@ export class Friend {
     }
 }
 
-export function saveCookie(name, element, days)
-{
+export function saveCookie(name, element, days) {
     let data = new Date();
     data.setTime(data.getTime() + (days * 24 * 60 * 60 * 1000));
-    let scadenza = "expires=" + data.toUTCString();
-    document.cookie = name + "=" + encodeURIComponent(JSON.stringify(element)) + ";" + scadenza + ";path=/";
+    let expire_date = "expires=" + data.toUTCString();
+    document.cookie = name + "=" + encodeURIComponent(JSON.stringify(element)) + ";" + expire_date + ";path=/";
 }
 
 export function readCookie(name)
@@ -48,17 +47,16 @@ export function readCookie(name)
     let nameCookie = name + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let cookieArray = decodedCookie.split(';');
+
     for (let i = 0; i < cookieArray.length; i++) {
-      let cookie = cookieArray[i];
-      while (cookie.charAt(0) == ' ') {
-        cookie = cookie.substring(1);
-      }
-      if (cookie.indexOf(nameCookie) == 0) {
-        return JSON.parse(cookie.substring(nameCookie.length, cookie.length));
-      }
+        let cookie = cookieArray[i].trim();
+        if (cookie.startsWith(nameCookie)) {
+            return cookie.substring(nameCookie.length);
+        }
     }
     return null;
 }
+
 
 export function eraseCookie(name)
 {
