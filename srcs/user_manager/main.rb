@@ -2,7 +2,7 @@
 
 # require 'timeout'
 require 'json'
-require 'digest/hexdigest'
+require 'digest'
 
 # load ((File.file? '/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')
 
@@ -61,7 +61,7 @@ def add_user(_client, obj = nil)
   values['token'] = Digest::SHA256.hexdigest values['realname']
   puts "inserting new user: #{values}"
   LOGIN.addValues values.values, values.keys
-  puts 'Success!'
+  puts "Success! User token: #{values['token']}"
   {'status' => 'success', 'success' => 'true', 'token' => values['token']}
 end
 
@@ -71,10 +71,18 @@ def login_user(client, obj)
 
   return GUEST.add_guest data['username'] if obj['login_as_guest'] == 'true'   # create a guest
 
+  if token = obj['login_with_token']
+    if (usr = LOGIN.select ['realname'], [data['realname']])[0]
+      return usr.merge({'status' => 'success', 'success' => 'true'})
+    else
+      return {'status' => 'user not found', 'success' => 'false'}
+    end
+  end
+
   r = nil
-  if (t = LOGIN.select ['realname'], [data['realname']])[0]
+  if (usr = LOGIN.select ['realname'], [data['realname']])[0]
     LOGIN.valueManipulation 'realname', data['realname']
-    return t[0].merge({'status' => 'success', 'success' => 'true'})
+    return usr.merge({'status' => 'success', 'success' => 'true'})
   end rescue r
   return {'status' => 'bad request', 'success' => 'false'} unless r.nil?
   return add_user(client, obj) if obj['do_create']
@@ -121,7 +129,7 @@ def get_user(_client, obj = nil)
         cols.append key.to_s
         keys.append val.to_s
       end
-      if p['username']
+      if p['username'] && p['type'].to_s != 'login'
         t = GUEST.get_guests(p['username'], (p['logged_in'].to_s == 'true' ? true : false))
         lst_guest += t if t
       end
@@ -197,7 +205,7 @@ def user_manager(client, _server)
     when 'drop_users'
       drop_users client, bobj
     when 'drop_guests'
-      GUEST.drop_guests
+      exit
     when 'login_user'
       login_user client, bobj
     when 'logout_user'

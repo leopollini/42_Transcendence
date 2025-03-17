@@ -1,14 +1,11 @@
 MAX_GUEST_COUNT = 10
 
 class GuestsList
-  def set_zero()
+  
+  def initialize()
     @guests = []
     @index = {}
     @counter = 0
-  end
-
-  def initialize()
-    set_zero
   end
 
   def add_guest(username)
@@ -19,8 +16,8 @@ class GuestsList
     @counter = @counter % MAX_GUEST_COUNT + 1
     @index.delete @guests[@counter]['username'] if @guests[@counter]
     @index[username] = @counter
-    @guests[@counter] = {'username' => username, 'created' => Time.now.to_i, 'deleted' => -1, 'token' => Digest::SHA256.hexdigest username}
-    puts "added #{username}!"
+    @guests[@counter] = {'username' => username, 'created' => Time.now.to_i, 'deleted' => -1, 'token' => Digest::SHA256.hexdigest(username)}
+    puts "added #{username}! Token #{@guests[@counter]['token']}"
     {'status' => 'success', 'success' => 'true', 'token' => @guests[@counter]['token']}
   end
   def del_guest(username)
@@ -41,10 +38,6 @@ class GuestsList
   end
   def get_all_guests()
     @guests.count > 0 ? @guests[1..] : []
-  end
-  def drop_guests()
-    set_zero
-    DEFAULT_SUCCESS_RES.clone
   end
   def update_guest(username, new_data)
     guest = (get_guests username, true)[0]
