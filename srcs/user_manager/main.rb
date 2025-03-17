@@ -2,7 +2,7 @@
 
 # require 'timeout'
 require 'json'
-require 'digest/hexdigest'
+require 'digest'
 
 # load ((File.file? '/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')
 

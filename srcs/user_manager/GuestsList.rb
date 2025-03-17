@@ -19,7 +19,7 @@ class GuestsList
     @counter = @counter % MAX_GUEST_COUNT + 1
     @index.delete @guests[@counter]['username'] if @guests[@counter]
     @index[username] = @counter
-    @guests[@counter] = {'username' => username, 'created' => Time.now.to_i, 'deleted' => -1, 'token' => Digest::SHA256.hexdigest username}
+    @guests[@counter] = {'username' => username, 'created' => Time.now.to_i, 'deleted' => -1, 'token' => Digest::SHA256.hexdigest(username)}
     puts "added #{username}!"
     {'status' => 'success', 'success' => 'true', 'token' => @guests[@counter]['token']}
   end
