@@ -2,6 +2,7 @@
 
 # require 'timeout'
 require 'json'
+require 'digest/hexdigest'
 
 # load ((File.file? '/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')
 
@@ -23,7 +24,7 @@ PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
                                ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT']
+                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'token TEXT']
 
 
 GUEST = GuestsList.new
@@ -49,8 +50,6 @@ def add_user(_client, obj = nil)
   rescue StandardError
     max = { 'max' => 0 }
   end
-  ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-  'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT']
 
   fields = LOGIN.getColumns
   values = {}
@@ -59,10 +58,11 @@ def add_user(_client, obj = nil)
     values[f] = data[f] if data[f]
   end
   values['id'] = max['max'].to_i
+  values['token'] = Digest::SHA256.hexdigest values['realname']
   puts "inserting new user: #{values}"
   LOGIN.addValues values.values, values.keys
   puts 'Success!'
-  DEFAULT_SUCCESS_RES.clone
+  DEFAULT_SUCCESS_RES.clone.merge {'token' => values['token']}
 end
 
 def login_user(client, obj)
@@ -186,23 +186,27 @@ def user_manager(client, _server)
   bobj = RequestUnpacker::Unpacker.new.unpack msg
   puts bobj
   # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
-  res = case bobj['method'].to_s
-  when 'add_user'
-    add_user client, bobj
-  when 'get_user'
-    get_user client, bobj
-  when 'update_user'
-    update_user client, bobj
-  when 'drop_users'
-    drop_users client, bobj
-  when 'drop_guests'
-    GUEST.drop_guests
-  when 'login_user'
-    login_user client, bobj
-  when 'logout_user'
-    logout_user client, bobj
-  else
-    {'status' => 'bad method: ' + bobj['method'].to_s, 'success' => 'false'}
+  begin
+    res = case bobj['method'].to_s
+    when 'add_user'
+      add_user client, bobj
+    when 'get_user'
+      get_user client, bobj
+    when 'update_user'
+      update_user client, bobj
+    when 'drop_users'
+      drop_users client, bobj
+    when 'drop_guests'
+      GUEST.drop_guests
+    when 'login_user'
+      login_user client, bobj
+    when 'logout_user'
+      logout_user client, bobj
+    else
+      {'status' => 'bad method: ' + bobj['method'].to_s, 'success' => 'false'}
+    end
+  rescue => r
+    return {'status' => "error: #{r.to_s}", 'success' => 'false'}.to_json
   end
 
   client.puts res.to_json
