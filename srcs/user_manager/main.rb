@@ -150,7 +150,6 @@ end
 
 def update_user(_client, obj = nil)
   puts 'update_user called' if DEBUG_MODE
-  return 
 
   r = nil
   res = DEFAULT_ERROR_RES.clone
