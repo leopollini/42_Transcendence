@@ -62,7 +62,7 @@ def add_user(_client, obj = nil)
   puts "inserting new user: #{values}"
   LOGIN.addValues values.values, values.keys
   puts 'Success!'
-  DEFAULT_SUCCESS_RES.clone.merge {'token' => values['token']}
+  {'status' => 'success', 'success' => 'true', 'token' => values['token']}
 end
 
 def login_user(client, obj)
