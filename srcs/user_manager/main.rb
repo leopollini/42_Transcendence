@@ -71,12 +71,11 @@ def login_user(client, obj)
 
   return GUEST.add_guest data['username'] if obj['login_as_guest'] == 'true'   # create a guest
 
-  if token = obj['login_with_token']
-    if (usr = LOGIN.select ['realname'], [data['realname']])[0]
+  if obj['token'].to_s == token
+    if usr = (LOGIN.select ['token'], [data['token']])[0]
       return usr.merge({'status' => 'success', 'success' => 'true'})
-    else
-      return {'status' => 'user not found', 'success' => 'false'}
     end
+    return GUEST.login_with_token(token)
   end
 
   r = nil

@@ -48,4 +48,10 @@ class GuestsList
     guest['bio'] = new_data['bio'] if new_data['bio']
     guest['image'] = new_data['image'] if new_data['image']
   end
+  def login_with_token(token)
+    @guests.each do |entry|
+      return @guest.to_json.merge({'status' => 'success', 'success' => 'true'}) if entry['token'].to_s == token
+    end
+    return {'status' => 'invalid token', 'success' => 'false'}
+  end
 end
