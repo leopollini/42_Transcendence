@@ -21,7 +21,7 @@ import { userName } from "./pages/user_data.js";
 import { Forza4Home, showForza4HomeScreen, addForza4PageHandlers } from "./pages/forza4/forza4_home.js";
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
-import { Forza4UserStats, forza4ShowUserStatistics, forza4ShowMatchDetails, addForza4StatsPageHandlers } from "./pages/forza4/forza4_statistics.js";
+import { GameUserStatistics, gameUserStatisticsPageHandlers, pongShowMatchDetails } from "./pages/game_statistics.js";
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import Friends from "./pages/friends.js";
 import Access_Denied from "./pages/access_denied.js";
@@ -39,9 +39,9 @@ const routes = {
     "/classic/lobby": ClassicPongLobbyRoom,
     "/V.S._AI": PongGame,
     "/tournament": Tournament,
+    "/userstats": GameUserStatistics,
     "/forza4": Forza4Home,
     "/forza4/game": Forza4,
-    "/forza4/userstats": Forza4UserStats,
     "/forza4/findopponent": Forza4LobbyRoom,
     "/settings": Settings,
     "/settings/customizepong": Customize,
@@ -274,14 +274,14 @@ const loadContent = async () => {
                 else
                     forza4Config();
                 break;
-            case "/forza4/userstats":
+            case "/userstats":
                 if (current_user === null)
                     access_denied();
                 else
                 {
-                    Forza4UserStats();
-                    addForza4StatsPageHandlers();
-                    forza4ShowUserStatistics();
+                    GameUserStatistics()
+                    gameUserStatisticsPageHandlers();
+                    pongShowMatchDetails();
                 }
                 break;
             case "/forza4/findopponent":

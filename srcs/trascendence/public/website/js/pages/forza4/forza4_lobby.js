@@ -43,20 +43,6 @@ export default function Forza4LobbyRoom() {
         </div>`;
 }
 
-
-// export function handleLobby(tournamentType, totPlayers) {
-//     //console.log("total players = " + totPlayers);
-//     const canvas = document.getElementById('lobbyUsersCanvas');
-//     //const ctx = canvas.getContext('2d');
-//     canvas.width = window.innerWidth * 0.5; 
-//     canvas.height = window.innerHeight * 0.9; 
-
-//     const numPlayersLabel = document.getElementById("numPlayers");
-//     numPlayersLabel.innerHTML = "0/" + Number(totPlayers);
-// }
-
-
-
 export function handleForza4Lobby() {
     matchPlayers = [];
     matchPlayers.push(current_user.display_name);

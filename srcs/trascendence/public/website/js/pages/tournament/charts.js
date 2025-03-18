@@ -7,6 +7,9 @@ import { current_user, change_name, update_image} from "../modes.js";
 let userData;
 let wins = 0;
 let losses = 0;
+let ralliesChartInstance = null; 
+let winLossChartInstance = null;
+let winLossHistoryChartInstance = null;
 
 export function Charts() {
     return `
@@ -66,6 +69,10 @@ function drawRalliesChart(matchesData)
     const opponents = matchesData.map (match => match.player1 === userName ? match.player2 : match.player1);
 
     const ralliesCtx = document.getElementById('matchLongestRallyChart').getContext('2d');
+
+    if (ralliesChartInstance) {
+        ralliesChartInstance.destroy();
+    }
     const ralliesData = {
         labels: opponents,
         datasets: [{
@@ -74,7 +81,7 @@ function drawRalliesChart(matchesData)
             backgroundColor: '#02BFB9'
         }]
     };
-    new Chart(ralliesCtx, {
+    ralliesChartInstance = new Chart(ralliesCtx, {
         type: 'bar',
         data: ralliesData,
         options: {
@@ -105,6 +112,10 @@ function drawWinLossChart() {
     });
 
     const winLossCtx = document.getElementById('winLossChart').getContext('2d');
+
+    if (winLossChartInstance)
+        winLossChartInstance.destroy();
+
     const winLossData = {
         labels: ['Win', 'Loss'],
         datasets: [{
@@ -112,7 +123,7 @@ function drawWinLossChart() {
             backgroundColor: ['#02BFB9', '#014C4A']
         }]
     };
-    new Chart(winLossCtx, {
+    winLossChartInstance = new Chart(winLossCtx, {
         type: 'pie',
         data: winLossData,
         options: {
@@ -150,6 +161,9 @@ function drawWinLossHistoryChart(matchesData) {
       
       progression.push(cumulativeScore);
     });
+
+    if (winLossHistoryChartInstance)
+        winLossHistoryChartInstance.destroy();
   
     // Set data for graph
     const winLossData = {
@@ -165,7 +179,7 @@ function drawWinLossHistoryChart(matchesData) {
     };
   
     // Create graph
-    new Chart(ctx, {
+    winLossHistoryChartInstance = new Chart(ctx, {
       type: 'line',
       data: winLossData,
       options: {
@@ -181,8 +195,6 @@ function drawWinLossHistoryChart(matchesData) {
       }
     });
 }
-
-  
 
 
 function matchesTimeRank() {
@@ -231,20 +243,20 @@ export async function showCharts() {
         console.error("Fetch error:", error);
     }
 
-    const noMatchesMessage = document.getElementById('noMatchesMessage');
-    const chartsContainer = document.querySelector('.charts-container');
-    const chartsButtonContainer = document.querySelector('.charts-button-container');
+    //const noMatchesMessage = document.getElementById('noMatchesMessage');
+    //const chartsContainer = document.querySelector('.charts-container');
+    //const chartsButtonContainer = document.querySelector('.charts-button-container');
 
     if (!userData || userData.length === 0) {
-        noMatchesMessage.style.display = 'block';
-        chartsContainer.style.display = 'none'; // If no matches don't show charts
-        chartsButtonContainer.style.display = 'none';
+        //noMatchesMessage.style.display = 'block';
+        //chartsContainer.style.display = 'none'; // If no matches don't show charts
+        //chartsButtonContainer.style.display = 'none';
         return;
     }
 
-    noMatchesMessage.style.display = 'none';
-    chartsContainer.style.display = 'flex'; 
-    chartsButtonContainer.style.display = 'block';
+    //noMatchesMessage.style.display = 'none';
+    //chartsContainer.style.display = 'flex'; 
+    //chartsButtonContainer.style.display = 'block';
 
     let lastMatchesData = userData.slice(-10);
 
@@ -257,6 +269,7 @@ export async function showCharts() {
     matchesTimeRank(lastMatchesData);
     drawWinLossHistoryChart(lastMatchesData);
 }
+
 
 export const addChartsPageHandlers = () => {
     const matchDetailsButton = document.getElementById('matchDetailsButton');
