@@ -1,5 +1,7 @@
 import { nullify_user, updateProfileUI} from "../pages/modes.js";
 
+import { nullify_user, updateProfileUI} from "../pages/modes.js";
+
 export class user {
     constructor(image, name, login_name, email, bio) {
         this.image = image;
