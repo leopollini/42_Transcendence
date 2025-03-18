@@ -1,6 +1,5 @@
 import { nullify_user, updateProfileUI} from "../pages/modes.js";
-
-import { nullify_user, updateProfileUI} from "../pages/modes.js";
+import { navigate } from "../main.js";
 
 export class user {
     constructor(image, name, login_name, email, bio) {
@@ -77,7 +76,7 @@ export function deleteAllCookies()
 
 export function restore_user()
 {
-    let token = readCookie("user_token");
+    let token = readCookie("user_token").replace(/"/g, '');
     let data = JSON.stringify({ "params" : [{}]});
     console.log("data totale token+parametri = ", data);
     fetch("http://localhost:8008",
@@ -88,24 +87,30 @@ export function restore_user()
     .then(response => response.json())
     .then(data =>
     {
-        console.log("\n\n\nsas\n\n\n");
         console.log("(GET_USER)\ndata search ...= ", data);
-        if (data && data.status === "no users found" || "invalid request")
+        if (!data || (!data.user && !data.guest)) 
         {
             nullify_user();
             deleteAllCookies();
             navigate("/access_denied", "invalid action");
             return;
         }
-        if (data.user)
+        let user = data.user?.find(u => u.token === token);
+        if (!user)
         {
-            updateProfileUI(data.user[0]);
-            localStorage.setItem('your_profile', JSON.stringify(data.user[0]));
+            user = data.guest?.find(g => g.token === token);
         }
-        else
+        console.log("user = ", user);
+        if (user) 
         {
-            updateProfileUI(data.guest[0]);
-            localStorage.setItem('your_profile', JSON.stringify(data.guest[0]));
+            localStorage.setItem('your_profile', JSON.stringify(user));
+            updateProfileUI(user);
+        } 
+        else 
+        {
+            nullify_user();
+            deleteAllCookies();
+            navigate("/access_denied", "back_to_home");
         }
     })
 }
