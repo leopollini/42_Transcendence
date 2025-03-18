@@ -61,9 +61,6 @@ export let current_user = JSON.parse(localStorage.getItem('your_profile'));
 
 window.onload = function()
 {
-    console.log("current_user = ", current_user);
-    console.log("logged = ", readCookie("logged"));
-    console.log("token = ", readCookie("user_token"));
     if ((current_user === null || current_user === undefined) && readCookie("logged") === "1" && readCookie("user_token"))
     restore_user();
 }

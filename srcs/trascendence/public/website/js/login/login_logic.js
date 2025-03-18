@@ -1,7 +1,7 @@
 
 import { navigate } from "../main.js";
 import { update_image, change_name, updateUserProfile, current_user} from "../pages/modes.js";
-import { user, profile, readCookie, eraseCookie} from "./user.js";
+import { profile, readCookie, eraseCookie, checkCookieAcrossTabs} from "./user.js";
 import { saveCookie } from "./user.js";
 export let popupOpened = false;
 

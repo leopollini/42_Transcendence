@@ -60,7 +60,6 @@ export function readCookie(name)
     return null;
 }
 
-
 export function eraseCookie(name)
 {
     document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
@@ -92,7 +91,8 @@ export function restore_user()
         {
             nullify_user();
             deleteAllCookies();
-            navigate("/access_denied", "invalid action");
+            alert("ERROR: accessing unautorized page...");
+            navigate("/", "home");
             return;
         }
         let user = data.user?.find(u => u.token === token);
@@ -110,7 +110,32 @@ export function restore_user()
         {
             nullify_user();
             deleteAllCookies();
-            navigate("/access_denied", "back_to_home");
+            alert("ERROR: accessing unautorized page...");
+            navigate("/", "home");
         }
     })
+}
+
+export function checkCookieAcrossTabs(cookieName) 
+{
+    let cookieValue = readCookie(cookieName);
+    if (cookieValue)
+        return 1;
+
+    let key = `cookie_check_${cookieName}`;
+    localStorage.setItem(key, Date.now());
+
+    return new Promise((resolve) => {
+        function checkStorage(event) {
+            if (event.key === key) {
+                resolve(0);
+                window.removeEventListener("storage", checkStorage);
+            }
+        }
+        window.addEventListener("storage", checkStorage);
+        setTimeout(() => {
+            window.removeEventListener("storage", checkStorage);
+            resolve(-1);
+        }, 500);
+    });
 }

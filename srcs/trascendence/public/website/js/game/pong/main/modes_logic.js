@@ -1,7 +1,7 @@
 import { navigate } from "../../../main.js";
 import { pop_false } from "../../../login/login_logic.js";
 import { current_user, nullify_user} from "../../../pages/modes.js";
-import { deleteAllCookies } from "../../../login/user.js";
+import { deleteAllCookies, checkCookieAcrossTabs} from "../../../login/user.js";
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
         statIcon, history, logout)
@@ -111,12 +111,4 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     }
     else 
         console.error("logout icon not found!");
-}
-
-export function access_denied()
-{
-    navigate("/access_denied", "Access Denied");
-    setTimeout(() => {
-        navigate("/", "home");
-    }, 3000);
 }

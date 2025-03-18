@@ -98,8 +98,6 @@ export function setupRoundRobinPlayers() {
 }
 
 export const addRoundRobinPageHandlers = () => {
-    if (current_user === null)
-        access_denied();
     const radioButtons = document.querySelectorAll("input[name='players']");
     const backImageButton = document.getElementById('backImageButton');
 

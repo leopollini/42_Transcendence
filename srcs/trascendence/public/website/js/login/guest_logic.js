@@ -48,7 +48,7 @@ export async function guest_login()
     .then(data => {
         console.log("get name = ", data);
         if (data.user && Array.isArray(data.user)) {
-            const value = data.user.some(user => user.display_name === name) ? 1 : 0;
+            let value = data.user.some(user => user.display_name === name) ? 1 : 0;
             if (value === 1)
             {
                 alert("Name already taken, try a different one");

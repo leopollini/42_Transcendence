@@ -1,7 +1,6 @@
 import { current_user, updateUserProfile} from "../modes.js";
-import { profile, profiles, saveCookie} from "../../login/user.js";
+import { profile, profiles} from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
-import { access_denied } from "../../game/pong/main/modes_logic.js";
 
 export default function Profile() {
   return `
@@ -46,7 +45,8 @@ function insert_user_data() {
 
 export function profileHandler() {
   if (current_user === null || current_user === undefined) {
-    access_denied();
+    alert("ERROR: accessing unautorized page...");
+    navigate("/", "home");
     return;
   }
   insert_user_data();

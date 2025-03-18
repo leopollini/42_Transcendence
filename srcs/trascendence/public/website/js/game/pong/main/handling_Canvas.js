@@ -1,6 +1,5 @@
 import { startPongGame, PongGame } from "./pong.js";
 import { current_user } from "../../../pages/modes.js";
-import { access_denied } from "./modes_logic.js";
 let gameInstance;
 
 // Funzione per aggiungere il canvas di gioco
@@ -41,5 +40,8 @@ export function initializeGameCanvas() {
         }, 50);
     }
     else
-        access_denied();
+    { 
+        alert("ERROR: accessing unautorized page...");
+        navigate("/", "home");
+    }
 }

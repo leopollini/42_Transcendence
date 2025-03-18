@@ -19,11 +19,9 @@ import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.j
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
 import { Forza4UserStats, forza4ShowUserStatistics, forza4ShowMatchDetails, addForza4StatsPageHandlers } from "./pages/forza4/forza4_statistics.js";
 import Friends from "./pages/friends.js";
-import Access_Denied from "./pages/access_denied.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import { eraseCookie, readCookie } from "./login/user.js";
-import { access_denied } from "./game/pong/main/modes_logic.js";
+import { checkCookieAcrossTabs, deleteAllCookies, eraseCookie, readCookie } from "./login/user.js";
 let buttonTitle;
 let winner;
 
@@ -51,25 +49,13 @@ const routes = {
     "/profile": Profile,
     "/stats": Stats,
     "/friends": Friends,
-    "/access_denied": Access_Denied
 };
 
 // Funzione universale per la navigazione
-export const navigate = (path, title = "") => {
+export const navigate = async (path, title = "") => {
     history.pushState({ path }, title, path);
-    buttonTitle = title;
-    let data = JSON.stringify({ "params" : {}});
-    fetch("http://localhost:8008",
-    {
-        method: "get_user",
-        body: data
-    })
-    .then(response => response.json())
-    .then(data =>
-    {
-        console.log("(GET_USER)\nall user saved = ", data);
-    });
-    loadContent();
+    buttonTitle = title;    
+    await loadContent();
 };
 
 window.addEventListener("beforeunload", () => {
@@ -95,6 +81,8 @@ const loadContent = async () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
+    let logged = await checkCookieAcrossTabs("logged");
+    let userToken = await checkCookieAcrossTabs("user_token");
     let players;
     let playerNames;
     let numPlayers = 4;
@@ -106,7 +94,8 @@ const loadContent = async () => {
     //console.log("Players? " +players);
     playerNames = players;  
     //console.log("path => " + path);
-    if (component) {
+    if (component)
+    {
         app.innerHTML = await component();
         if (path === "/classic" || path === "/V.S._AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
             initializeGameCanvas();
@@ -114,49 +103,41 @@ const loadContent = async () => {
         }
         else
             restoreBackground();
-        switch (path) {
-            case "/":
-                if (readCookie("logged"))
-                    eraseCookie("logged");
-                addLoginPageHandlers();
-                break;
-            case "/stats":
-                    if (!current_user)
-                        access_denied();
-                    else
+        if ((logged === 0 && userToken === 0) || (logged === -1 && userToken === -1) && path !== "/")
+        {
+            alert("ERROR: accessing unautorized page...");
+            navigate("/", "home");
+            return;
+        }
+        else
+        {
+            switch (path)
+            {
+                case "/":
+                    if (logged === 1 && userToken === 1)
+                        deleteAllCookies();
+                    addLoginPageHandlers();
+                    break;
+                case "/stats":
                         ShowStats()
-                break;
-            case "/profile":
-                if (!current_user)
-                    access_denied();
-                else
+                    break;
+                case "/profile":
                     profileHandler();
-                break;
-            case "/modes":
+                    break;
+                case "/modes":
                     addModesPageHandlers();
-                break;
-            case "/tournament":
-                if (!current_user)
-                        access_denied();
-                else if (current_user.type === "guest")
-                    alert("You must be logged to use this feature!");
-                else
-                    addTournamentPageHandlers();
-                break;
-            case "/tournament/knockout":
-                if (!current_user)
-                    access_denied();
-                else
-                {
-                    addKnockoutPageHandlers();
-                    resetBracketState();
-                }
-                break;
-            case "/tournament/knockout/bracket":
-                if (!current_user)
-                    access_denied();
-                else
-                {
+                    break;
+                case "/tournament":
+                    if (current_user.type === "guest")
+                        alert("You must be logged to use this feature!");
+                    else
+                        addTournamentPageHandlers();
+                    break;
+                case "/tournament/knockout":
+                        addKnockoutPageHandlers();
+                        resetBracketState();
+                    break;
+                case "/tournament/knockout/bracket":
                     addBracketPageHandlers();
                     //players = JSON.parse(sessionStorage.getItem('players'));
                     //console.log("title => " + buttonTitle);
@@ -166,20 +147,12 @@ const loadContent = async () => {
                         backToBracket(winner);
                     }
                     else
-                    drawBracket(players);          
-                }
-                break;
-            case "/tournament/roundrobin":
-                if (!current_user)
-                    access_denied();
-                else
+                        drawBracket(players);          
+                    break;
+                case "/tournament/roundrobin":
                     addRoundRobinPageHandlers();
-                break;
-            case "/tournament/roundrobin/robinranking":
-                if (!current_user)
-                    access_denied();
-                else    
-                {
+                    break;
+                case "/tournament/roundrobin/robinranking":
                     addRobinRankingPageHandlers();
                     if (buttonTitle === "Return from Match") {
                         //console.log("return to bracket");
@@ -187,68 +160,38 @@ const loadContent = async () => {
                         assignPointsToPlayer(winner);
                     }
                     robinDraw(playerNames);
-                }
-                break;
-            case "/settings":
-                if (!current_user)
-                    access_denied();
-                else
+                    break;
+                case "/settings":
                     addSettingsPageHandlers();
-                break;
-            case "/settings/customizepong":
-                if (!current_user)
-                    access_denied();
-                else
+                    break;
+                case "/settings/customizepong":
                     addCustomizeGame();
-                break;
-            case "/tournament/userstats":
-                if (!current_user)
-                    access_denied();
-                else
-                {
+                    break;
+                case "/tournament/userstats":
                     addChartsPageHandlers();
                     showCharts();
-                }
-                break;
-            case "/tournament/userstats/matchdetails":
-                if (!current_user)
-                    access_denied();
-                else    
+                    break;
+                case "/tournament/userstats/matchdetails":
                     showMatchDetails();
-                break;
-            case "/forza4":
-                if (!current_user)
-                    access_denied();
-                else
-                {
+                    break;
+                case "/forza4":
                     showForza4HomeScreen();
                     addForza4PageHandlers();
-                }
-                break;
-            case "/settings/customizeforza4":
-                if (!current_user)
-                    access_denied();
-                else
+                    break;
+                case "/settings/customizeforza4":
                     forza4Config();
-                break;
-            case "/forza4/userstats":
-                if (!current_user)
-                    access_denied();
-                else
-                {
+                    break;
+                case "/forza4/userstats":
                     Forza4UserStats();
                     addForza4StatsPageHandlers();
                     forza4ShowUserStatistics();
-                }
-                break;
-            case "/forza4/game":
-                if (!current_user)
-                    access_denied();
-                else
+                    break;
+                case "/forza4/game":
                     startForza4Game();
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
+            }
         }
     }
     else
