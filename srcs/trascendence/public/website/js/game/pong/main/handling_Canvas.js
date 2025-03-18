@@ -39,9 +39,4 @@ export function initializeGameCanvas() {
             gameInstance.start();
         }, 50);
     }
-    else
-    { 
-        alert("ERROR: accessing unautorized page...");
-        navigate("/", "home");
-    }
 }

@@ -1,7 +1,7 @@
 
 import { navigate } from "../main.js";
-import { update_image, change_name, updateUserProfile, current_user} from "../pages/modes.js";
-import { profile, readCookie, eraseCookie, checkCookieAcrossTabs} from "./user.js";
+import { update_image, change_name, updateUserProfile} from "../pages/modes.js";
+import { profile, readCookie, deleteAllCookies} from "./user.js";
 import { saveCookie } from "./user.js";
 export let popupOpened = false;
 
@@ -13,7 +13,7 @@ export function pop_false()
 
 function checkLoginRestrictions()
 {
-    if (localStorage.getItem('your_profile'))
+    if (readCookie("logged") === 1)
     {
         alert("user already logged in");
         return false;
@@ -27,22 +27,21 @@ function popupHandling(popup, data)
     localStorage.setItem('popup_opened', 'true');
 
     let log_succ = false
-    let messageReceived = false;
-    window.addEventListener("message", (event) => {
-        log_succ = event.data.access_granted;
-        if (event.data.access_granted === true) 
-        {
+    function receiveMessage(event) {
+        if (event.data.access_granted === true) {
             log_succ = true;
-            messageReceived = true;
-        } 
-    });
+        }
+    }
+    window.addEventListener("message", receiveMessage);
     let popupMonitor = setInterval(() => {
-        if (popup.closed) 
-        {
+        if (popup.closed) {
             clearInterval(popupMonitor);
             localStorage.setItem('popup_opened', 'false');
             popupOpened = false;
-            if (messageReceived === true && log_succ === true) 
+            window.removeEventListener("message", receiveMessage); // Rimuovi l'evento dopo la chiusura
+
+            console.log("log_succ = ", log_succ);
+            if (log_succ === true)
             {
                 get_data();
                 navigate("/modes", "Modalità di gioco");
@@ -51,7 +50,7 @@ function popupHandling(popup, data)
             else
                 alert("Error: Unexpected popup closure, authentication failed.");
         }
-    }, 500);
+    }, 10);
 }
 
 function get_data()
@@ -64,9 +63,13 @@ function get_data()
     .then(response => response.json())
     .then(data =>
     {
-        console.log("data login = ", data);
-        /*if (data.status === "no users found" || !data.user || data.user.length === 0)
-            navigate("/", "login");*/
+        console.log("(GET_USER)\ndata login = ", data);
+        if (data.status === "no users found")
+        {
+            deleteAllCookies();
+            navigate("/", "login");
+            return;
+        }
         let user = data.user[0];
         let new_user = {
             email: user.email,
@@ -89,12 +92,10 @@ function get_data()
             new_user.type
         );
         console.log("adding user hahahah");
-        if (readCookie("logged_token"))
-        {
-            eraseCookie("logged_token");
-            saveCookie("user_token");
-        }
+        saveCookie("user_token");
         saveCookie("logged", 1, 1);
+        sessionStorage.setItem("already in", 1);
+        localStorage.setItem("session opened", 1);
         updateUserProfile(current_user);
     })
     .catch(error => {

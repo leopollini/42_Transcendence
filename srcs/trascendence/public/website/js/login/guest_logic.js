@@ -2,25 +2,9 @@ import { navigate } from "../main.js";
 import { user, profile, readCookie, eraseCookie} from "./user.js";
 import { update_image, change_name, updateUserProfile } from "../pages/modes.js";
 import { saveCookie } from "./user.js";
-export let guest = JSON.parse(localStorage.getItem('guest')) || [];
-
-window.addEventListener("beforeunload", () => {
-    localStorage.clear();
-});
-
-window.addEventListener('storage', (event) => {
-    if (event.key === 'guest')
-        guest = JSON.parse(localStorage.getItem('guest')) || [];
-});
 
 export async function guest_login()
 {
-    if (localStorage.getItem("guest") || localStorage.getItem("your_profile"))
-    {
-        alert("user already logged in");
-        return;
-    }
-
     let name = prompt("Enter your guest name:");
     if (!name) {
         alert('No name. Please try again');
@@ -36,9 +20,8 @@ export async function guest_login()
         alert('Name too long.');
         return;
     }
-    localStorage.setItem('guest', JSON.stringify(guest));
     addGuest(name);
-    let data = JSON.stringify({"params" : {}});
+    /* let data = JSON.stringify({"params" : {}});
     fetch("http://localhost:8008",
     {
         method: "get_user",
@@ -63,7 +46,6 @@ export async function guest_login()
                     return;
                 }
             }
-            localStorage.setItem('guest', JSON.stringify(guest));
             addGuest(name);
         }
         else
@@ -71,14 +53,12 @@ export async function guest_login()
     })
     .catch(error => {
         console.error("Error:", error);
-    });
+    }); */
 }
 
 function addGuest(name) {
     let curr_guest = new user("website/images/guest.jpg", name, null, null, null);
-    localStorage.setItem('guest', JSON.stringify(curr_guest));
     update_guest(curr_guest);
-    navigate("/modes", "Modalità di gioco");
 }
 
 function update_guest(curr_guest)
@@ -102,9 +82,15 @@ function update_guest(curr_guest)
     .then(response => response.json())
     .then(data =>
     {
+        sessionStorage.setItem("already in", 1);
+        localStorage.setItem("session opened", 1);
         console.log("(LOGIN_USER)\n data guest = ", data);
-        saveCookie("user_token", data.token);
         saveCookie("logged", 1, 1);
+        if (!data.token)
+            saveCookie("user_token", "nulla", 1);
+        else
+            saveCookie("user_token", data.token, 1);
         updateUserProfile(current_user);
+        navigate("/modes", "Modalità di gioco");
     })
 }

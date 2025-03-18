@@ -77,7 +77,6 @@ export function restore_user()
 {
     let token = readCookie("user_token").replace(/"/g, '');
     let data = JSON.stringify({ "params" : [{}]});
-    console.log("data totale token+parametri = ", data);
     fetch("http://localhost:8008",
     {
         method: "get_user",
@@ -86,7 +85,9 @@ export function restore_user()
     .then(response => response.json())
     .then(data =>
     {
-        console.log("(GET_USER)\ndata search ...= ", data);
+        console.log("updating local and session");
+        sessionStorage.setItem("already in", 1);
+        localStorage.setItem("session opened", 1);
         if (!data || (!data.user && !data.guest)) 
         {
             nullify_user();
@@ -100,42 +101,18 @@ export function restore_user()
         {
             user = data.guest?.find(g => g.token === token);
         }
-        console.log("user = ", user);
+    
         if (user) 
         {
             localStorage.setItem('your_profile', JSON.stringify(user));
             updateProfileUI(user);
-        } 
-        else 
+        }
+        /* else 
         {
             nullify_user();
             deleteAllCookies();
             alert("ERROR: accessing unautorized page...");
             navigate("/", "home");
-        }
+        } */
     })
-}
-
-export function checkCookieAcrossTabs(cookieName) 
-{
-    let cookieValue = readCookie(cookieName);
-    if (cookieValue)
-        return 1;
-
-    let key = `cookie_check_${cookieName}`;
-    localStorage.setItem(key, Date.now());
-
-    return new Promise((resolve) => {
-        function checkStorage(event) {
-            if (event.key === key) {
-                resolve(0);
-                window.removeEventListener("storage", checkStorage);
-            }
-        }
-        window.addEventListener("storage", checkStorage);
-        setTimeout(() => {
-            window.removeEventListener("storage", checkStorage);
-            resolve(-1);
-        }, 500);
-    });
 }

@@ -1,6 +1,5 @@
 import { guest_login } from "../../login/guest_logic.js";
 import { performLogin, popupOpened } from "../../login/login_logic.js";
-import {checkCookieAcrossTabs, readCookie} from "../../login/user.js";
 
 export default function Login() {
     return `
@@ -33,12 +32,15 @@ export const addLoginPageHandlers = async () => {
     const loginButton = document.getElementById("loginButton");
     const guestButton = document.getElementById("guestButton");
     if (loginButton && guestButton)
-    {
-        let cookie = await checkCookieAcrossTabs("logged");
+    {   
+        let access = 0;
+        if (sessionStorage.getItem("already in") === null && localStorage.getItem("session opened") === '1')
+            access = 1;
+
         loginButton.addEventListener("click", () => {
             if (popupOpened === true)
                 alert("popup already open finish authentication before continuing")
-            else if (cookie === 0)
+            else if (access === 1)
                 alert("You've already logged in!");
             else
                 performLogin();
@@ -46,12 +48,10 @@ export const addLoginPageHandlers = async () => {
         guestButton.addEventListener("click", () => {
             if (popupOpened === true)
                 alert("Authenticating in progress....\nPlease wait.");
-            else if (cookie === 0)
+            else if (access === 1)
                 alert("You've already logged in!");
             else
-            {
                 guest_login();
-            }
         });
     }
 };

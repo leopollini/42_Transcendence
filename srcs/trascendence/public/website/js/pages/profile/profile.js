@@ -43,12 +43,8 @@ function insert_user_data() {
   profiles.push(me);
 }
 
-export function profileHandler() {
-  if (current_user === null || current_user === undefined) {
-    alert("ERROR: accessing unautorized page...");
-    navigate("/", "home");
-    return;
-  }
+export function profileHandler()
+{
   insert_user_data();
   document.querySelector("#profileImage").src = me.image;
   document.getElementById("imageUploadInput").style.display = "none";

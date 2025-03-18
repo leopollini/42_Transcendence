@@ -21,7 +21,7 @@ import { Forza4UserStats, forza4ShowUserStatistics, forza4ShowMatchDetails, addF
 import Friends from "./pages/friends.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import { checkCookieAcrossTabs, deleteAllCookies, eraseCookie, readCookie } from "./login/user.js";
+import {deleteAllCookies, readCookie} from "./login/user.js";
 let buttonTitle;
 let winner;
 
@@ -81,16 +81,29 @@ const loadContent = async () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    let logged = await checkCookieAcrossTabs("logged");
-    let userToken = await checkCookieAcrossTabs("user_token");
     let players;
     let playerNames;
     let numPlayers = 4;
+    let can_go = 0;
+    if (!readCookie("logged"))
+    {
+        sessionStorage.clear();
+        localStorage.clear();
+    }
+    if (sessionStorage.getItem("already in") === null && localStorage.getItem("session opened") === '1')
+        can_go = 1;
+    console.log("can go = ", can_go);
+    if (can_go === 1 && path !== "/")
+    {
+        alert("ERROR: accessing unautorized page...");
+        navigate("/", "home");
+        deleteAllCookies();
+        return;
+    }
     if (buttonTitle === "4" || buttonTitle === "5" || buttonTitle === "6" || buttonTitle === "7" || buttonTitle === "8" || buttonTitle === "16")
         numPlayers = +buttonTitle;
     
     players = createPlayersArray(numPlayers);
-
     //console.log("Players? " +players);
     playerNames = players;  
     //console.log("path => " + path);
@@ -103,95 +116,93 @@ const loadContent = async () => {
         }
         else
             restoreBackground();
-        if ((logged === 0 && userToken === 0) || (logged === -1 && userToken === -1) && path !== "/")
+        switch (path)
         {
-            alert("ERROR: accessing unautorized page...");
-            navigate("/", "home");
-            return;
-        }
-        else
-        {
-            switch (path)
-            {
-                case "/":
-                    if (logged === 1 && userToken === 1)
+            case "/":
+                if(readCookie("logged") === "1")
+                {
+                    if (sessionStorage.getItem("already in") === 1)
+                    {
                         deleteAllCookies();
-                    addLoginPageHandlers();
-                    break;
-                case "/stats":
-                        ShowStats()
-                    break;
-                case "/profile":
-                    profileHandler();
-                    break;
-                case "/modes":
-                    addModesPageHandlers();
-                    break;
-                case "/tournament":
-                    if (current_user.type === "guest")
-                        alert("You must be logged to use this feature!");
-                    else
-                        addTournamentPageHandlers();
-                    break;
-                case "/tournament/knockout":
-                        addKnockoutPageHandlers();
-                        resetBracketState();
-                    break;
-                case "/tournament/knockout/bracket":
-                    addBracketPageHandlers();
-                    //players = JSON.parse(sessionStorage.getItem('players'));
-                    //console.log("title => " + buttonTitle);
-                    if (buttonTitle === "Return from Match") {
-                        //console.log("return to bracket");
-                        winner = sessionStorage.getItem('winner');
-                        backToBracket(winner);
+                        sessionStorage.clear();
+                        localStorage.clear();
                     }
-                    else
-                        drawBracket(players);          
-                    break;
-                case "/tournament/roundrobin":
-                    addRoundRobinPageHandlers();
-                    break;
-                case "/tournament/roundrobin/robinranking":
-                    addRobinRankingPageHandlers();
-                    if (buttonTitle === "Return from Match") {
-                        //console.log("return to bracket");
-                        winner = sessionStorage.getItem('winner');
-                        assignPointsToPlayer(winner);
-                    }
-                    robinDraw(playerNames);
-                    break;
-                case "/settings":
-                    addSettingsPageHandlers();
-                    break;
-                case "/settings/customizepong":
-                    addCustomizeGame();
-                    break;
-                case "/tournament/userstats":
-                    addChartsPageHandlers();
-                    showCharts();
-                    break;
-                case "/tournament/userstats/matchdetails":
-                    showMatchDetails();
-                    break;
-                case "/forza4":
-                    showForza4HomeScreen();
-                    addForza4PageHandlers();
-                    break;
-                case "/settings/customizeforza4":
-                    forza4Config();
-                    break;
-                case "/forza4/userstats":
-                    Forza4UserStats();
-                    addForza4StatsPageHandlers();
-                    forza4ShowUserStatistics();
-                    break;
-                case "/forza4/game":
-                    startForza4Game();
-                    break;
-                default:
-                    break;
-            }
+                }
+                addLoginPageHandlers();
+                break;
+            case "/stats":
+                    ShowStats()
+                break;
+            case "/profile":
+                profileHandler();
+                break;
+            case "/modes":
+                addModesPageHandlers();
+                break;
+            case "/tournament":
+                if (current_user.type === "guest")
+                    alert("You must be logged to use this feature!");
+                else
+                    addTournamentPageHandlers();
+                break;
+            case "/tournament/knockout":
+                    addKnockoutPageHandlers();
+                    resetBracketState();
+                break;
+            case "/tournament/knockout/bracket":
+                addBracketPageHandlers();
+                //players = JSON.parse(sessionStorage.getItem('players'));
+                //console.log("title => " + buttonTitle);
+                if (buttonTitle === "Return from Match") {
+                    //console.log("return to bracket");
+                    winner = sessionStorage.getItem('winner');
+                    backToBracket(winner);
+                }
+                else
+                    drawBracket(players);          
+                break;
+            case "/tournament/roundrobin":
+                addRoundRobinPageHandlers();
+                break;
+            case "/tournament/roundrobin/robinranking":
+                addRobinRankingPageHandlers();
+                if (buttonTitle === "Return from Match") {
+                    //console.log("return to bracket");
+                    winner = sessionStorage.getItem('winner');
+                    assignPointsToPlayer(winner);
+                }
+                robinDraw(playerNames);
+                break;
+            case "/settings":
+                addSettingsPageHandlers();
+                break;
+            case "/settings/customizepong":
+                addCustomizeGame();
+                break;
+            case "/tournament/userstats":
+                addChartsPageHandlers();
+                showCharts();
+                break;
+            case "/tournament/userstats/matchdetails":
+                showMatchDetails();
+                break;
+            case "/forza4":
+                showForza4HomeScreen();
+                addForza4PageHandlers();
+                break;
+            case "/settings/customizeforza4":
+                forza4Config();
+                break;
+            case "/forza4/userstats":
+                Forza4UserStats();
+                addForza4StatsPageHandlers();
+                forza4ShowUserStatistics();
+                break;
+            case "/forza4/game":
+                startForza4Game();
+                break;
+            default:
+                break;
         }
     }
     else
