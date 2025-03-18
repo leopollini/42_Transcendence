@@ -1,5 +1,5 @@
 import { navigate } from "../main.js";
-import { user, profile} from "./user.js";
+import { user, profile, readCookie, eraseCookie} from "./user.js";
 import { update_image, change_name, updateUserProfile } from "../pages/modes.js";
 import { saveCookie } from "./user.js";
 export let guest = JSON.parse(localStorage.getItem('guest')) || [];
@@ -105,10 +105,9 @@ function update_guest(curr_guest)
     .then(response => response.json())
     .then(data =>
     {
-        console.log("data guest = ", data);
-        saveCookie("token_guest", data.token);
+        console.log("(LOGIN_USER)\n data guest = ", data);
+        saveCookie("user_token", data.token);
+        saveCookie("logged", 1, 1);
+        updateUserProfile(current_user);
     })
-    console.log("saving logged");
-    saveCookie("logged", 1, 1);
-    updateUserProfile(current_user);
 }

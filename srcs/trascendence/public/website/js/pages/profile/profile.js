@@ -85,10 +85,6 @@ function saveProfile(infoContainer) {
     saving += savename(me, infoContainer);
     current_user.display_name = me.display_name;
   }
-  if (current_user.type === "guest")
-  {
-    saveCookie("current_guest", current_user, 1);
-  }
   else
   {
     let data = JSON.stringify({"display_name" : current_user.display_name, "image" : current_user.image, 
@@ -99,7 +95,7 @@ function saveProfile(infoContainer) {
       body: data
     })
     .then(data =>{
-      console.log("data update user profile = ", data);
+      console.log("(UPDATE_USER)\ndata update user profile = ", data);
     })
   }
   alert(saving);

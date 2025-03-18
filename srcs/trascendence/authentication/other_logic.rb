@@ -41,6 +41,13 @@ module Other_logic
         display_name: display_name
       }
     }
-    SimpleServer.method_req("add_user", payload.to_json)
+    puts "adding token cookie"
+    response = SimpleServer.method_req("add_user", payload.to_json)
+    puts response
+    data = JSON.parse(response)
+    if (data["token"])
+      token = data["token"]
+      res.cookies << WEBrick::Cookie.new("logged_token", token)
+    end
   end
 end

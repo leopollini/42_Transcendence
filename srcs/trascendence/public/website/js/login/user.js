@@ -1,3 +1,5 @@
+import { nullify_user, updateProfileUI} from "../pages/modes.js";
+
 export class user {
     constructor(image, name, login_name, email, bio) {
         this.image = image;
@@ -61,4 +63,53 @@ export function readCookie(name)
 export function eraseCookie(name)
 {
     document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+}
+
+export function deleteAllCookies()
+{
+    document.cookie.split(";").forEach(cookie => {
+        let name = cookie.split("=")[0].trim();
+        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    });
+}
+
+export function restore_user()
+{
+    let token = readCookie("user_token");
+    token = token.replace(/^"|"$/g, '');
+    let data = JSON.stringify({ "params": {token} });
+    console.log("data totale token+parametri = ", data);
+    fetch("http://localhost:8008",
+    {
+        method: "get_user",
+        body: data
+    })
+    .then(response => response.json())
+    .then(data =>
+    {
+        console.log("(GET_USER)\ndata search ...= ", data);
+        if (data && data.status === "no users found" || "invalid request")
+        {
+            nullify_user();
+            deleteAllCookies();
+            navigate("/access_denied", "invalid action");
+            return;
+        }
+        if (data.user)
+        {
+            updateProfileUI(data.user[0]);
+            localStorage.setItem('your_profile', JSON.stringify(data.user[0]));
+        }
+        else
+        {
+            updateProfileUI(data.guest[0]);
+            localStorage.setItem('your_profile', JSON.stringify(data.guest[0]));
+        }
+    })
+    .catch(error => {
+        console.error("Errore nel recuperare i dati dell'utente: ", error);
+        nullify_user();
+        deleteAllCookies();
+        navigate("/error", "Errore nel recuperare i dati");
+    });   
 }

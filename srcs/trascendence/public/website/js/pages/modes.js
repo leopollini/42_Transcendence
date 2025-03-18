@@ -1,7 +1,8 @@
 import { navigate } from '../main.js';
-import { eraseCookie, profile, readCookie, saveCookie } from "../login/user.js";
-import { access_denied, handle_modes_logic } from '../game/pong/main/modes_logic.js';
+import {profile, restore_user} from "../login/user.js";
+import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
+import { readCookie } from '../login/user.js';
 
 export default function Modes()
 {
@@ -58,41 +59,13 @@ export default function Modes()
 
 export let current_user = JSON.parse(localStorage.getItem('your_profile'));
 
-export function load_user()
-{   
-    let cookie_guest = readCookie("current_guest");
-    if (!cookie_guest)
-    {
-        eraseCookie("current_guest");
-        let data = JSON.stringify({ "params" : {}});
-        fetch("http://localhost:8008",
-        {
-            method: "get_user",
-            body: data
-        })
-        .then(response => response.json())
-        .then(data =>
-        {
-            console.log("data search ...= ", data);
-            if (data && data.status === "no users found")
-            {
-                nullify_user();
-                return;
-            }
-            else if (data.user && data.user[0])
-                current_user = data.user[0];
-            else
-                console.log("no users found");
-            updateProfileUI(current_user);
-        })
-    }
-    else
-    {
-        current_user = cookie_guest;
-        console.log("loading guest =", current_user);
-        updateProfileUI(current_user);
-        return;
-    }
+window.onload = function()
+{
+    console.log("current_user = ", current_user);
+    console.log("logged = ", readCookie("logged"));
+    console.log("token = ", readCookie("user_token"));
+    if ((current_user === null || current_user === undefined) && readCookie("logged") === "1" && readCookie("user_token"))
+    restore_user();
 }
 
 export function nullify_user()
@@ -145,12 +118,10 @@ export function updateUserProfile(newUserData) {
         newUserData.image,
         newUserData.type
     );
-    if (current_user.type === "guest")
-        saveCookie("current_guest", current_user, 1);
     localStorage.setItem("your_profile", JSON.stringify(current_user));
 }
 
-function updateProfileUI(profile) {
+export function updateProfileUI(profile) {
     if (current_user !== undefined && current_user !== null)
     {
         if (profile.image)
