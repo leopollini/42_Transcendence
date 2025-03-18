@@ -38,7 +38,7 @@ export async function guest_login()
     }
     localStorage.setItem('guest', JSON.stringify(guest));
     addGuest(name);
-    /*let data = JSON.stringify({"params" : {}});
+    let data = JSON.stringify({"params" : {}});
     fetch("http://localhost:8008",
     {
         method: "get_user",
@@ -46,8 +46,6 @@ export async function guest_login()
     })
     .then(response => response.json())
     .then(data => {
-        if (data.status === "no users found" || !data.user || data.user.length === 0)
-            navigate("/", "login");
         console.log("get name = ", data);
         if (data.user && Array.isArray(data.user)) {
             const value = data.user.some(user => user.display_name === name) ? 1 : 0;
@@ -67,14 +65,13 @@ export async function guest_login()
             }
             localStorage.setItem('guest', JSON.stringify(guest));
             addGuest(name);
-        } else {
-            console.error("Error: data.user is not available or is not an array");
-            alert("Failed to check name. Please try again later.");
         }
+        else
+            alert("Failed to check name. Please try again later.");
     })
     .catch(error => {
         console.error("Error:", error);
-    });*/
+    });
 }
 
 function addGuest(name) {

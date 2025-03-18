@@ -76,8 +76,7 @@ export function deleteAllCookies()
 export function restore_user()
 {
     let token = readCookie("user_token");
-    token = token.replace(/^"|"$/g, '');
-    let data = JSON.stringify({ "params": {token} });
+    let data = JSON.stringify({ "params" : [{}]});
     console.log("data totale token+parametri = ", data);
     fetch("http://localhost:8008",
     {
@@ -87,6 +86,7 @@ export function restore_user()
     .then(response => response.json())
     .then(data =>
     {
+        console.log("\n\n\nsas\n\n\n");
         console.log("(GET_USER)\ndata search ...= ", data);
         if (data && data.status === "no users found" || "invalid request")
         {
@@ -106,10 +106,4 @@ export function restore_user()
             localStorage.setItem('your_profile', JSON.stringify(data.guest[0]));
         }
     })
-    .catch(error => {
-        console.error("Errore nel recuperare i dati dell'utente: ", error);
-        nullify_user();
-        deleteAllCookies();
-        navigate("/error", "Errore nel recuperare i dati");
-    });   
 }
