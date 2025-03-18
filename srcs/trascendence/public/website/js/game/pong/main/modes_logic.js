@@ -1,7 +1,7 @@
 import { navigate } from "../../../main.js";
 import { pop_false } from "../../../login/login_logic.js";
 import { current_user, nullify_user} from "../../../pages/modes.js";
-import { eraseCookie, saveCookie } from "../../../login/user.js";
+import { deleteAllCookies } from "../../../login/user.js";
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
         statIcon, history, logout)
@@ -77,7 +77,6 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             localStorage.clear();
             sessionStorage.clear();
             pop_false();
-            saveCookie("log-out", 1, 1);
             if (!current_user)
             {
                 navigate("/", "logout");
@@ -90,23 +89,22 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
                     method: "drop_guest"
                 })
                 .then(data =>{
-                    console.log("data delete from all users = ", data);
+                    console.log("(DROP_GUEST)\ndata delete from all users = ", data);
                 })
-                eraseCookie("current_guest");
             }
             else
             {
                 let data = JSON.stringify({"realname" : current_user.realname})
                 fetch("http://localhost:8008",
                 {
-                    method: "update_user",
+                    method: "drop_user",
                     body: data
                 })
                 .then(data =>{
-                    console.log("data update logged user = ", data);
+                    console.log("(DROP_USER)\ndata update logged user = ", data);
                 })
             }
-            eraseCookie("logged");
+            deleteAllCookies();
             nullify_user();
             navigate("/", "login");
         });

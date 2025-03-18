@@ -22,7 +22,6 @@ import Friends from "./pages/friends.js";
 import Access_Denied from "./pages/access_denied.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import { load_user } from "./pages/modes.js";
 import { eraseCookie, readCookie } from "./login/user.js";
 import { access_denied } from "./game/pong/main/modes_logic.js";
 let buttonTitle;
@@ -55,28 +54,21 @@ const routes = {
     "/access_denied": Access_Denied
 };
 
-export function log_user()
-{
-    if (readCookie("logged") && readCookie("current_guest"))
-        load_user();
-    else
-    {
-        eraseCookie("logged");
-        eraseCookie("current_guest");
-    }
-}
-
 // Funzione universale per la navigazione
 export const navigate = (path, title = "") => {
     history.pushState({ path }, title, path);
     buttonTitle = title;
-    if (path === "/" && !current_user && readCookie("logged") && readCookie("current_guest"))
+    let data = JSON.stringify({ "params" : {}});
+    fetch("http://localhost:8008",
     {
-        eraseCookie("logged");
-        eraseCookie("current_guest");
-    }
-    if (path === "/modes")
-        load_user();
+        method: "get_user",
+        body: data
+    })
+    .then(response => response.json())
+    .then(data =>
+    {
+        console.log("(GET_USER)\nall user saved = ", data);
+    });
     loadContent();
 };
 
@@ -100,15 +92,6 @@ function restoreBackground() {
 
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
-    if (readCookie("log-out") !== 1)
-    {
-        eraseCookie("current_guest");
-        eraseCookie("logged");
-        eraseCookie("log-out");
-        nullify_user();
-    }
-    if (!current_user)
-        log_user();
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
@@ -133,11 +116,8 @@ const loadContent = async () => {
             restoreBackground();
         switch (path) {
             case "/":
-                if (readCookie("logged") && readCookie("current_guest"))
-                {
+                if (readCookie("logged"))
                     eraseCookie("logged");
-                    eraseCookie("current_guest");
-                }   
                 addLoginPageHandlers();
                 break;
             case "/stats":

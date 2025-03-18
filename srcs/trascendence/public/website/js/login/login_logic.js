@@ -1,10 +1,9 @@
 
 import { navigate } from "../main.js";
 import { update_image, change_name, updateUserProfile, current_user} from "../pages/modes.js";
-import { user, profile} from "./user.js";
+import { user, profile, readCookie, eraseCookie} from "./user.js";
 import { saveCookie } from "./user.js";
 export let popupOpened = false;
-export let new_user = new user();
 
 export function pop_false()
 {
@@ -89,6 +88,12 @@ function get_data()
             new_user.image,
             new_user.type
         );
+        console.log("adding user hahahah");
+        if (readCookie("logged_token"))
+        {
+            eraseCookie("logged_token");
+            saveCookie("user_token");
+        }
         saveCookie("logged", 1, 1);
         updateUserProfile(current_user);
     })

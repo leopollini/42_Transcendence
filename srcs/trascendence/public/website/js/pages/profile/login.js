@@ -1,7 +1,6 @@
 import { guest_login } from "../../login/guest_logic.js";
 import { performLogin, popupOpened } from "../../login/login_logic.js";
-import { eraseCookie, readCookie, saveCookie } from "../../login/user.js";
-import { current_user } from "../modes.js";
+import {readCookie} from "../../login/user.js";
 
 export default function Login() {
     return `
@@ -51,8 +50,6 @@ export const addLoginPageHandlers = () => {
                 alert("You've already logged in!");
             else
             {
-                if (readCookie("current_guest"))
-                    eraseCookie("current_guest");
                 guest_login();
             }
         });
