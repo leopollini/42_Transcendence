@@ -10,15 +10,12 @@ import Customize, { addCustomizeGame } from "./pages/profile/customize.js";
 import Roundrobin, { addRoundRobinPageHandlers } from "./pages/tournament/roundrobin.js";
 import RobinRanking, { addRobinRankingPageHandlers, robinDraw, assignPointsToPlayer } from "./pages/tournament/robindraw.js";
 import LobbyRoom, { addLobbyPageHandlers, handleLobby } from "./pages/tournament/tournament_lobby.js";
-import { Charts, addChartsPageHandlers,showCharts } from "./pages/tournament/charts.js";
-import MatchDetails, {showMatchDetails } from "./pages/match_details.js";
 import Bracket, { addBracketPageHandlers, drawBracket, backToBracket, resetBracketState } from "./pages/tournament/bracket.js";
 import { initializeGameCanvas } from "./game/pong/main/handling_Canvas.js";
 import Profile, { profileHandler } from "./pages/profile/profile.js";
 import Settings, { addSettingsPageHandlers } from "./pages/profile/settings.js";
 import Stats, {ShowStats} from "./pages/profile/stats.js";
 import { userName } from "./pages/user_data.js";
-import { Forza4Home, showForza4HomeScreen, addForza4PageHandlers } from "./pages/forza4/forza4_home.js";
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
 import { GameUserStatistics, gameUserStatisticsPageHandlers, pongShowMatchDetails } from "./pages/game_statistics.js";
@@ -40,7 +37,6 @@ const routes = {
     "/V.S._AI": PongGame,
     "/tournament": Tournament,
     "/userstats": GameUserStatistics,
-    "/forza4": Forza4Home,
     "/forza4/game": Forza4,
     "/forza4/findopponent": Forza4LobbyRoom,
     "/settings": Settings,
@@ -52,8 +48,6 @@ const routes = {
     "/tournament/roundrobin/robinranking": RobinRanking,
     "/tournament/roundrobin/robinranking/game": PongGame,
     "/tournament/roundrobin/lobby": LobbyRoom,
-    "/tournament/userstats": Charts,
-    "/tournament/userstats/matchdetails": MatchDetails,
     "/tournament/knockout/bracket": Bracket,
     "/tournament/knockout/bracket/game": PongGame,
     "/profile": Profile,
@@ -247,19 +241,6 @@ const loadContent = async () => {
                     access_denied();
                 else
                     addCustomizeGame();
-                break;
-            case "/tournament/userstats":
-                if (current_user === null)
-                    access_denied();
-                else
-                    addChartsPageHandlers();
-                    showCharts();
-                break;
-            case "/tournament/userstats/matchdetails":
-                if (current_user === null)
-                    access_denied();
-                else
-                    showMatchDetails();
                 break;
             case "/forza4":
                 if (current_user === null)

@@ -32,19 +32,31 @@ export function GameUserStatistics() {
             <span class="letter letter-16">s</span>
         </h1>
         
-        <div id="forza4UserStats">
+
+        <div id="gameUserStats">
             <div class="stats-switcher">
-                <button id="showPongCharts" class="button-style">Pong Charts</button>
-                <button id="showPongMatchHistory" class="button-style">Pong Matches</button>
-                <button id="showForza4Stats" class="button-style active">Forza4 Stats</button>
-                <button id="showForza4MatchHistory" class="button-style">Forza4 Matches</button>
+                <label class="gamestats-label">
+                    <input type="radio" id="pongChartsCheckbox" name="gamestats" class="gamestats-checkbox" />
+                    <span class="gamestats-text">Pong Charts</span>
+                </label>
+                <label class="gamestats-label">
+                    <input type="radio" id="pongMatchesCheckbox" name="gamestats" class="gamestats-checkbox" checked />
+                    <span class="gamestats-text">Pong Matches</span>
+                </label>
+                <label class="gamestats-label">
+                    <input type="radio" id="forza4StatsCheckbox" name="gamestats" class="gamestats-checkbox" />
+                    <span class="gamestats-text">Forza4 Stats</span>
+                </label>
+                <label class="gamestats-label">
+                    <input type="radio" id="forza4MatchesCheckbox" name="gamestats" class="gamestats-checkbox"  />
+                    <span class="gamestats-text">Forza4 Matches</span>
+                </label>
             </div>
+
             <div class="stats-content-container">
 
-                
-
                 <!-- Sezione statistiche Forza4 -->
-                <div class="stats-card visible" id="forza4StatsSection">
+                <div class="stats-card hidden1" id="forza4StatsSection">
                     <dl class="stats-grid">
                         <div class="stat-item">
                             <dt>Total matches played:</dt>
@@ -102,7 +114,7 @@ export function GameUserStatistics() {
                 <div id="f4MatchDetailsContainer" class="hidden1">
                     <!-- I dettagli delle partite forza 4 verranno inseriti qui -->
                 </div>
-                <div id="pongMatchDetailsContainer" class="hidden1">
+                <div id="pongMatchDetailsContainer" class="visible">
                     <!-- I dettagli delle partite pong verranno inseriti qui -->
                 </div>
             </div>
@@ -294,6 +306,7 @@ export function pongShowMatchDetails() {
     
     getPongMatchesData();
 
+    console.log("pong show match details");
 
     if (!pongUserData) {
         return null;
@@ -351,13 +364,82 @@ export function pongShowMatchDetails() {
 
 export function gameUserStatisticsPageHandlers() {
     const backImageButton = document.getElementById('backImageButton');
-    const forza4StatsBtn = document.getElementById('showForza4Stats');
-    const pongChartsBtn = document.getElementById('showPongCharts');
-    const f4MatchHistoryBtn = document.getElementById('showForza4MatchHistory');
-    const pongMatchHistoryBtn = document.getElementById('showPongMatchHistory');
+    const pongChartsCheckbox = document.getElementById('pongChartsCheckbox');
+    const pongMatchesCheckbox = document.getElementById('pongMatchesCheckbox');
+    const forza4StatsCheckbox = document.getElementById('forza4StatsCheckbox');
+    const forza4MatchesCheckbox = document.getElementById('forza4MatchesCheckbox');
 
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");
+    });
+
+    pongChartsCheckbox?.addEventListener('change', () => {
+        if (pongChartsCheckbox.checked) {
+            console.log("pong charts");
+            document.getElementById('pongChartsSection').classList.remove('hidden1');
+            document.getElementById('pongMatchDetailsContainer').classList.add('hidden1');
+            document.getElementById('forza4StatsSection').classList.add('hidden1');
+            document.getElementById('f4MatchDetailsContainer').classList.add('hidden1');
+            showCharts();
+        }
+    });
+
+    pongMatchesCheckbox?.addEventListener('change', () => {
+        if (pongMatchesCheckbox.checked) {
+            console.log("pong matches");
+            document.getElementById('pongMatchDetailsContainer').classList.remove('hidden1');
+            document.getElementById('pongChartsSection').classList.add('hidden1');
+            document.getElementById('forza4StatsSection').classList.add('hidden1');
+            document.getElementById('f4MatchDetailsContainer').classList.add('hidden1');
+            pongShowMatchDetails();
+        } 
+    });
+
+    forza4StatsCheckbox?.addEventListener('change', () => {
+        if (forza4StatsCheckbox.checked) {
+            console.log("forza4 stats");
+            document.getElementById('forza4StatsSection').classList.remove('hidden1');
+            document.getElementById('pongChartsSection').classList.add('hidden1');
+            document.getElementById('pongMatchDetailsContainer').classList.add('hidden1');
+            document.getElementById('f4MatchDetailsContainer').classList.add('hidden1');
+            forza4ShowUserStatistics();
+        } 
+    });
+
+    forza4MatchesCheckbox?.addEventListener('change', () => {
+        if (forza4MatchesCheckbox.checked) {
+            console.log("forza4 matches");
+            document.getElementById('f4MatchDetailsContainer').classList.remove('hidden1');
+            document.getElementById('pongChartsSection').classList.add('hidden1');
+            document.getElementById('pongMatchDetailsContainer').classList.add('hidden1');
+            document.getElementById('forza4StatsSection').classList.add('hidden1');
+            forza4ShowMatchDetails();
+        } 
+    });
+
+
+    /*pongMatchHistoryBtn?.addEventListener('click', () => {
+        pongShowMatchDetails();
+        document.getElementById('forza4StatsSection').classList.add('hidden1');
+        document.getElementById('pongChartsSection').classList.add('hidden1');
+        document.getElementById('f4MatchDetailsContainer').classList.add('hidden1');
+        document.getElementById('pongMatchDetailsContainer').classList.remove('hidden1');
+       
+
+    })
+
+    f4MatchHistoryBtn?.addEventListener('click', () => {
+        forza4ShowMatchDetails();
+        document.getElementById('forza4StatsSection').classList.add('hidden1');
+        document.getElementById('pongChartsSection').classList.add('hidden1');
+        document.getElementById('pongMatchDetailsContainer').classList.add('hidden1');
+        document.getElementById('f4MatchDetailsContainer').classList.remove('hidden1');
+
+        f4MatchHistoryBtn.classList.add('active');
+        forza4StatsBtn.classList.remove('active');
+        pongChartsBtn.classList.remove('active');
+
+       
     });
 
     forza4StatsBtn?.addEventListener('click', () => {
@@ -386,30 +468,6 @@ export function gameUserStatisticsPageHandlers() {
         showCharts();
 
         // Al momento non serve logica specifica per Ping Pong; il test field basta per verificare il cambio finestra
-    });
-
-    pongMatchHistoryBtn?.addEventListener('click', () => {
-        pongShowMatchDetails();
-        document.getElementById('forza4StatsSection').classList.add('hidden1');
-        document.getElementById('pongChartsSection').classList.add('hidden1');
-        document.getElementById('f4MatchDetailsContainer').classList.add('hidden1');
-        document.getElementById('pongMatchDetailsContainer').classList.remove('hidden1');
-       
-
-    })
-
-    f4MatchHistoryBtn?.addEventListener('click', () => {
-        forza4ShowMatchDetails();
-        document.getElementById('forza4StatsSection').classList.add('hidden1');
-        document.getElementById('pongChartsSection').classList.add('hidden1');
-        document.getElementById('pongMatchDetailsContainer').classList.add('hidden1');
-        document.getElementById('f4MatchDetailsContainer').classList.remove('hidden1');
-
-        f4MatchHistoryBtn.classList.add('active');
-        forza4StatsBtn.classList.remove('active');
-        pongChartsBtn.classList.remove('active');
-
-       
-    });
+    });*/
 }
 
