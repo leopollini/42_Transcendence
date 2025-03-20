@@ -85,9 +85,9 @@ export function restore_user()
     .then(response => response.json())
     .then(data =>
     {
-        console.log("updating local and session");
-        sessionStorage.setItem("already in", 1);
-        localStorage.setItem("session opened", 1);
+        sessionStorage.setItem("already in", '1');
+        console.log("update sessione in refresh");
+        localStorage.setItem("session opened", '1');
         if (!data || (!data.user && !data.guest)) 
         {
             nullify_user();
@@ -98,13 +98,19 @@ export function restore_user()
         }
         let user = data.user?.find(u => u.token === token);
         if (!user)
-        {
             user = data.guest?.find(g => g.token === token);
-        }
-    
         if (user) 
         {
-            localStorage.setItem('your_profile', JSON.stringify(user));
+            //console.log("save user = ", user );
+            let current_user = new profile(
+                "",
+                user.name,
+                "",
+                "",
+                "",
+                "guest"
+            );
+            localStorage.setItem('your_profile', JSON.stringify(current_user));
             updateProfileUI(user);
         }
         /* else 

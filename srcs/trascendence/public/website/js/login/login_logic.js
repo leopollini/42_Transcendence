@@ -55,6 +55,9 @@ function popupHandling(popup, data)
 
 function get_data()
 {
+    sessionStorage.setItem("already in", '1');
+    console.log("update sessione in login");
+    localStorage.setItem("session opened", '1');
     let data = JSON.stringify({"params" :{"type" : "login"}});
     fetch("http://localhost:8008", {
         method: "get_user",
@@ -68,7 +71,7 @@ function get_data()
         {
             deleteAllCookies();
             navigate("/", "login");
-            return;
+            return ;
         }
         let user = data.user[0];
         let new_user = {
@@ -94,8 +97,6 @@ function get_data()
         console.log("adding user hahahah");
         saveCookie("user_token");
         saveCookie("logged", 1, 1);
-        sessionStorage.setItem("already in", 1);
-        localStorage.setItem("session opened", 1);
         updateUserProfile(current_user);
     })
     .catch(error => {
@@ -106,7 +107,7 @@ function get_data()
 export function performLogin()
 {
     if (!checkLoginRestrictions())
-        return;
+        return ;
     fetch('/auth/login')
     .then(response => response.json())
     .then(data => {

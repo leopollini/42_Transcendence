@@ -108,6 +108,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             localStorage.clear();
             deleteAllCookies();
             nullify_user();
+            localStorage.setItem('openTabs', 1);
             navigate("/", "login");
         });
     }

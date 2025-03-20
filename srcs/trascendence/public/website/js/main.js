@@ -21,7 +21,7 @@ import { Forza4UserStats, forza4ShowUserStatistics, forza4ShowMatchDetails, addF
 import Friends from "./pages/friends.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import {deleteAllCookies, readCookie} from "./login/user.js";
+import {deleteAllCookies, eraseCookie, readCookie, saveCookie} from "./login/user.js";
 let buttonTitle;
 let winner;
 
@@ -51,24 +51,27 @@ const routes = {
     "/friends": Friends,
 };
 
-// Funzione universale per la navigazione
-export const navigate = async (path, title = "") => {
-    history.pushState({ path }, title, path);
-    buttonTitle = title;    
-    await loadContent();
-};
+/*window.onload = function()
+{
+    if ((current_user === null || current_user === undefined) && readCookie("logged") === "1" && readCookie("user_token"))
+    restore_user();
+}*/
 
-window.addEventListener("beforeunload", () => {
-});
+export const navigate = (path, title = "") => {
+    history.pushState({ path }, title, path);
+    buttonTitle = title;
+    loadContent();
+};
 
 function createPlayersArray(numPlayers) {
     let players = [];
-    for (let i = 1; i <= numPlayers; i++) {
+    for (let i = 1; i <= numPlayers; i++)
+    {
         if (i === 1)
             players.push(userName);
         else
         players.push(`Player ${i}`);
-}
+    }
     return players;
 }
 
@@ -77,39 +80,45 @@ function restoreBackground() {
 }
 
 // Caricamento dinamico del contenuto
-const loadContent = async () => {
+const loadContent = () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
     let players;
     let playerNames;
     let numPlayers = 4;
-    let can_go = 0;
-    if (!readCookie("logged"))
+    if (sessionStorage.getItem("already in") === null && localStorage.getItem("session opened") === null)
     {
+        deleteAllCookies();
         sessionStorage.clear();
         localStorage.clear();
-    }
-    if (sessionStorage.getItem("already in") === null && localStorage.getItem("session opened") === '1')
-        can_go = 1;
-    console.log("can go = ", can_go);
-    if (can_go === 1 && path !== "/")
-    {
-        alert("ERROR: accessing unautorized page...");
-        navigate("/", "home");
-        deleteAllCookies();
-        return;
+        nullify_user();
     }
     if (buttonTitle === "4" || buttonTitle === "5" || buttonTitle === "6" || buttonTitle === "7" || buttonTitle === "8" || buttonTitle === "16")
         numPlayers = +buttonTitle;
-    
+    if (path !== "/")
+    {
+        let session = 0;
+        let opened = 0;
+        if (sessionStorage.getItem("already in") === '0' || sessionStorage.getItem("already in") === null)
+            session = 1;
+        if (localStorage.getItem("session opened") === '1' || localStorage.getItem("session opened") === null)
+            opened = 1;
+        if (session === 1 && opened === 1 && readCookie("logged") !== '1' && !readCookie("user_token"))
+        {
+            alert("ERROR: accessing unauthorized page...");
+            navigate("/", "home");
+            deleteAllCookies();
+            return;
+        }
+    }
     players = createPlayersArray(numPlayers);
     //console.log("Players? " +players);
     playerNames = players;  
     //console.log("path => " + path);
     if (component)
     {
-        app.innerHTML = await component();
+        app.innerHTML = component();
         if (path === "/classic" || path === "/V.S._AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
             initializeGameCanvas();
             document.getElementById('app').classList.add('no-background');
@@ -119,15 +128,6 @@ const loadContent = async () => {
         switch (path)
         {
             case "/":
-                if(readCookie("logged") === "1")
-                {
-                    if (sessionStorage.getItem("already in") === 1)
-                    {
-                        deleteAllCookies();
-                        sessionStorage.clear();
-                        localStorage.clear();
-                    }
-                }
                 addLoginPageHandlers();
                 break;
             case "/stats":

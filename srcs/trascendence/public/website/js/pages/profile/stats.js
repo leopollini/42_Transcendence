@@ -10,11 +10,10 @@ export default function Stats()
         <span class="letter">U</span>
         <span class="letter">R</span>
         <span class="letter"> </span>
-        <span class="letter">S</span>
-        <span class="letter">T</span>
+        <span class="letter">D</span>
         <span class="letter">A</span>
         <span class="letter">T</span>
-        <span class="letter">S</span>
+        <span class="letter">A</span>
     </h1>
     <div id="stats-container">
         <div id="title"><h2>Your Name</h2></div>

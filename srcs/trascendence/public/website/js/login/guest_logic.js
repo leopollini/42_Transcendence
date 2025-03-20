@@ -8,17 +8,17 @@ export async function guest_login()
     let name = prompt("Enter your guest name:");
     if (!name) {
         alert('No name. Please try again');
-        return;
+        return ;
     }
     name = name.trim();
     if (name.length < 4) {
         alert('Name too short.');
-        return;
+        return ;
     }
     if (name.length >= 15)
     {
         alert('Name too long.');
-        return;
+        return ;
     }
     addGuest(name);
     /* let data = JSON.stringify({"params" : {}});
@@ -73,6 +73,9 @@ function update_guest(curr_guest)
         curr_guest.image,
         "guest"
     );
+    sessionStorage.setItem("already in", 1);
+    console.log("update sessione in guest");
+    localStorage.setItem("session opened", 1);
     let data = JSON.stringify({data : {username : current_user.display_name}, login_as_guest : "true"});
     fetch("http://localhost:8008",
     {
@@ -82,8 +85,6 @@ function update_guest(curr_guest)
     .then(response => response.json())
     .then(data =>
     {
-        sessionStorage.setItem("already in", 1);
-        localStorage.setItem("session opened", 1);
         console.log("(LOGIN_USER)\n data guest = ", data);
         saveCookie("logged", 1, 1);
         if (!data.token)
