@@ -261,8 +261,8 @@ const loadContent = async () => {
                 else
                 {
                     GameUserStatistics()
-                    gameUserStatisticsPageHandlers();
                     pongShowMatchDetails();
+                    gameUserStatisticsPageHandlers();
                 }
                 break;
             case "/forza4/findopponent":

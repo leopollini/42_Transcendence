@@ -301,10 +301,11 @@ async function getPongMatchesData() {
     }
 }
 
-export function pongShowMatchDetails() {
+export async function pongShowMatchDetails() {
     const pongMatchDetailsContainer = document.getElementById("pongMatchDetailsContainer");
     
-    getPongMatchesData();
+    await getPongMatchesData();
+
 
     console.log("pong show match details");
 
