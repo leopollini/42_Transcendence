@@ -96,8 +96,6 @@ function handle_access(loginButton, guestButton)
             performLogin();
     });
     guestButton.addEventListener("click", () => {
-        console.log("already in = ", sessionStorage.getItem("already in"));
-        console.log("session opened = ", localStorage.getItem("session opened"));
         if (popupOpened === true)
             alert("Authenticating in progress....\nPlease wait.");
         else if (sessionStorage.getItem("already in") === '0'
