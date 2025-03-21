@@ -21,7 +21,7 @@ import { Forza4UserStats, forza4ShowUserStatistics, forza4ShowMatchDetails, addF
 import Friends from "./pages/friends.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import {deleteAllCookies, eraseCookie, readCookie, saveCookie} from "./login/user.js";
+import {deleteAllCookies, eraseCookie, readCookie, restore_user, saveCookie} from "./login/user.js";
 let buttonTitle;
 let winner;
 
@@ -51,12 +51,6 @@ const routes = {
     "/friends": Friends,
 };
 
-/*window.onload = function()
-{
-    if ((current_user === null || current_user === undefined) && readCookie("logged") === "1" && readCookie("user_token"))
-    restore_user();
-}*/
-
 export const navigate = (path, title = "") => {
     history.pushState({ path }, title, path);
     buttonTitle = title;
@@ -75,6 +69,8 @@ function createPlayersArray(numPlayers) {
     return players;
 }
 
+
+
 function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
@@ -87,31 +83,10 @@ const loadContent = () => {
     let players;
     let playerNames;
     let numPlayers = 4;
-    if (sessionStorage.getItem("already in") === null && localStorage.getItem("session opened") === null)
-    {
-        deleteAllCookies();
-        sessionStorage.clear();
-        localStorage.clear();
-        nullify_user();
-    }
+    if (accessing_errors(path) === 1)
+        return;
     if (buttonTitle === "4" || buttonTitle === "5" || buttonTitle === "6" || buttonTitle === "7" || buttonTitle === "8" || buttonTitle === "16")
         numPlayers = +buttonTitle;
-    if (path !== "/")
-    {
-        let session = 0;
-        let opened = 0;
-        if (sessionStorage.getItem("already in") === '0' || sessionStorage.getItem("already in") === null)
-            session = 1;
-        if (localStorage.getItem("session opened") === '1' || localStorage.getItem("session opened") === null)
-            opened = 1;
-        if (session === 1 && opened === 1 && readCookie("logged") !== '1' && !readCookie("user_token"))
-        {
-            alert("ERROR: accessing unauthorized page...");
-            navigate("/", "home");
-            deleteAllCookies();
-            return;
-        }
-    }
     players = createPlayersArray(numPlayers);
     //console.log("Players? " +players);
     playerNames = players;  
@@ -128,6 +103,13 @@ const loadContent = () => {
         switch (path)
         {
             case "/":
+                if (sessionStorage.getItem("already in") === '1')
+                {
+                    deleteAllCookies();
+                    sessionStorage.clear();
+                    localStorage.clear();
+                    nullify_user();
+                }
                 addLoginPageHandlers();
                 break;
             case "/stats":
@@ -230,3 +212,47 @@ function initChat() {
 
 // Inizializzazione dell'app
 document.addEventListener("DOMContentLoaded", loadContent);
+
+export function unauthorized_acess()
+{
+    eraseCookie("logged");
+    eraseCookie("user_token");
+    navigate("/", "home");
+}
+
+function accessing_errors(path)
+{   
+    if ((current_user === null || current_user === undefined) && 
+    readCookie("logged") === "1" && readCookie("user_token") && sessionStorage.getItem("already in") === '1')
+        restore_user();
+    else if (sessionStorage.getItem("already in") === null && localStorage.getItem("session opened") === null)
+    {
+        deleteAllCookies();
+        sessionStorage.clear();
+        localStorage.clear();
+        nullify_user();
+    }
+    else if (sessionStorage.getItem("already in") === '1' && localStorage.getItem("session opened") === '1' 
+    && readCookie("logged") === '1' && path === '/')
+    {
+        deleteAllCookies();
+        sessionStorage.clear();
+        localStorage.clear();
+        nullify_user();
+    }
+    if (path !== "/")
+    {
+        let session = 0;
+        let opened = 0;
+        if (sessionStorage.getItem("already in") === '0' || sessionStorage.getItem("already in") === null)
+            session = 1;
+        if (localStorage.getItem("session opened") === '1' || localStorage.getItem("session opened") === null)
+            opened = 1;
+        if (session === 1 && opened === 1)
+        {
+            alert("ERROR: accessing unauthorized page...");
+            unauthorized_acess();
+            return (1);
+        }
+    }
+}

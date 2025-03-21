@@ -55,9 +55,6 @@ function popupHandling(popup, data)
 
 function get_data()
 {
-    sessionStorage.setItem("already in", '1');
-    console.log("update sessione in login");
-    localStorage.setItem("session opened", '1');
     let data = JSON.stringify({"params" :{"type" : "login"}});
     fetch("http://localhost:8008", {
         method: "get_user",
@@ -68,7 +65,7 @@ function get_data()
     {
         console.log("(GET_USER)\ndata login = ", data);
         if (data.status === "no users found")
-        {
+        {;
             deleteAllCookies();
             navigate("/", "login");
             return ;
@@ -97,6 +94,8 @@ function get_data()
         console.log("adding user hahahah");
         saveCookie("user_token");
         saveCookie("logged", 1, 1);
+        sessionStorage.setItem("already in", '1');
+        localStorage.setItem("session opened", '1');
         updateUserProfile(current_user);
     })
     .catch(error => {

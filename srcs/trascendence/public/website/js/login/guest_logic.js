@@ -74,7 +74,6 @@ function update_guest(curr_guest)
         "guest"
     );
     sessionStorage.setItem("already in", 1);
-    console.log("update sessione in guest");
     localStorage.setItem("session opened", 1);
     let data = JSON.stringify({data : {username : current_user.display_name}, login_as_guest : "true"});
     fetch("http://localhost:8008",

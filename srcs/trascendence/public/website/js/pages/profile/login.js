@@ -1,7 +1,8 @@
 import { guest_login } from "../../login/guest_logic.js";
 import { performLogin, popupOpened } from "../../login/login_logic.js";
-import { readCookie, saveCookie } from "../../login/user.js";
-
+import { eraseCookie, readCookie, saveCookie } from "../../login/user.js";
+import { navigate, unauthorized_acess } from "../../main.js";
+import { nullify_user } from "../modes.js";
 export default function Login() {
     return `
         <h1 class="text">
@@ -29,58 +30,51 @@ export default function Login() {
     `;
 }
 
-window.addEventListener('beforeunload', () => {
-    let openTabs = parseInt(localStorage.getItem('openTabs')) || 1;
-    console.log("if(tabs > 1)= ", openTabs);
-    if (openTabs > 1)
-        localStorage.setItem('openTabs', openTabs - 1);
-    else
-    {
-        localStorage.removeItem('openTabs');
-        checkIfNoTabHasCookie();
-    }
-    if (sessionStorage.getItem("already in") === '1')
-        localStorage.setItem('session closed', 'true');
-});
-
-function checkIfNoTabHasCookie()
+function AllTabClosed()
 {
-    if (!localStorage.getItem('openTabs'))
-    {
-        alert("deleting all data");
-        console.log("deleting all");
-        sessionStorage.clear();
-        localStorage.clear();
-        deleteAllCookies();
-    }
+    nullify_user();
+    sessionStorage.clear();
+    localStorage.clear();
+    deleteAllCookies();
 }
 
-window.addEventListener('load', () => {
-    if (sessionStorage.getItem("already in") === null)
-        sessionStorage.setItem("already in", '0');
-    let openTabs = parseInt(localStorage.getItem('openTabs')) || 0;
-    openTabs++;
-    localStorage.setItem('openTabs', openTabs);
-});
 
-window.addEventListener('storage', (event) => {
-    if (event.key === 'session closed' && event.newValue === 'true')
+window.addEventListener('beforeunload', () => {
+    if (sessionStorage.getItem("opened") === '1')
     {
-        console.log("already in = ", sessionStorage.getItem("already in"));
-        if (sessionStorage.getItem("already in") === '0')
+        let openTabs = parseInt(localStorage.getItem('openTabs')) || 1;
+        openTabs--;
+        localStorage.setItem('openTabs', openTabs);
+        if (openTabs === 0)
+            AllTabClosed();
+        else if (sessionStorage.getItem("already in") === '1')
         {
             sessionStorage.setItem("already in", '0');
-            localStorage.setItem("session opened", '0');
+            localStorage.setItem("session opened", '1');
         }
+    }
+});
+
+window.addEventListener('load', () => {
+    if (sessionStorage.getItem("opened") === null)
+    {
+        let openTabs = parseInt(localStorage.getItem('openTabs')) || 0;
+        openTabs++;
+        localStorage.setItem('openTabs', openTabs);
+        sessionStorage.setItem("opened", '1');
+    }   
+    if (sessionStorage.getItem("already in") === null)
+        sessionStorage.setItem("already in", '0');
+});
+
+/*window.addEventListener('storage', (event) => {
+    if (event.key === 'session closed' && event.newValue === 'true')
+    {
+        sessionStorage.setItem("already in", '0');
+        localStorage.setItem("session opened", '1');
         localStorage.removeItem('session closed');
     }
-    if (event.key === 'already in' && event.newValue === '1')
-    {
-        console.log("already in aggiornato ora");
-    }
-    if (event.key === 'openTabs' && event.newValue === '0')
-        checkIfNoTabHasCookie();
-});
+});*/
 
 export const addLoginPageHandlers = () => {
     const loginButton = document.getElementById("loginButton");
@@ -93,8 +87,6 @@ export const addLoginPageHandlers = () => {
 function handle_access(loginButton, guestButton)
 {
     loginButton.addEventListener("click", () => {
-        console.log("already in = ", sessionStorage.getItem("already in"));
-        console.log("session opened = ", localStorage.getItem("session opened"));
         if (popupOpened === true)
             alert("popup already open finish authentication before continuing")
         else if (sessionStorage.getItem("already in") === '0'

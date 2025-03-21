@@ -59,18 +59,10 @@ export default function Modes()
 
 export let current_user = JSON.parse(localStorage.getItem('your_profile'));
 
-window.onload = function()
-{
-    if ((current_user === null || current_user === undefined) && readCookie("logged") === "1" && readCookie("user_token"))
-    restore_user();
-}
-
 export function nullify_user()
 {
     current_user = null;
 }
-
-history.pushState(null, null, location.href);
 
 window.onpopstate = function () {
     if (location.pathname === "/")

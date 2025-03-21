@@ -1,6 +1,5 @@
 import { nullify_user, updateProfileUI} from "../pages/modes.js";
-import { navigate } from "../main.js";
-
+import { unauthorized_acess } from "../main.js";
 export class user {
     constructor(image, name, login_name, email, bio) {
         this.image = image;
@@ -86,14 +85,12 @@ export function restore_user()
     .then(data =>
     {
         sessionStorage.setItem("already in", '1');
-        console.log("update sessione in refresh");
         localStorage.setItem("session opened", '1');
         if (!data || (!data.user && !data.guest)) 
         {
             nullify_user();
-            deleteAllCookies();
-            alert("ERROR: accessing unautorized page...");
-            navigate("/", "home");
+            alert("ERROR: no users found...");
+            unauthorized_acess();
             return;
         }
         let user = data.user?.find(u => u.token === token);
@@ -110,15 +107,17 @@ export function restore_user()
                 "",
                 "guest"
             );
+            /*sessionStorage.setItem("already in", '1');
+            localStorage.setItem("session opened", '1');
             localStorage.setItem('your_profile', JSON.stringify(current_user));
             updateProfileUI(user);
         }
-        /* else 
+        else 
         {
             nullify_user();
-            deleteAllCookies();
-            alert("ERROR: accessing unautorized page...");
-            navigate("/", "home");
+            alert("ERROR: finding logged user...");
+            unauthorized_acess();
         } */
-    })
+        }
+    });
 }
