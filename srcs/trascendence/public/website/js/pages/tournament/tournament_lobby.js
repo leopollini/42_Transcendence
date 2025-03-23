@@ -1,7 +1,5 @@
 import { navigate } from "../../main.js";
 import { current_user} from "../modes.js";
-import { access_denied } from "../../game/pong/main/modes_logic.js";
-
 
 let invitedPlayers = [];
 let tournament;
@@ -124,17 +122,30 @@ function searchUser(username) {
     fetch("http://localhost:8008", {
             method: "get_user",
             body: JSON.stringify({ 
-                "params": { "display_name": username } 
+                "params" : [{}] 
             }) 
         })
         .then(response => response.json())
         .then(data =>
         {
-            let user = data.user[0];
-            if (user) {
-                playerSearchResult.innerHTML = "User Found: " + user.display_name;
-                toggleInviteUser.disabled = false;
-
+            if (!data || (!data.user && !data.guest)) 
+            {
+                nullify_user();
+                alert("ERROR: no users found...");
+                unauthorized_acess();
+                return;
+            }
+            let user_name;
+            let find_user = data.user?.find(u => u.username === username);
+            if (!find_user)
+                find_user = data.guest?.find(g => g.username === username);
+            if (find_user) 
+            {
+                user_name = find_user;
+                if (user_name) {
+                    playerSearchResult.innerHTML = "User Found: " + user_name.username;
+                    toggleInviteUser.disabled = false;
+                }
             }
             else {
                 playerSearchResult.innerHTML = "User Not Found";
@@ -156,8 +167,6 @@ export function addLobbyPageHandlers() {
     const toggleStartTournament = document.getElementById('toggleStartTournament');
     const canvas = document.getElementById('lobbyUsersCanvas');
 
-    if (current_user === null)
-        access_denied();
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");   
         invitedPlayers = [];     

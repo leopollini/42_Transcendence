@@ -1,7 +1,5 @@
 import { navigate } from "../main.js";
 import { current_user } from "./modes.js";
-import { access_denied } from "../game/pong/main/modes_logic.js";
-
 
 let matchPlayers = [];
 
@@ -68,29 +66,42 @@ function searchUser(username) {
     fetch("http://localhost:8008", {
             method: "get_user",
             body: JSON.stringify({ 
-                "params": { "display_name": username } 
+                "params" : [{}] 
             }) 
         })
         .then(response => response.json())
         .then(data =>
         {
-            let user = data.user[0];
-            if (user && matchPlayers.includes(user.display_name)) {
-                pongPlayerSearchResult.style.color = "red";
-                pongPlayerSearchResult.innerHTML = "Cannot add urself as opponent"
-                pongToggleAddUser.disabled = true;
-            }
-            else if (user) 
+            if (!data || (!data.user && !data.guest)) 
             {
-                pongPlayerSearchResult.style.color = "green";
-                pongPlayerSearchResult.innerHTML = "User Found: " + user.display_name;
-                pongToggleAddUser.disabled = false;
+                nullify_user();
+                alert("ERROR: no users found...");
+                unauthorized_acess();
+                return;
+            }
+            let user_name;
+            let find_user = data.user?.find(u => u.username === username);
+            if (!find_user)
+                find_user = data.guest?.find(g => g.username === username);
+            if (find_user) 
+            {
+                user_name = find_user;
+                if (user_name && matchPlayers.includes(user_name.username)) {
+                    pongPlayerSearchResult.style.color = "red";
+                    pongPlayerSearchResult.innerHTML = "Cannot add urself as opponent"
+                    pongToggleAddUser.disabled = true;
+                }
+                else if (user_name) 
+                {
+                    pongPlayerSearchResult.style.color = "green";
+                    pongPlayerSearchResult.innerHTML = "User Found: " + user_name.username;
+                    pongToggleAddUser.disabled = false;
+                }
             }
             else {
                 pongPlayerSearchResult.style.color = "red";
                 pongPlayerSearchResult.innerHTML = "User Not Found";
                 pongToggleAddUser.disabled = true;
-
             }
         })
         .catch(error => {
@@ -106,8 +117,6 @@ export function addClassicPongLobbyPageHandlers() {
     const pongToggleStartGame = document.getElementById('pongToggleStartGame');
     //const toggleAddUserRaw = document.getElementById('toggleAddUserRaw');
 
-    if (current_user === null)
-        access_denied();
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");   
         matchPlayers = [];     

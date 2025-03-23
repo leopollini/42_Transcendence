@@ -15,7 +15,7 @@ import Settings, { addSettingsPageHandlers } from "./pages/profile/settings.js";
 import { userName } from "./pages/user_data.js";
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
-import { GameUserStatistics} from "./pages/game_statistics.js";
+import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers} from "./pages/game_statistics.js";
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import Friends from "./pages/friends.js";
 import LiveChat from "./pages/live-chat.js";
@@ -50,10 +50,21 @@ const routes = {
     "/friends": Friends,
 };
 
-export const navigate = (path, title = "") => {
+export const navigate = (path, title = "", lobbyPlayers) => {
     history.pushState({ path }, title, path);
     buttonTitle = title;
     players = lobbyPlayers;
+    let data = JSON.stringify({ "params" : [{}]});
+    fetch("http://localhost:8008",
+    {
+        method: "get_user",
+        body: data
+    })
+    .then(response => response.json())
+    .then(data =>
+    {
+        console.log("(get_user)\nData login = ", data);
+    });
     loadContent();
 };
 
@@ -118,8 +129,6 @@ const loadContent = () => {
                 profileHandler();
                 break;
             case "/classic":
-                if (current_user === null)
-                    access_denied();
                 break;
             case "/classic/lobby":
                 addClassicPongLobbyPageHandlers();

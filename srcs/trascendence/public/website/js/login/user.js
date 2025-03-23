@@ -92,15 +92,15 @@ export function restore_user()
             unauthorized_acess();
             return;
         }
-        let user = data.user?.find(u => u.token === token);
-        if (!user)
-            user = data.guest?.find(g => g.token === token);
-        if (user) 
+        let find_user = data.user?.find(u => u.token === token);
+        if (!find_user)
+            find_user = data.guest?.find(g => g.token === token);
+        if (find_user) 
         {
-            //console.log("save user = ", user );
+            //console.log("save user = ", find_user);
             let current_user = new profile(
                 "",
-                user.name,
+                find_user.name,
                 "",
                 "",
                 "",
@@ -109,7 +109,7 @@ export function restore_user()
             /*sessionStorage.setItem("already in", '1');
             localStorage.setItem("session opened", '1');
             localStorage.setItem('your_profile', JSON.stringify(current_user));
-            updateProfileUI(user);
+            updateProfileUI(find_user);
         }
         else 
         {
