@@ -12,7 +12,6 @@ import Bracket, { addBracketPageHandlers, drawBracket, backToBracket, resetBrack
 import { initializeGameCanvas } from "./game/pong/main/handling_Canvas.js";
 import Profile, { profileHandler } from "./pages/profile/profile.js";
 import Settings, { addSettingsPageHandlers } from "./pages/profile/settings.js";
-import Stats, {ShowStats} from "./pages/profile/stats.js";
 import { userName } from "./pages/user_data.js";
 import { Forza4Home, showForza4HomeScreen, addForza4PageHandlers } from "./pages/forza4/forza4_home.js";
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
@@ -47,7 +46,6 @@ const routes = {
     "/tournament/knockout/bracket": Bracket,
     "/tournament/knockout/bracket/game": PongGame,
     "/profile": Profile,
-    "/stats": Stats,
     "/friends": Friends,
 };
 
@@ -111,9 +109,6 @@ const loadContent = () => {
                     nullify_user();
                 }
                 addLoginPageHandlers();
-                break;
-            case "/stats":
-                    ShowStats()
                 break;
             case "/profile":
                 profileHandler();

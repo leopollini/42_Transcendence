@@ -42,7 +42,7 @@ module Other_logic
       }
     }
     puts "adding token cookie"
-    response = SimpleServer.method_req("add_user", payload.to_json)
+    response = SimpleServer.method_req("login_user", payload.to_json)
     puts response
     data = JSON.parse(response)
     if (data["token"])
