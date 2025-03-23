@@ -55,7 +55,7 @@ function popupHandling(popup, data)
 
 function get_data()
 {
-    let data = JSON.stringify({"params" :{"type" : "login"}});
+    let data = JSON.stringify({"params" :{}});
     fetch("http://localhost:8008", {
         method: "get_user",
         body: data

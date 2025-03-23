@@ -36,7 +36,9 @@ class ChatApp {
         this.updateFriendsList();
         this.updateFriendRequestsUI();
         this.initializeGeneralChat();
-        //this.username = prompt("Inserisci il tuo username:").toLowerCase();
+        console.log("SET USERNAME PROPERLY PLEASE")
+        // this.username = prompt("Inserisci il tuo username:").toLowerCase();
+        this.username = "Dave_" + String(Math.random())
 
         // Inizializza la connessione WebSocket
         this.socket = initSocket(this.username, this);
@@ -76,12 +78,12 @@ class ChatApp {
         if (!this.chats.has('general')) {
             this.chats.set('general', []);
             const generalChat = this.chats.get('general');
-            generalChat.push({
-                date: new Date().toISOString(),
-                from: 'system',
-                to: 'general',
-                content: 'Welcome to General Chat!'
-            });
+            // generalChat.push({
+            //     date: new Date().toISOString(),
+            //     from: 'system',
+            //     to: 'general',
+            //     content: 'Welcome to General Chat!'
+            // });
             this.createChatElement('general', 'General Chat', false);
             this.updateMessagesDisplay();
         }

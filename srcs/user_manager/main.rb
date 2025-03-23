@@ -14,9 +14,9 @@ Dir['/var/common/*.rb'].each { |file| require file }
 
 require_relative 'GuestsList'
 
-DEFAULT_ERROR_RES = { 'status' => 'failed', 'success' => 'false' }
+DEFAULT_ERROR_RES = { 'status' => 'user_manager: failed', 'success' => 'false' }
 DEFAULT_SUCCESS_RES = { 'status' => 'success', 'success' => 'true' }
-DEFAULT_MISSING_PARAM = { 'status' => 'missing mandatory data', 'success' => 'false' }
+DEFAULT_MISSING_PARAM = { 'status' => 'user_manager: missing mandatory data', 'success' => 'false' }
 
 $stdout.sync = true
 SERVICE_NAME = 'user_manager'
@@ -28,7 +28,7 @@ LOGIN = BetterPG::SimplePG.new 'users',
 
 
 GUEST = GuestsList.new
-# REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image type]
+# REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image]
 
 
 def add_user(_client, obj = nil)
@@ -42,7 +42,7 @@ def add_user(_client, obj = nil)
 
   if (LOGIN.select ['realname'], [data['realname']])[0]
     puts "user already present (#{data['realname']})"
-    return { 'status' => 'user with same login_name already in database', 'success' => 'false' }
+    return { 'status' => 'user_manager: user with same login_name already in database', 'success' => 'false' }
   end
 
   begin
@@ -83,15 +83,15 @@ def login_user(client, obj)
     LOGIN.valueManipulation 'realname', data['realname']
     return usr.merge({'status' => 'success', 'success' => 'true'})
   end rescue r
-  return {'status' => 'bad request', 'success' => 'false'} unless r.nil?
+  return {'status' => 'user_manager: bad request', 'success' => 'false'} unless r.nil?
   return add_user(client, obj) if obj['do_create']
   
-  {'status' => 'user not found', 'success' => 'false'}
+  {'status' => 'user_manager: user not found', 'success' => 'false'}
 end
 
 def logout_user(client, obj)
-  return DEFAULT_MISSING_PARAM.clone unless obj['username'] || obj['realname']
   return GUEST.del_guest obj['username'] if obj['username']
+  return DEFAULT_MISSING_PARAM.clone unless obj['realname']
 
   LOGIN.valueManipulation 'realname', obj['realname']
 end
@@ -153,7 +153,7 @@ def update_user(_client, obj = nil)
   r = nil
   res = DEFAULT_ERROR_RES.clone
   return res if !obj || !(params = obj['new_params']) || !(lname = obj['display_name'])
-  return { 'status' => 'Invalid login name change request', 'success' => 'false' } if params.include? 'display_name'
+  return { 'status' => 'user_manager: Invalid login name change request', 'success' => 'false' } if params.include? 'display_name'
 
   # (LOGIN.select ["display_name"], [lname])[0] rescue r
   usr = begin
@@ -161,7 +161,7 @@ def update_user(_client, obj = nil)
   rescue StandardError
     r
   end
-  return { 'status' => 'display_name not found', 'success' => 'false' } if r || usr.nil?
+  return { 'status' => 'user_manager: display_name not found', 'success' => 'false' } if r || usr.nil?
 
   cols = []
   keys = []
@@ -178,6 +178,8 @@ def drop_users(_client, _obj = nil)
   does = 'yesiam' # obj['reallysure']
   if does.to_s == 'yesiam'
     LOGIN.dropTable
+    _client.puts DEFAULT_SUCCESS_RES.to_json
+    _client.close
     exit
   end
   DEFAULT_ERROR_RES.clone
@@ -186,11 +188,10 @@ end
 def user_manager(client, _server)
   res = DEFAULT_ERROR_RES.clone
   t = select [client], [], [], 20 # waits for client, a few seconds
-  return if t[0].empty? || client.closed?
+  return if t.nil? || t[0].empty? || client.closed?
 
   msg = client.read_nonblock Ports::MAX_MSG_LEN
-  bobj = RequestUnpacker::Unpacker.new.unpack msg
-  puts bobj
+  bobj = JSON.parse(msg)
   # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
   begin
     res = case bobj['method'].to_s
@@ -209,10 +210,10 @@ def user_manager(client, _server)
     when 'logout_user'
       logout_user client, bobj
     else
-      {'status' => 'bad method: ' + bobj['method'].to_s, 'success' => 'false'}
+      {'status' => 'user_manager: unknown method: ' + bobj['method'].to_s, 'success' => 'false'}
     end
   rescue => r
-    return {'status' => "error: #{r.to_s}", 'success' => 'false'}.to_json
+    return {'status' => "user_manager: error: #{r.to_s}", 'success' => 'false'}.to_json
   end
 
   client.puts res.to_json

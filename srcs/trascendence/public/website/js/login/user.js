@@ -13,14 +13,13 @@ export class user {
 export let profiles = [];
 
 export class profile {
-    constructor(email, display_name, realname, bio, image, type)
+    constructor(email, display_name, realname, bio, image)
     {
         this.email = email;
         this.display_name = display_name;
         this.realname = realname
         this.bio = bio;
         this.image = image;
-        this.type = type;
         this.num_friends = 0;
         this.myfriend = friend_list;
 

@@ -4,7 +4,8 @@ require_relative 'Oauth'
 require_relative 'session'
 require_relative 'error_logger'
 require_relative 'handle_route'
-require_relative ((File.file?('/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../../common_tools/tools/Ports.rb'))
+
+Dir['/var/common/*.rb'].each { |file| require file }
 
 module WEBrick
   class Log
@@ -31,10 +32,10 @@ $stdout.sync = true
 SERVICE_NAME = "auth"
 PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
-logger = Logger.new(STDOUT)
-logger.level = Logger::DEBUG
+LOGGER = Logger.new(STDOUT)
+LOGGER.level = Logger::DEBUG
 
-app = App.new(OAuthClient.new, logger)
+APP = App.new(OAuthClient.new, LOGGER)
 
 cert_path = File.expand_path("ssl_certs/server.crt", __dir__)
 key_path = File.expand_path("ssl_certs/server.key", __dir__)
@@ -43,7 +44,7 @@ cert = OpenSSL::X509::Certificate.new(File.read(cert_path))
 key = OpenSSL::PKey::RSA.new(File.read(key_path))
 
 server = WEBrick::HTTPServer.new(
-  Port: 443,
+  Port: PORT,
   BindAddress: '0.0.0.0',
   DocumentRoot: File.expand_path("../../public", __FILE__),
   RequestCallback: proc { |req, res| res['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0' },
@@ -54,33 +55,39 @@ server = WEBrick::HTTPServer.new(
   SSLVerifyClient: OpenSSL::SSL::VERIFY_NONE
 )
 
-server.mount_proc '/' do |req, res|
-  status, headers, body = app.call(req.meta_vars)
-  res.status = status
-  headers.each { |k, v| res[k] = v }
-  log_error_details(req, status, body, logger)
-
-  if body.nil?
-    res.body = "Internal Server Error"
-  else
-    if body.is_a?(String)
-      res.body = body
+class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
+  def do_GET(req, res)
+    puts "####", req.request_method, res, "####"
+    # return request_sorter req if req.method == "OPTIONS"
+    status, headers, body = APP.call(req.meta_vars)
+    res.status = status
+    headers.each { |k, v| res[k] = v }
+    log_error_details(req, status, body, LOGGER)
+  
+    if body.nil?
+      res.body = "Internal Server Error"
     else
-      body.each { |chunk| res.body << chunk }
+      if body.is_a?(String)
+        res.body = body
+      else
+        body.each { |chunk| res.body << chunk }
+      end
+    end
+  
+    if status >= 400
+      LOGGER.error("#{status} Error: #{req.path}".red)
     end
   end
-
-  if status >= 400
-    logger.error("#{status} Error: #{req.path}".red)
-  end
 end
+
+server.mount '/', RootDirManager
 
 set_routes(server)
 
 trap 'INT' do
-  logger.info "Shutting down WEBrick server..."
+  LOGGER.info "Shutting down WEBrick server..."
   pid = Process.pid
-  logger.info "Terminating process with PID #{pid}".red
+  LOGGER.info "Terminating process with PID #{pid}".red
   Process.kill('TERM', pid)
   server.shutdown
 end

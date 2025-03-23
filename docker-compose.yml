@@ -92,25 +92,6 @@ services:
     entrypoint: /var/www/init.sh
     working_dir: /var/www
 
-  request_manager:
-    image: ruby:latest
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./srcs/common_tools/tools:/var/common
-      - ./srcs/request_manager:/var/www
-    depends_on:
-      - receiver
-      - postgres
-    networks:
-      - app-network
-    env_file:
-      - .env
-    ports:
-      - "9000:9000"
-    entrypoint: /var/www/init.sh
-    working_dir: /var/www
-
   auth:
     image: ruby:latest
     container_name: website_container

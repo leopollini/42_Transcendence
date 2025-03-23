@@ -1,5 +1,5 @@
 function initSocket(username, chatAppInstance) {
-    const socket = new WebSocket('ws://localhost:3000/ws');
+    const socket = new WebSocket('ws://localhost:6087');
 
     socket.onopen = () => {
         socket.send(JSON.stringify({ type: "join", username }));
@@ -7,6 +7,8 @@ function initSocket(username, chatAppInstance) {
 
     socket.onmessage = (event) => {
         const msg = JSON.parse(event.data);
+
+console.log(msg)
 
         if (msg.type === "message") {
             chatAppInstance.addMessageToChat('general', msg.data);

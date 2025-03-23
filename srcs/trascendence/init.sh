@@ -23,6 +23,8 @@ else
     echo "✅ Bundler installato correttamente."
 fi
 
+cd authentication
+
 echo "==============================="
 echo "Pulizia delle gemme..."
 if gem cleanup; then
@@ -31,7 +33,6 @@ else
     echo "❌ Errore durante la pulizia delle gemme."
 fi
 
-cd authentication/
 if [ -f "Gemfile.lock" ]; then
     rm Gemfile.lock
 fi
@@ -54,4 +55,8 @@ else
     bundle install
 fi
 
-bash https.sh
+if [ "$SSL_RE" == "no" ]; then
+    ruby server.rb
+else
+    bash https.sh
+fi
