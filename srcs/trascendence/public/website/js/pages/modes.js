@@ -47,7 +47,6 @@ export default function Modes()
         <img alt="Avatar" class="avatar-image" id="avatarImage">
         <div class="menu-container hidden">
             <div class="menu-item"><img src="website/images/profile.png" alt="Profile" id="profileIcon"></div>
-            <div class="menu-item"><img src="website/images/stats.png" alt="Settings" id="statIcon"></div>
             <!-- <div class="menu-item"><img src="website/images/friends.jpg" alt="Settings" id="friends"></div> -->
             <div class="menu-item"><img src="website/images/history_match.png" alt="Settings" id="history"></div>
             <div class="menu-item" id="settings-link"><img src="website/images/settings.png" alt="Settings"></div>
@@ -129,13 +128,11 @@ export const addModesPageHandlers = () => {
     const menuContainer = document.querySelector('.menu-container');
     const Settings = document.getElementById('settings-link');
     const profileIcon = document.getElementById("profileIcon");
-    const statIcon = document.getElementById("statIcon");
-    //const friends = document.getElementById("friends");
     const history = document.getElementById("history");
     const logout = document.getElementById("logout");
     handle_modes_logic(classicButton, aiButton, tournamentButton, 
     forza4Button, avatarImage, menuContainer, Settings, profileIcon,
-    statIcon, history, logout);
+    history, logout);
 };
 
 export function update_image(image)

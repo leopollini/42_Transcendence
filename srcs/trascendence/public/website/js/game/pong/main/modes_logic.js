@@ -4,7 +4,7 @@ import { current_user, nullify_user} from "../../../pages/modes.js";
 import { deleteAllCookies} from "../../../login/user.js";
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
-        statIcon, history, logout)
+        history, logout)
 {
     classicButton?.addEventListener('click', () => {
         navigate("/classic", "Modalità Classic");
@@ -50,14 +50,6 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     }
     else
         console.error("profile icon not found!");
-    if (statIcon)
-    {
-        statIcon.addEventListener("click", () => {
-            navigate("/stats", "Stats");
-        });
-    }
-    else
-        console.error("stat icon not found!");
     if (history)
     {
         history.addEventListener("click", () => {

@@ -1,7 +1,5 @@
 import { guest_login } from "../../login/guest_logic.js";
 import { performLogin, popupOpened } from "../../login/login_logic.js";
-import { eraseCookie, readCookie, saveCookie } from "../../login/user.js";
-import { navigate, unauthorized_acess } from "../../main.js";
 import { nullify_user } from "../modes.js";
 export default function Login() {
     return `
@@ -67,14 +65,6 @@ window.addEventListener('load', () => {
         sessionStorage.setItem("already in", '0');
 });
 
-/*window.addEventListener('storage', (event) => {
-    if (event.key === 'session closed' && event.newValue === 'true')
-    {
-        sessionStorage.setItem("already in", '0');
-        localStorage.setItem("session opened", '1');
-        localStorage.removeItem('session closed');
-    }
-});*/
 
 export const addLoginPageHandlers = () => {
     const loginButton = document.getElementById("loginButton");

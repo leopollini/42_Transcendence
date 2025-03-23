@@ -22,8 +22,6 @@
 @import url("live-chat/responsive.css");
 @import url("live-chat/friends.css");
 @import url('match-details.css');
-@import url('errors.css');
-
 * {
     box-sizing: border-box;
 }
