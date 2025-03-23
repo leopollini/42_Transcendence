@@ -7,7 +7,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         history, logout)
 {
     classicButton?.addEventListener('click', () => {
-        navigate("/classic", "Modalità Classic");
+        navigate("/classic/lobby", "Classic Pong Lobby Room");
     });
     
     aiButton?.addEventListener('click', () => {
@@ -24,7 +24,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     });
 
     forza4Button?.addEventListener('click', () => {
-        navigate("/forza4", "Modalità Forza 4");
+        navigate("/forza4/findopponent", "Forza 4 Find Opponent");
     })
     avatarImage.addEventListener("click", (event) => {
         menuContainer.classList.toggle("visible");
@@ -58,7 +58,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
                 alert("You must be logged to use this feature!");
                 return;
             }
-            navigate("/tournament/userstats", "Userstats");
+            navigate("/userstats", "Game User Statistics");
         });
     }
     else 

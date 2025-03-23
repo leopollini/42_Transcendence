@@ -39,9 +39,6 @@ export default function Tournament() {
             <div class="tour-button-container">
                 <button class="button-style" id="roundrobinTournament">Round-robin</button>
             </div>
-            <div class="tour-button-container">
-                <button class="button-style" id="userStatisticsButton">Statistics</button>
-            </div>
         </div>
     `;
 }
@@ -49,7 +46,6 @@ export default function Tournament() {
 export const addTournamentPageHandlers = () => {
     const knockoutTournament = document.getElementById('knockoutTournament');
     const roundrobinTournament = document.getElementById('roundrobinTournament');
-    const userStatisticsButton = document.getElementById('userStatisticsButton');
     const backImageButton = document.getElementById('backImageButton');
 
     knockoutTournament?.addEventListener('click', () => {
@@ -58,10 +54,6 @@ export const addTournamentPageHandlers = () => {
 
     roundrobinTournament?.addEventListener('click', () => {
         navigate("/tournament/roundrobin", "Roundrobin");
-    });
-
-    userStatisticsButton?.addEventListener('click', () => {
-            navigate("/tournament/userstats", "Userstats");
     });
 
     backImageButton?.addEventListener('click', () => {

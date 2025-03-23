@@ -3,8 +3,8 @@ import { current_user } from "../../../pages/modes.js";
 let gameInstance;
 
 // Funzione per aggiungere il canvas di gioco
-export function initializeGameCanvas() {
-    //console.log("Inizializzazione game canvas");
+export function initializeGameCanvas(matchPlayers) {
+    console.log("Inizializzazione game canvas");
     const path = window.location.pathname;
     let players;
 
@@ -26,8 +26,7 @@ export function initializeGameCanvas() {
                 startPongGame(players, "ai");
             } 
             else if (path === "/classic") {
-                players = [current_user.display_name, "Player 2"];
-                startPongGame(players, "classic");
+                startPongGame(matchPlayers, "classic");
             }
             else {
                 players = JSON.parse(sessionStorage.getItem('matchPlayers')) || ["Player 1", "Player 2"];

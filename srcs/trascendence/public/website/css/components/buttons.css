@@ -40,6 +40,12 @@
     transition: all 0.3s ease;
 }
 
+.button-style:disabled {
+    color: #054d3e;
+    border: 2px solid #054d3e;
+    cursor: not-allowed;
+}
+
 /*-----------Radio button style start-------------*/
 .container {
     display: flex;
