@@ -27,7 +27,7 @@ class ChatService < WEBrick::Websocket::Servlet
 # }
 
   def socket_close(sock)
-    ChatStore.remove_client(@username, sock) if @username
+    ChatStore.clients[@username].close(@username, sock) if @username
     puts "#{@username} left the chat"
   end
   
@@ -56,8 +56,12 @@ class ChatService < WEBrick::Websocket::Servlet
           ChatStore.broadcast message, 'message'
 
         elsif data["chat"] == "private"
+          unless ChatStore.clients[@username].friends.include? target
+            return ChatStore.clients[@username].send_sys "The message could not be delivered" 
+          end
           message["to"] = target
-          ChatStore.clietns[target].send_me message
+          ChatStore.clients[target].send_me message, 'private_message'
+          ChatStore.clients[@username].send_me message, 'private_message'
         end
 
       when "friend_request"
@@ -68,17 +72,17 @@ class ChatService < WEBrick::Websocket::Servlet
         ChatStore.friend_res target, @username, data['accepted']
 
       when "remove_friend"
-        @@clients[target].send_me({"from" => @username}, 'friend_removed')
-        @@clients[@username].send_me({"from" => target}, 'friend_removed')
+        ChatStore.remove_friend target, @username
 
       when "private_chat_started"
-        @@clients[target].send_me({"from" => @username}, 'private_chat_started')
+        ChatStore.clients[target].send_me({"from" => @username}, 'private_chat_started')
 
       when "block_user"
-         
+        ChatStore.block target, @username
 
       when "unblock_user"
-    
+        ChatStore.clients[user].send_sys "You have unblocked #{target}"
+        ChatStore.clients[user].unblock_usr target
 
       else
         puts "Unknown message type: #{data["type"]}"

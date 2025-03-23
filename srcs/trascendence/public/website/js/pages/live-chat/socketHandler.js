@@ -79,9 +79,9 @@ console.log(msg)
                     match = msg.data.content.match(regex);
                 }
                 if (match && match[1]) {
-                    const blockingUser = match[1].trim().toLowerCase();
+                    const blockingUser = match[1].trim();
                     chatAppInstance.pendingRequests.delete(blockingUser);
-                    if (chatAppInstance.selectedUser && chatAppInstance.selectedUser.toLowerCase() === blockingUser) {
+                    if (chatAppInstance.selectedUser && chatAppInstance.selectedUser === blockingUser) {
                         const addFriendItem = chatAppInstance.elements.contextMenu.querySelector('[data-action="addFriend"]');
                         if (addFriendItem) {
                             addFriendItem.textContent = 'Add Friend';

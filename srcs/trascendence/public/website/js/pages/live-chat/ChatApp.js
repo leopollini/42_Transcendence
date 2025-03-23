@@ -25,8 +25,8 @@ class ChatApp {
 
     // Genera l'ID della chat privata in base ai nomi degli utenti
     getPrivateChatId(user1, user2) {
-        user1 = user1.toLowerCase();
-        user2 = user2.toLowerCase();
+        user1 = user1;
+        user2 = user2;
         return user1 < user2 ? `private-${user1}-${user2}` : `private-${user2}-${user1}`;
     }
 
@@ -37,7 +37,7 @@ class ChatApp {
         this.updateFriendRequestsUI();
         this.initializeGeneralChat();
         console.log("SET USERNAME PROPERLY PLEASE")
-        // this.username = prompt("Inserisci il tuo username:").toLowerCase();
+        // this.username = prompt("Inserisci il tuo username:");
         this.username = "Dave_" + String(Math.random())
 
         // Inizializza la connessione WebSocket
@@ -147,7 +147,7 @@ class ChatApp {
 
     // IMPLEMENTAZIONE DEL BLOCK USER
     blockUser(user) {
-        user = user.toLowerCase();
+        user = user;
 
         // Aggiunge l'utente alla lista dei bloccati
         this.blockedUsers.add(user);
@@ -177,7 +177,7 @@ class ChatApp {
     }
 
     unblockUser(user) {
-        user = user.toLowerCase();
+        user = user;
         if (this.blockedUsers.has(user)) {
             this.blockedUsers.delete(user);
             // Notifica il server dell'unblock (se previsto)
@@ -207,7 +207,7 @@ class ChatApp {
         msg.from = sender; // Aggiorna il messaggio con il sender garantito
     
         // Se il messaggio non proviene dal sistema e il mittente è bloccato, ignora il messaggio
-        if (sender !== 'system' && this.blockedUsers.has(sender.toLowerCase())) {
+        if (sender !== 'system' && this.blockedUsers.has(sender)) {
             return;
         }
     
@@ -275,7 +275,7 @@ class ChatApp {
     }    
 
     openPrivateChat(user) {
-        user = user.toLowerCase();
+        user = user;
         if (!this.friends.has(user)) return;
         const chatId = this.getPrivateChatId(this.username, user);
         // Controlla se la chat esiste già sia nel Map che nel DOM
@@ -436,7 +436,7 @@ class ChatApp {
     }
 
     showContextMenuForUser(user, x, y) {
-        this.selectedUser = user.toLowerCase();
+        this.selectedUser = user;
         const menu = this.elements.contextMenu;
         menu.style.display = 'block';
         menu.style.left = `${x}px`;
@@ -460,7 +460,7 @@ class ChatApp {
         }
     
         // Se l'utente è bloccato, mostra SOLO le opzioni: Add Friend, View Profile, Unblock User
-        if (this.blockedUsers.has(user.toLowerCase())) {
+        if (this.blockedUsers.has(user)) {
             // Nascondi le opzioni non utili per un utente bloccato
             chatItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
@@ -519,7 +519,7 @@ class ChatApp {
                 this.openPrivateChat(this.selectedUser);
                 break;
             case 'addFriend':
-                if (this.blockedUsers.has(this.selectedUser.toLowerCase())) {
+                if (this.blockedUsers.has(this.selectedUser)) {
                     this.addMessageToChat(this.currentChat, {
                         date: new Date().toISOString(),
                         from: 'system',
@@ -549,7 +549,7 @@ class ChatApp {
                 // Logica per l'invito
                 break;
             case 'block':
-                if (this.blockedUsers.has(this.selectedUser.toLowerCase())) {
+                if (this.blockedUsers.has(this.selectedUser)) {
                     this.unblockUser(this.selectedUser);
                 } else {
                     this.blockUser(this.selectedUser);
