@@ -1,7 +1,5 @@
 import { navigate } from "../../main.js";
 import { current_user } from "../modes.js";
-import { access_denied } from "../../game/pong/main/modes_logic.js";
-
 
 let matchPlayers = [];
 
@@ -58,23 +56,30 @@ function searchUser(username) {
     fetch("http://localhost:8008", {
             method: "get_user",
             body: JSON.stringify({ 
-                "params": { "display_name": username } 
+                "params" : [{}] 
             }) 
         })
         .then(response => response.json())
         .then(data =>
-        {
-            let user = data.user[0];
-            if (user && matchPlayers.includes(user.display_name)) {
-                f4PlayerSearchResult.style.color = "red";
-                f4PlayerSearchResult.innerHTML = "Cannot add urself as opponent"
-                f4ToggleAddUser.disabled = true;
-            }
-            else if (user) 
+        {    
+            let user_name;
+            let find_user = data.user?.find(u => u.username === username);
+            if (!find_user)
+                find_user = data.guest?.find(g => g.username === username);
+            if (find_user) 
             {
-                f4PlayerSearchResult.style.color = "green";
-                f4PlayerSearchResult.innerHTML = "User Found: " + user.display_name;
-                f4ToggleAddUser.disabled = false;
+                user_name = find_user;
+                if (user_name && matchPlayers.includes(user_name.username)) {
+                    f4PlayerSearchResult.style.color = "red";
+                    f4PlayerSearchResult.innerHTML = "Cannot add urself as opponent"
+                    f4ToggleAddUser.disabled = true;
+                }
+                else if (user_name) 
+                {
+                    f4PlayerSearchResult.style.color = "green";
+                    f4PlayerSearchResult.innerHTML = "User Found: " + user_name.username;
+                    f4ToggleAddUser.disabled = false;
+                }
             }
             else {
                 f4PlayerSearchResult.style.color = "red";
@@ -95,8 +100,6 @@ export function addForza4LobbyPageHandlers() {
     const f4ToggleStartGame = document.getElementById('f4ToggleStartGame');
     //const toggleAddUserRaw = document.getElementById('toggleAddUserRaw');
 
-    if (current_user === null)
-        access_denied();
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");   
         matchPlayers = [];     

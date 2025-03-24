@@ -26,6 +26,7 @@ class App
       use Rack::Session::Cookie, secret: SecureRandom.hex(64), httponly: true, secure: true
       run self
     end
+    # @is_logged_in = false
   end
 
   def call(env)
@@ -40,13 +41,11 @@ class App
       login(request, response, @client)
     when '/callback'
       callback(request, response, @client)
-
     else
       if File.extname(request.path).empty? && @spa_route.include?(request.path)
         response.write(File.read(File.join(__dir__, '../public', 'index.html')))
         response.content_type = 'text/html'
-      elsif request.path.start_with?('/website') && File.exist?(File.join(__dir__, '../public', request.path))
-        static_file_path = File.join(__dir__, '../public', request.path)
+      elsif request.path.start_with?('/website') && static_file_path = File.exist?(File.join(__dir__, '../public', request.path))
         response.write(File.read(static_file_path))
         response.content_type = determine_content_type(request.path)
       else

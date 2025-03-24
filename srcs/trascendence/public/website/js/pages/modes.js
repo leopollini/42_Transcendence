@@ -1,7 +1,8 @@
 import { navigate } from '../main.js';
-import { profile } from "../login/user.js";
-import { handle_modes_logic } from '../game/pong/main/modes_logic.js';
+import {profile, restore_user} from "../login/user.js";
+import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
+import { readCookie } from '../login/user.js';
 
 export default function Modes()
 {
@@ -46,8 +47,7 @@ export default function Modes()
         <img alt="Avatar" class="avatar-image" id="avatarImage">
         <div class="menu-container hidden">
             <div class="menu-item"><img src="website/images/profile.png" alt="Profile" id="profileIcon"></div>
-            <div class="menu-item"><img src="website/images/stats.png" alt="Settings" id="statIcon"></div>
-            <div class="menu-item"><img src="website/images/friends.jpg" alt="Settings" id="friends"></div>
+            <!-- <div class="menu-item"><img src="website/images/friends.jpg" alt="Settings" id="friends"></div> -->
             <div class="menu-item"><img src="website/images/history_match.png" alt="Settings" id="history"></div>
             <div class="menu-item" id="settings-link"><img src="website/images/settings.png" alt="Settings"></div>
             <div class="menu-item" id="logout"><img src="website/images/logout.png" alt="Settings"></div>
@@ -58,26 +58,10 @@ export default function Modes()
 
 export let current_user = JSON.parse(localStorage.getItem('your_profile'));
 
-const storedGuest = JSON.parse(localStorage.getItem("guest"));
-
-export function refresh_reload_var()
+export function nullify_user()
 {
-    fetch("http://localhost:8008",
-    {
-        method: "get_user",
-        body:{"params": {"entered":"1"}}
-    })
-    .then(response => response.json())
-    .then(data =>
-    {
-        console.log("data = ", data);
-        current_user = data.user[0];
-        change_name(current_user.display_name);
-        update_image(current_user.image);
-    })
+    current_user = null;
 }
-
-history.pushState(null, null, location.href);
 
 window.onpopstate = function () {
     if (location.pathname === "/")
@@ -113,29 +97,6 @@ window.addEventListener('popstate', (event) => {
     }
 });
 
-window.addEventListener('load', () => {
-    let storedUser = localStorage.getItem('your_profile');
-    if (storedUser)
-        {
-            let parsedUser = JSON.parse(storedUser);
-            current_user = new profile(
-                parsedUser.email,
-                parsedUser.display_name,
-            parsedUser.realname,
-            parsedUser.bio,
-            parsedUser.image,
-            parsedUser.type
-        );
-        current_user.entered = 1;
-    }
-    else
-    {
-        current_user = new profile(null, null, null, null, null, null);
-        return ;
-    }
-    updateProfileUI(current_user);
-});
-
 export function updateUserProfile(newUserData) {
     current_user = new profile(
         newUserData.email,
@@ -145,17 +106,16 @@ export function updateUserProfile(newUserData) {
         newUserData.image,
         newUserData.type
     );
-    current_user.entered = 1;
-    //setUserName("Samir");
     localStorage.setItem("your_profile", JSON.stringify(current_user));
 }
 
-function updateProfileUI(profile) {
-    if (profile.display_name) {
-        change_name(profile.display_name);
-    }
-    if (profile.image) {
-        update_image(profile.image);
+export function updateProfileUI(profile) {
+    if (current_user !== undefined && current_user !== null)
+    {
+        if (profile.image)
+            update_image(profile.image);
+        if (profile.display_name)
+            change_name(profile.display_name);
     }
 }
 
@@ -168,13 +128,11 @@ export const addModesPageHandlers = () => {
     const menuContainer = document.querySelector('.menu-container');
     const Settings = document.getElementById('settings-link');
     const profileIcon = document.getElementById("profileIcon");
-    const statIcon = document.getElementById("statIcon");
-    const friends = document.getElementById("friends");
     const history = document.getElementById("history");
     const logout = document.getElementById("logout");
     handle_modes_logic(classicButton, aiButton, tournamentButton, 
     forza4Button, avatarImage, menuContainer, Settings, profileIcon,
-    statIcon, friends, history, logout);
+    history, logout);
 };
 
 export function update_image(image)

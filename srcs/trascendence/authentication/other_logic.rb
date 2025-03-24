@@ -33,8 +33,21 @@ module Other_logic
     email = user_data['email']
     image = user_data['image']['link']
     display_name = user_data['login']
-    payload = { realname: realname, email: email, image: image, display_name: display_name, type: "login", entered: 1}
-
-    SimpleServer.method_req("add_user", payload)  
+    payload = {
+      data: {
+        realname: realname,
+        email: email,
+        image: image,
+        display_name: display_name
+      }
+    }
+    puts "adding token cookie"
+    response = SimpleServer.method_req("login_user", payload.to_json)
+    puts response
+    data = JSON.parse(response)
+    if (data["token"])
+      token = data["token"]
+      res.cookies << WEBrick::Cookie.new("logged_token", token)
+    end
   end
 end

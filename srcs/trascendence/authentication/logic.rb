@@ -24,14 +24,13 @@ module AuthMethods
       response.write({ success: false, error: "No authorization code received" }.to_json)
       return
     end
-  
     token = client.get_token(code)
     response.set_cookie('access_token', {
       value: token.token,
       path: '/',
       max_age: 3600,
-      secure: true,    # Only on HTTPS
-      httponly: true   # Not accessible via JavaScript
+      secure: true,
+      httponly: true
     })
   
     request.session[:authenticated] = true

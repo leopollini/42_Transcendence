@@ -1,5 +1,5 @@
 function initSocket(username, chatAppInstance) {
-    const socket = new WebSocket('ws://localhost:3000/ws');
+    const socket = new WebSocket('ws://localhost:6087');
 
     socket.onopen = () => {
         socket.send(JSON.stringify({ type: "join", username }));
@@ -7,6 +7,8 @@ function initSocket(username, chatAppInstance) {
 
     socket.onmessage = (event) => {
         const msg = JSON.parse(event.data);
+
+console.log(msg)
 
         if (msg.type === "message") {
             chatAppInstance.addMessageToChat('general', msg.data);
@@ -77,9 +79,9 @@ function initSocket(username, chatAppInstance) {
                     match = msg.data.content.match(regex);
                 }
                 if (match && match[1]) {
-                    const blockingUser = match[1].trim().toLowerCase();
+                    const blockingUser = match[1].trim();
                     chatAppInstance.pendingRequests.delete(blockingUser);
-                    if (chatAppInstance.selectedUser && chatAppInstance.selectedUser.toLowerCase() === blockingUser) {
+                    if (chatAppInstance.selectedUser && chatAppInstance.selectedUser === blockingUser) {
                         const addFriendItem = chatAppInstance.elements.contextMenu.querySelector('[data-action="addFriend"]');
                         if (addFriendItem) {
                             addFriendItem.textContent = 'Add Friend';

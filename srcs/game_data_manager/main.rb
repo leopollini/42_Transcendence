@@ -41,7 +41,7 @@ def save_pong(obj)
   GAMES_PONG.addValues obj.values, obj.keys
 
   puts 'game saved!'
-  return DEFAULT_SUCCESS_RES
+  return DEFAULT_SUCCESS_RES.clone
 end
 
 def get_f4(obj)
@@ -60,7 +60,7 @@ def save_f4(obj)
   GAMES_F4.addValues obj.values, obj.keys
 
   puts 'game saved!'
-  return DEFAULT_SUCCESS_RES
+  return DEFAULT_SUCCESS_RES.clone
 end
 
 def get_all_games()

@@ -75,7 +75,7 @@ function setupEventListeners(chatApp) {
 
     elems.messagesContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('sender')) {
-            const user = e.target.textContent.replace(':', '').trim().toLowerCase();
+            const user = e.target.textContent.replace(':', '').trim();
             if (user !== 'self') {
                 chatApp.showContextMenuForUser(user, e.clientX, e.clientY);
             }

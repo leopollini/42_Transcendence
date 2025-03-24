@@ -21,7 +21,6 @@ export function initializeGameCanvas(matchPlayers) {
     if (current_user)
     {
         setTimeout(() => {
-
             if (path === "/V.S._AI") {
                 players = [current_user.display_name, "AI"];
                 startPongGame(players, "ai");
@@ -39,6 +38,4 @@ export function initializeGameCanvas(matchPlayers) {
             gameInstance.start();
         }, 50);
     }
-    else
-        alert("no curr_user");
 }

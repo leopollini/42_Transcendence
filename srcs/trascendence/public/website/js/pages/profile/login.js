@@ -1,7 +1,6 @@
 import { guest_login } from "../../login/guest_logic.js";
 import { performLogin, popupOpened } from "../../login/login_logic.js";
-import { current_user } from "../modes.js";
-
+import { nullify_user } from "../modes.js";
 export default function Login() {
     return `
         <h1 class="text">
@@ -29,27 +28,70 @@ export default function Login() {
     `;
 }
 
+function AllTabClosed()
+{
+    nullify_user();
+    sessionStorage.clear();
+    localStorage.clear();
+    deleteAllCookies();
+}
+
+
+window.addEventListener('beforeunload', () => {
+    if (sessionStorage.getItem("opened") === '1')
+    {
+        let openTabs = parseInt(localStorage.getItem('openTabs')) || 1;
+        openTabs--;
+        localStorage.setItem('openTabs', openTabs);
+        if (openTabs === 0)
+            AllTabClosed();
+        else if (sessionStorage.getItem("already in") === '1')
+        {
+            sessionStorage.setItem("already in", '0');
+            localStorage.setItem("session opened", '1');
+        }
+    }
+});
+
+window.addEventListener('load', () => {
+    if (sessionStorage.getItem("opened") === null)
+    {
+        let openTabs = parseInt(localStorage.getItem('openTabs')) || 0;
+        openTabs++;
+        localStorage.setItem('openTabs', openTabs);
+        sessionStorage.setItem("opened", '1');
+    }   
+    if (sessionStorage.getItem("already in") === null)
+        sessionStorage.setItem("already in", '0');
+});
+
+
 export const addLoginPageHandlers = () => {
     const loginButton = document.getElementById("loginButton");
     const guestButton = document.getElementById("guestButton");
-    if (loginButton && guestButton)
-    {
-        let user = current_user;
-        loginButton.addEventListener("click", () => {
-            if (popupOpened === true)
-                alert("popup already open finish authentication before continuing")
-            else if (user && user.entered === 1)
-                alert("You've already logged in!");
-            else
-                performLogin();
-        });
-        guestButton.addEventListener("click", () => {
-            if (popupOpened === true)
-                alert("Authenticating in progress....\nPlease wait.");
-            else if (user && user.entered === 1)
-                alert("You've already logged in!");
-            else
-                guest_login();
-        });
-    }
+    if (!loginButton || !guestButton)
+        return;
+    handle_access(loginButton, guestButton);
 };
+
+function handle_access(loginButton, guestButton)
+{
+    loginButton.addEventListener("click", () => {
+        if (popupOpened === true)
+            alert("popup already open finish authentication before continuing")
+        else if (sessionStorage.getItem("already in") === '0'
+        && localStorage.getItem("session opened") === '1')
+            alert("You've already logged in!");
+        else
+            performLogin();
+    });
+    guestButton.addEventListener("click", () => {
+        if (popupOpened === true)
+            alert("Authenticating in progress....\nPlease wait.");
+        else if (sessionStorage.getItem("already in") === '0'
+        && localStorage.getItem("session opened") === '1')
+            alert("You've already logged in!");
+        else
+            guest_login();
+    });
+}

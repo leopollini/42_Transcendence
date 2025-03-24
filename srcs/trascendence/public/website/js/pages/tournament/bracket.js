@@ -1,6 +1,4 @@
 import { navigate } from "../../main.js";
-import { current_user} from "../modes.js";
-import { access_denied } from "../../game/pong/main/modes_logic.js";
 
 
 export default function Bracket() {
@@ -247,8 +245,6 @@ export function backToBracket(winner) {
 
 // Event listeners
 export const addBracketPageHandlers = () => {
-    if (current_user === null)
-        access_denied();
     const backImageButton = document.getElementById('backImageButton');
 
     knockoutMatchButton?.addEventListener('click', () => {

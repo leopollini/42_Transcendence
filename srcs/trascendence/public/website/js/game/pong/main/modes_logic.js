@@ -1,9 +1,10 @@
 import { navigate } from "../../../main.js";
 import { pop_false } from "../../../login/login_logic.js";
-import { current_user } from "../../../pages/modes.js";
+import { current_user, nullify_user} from "../../../pages/modes.js";
+import { deleteAllCookies} from "../../../login/user.js";
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
-        statIcon, friends, history, logout)
+        history, logout)
 {
     classicButton?.addEventListener('click', () => {
         navigate("/classic/lobby", "Classic Pong Lobby Room");
@@ -49,27 +50,6 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     }
     else
         console.error("profile icon not found!");
-    if (statIcon)
-    {
-        statIcon.addEventListener("click", () => {
-            navigate("/stats", "Stats");
-        });
-    }
-    else
-        console.error("stat icon not found!");
-    if (friends)
-    {
-        friends.addEventListener("click", () => {
-            if (current_user.type == "guest")
-            {
-                alert("You must be logged to use this feature!");
-                return;
-            }
-            navigate("/friends", "Friends");
-        });
-    }
-    else
-        console.error("friend icon not found!");
     if (history)
     {
         history.addEventListener("click", () => {
@@ -89,19 +69,41 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             localStorage.clear();
             sessionStorage.clear();
             pop_false();
-            current_user.entered = 0;
-            /*dorp_table fetch*/
-            navigate("/", "Logout");
+            if (!current_user)
+            {
+                navigate("/", "logout");
+                return;
+            }
+            if (current_user.type === "guest")
+            {
+                fetch("http://localhost:8008",
+                {
+                    method: "drop_guest"
+                })
+                .then(data =>{
+                    console.log("(DROP_GUEST)\ndata delete from all users = ", data);
+                })
+            }
+            else
+            {
+                let data = JSON.stringify({"realname" : current_user.realname})
+                fetch("http://localhost:8008",
+                {
+                    method: "drop_user",
+                    body: data
+                })
+                .then(data =>{
+                    console.log("(DROP_USER)\ndata update logged user = ", data);
+                })
+            }
+            sessionStorage.clear();
+            localStorage.clear();
+            deleteAllCookies();
+            nullify_user();
+            localStorage.setItem('openTabs', 1);
+            navigate("/", "login");
         });
     }
     else 
         console.error("logout icon not found!");
-}
-
-export function access_denied()
-{
-    navigate("/access_denied", "Access Denied");
-    setTimeout(() => {
-        navigate("/", "home");
-    }, 3000);
 }

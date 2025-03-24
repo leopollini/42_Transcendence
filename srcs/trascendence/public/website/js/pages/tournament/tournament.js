@@ -1,6 +1,4 @@
 import { navigate } from "../../main.js";
-import { current_user} from "../modes.js";
-import { access_denied } from "../../game/pong/main/modes_logic.js";
 export default function Tournament() {
     return `
         <img id="backImageButton" src="../website/images/home.png" alt="Back" class="back-button">
@@ -46,8 +44,6 @@ export default function Tournament() {
 }
 
 export const addTournamentPageHandlers = () => {
-    if (current_user === null)
-        access_denied();
     const knockoutTournament = document.getElementById('knockoutTournament');
     const roundrobinTournament = document.getElementById('roundrobinTournament');
     const backImageButton = document.getElementById('backImageButton');

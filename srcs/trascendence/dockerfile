@@ -5,11 +5,18 @@ RUN apt-get update -y && \
     lsof \
     build-essential \
     libpq-dev \
-    nodejs && \
+    nodejs \
+    ca-certificates \
+    openssl && \  
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-ENV TERM xterm-256color
+RUN mkdir -p /ssl_certs && \
+    openssl req -new -x509 -days 365 -nodes -out /ssl_certs/server.crt -keyout /ssl_certs/server.key -subj "/C=IT/ST=F/L=MyCity/O=MyOrg/OU=MyDept/CN=localhost"
+
+COPY /ssl_certs/server.crt /usr/local/share/ca-certificates/
+
+RUN update-ca-certificates
 
 RUN gem install bundler
 
@@ -23,6 +30,6 @@ RUN bundle install
 
 COPY srcs/trascendence/ /var/www/
 
-EXPOSE 9292
+EXPOSE 8433
 
 CMD ["bundle", "exec", "ruby", "server.rb"]

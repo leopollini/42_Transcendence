@@ -9,7 +9,7 @@ export function savebio(me, yourDataSection)
     polbio.style.width = "50%";
 
     if (!newBio)
-        return ("Error: No Bio saved(Please enter a bio)\n");
+        return ("Error: No Bio saved(Please enter a bio next time)\n");
     if (newBio.length >= 400)
         return ("Error: Bio too big\n");
     me.bio = JSON.stringify(newBio);
@@ -26,7 +26,7 @@ export function savename(me, yourDataSection)
     polname.style.width = "50%";
     
     if (!newname)
-        return("Error: No Name saved(Please enter a name)\n");
+        return("Error: No Name saved(Please enter a name next time)\n");
     if (newname.length < 4)
         return("Error: Name too short(" + newname + ")\n");
     if (newname.length >= 15)
@@ -38,14 +38,6 @@ export function savename(me, yourDataSection)
     }
     else
         return ("Error: name already taken(" + newname + ")\n");
-}
-
-export function emailHandler(me, yourDataSection) {
-    const emailInput = yourDataSection.querySelector('#emailInput');
-
-    emailInput.value = me.email || "";
-    emailInput.disabled = false;
-    emailInput.style.fontSize = "1em";
 }
 
 export function saveimage(me, yourDataSection)

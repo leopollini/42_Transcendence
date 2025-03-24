@@ -1,10 +1,9 @@
 
 import { navigate } from "../main.js";
-import { update_image, change_name, updateUserProfile, current_user} from "../pages/modes.js";
-import { user, profile} from "./user.js";
-
+import { update_image, change_name, updateUserProfile} from "../pages/modes.js";
+import { profile, readCookie, deleteAllCookies} from "./user.js";
+import { saveCookie } from "./user.js";
 export let popupOpened = false;
-export let new_user = new user();
 
 export function pop_false()
 {
@@ -14,7 +13,7 @@ export function pop_false()
 
 function checkLoginRestrictions()
 {
-    if (localStorage.getItem('your_profile'))
+    if (readCookie("logged") === 1)
     {
         alert("user already logged in");
         return false;
@@ -22,33 +21,55 @@ function checkLoginRestrictions()
     return true;
 }
 
-function popupHandling(popup)
+function popupHandling(popup, data)
 {
     popupOpened = true;
     localStorage.setItem('popup_opened', 'true');
 
+    let log_succ = false
+    function receiveMessage(event) {
+        if (event.data.access_granted === true) {
+            log_succ = true;
+        }
+    }
+    window.addEventListener("message", receiveMessage);
     let popupMonitor = setInterval(() => {
-        if (popup.closed)
-        {
+        if (popup.closed) {
             clearInterval(popupMonitor);
             localStorage.setItem('popup_opened', 'false');
             popupOpened = false;
-            get_data();
-            navigate("/modes", "Modalità di gioco");
-            alert("You are logged in successfully.\nTo change user, close this tab first!");
+            window.removeEventListener("message", receiveMessage); // Rimuovi l'evento dopo la chiusura
+
+            console.log("log_succ = ", log_succ);
+            if (log_succ === true)
+            {
+                get_data();
+                navigate("/modes", "Modalità di gioco");
+                alert("You are logged in successfully.\nTo change user, close this tab first!");
+            }
+            else
+                alert("Error: Unexpected popup closure, authentication failed.");
         }
-    }, 500);
+    }, 10);
 }
 
 function get_data()
 {
+    let data = JSON.stringify({"params" :{}});
     fetch("http://localhost:8008", {
         method: "get_user",
-        body: {"params": {"entered":"1"}}
+        body: data
     })
     .then(response => response.json())
     .then(data =>
     {
+        console.log("(GET_USER)\ndata login = ", data);
+        if (data.status === "no users found")
+        {;
+            deleteAllCookies();
+            navigate("/", "login");
+            return ;
+        }
         let user = data.user[0];
         let new_user = {
             email: user.email,
@@ -70,7 +91,11 @@ function get_data()
             new_user.image,
             new_user.type
         );
-        
+        console.log("adding user hahahah");
+        saveCookie("user_token");
+        saveCookie("logged", 1, 1);
+        sessionStorage.setItem("already in", '1');
+        localStorage.setItem("session opened", '1');
         updateUserProfile(current_user);
     })
     .catch(error => {
@@ -81,15 +106,11 @@ function get_data()
 export function performLogin()
 {
     if (!checkLoginRestrictions())
-        return;
+        return ;
     fetch('/auth/login')
     .then(response => response.json())
     .then(data => {
         const popup = window.open(data.auth_url, 'Login', 'width=800,height=800');
-        popupHandling(popup);
+        popupHandling(popup, data);
     })
-    .catch(error => {
-        console.error("Errore di rete:", error);
-        localStorage.setItem('authenticated', 'false');
-    });
 }

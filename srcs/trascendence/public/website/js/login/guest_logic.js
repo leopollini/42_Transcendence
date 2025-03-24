@@ -1,72 +1,64 @@
 import { navigate } from "../main.js";
-import { user, profile} from "./user.js";
+import { user, profile, readCookie, eraseCookie} from "./user.js";
 import { update_image, change_name, updateUserProfile } from "../pages/modes.js";
-
-export let guest = JSON.parse(localStorage.getItem('guest')) || [];
-
-window.addEventListener("beforeunload", () => {
-    localStorage.clear();
-});
-
-window.addEventListener('storage', (event) => {
-    if (event.key === 'guest')
-        guest = JSON.parse(localStorage.getItem('guest')) || [];
-});
+import { saveCookie } from "./user.js";
 
 export async function guest_login()
 {
-    if (localStorage.getItem("guest") || localStorage.getItem("your_profile"))
-    {
-        alert("user already logged in");
-        return;
-    }
-
     let name = prompt("Enter your guest name:");
     if (!name) {
         alert('No name. Please try again');
-        return;
+        return ;
     }
     name = name.trim();
     if (name.length < 4) {
         alert('Name too short.');
-        return;
+        return ;
     }
     if (name.length >= 15)
     {
         alert('Name too long.');
-        return;
+        return ;
     }
+    addGuest(name);
+    /* let data = JSON.stringify({"params" : {}});
     fetch("http://localhost:8008",
     {
         method: "get_user",
-        body:{"params": [{"type":"login"}, {"type":"guest"}]}
+        body: data
     })
     .then(response => response.json())
     .then(data => {
+        console.log("get name = ", data);
         if (data.user && Array.isArray(data.user)) {
-            const value = data.user.some(user => user.display_name === name) ? 1 : 0;
+            let value = data.user.some(user => user.display_name === name) ? 1 : 0;
             if (value === 1)
             {
                 alert("Name already taken, try a different one");
                 return;
             }
-            localStorage.setItem('guest', JSON.stringify(guest));
+            else if (data.guest && Array.isArray(data.guest))
+            {
+                value = data.guest.some(guest => guest.display_name === name) ? 1 : 0;
+                if (value === 1)
+                {
+                    alert("Name already taken, try a different one");
+                    return;
+                }
+            }
             addGuest(name);
-        } else {
-            console.error("Error: data.user is not available or is not an array");
-            alert("Failed to check name. Please try again later.");
         }
+        else
+            alert("Failed to check name. Please try again later.");
     })
     .catch(error => {
         console.error("Error:", error);
-    });
+    }); */
 }
 
 function addGuest(name) {
     let curr_guest = new user("website/images/guest.jpg", name, null, null, null);
-    localStorage.setItem('guest', JSON.stringify(curr_guest));
     update_guest(curr_guest);
-    navigate("/modes", "Modalità di gioco");
 }
 
 function update_guest(curr_guest)
@@ -80,14 +72,25 @@ function update_guest(curr_guest)
         curr_guest.bio,
         curr_guest.image,
         "guest"
-        
     );
+    sessionStorage.setItem("already in", 1);
+    localStorage.setItem("session opened", 1);
+    let data = JSON.stringify({data : {username : current_user.display_name}, login_as_guest : "true"});
     fetch("http://localhost:8008",
     {
-        method: "add_user", 
-        body: JSON.stringify(current_user)
+        method: "login_user",
+        body: data
     })
     .then(response => response.json())
-    console.log("hi there")
-    updateUserProfile(current_user);
+    .then(data =>
+    {
+        console.log("(LOGIN_USER)\n data guest = ", data);
+        saveCookie("logged", 1, 1);
+        if (!data.token)
+            saveCookie("user_token", "nulla", 1);
+        else
+            saveCookie("user_token", data.token, 1);
+        updateUserProfile(current_user);
+        navigate("/modes", "Modalità di gioco");
+    })
 }

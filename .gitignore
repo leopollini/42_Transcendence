@@ -1,3 +1,4 @@
 *.identifier.zone
 .vscode
 *.DS_Store
+srcs/trascendence/authentication/ssl_certs/

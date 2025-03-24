@@ -92,25 +92,6 @@ services:
     entrypoint: /var/www/init.sh
     working_dir: /var/www
 
-  request_manager:
-    image: ruby:latest
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./srcs/common_tools/tools:/var/common
-      - ./srcs/request_manager:/var/www
-    depends_on:
-      - receiver
-      - postgres
-    networks:
-      - app-network
-    env_file:
-      - .env
-    ports:
-      - "9000:9000"
-    entrypoint: /var/www/init.sh
-    working_dir: /var/www
-
   auth:
     image: ruby:latest
     container_name: website_container
@@ -127,7 +108,7 @@ services:
     env_file:
       - .env
     ports:
-      - "9292:9292"
+      - "443:443"
     entrypoint: /var/www/init.sh
     working_dir: /var/www
 
@@ -200,17 +181,3 @@ services:
       - "8790:8790"
     entrypoint: /var/www/init.sh
     working_dir: /var/www
-
-  # nginx:
-  #   image: nginx:latest
-  #   container_name: nginx-server
-  #   restart: always
-  #   ports:
-  #     - "8443:443"
-  #   volumes:
-  #     - ./srcs/nginx/:/var/www/nginx
-  #     - ./srcs/trascendence/public:/usr/share/nginx/html:ro
-  #   networks:
-  #     - app-network
-  #   entrypoint: bash /var/www/nginx/server.sh
-  #   working_dir: /var/www

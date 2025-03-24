@@ -1,6 +1,5 @@
-import { current_user, updateUserProfile } from "../modes.js";
-import { emailHandler } from "../../game/pong/other/profile_logic.js";
-import { profile, profiles } from "../../login/user.js";
+import { current_user, updateUserProfile} from "../modes.js";
+import { profile, profiles} from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
 
 export default function Profile() {
@@ -19,10 +18,6 @@ export default function Profile() {
             <label for="displayNameInput">Change your display name:</label>
             <input type="text" id="displayNameInput" class="input-field" autocomplete="off" placeholder="Insert your new name">
             <span id="displayNameLabel" style="display: none;"></span>
-          </div>
-          <div class="form-group" id="emailtext">
-            <label for="emailInput" class="email-label">Your email:</label>
-            <input type="email" id="emailInput" class="input-field" autocomplete="off" placeholder="Enter your email">
           </div>
           <div id="bioSection" class="form-group bio-group">
             <label for="bioInput">Modify your bio:</label>
@@ -44,26 +39,25 @@ function insert_user_data() {
   me.display_name = current_user.display_name;
   me.realname = current_user.realname || null;
   me.image = current_user.image;
-  me.email = current_user.email || null;
   me.bio = current_user.bio || "";
   profiles.push(me);
 }
 
-export function profileHandler() {
-  if (current_user === null) {
-    access_denied();
-    return;
-  }
+export function profileHandler()
+{
   insert_user_data();
   document.querySelector("#profileImage").src = me.image;
   document.getElementById("imageUploadInput").style.display = "none";
-  
+  if (current_user.type === "guest")
+  {
+    document.getElementById("changeDisplayName").style.display = "none";
+    document.getElementById("myName").style.display = "none";
+  }
   // Seleziono l'intera scheda e, all'interno, la sezione delle informazioni
   const card = document.querySelector(".profile-card");
   const infoContainer = card.querySelector("#yourData");
 
   updateDisplayNames(infoContainer);
-  emailHandler(me, infoContainer);
   
   // Pre-compila il campo bio se già salvato
   const bioInput = infoContainer.querySelector("#bioInput");
@@ -82,20 +76,24 @@ function saveProfile(infoContainer) {
   
   saving += savebio(me, infoContainer);
   current_user.bio = me.bio;
-  
-  saving += savename(me, infoContainer);
-  current_user.display_name = me.display_name;
-  
-  // Salvataggio email
-  const emailInput = infoContainer.querySelector("#emailInput");
-  if (emailInput) {
-    current_user.email = emailInput.value;
-    me.email = emailInput.value;
-    saving += "saved email successfully\n";
-  } else {
-    saving += "Error: Email input not found\n";
+  if (current_user.type === "login")
+  {
+    saving += savename(me, infoContainer);
+    current_user.display_name = me.display_name;
   }
-  
+  else
+  {
+    let data = JSON.stringify({"display_name" : current_user.display_name, "image" : current_user.image, 
+    "bio" : current_user.bio});
+    fetch("http://localhost:8008",
+    {
+      method: "update_user",
+      body: data
+    })
+    .then(data =>{
+      console.log("(UPDATE_USER)\ndata update user profile = ", data);
+    })
+  }
   alert(saving);
   updateUserProfile(current_user);
   history.back();
