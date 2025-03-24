@@ -17,7 +17,6 @@ import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.j
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
 import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers} from "./pages/game_statistics.js";
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
-import Friends from "./pages/friends.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
 import {deleteAllCookies, eraseCookie, readCookie, restore_user} from "./login/user.js";
@@ -47,7 +46,6 @@ const routes = {
     "/tournament/knockout/bracket": Bracket,
     "/tournament/knockout/bracket/game": PongGame,
     "/profile": Profile,
-    "/friends": Friends,
 };
 
 export const navigate = (path, title = "", lobbyPlayers) => {
