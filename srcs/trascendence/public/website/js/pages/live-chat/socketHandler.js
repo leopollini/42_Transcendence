@@ -8,7 +8,7 @@ function initSocket(username, chatAppInstance) {
     socket.onmessage = (event) => {
         const msg = JSON.parse(event.data);
 
-console.log(msg)
+//console.log(msg)
 
         if (msg.type === "message") {
             chatAppInstance.addMessageToChat('general', msg.data);

@@ -36,7 +36,7 @@ class ChatApp {
         this.updateFriendsList();
         this.updateFriendRequestsUI();
         this.initializeGeneralChat();
-        console.log("SET USERNAME PROPERLY PLEASE")
+        //console.log("SET USERNAME PROPERLY PLEASE")
         // this.username = prompt("Inserisci il tuo username:");
         this.username = "Dave_" + String(Math.random())
 
@@ -173,7 +173,7 @@ class ChatApp {
         
         // Notifica il server dell'evento di block (se il server lo gestisce)
         this.socket.send(JSON.stringify({ type: "block_user", to: user }));
-        console.log(`User ${user} has been blocked.`);
+        //console.log(`User ${user} has been blocked.`);
     }
 
     unblockUser(user) {
@@ -197,7 +197,7 @@ class ChatApp {
             }
             // Aggiorna la UI della lista bloccati
             this.updateBlockedUsersList();
-            console.log(`User ${user} has been unblocked.`);
+            //console.log(`User ${user} has been unblocked.`);
         }
     }    
 

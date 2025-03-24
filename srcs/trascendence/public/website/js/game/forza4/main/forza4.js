@@ -37,10 +37,10 @@ export function startForza4Game(players) {
     backImageButton = document.getElementById('backImageButton');
     matchPlayers = players;
     let f4Game = new Forza4Game();
-    console.log("playerzz:" +players);
+    //console.log("playerzz:" +players);
    
-    console.log("match player 1:", matchPlayers[0]);
-    console.log("match player 2:", matchPlayers[1]);
+    //console.log("match player 1:", matchPlayers[0]);
+    //console.log("match player 2:", matchPlayers[1]);
 }
 
 class Forza4Game {

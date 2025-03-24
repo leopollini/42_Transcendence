@@ -39,7 +39,7 @@ function insert_user_data() {
   me.display_name = current_user.display_name;
   me.realname = current_user.realname || null;
   me.image = current_user.image;
-  me.bio = current_user.bio || "";
+  me.bio = (current_user.bio || "").replace(/^"/, '').replace(/"$/, '').replace(/\\n/g, "\n");
   profiles.push(me);
 }
 
@@ -71,11 +71,20 @@ export function profileHandler()
 }
 
 function saveProfile(infoContainer) {
-  let saving = "saved image successfully\n";
+  let saving = "✅saved image successfully\n";
   current_user.image = me.image;
-  
-  saving += savebio(me, infoContainer);
-  current_user.bio = me.bio;
+  let checkbio;
+  if (current_user.bio)
+    checkbio = current_user.bio.replace(/^"/, '').replace(/"$/, '').replace(/\\n/g, "\n");
+  else
+    checkbio = null;
+  if (checkbio && checkbio === me.bio)
+    saving += "no canges in bio have been made\n";
+  else
+  {
+    saving += savebio(me, infoContainer);
+    current_user.bio = me.bio;
+  }
   if (current_user.type === "login")
   {
     saving += savename(me, infoContainer);
@@ -91,7 +100,7 @@ function saveProfile(infoContainer) {
       body: data
     })
     .then(data =>{
-      console.log("(UPDATE_USER)\ndata update user profile = ", data);
+      //console.log("(UPDATE_USER)\ndata update user profile = ", data);
     })
   }
   alert(saving);

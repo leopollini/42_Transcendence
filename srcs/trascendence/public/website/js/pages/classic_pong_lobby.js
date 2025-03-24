@@ -54,7 +54,7 @@ export default function ClassicPongLobbyRoom() {
 export function handleClassicPongLobby() {
     matchPlayers = [];
     matchPlayers.push(current_user.display_name);
-    console.log("match players = " +matchPlayers[0]);
+    //console.log("match players = " +matchPlayers[0]);
 }
 
 function searchUser(username) {
@@ -123,7 +123,7 @@ export function addClassicPongLobbyPageHandlers() {
     });
 
     pongToggleSearchUser?.addEventListener('click', () => {
-        console.log("searching user...." +pongPlayerSearch.value);
+        //console.log("searching user...." +pongPlayerSearch.value);
 
         searchUser(pongPlayerSearch.value);
     });

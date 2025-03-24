@@ -38,7 +38,7 @@ function popupHandling(popup, data)
             clearInterval(popupMonitor);
             localStorage.setItem('popup_opened', 'false');
             popupOpened = false;
-            window.removeEventListener("message", receiveMessage); // Rimuovi l'evento dopo la chiusura
+            window.removeEventListener("message", receiveMessage);
 
             console.log("log_succ = ", log_succ);
             if (log_succ === true)

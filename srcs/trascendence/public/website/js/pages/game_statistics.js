@@ -139,10 +139,10 @@ async function forza4CalculateUserStatistics() {
             }),
         });
         const data = await response.json();
-        console.log("Get Pong Game response: ", data);
+        //console.log("Get Pong Game response: ", data);
         if (data.games) {
             f4UserData = data.games;
-            console.log("f4UserData aggiornata: ", f4UserData);
+            //console.log("f4UserData aggiornata: ", f4UserData);
         }
     } catch (error) {
     console.error("Fetch error:", error);
@@ -180,9 +180,9 @@ async function forza4CalculateUserStatistics() {
 
 
     
-    console.log("total time = " +totalTime);
+    //console.log("total time = " +totalTime);
     const averageTime = totalMatches > 0 ? (totalTime / totalMatches).toFixed(2) : 0;
-    console.log("average time = " + averageTime);
+    //console.log("average time = " + averageTime);
 
     return {
         totalMatches,
@@ -205,7 +205,7 @@ export async function forza4ShowUserStatistics() {
         return;
     }
 
-    console.log("stats total matches" + stats.totalMatches);
+    //console.log("stats total matches" + stats.totalMatches);
 
     // Popola il template con i dati
     document.getElementById('totalMatches').textContent = stats.totalMatches;
@@ -291,10 +291,10 @@ async function getPongMatchesData() {
             }),
         });
         const data = await response.json();
-        console.log("Get Pong Game response: ", data);
+        //console.log("Get Pong Game response: ", data);
         if (data.games) {
             pongUserData = data.games;
-            console.log("f4UserData aggiornata: ", pongUserData);
+            //console.log("f4UserData aggiornata: ", pongUserData);
         }
     } catch (error) {
     console.error("Fetch error:", error);
@@ -307,7 +307,7 @@ export async function pongShowMatchDetails() {
     await getPongMatchesData();
 
 
-    console.log("pong show match details");
+    //console.log("pong show match details");
 
     if (!pongUserData) {
         return null;
@@ -376,7 +376,7 @@ export function gameUserStatisticsPageHandlers() {
 
     pongChartsCheckbox?.addEventListener('change', () => {
         if (pongChartsCheckbox.checked) {
-            console.log("pong charts");
+            //console.log("pong charts");
             document.getElementById('pongChartsSection').classList.remove('hidden1');
             document.getElementById('pongMatchDetailsContainer').classList.add('hidden1');
             document.getElementById('forza4StatsSection').classList.add('hidden1');
@@ -387,7 +387,7 @@ export function gameUserStatisticsPageHandlers() {
 
     pongMatchesCheckbox?.addEventListener('change', () => {
         if (pongMatchesCheckbox.checked) {
-            console.log("pong matches");
+            //console.log("pong matches");
             document.getElementById('pongMatchDetailsContainer').classList.remove('hidden1');
             document.getElementById('pongChartsSection').classList.add('hidden1');
             document.getElementById('forza4StatsSection').classList.add('hidden1');
@@ -398,7 +398,7 @@ export function gameUserStatisticsPageHandlers() {
 
     forza4StatsCheckbox?.addEventListener('change', () => {
         if (forza4StatsCheckbox.checked) {
-            console.log("forza4 stats");
+            //console.log("forza4 stats");
             document.getElementById('forza4StatsSection').classList.remove('hidden1');
             document.getElementById('pongChartsSection').classList.add('hidden1');
             document.getElementById('pongMatchDetailsContainer').classList.add('hidden1');
@@ -409,7 +409,7 @@ export function gameUserStatisticsPageHandlers() {
 
     forza4MatchesCheckbox?.addEventListener('change', () => {
         if (forza4MatchesCheckbox.checked) {
-            console.log("forza4 matches");
+            //console.log("forza4 matches");
             document.getElementById('f4MatchDetailsContainer').classList.remove('hidden1');
             document.getElementById('pongChartsSection').classList.add('hidden1');
             document.getElementById('pongMatchDetailsContainer').classList.add('hidden1');
