@@ -48,6 +48,7 @@ const routes = {
     "/profile": Profile,
 };
 
+//restore logged da sistemare
 export const navigate = (path, title = "", lobbyPlayers) => {
     history.pushState({ path }, title, path);
     buttonTitle = title;
@@ -239,25 +240,7 @@ export function unauthorized_acess()
 }
 
 function accessing_errors(path)
-{   
-    if ((current_user === null || current_user === undefined) && 
-    readCookie("logged") === "1" && readCookie("user_token") && sessionStorage.getItem("already in") === '1')
-        restore_user();
-    else if (sessionStorage.getItem("already in") === null && localStorage.getItem("session opened") === null)
-    {
-        deleteAllCookies();
-        sessionStorage.clear();
-        localStorage.clear();
-        nullify_user();
-    }
-    else if (sessionStorage.getItem("already in") === '1' && localStorage.getItem("session opened") === '1' 
-    && readCookie("logged") === '1' && path === '/')
-    {
-        deleteAllCookies();
-        sessionStorage.clear();
-        localStorage.clear();
-        nullify_user();
-    }
+{
     if (path !== "/")
     {
         let session = 0;

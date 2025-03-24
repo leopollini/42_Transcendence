@@ -48,7 +48,7 @@ window.addEventListener('beforeunload', () => {
         else if (sessionStorage.getItem("already in") === '1')
         {
             sessionStorage.setItem("already in", '0');
-            localStorage.setItem("session opened", '1');
+            localStorage.setItem("session opened", '0');
         }
     }
 });
