@@ -148,7 +148,8 @@ const loadContent = () => {
                 resetBracketState();
                 break;
             case "/tournament/knockout/lobby":
-                addKnockoutPageHandlers();
+                addLobbyPageHandlers();
+                handleLobby("Bracket", numPlayers);
                 resetBracketState();
                 break;
             case "/tournament/roundrobin/lobby":
@@ -201,7 +202,7 @@ const loadContent = () => {
                 addForza4LobbyPageHandlers();
                 break;
             case "/forza4/game":
-                startForza4Game();
+                startForza4Game(players);
                 break;
             default:
                 break;

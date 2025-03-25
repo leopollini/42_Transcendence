@@ -36,7 +36,6 @@ export default function LobbyRoom() {
                 <div>
                     <h2 id="playerSearchResult">Waiting for User...</h2>
                     <button id="toggleInviteUser" class="button-style" disabled>Invite</button>
-                    <button id="toggleAddUserRaw" class="button-style">Add(test)</button>
                 </div>
 
             </div>
@@ -141,13 +140,16 @@ function searchUser(username) {
                 find_user = data.guest?.find(g => g.username === username);
             if (find_user) 
             {
+
                 user_name = find_user;
                 if (user_name) {
+                    playerSearchResult.style.color = "green";
                     playerSearchResult.innerHTML = "User Found: " + user_name.username;
                     toggleInviteUser.disabled = false;
                 }
             }
             else {
+                playerSearchResult.style.color = "red";
                 playerSearchResult.innerHTML = "User Not Found";
                 toggleInviteUser.disabled = true;
             }
@@ -163,7 +165,7 @@ export function addLobbyPageHandlers() {
     const toggleSearchUser = document.getElementById('toggleSearchUser');
     const toggleInviteUser = document.getElementById('toggleInviteUser');
     const pongPlayerSearch = document.getElementById('pongPlayerSearch');
-    const toggleAddUserRaw = document.getElementById('toggleAddUserRaw');
+    //const toggleAddUserRaw = document.getElementById('toggleAddUserRaw');
     const toggleStartTournament = document.getElementById('toggleStartTournament');
     const canvas = document.getElementById('lobbyUsersCanvas');
 
@@ -191,14 +193,14 @@ export function addLobbyPageHandlers() {
         }
     });
 
-    toggleAddUserRaw?.addEventListener('click', () => {
+    /*toggleAddUserRaw?.addEventListener('click', () => {
         const playerName = pongPlayerSearch.value;
         if (!invitedPlayers.includes(playerName) && playerName && invitedPlayers.length < canvas.dataset.totalPlayers) {
             console.log("adding player");
             invitedPlayers.push(playerName);
             updateCanvas(); 
         }
-    });
+    });*/
 
     toggleStartTournament?.addEventListener('click', () => {
         if (tournament === "Bracket")
