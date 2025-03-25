@@ -109,8 +109,10 @@ export function updateUserProfile(newUserData) {
     localStorage.setItem("your_profile", JSON.stringify(current_user));
 }
 
-export function updateProfileUI(profile) {
-    if (current_user !== undefined && current_user !== null)
+export function updateProfileUI(profile)
+{
+    console.log("current_user = ", profile);
+    if (profile !== undefined && profile !== null)
     {
         if (profile.image)
             update_image(profile.image);

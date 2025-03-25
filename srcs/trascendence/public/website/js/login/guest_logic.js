@@ -85,7 +85,6 @@ function update_guest(curr_guest)
     .then(data =>
     {
         console.log("(LOGIN_USER)\n data guest = ", data);
-        saveCookie("logged", 1, 1);
         if (!data.token)
             saveCookie("user_token", "nulla", 1);
         else

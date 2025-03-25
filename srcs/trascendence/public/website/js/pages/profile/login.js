@@ -1,7 +1,7 @@
 import { guest_login } from "../../login/guest_logic.js";
 import { performLogin, popupOpened } from "../../login/login_logic.js";
 import { nullify_user } from "../modes.js";
-import { deleteAllCookies, readCookie, restore_user, saveCookie} from "../../login/user.js";
+import { readCookie, restore_user, saveCookie} from "../../login/user.js";
 export default function Login() {
     return `
         <h1 class="text">
@@ -34,7 +34,6 @@ function AllTabClosed()
     nullify_user();
     sessionStorage.clear();
     localStorage.clear();
-    deleteAllCookies();
 }
  
 window.addEventListener('beforeunload', () =>
@@ -43,9 +42,10 @@ window.addEventListener('beforeunload', () =>
     console.log("all storage session = ", sessionStorage);
     if (sessionStorage.getItem("opened") === '1')
     {
-        let openTabs = parseInt(localStorage.getItem('openTabs')) || 1;
+        let openTabs = parseInt(readCookie('openTabs')) || 1;
         openTabs--;
         localStorage.setItem('openTabs', openTabs);
+        saveCookie('openTabs', openTabs, 1);
         if (openTabs === 0)
             AllTabClosed();
         else if (sessionStorage.getItem("already in") === '1')
@@ -67,13 +67,14 @@ window.addEventListener('load', () => {
     }
     if (sessionStorage.getItem("opened") === null)
     {
-        let openTabs = parseInt(localStorage.getItem('openTabs')) || 0;
+        let openTabs = parseInt(readCookie('openTabs')) || 0;
         openTabs++;
-        localStorage.setItem('openTabs', openTabs);
+        saveCookie('openTabs', openTabs, 1);
         sessionStorage.setItem("opened", '1');
-    }   
+    }
     if (sessionStorage.getItem("already in") === null)
         sessionStorage.setItem("already in", '0');
+    console.log("pages = ", readCookie('openTabs'));
 });
 
 export const addLoginPageHandlers = () => {

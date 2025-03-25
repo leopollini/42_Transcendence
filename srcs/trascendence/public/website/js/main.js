@@ -19,7 +19,6 @@ import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import {deleteAllCookies, eraseCookie, readCookie, saveCookie, restore_user} from "./login/user.js";
 let buttonTitle;
 let winner;
 let players;
@@ -240,8 +239,6 @@ document.addEventListener("DOMContentLoaded", loadContent);
 
 export function unauthorized_acess()
 {
-    eraseCookie("logged");
-    eraseCookie("user_token");
     navigate("/", "home");
 }
 
@@ -266,7 +263,6 @@ function accessing_errors(path)
     {
         if (sessionStorage.getItem("already in") === '1')
         {
-            deleteAllCookies();
             sessionStorage.clear();
             localStorage.clear();
             nullify_user();

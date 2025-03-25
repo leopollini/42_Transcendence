@@ -63,14 +63,6 @@ export function eraseCookie(name)
     document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
 }
 
-export function deleteAllCookies()
-{
-    document.cookie.split(";").forEach(cookie => {
-        let name = cookie.split("=")[0].trim();
-        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    });
-}
-
 export function restore_user()
 {
     let token = readCookie("user_token").replace(/"/g, '');
@@ -83,40 +75,45 @@ export function restore_user()
     .then(response => response.json())
     .then(data =>
     {
-        sessionStorage.setItem("already in", '1');
-        localStorage.setItem("session opened", '1');
-        /*if (!data || (!data.user && !data.guest)) 
+        if (!data || (!data.user && !data.guest)) 
         {
             nullify_user();
             alert("ERROR: no users found...");
             unauthorized_acess();
             return;
-        }*/
+        }
+        let type = 1;
         let find_user = data.user?.find(u => u.token === token);
         if (!find_user)
+        {
             find_user = data.guest?.find(g => g.token === token);
+            type = 0;
+        }
         if (find_user) 
         {
-            //console.log("save user = ", find_user);
-            let current_user = new profile(
+            let user_type;
+            if (type === 1)
+                user_type = "user"
+            else
+                user_type =  "guest";
+            let ref_user = new profile(
                 "",
-                find_user.name,
+                find_user.username,
                 "",
                 "",
                 "",
-                "guest"
+                user_type
             );
-            /*sessionStorage.setItem("already in", '1');
+            sessionStorage.setItem("already in", '1');
             localStorage.setItem("session opened", '1');
-            localStorage.setItem('your_profile', JSON.stringify(current_user));
-            updateProfileUI(find_user);
+            localStorage.setItem('your_profile', JSON.stringify(ref_user));
+            updateProfileUI(ref_user);
         }
         else 
         {
             nullify_user();
             alert("ERROR: finding logged user...");
             unauthorized_acess();
-        } */
         }
     });
 }
