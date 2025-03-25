@@ -38,22 +38,12 @@ function AllTabClosed()
  
 window.addEventListener('beforeunload', () =>
 {
-    console.log("all storage local = ", localStorage);
-    console.log("all storage session = ", sessionStorage);
-    if (sessionStorage.getItem("opened") === '1')
+    if (sessionStorage.getItem("already in") === '1')
     {
-        let openTabs = parseInt(readCookie('openTabs')) || 1;
-        openTabs--;
-        localStorage.setItem('openTabs', openTabs);
-        saveCookie('openTabs', openTabs, 1);
-        if (openTabs === 0)
-            AllTabClosed();
-        else if (sessionStorage.getItem("already in") === '1')
-        {
-            sessionStorage.setItem("already in", '0');
-            localStorage.setItem("session opened", '1');
-        }
+        sessionStorage.setItem("already in", '0');
+        localStorage.setItem("session opened", '1');
     }
+    AllTabClosed();
 });
 
 window.addEventListener('load', () => {
@@ -65,16 +55,8 @@ window.addEventListener('load', () => {
             restore_user();
         }
     }
-    if (sessionStorage.getItem("opened") === null)
-    {
-        let openTabs = parseInt(readCookie('openTabs')) || 0;
-        openTabs++;
-        saveCookie('openTabs', openTabs, 1);
-        sessionStorage.setItem("opened", '1');
-    }
     if (sessionStorage.getItem("already in") === null)
         sessionStorage.setItem("already in", '0');
-    console.log("pages = ", readCookie('openTabs'));
 });
 
 export const addLoginPageHandlers = () => {
