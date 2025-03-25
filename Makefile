@@ -1,10 +1,14 @@
-CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager history_manager nginx chat game_data_manager
+CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager history_manager chat game_data_manager
 
 # ========================================= #
 SHELL:=/bin/bash
 
 all: prep_dirs #stop_containers
 	@clear
+	@echo "configurazione server https locale"
+	@chmod +x setup/setup_online_website.sh
+	@sudo ./setup/setup_online_website.sh
+	@echo "configurazione completata"
 	make -C ./srcs/common_tools/ all
 	@if [ "$(DETATCH)" = "true" ]; then \
 		docker-compose -f ./docker-compose.yml up -d; \
@@ -37,7 +41,7 @@ down:
 	@docker-compose -f ./docker-compose.yml down
 
 re: clean prep_dirs
-
+	@clear
 	make -C srcs/common_tools/ re
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
@@ -46,18 +50,17 @@ re: clean prep_dirs
 prep_dirs:
 	@mkdir -p ./srcs/common_tools/tools
 	@mkdir -p ./srcs/receiver
-	@mkdir -p ./srcs/request_manager
+	# @mkdir -p ./srcs/request_manager
 	@mkdir -p ./srcs/trascendence
 	@mkdir -p ./srcs/user_manager
 	@chmod +x ./srcs/trascendence/init.sh
-	@chmod +x ./srcs/request_manager/init.sh
 
 clean:
 	@clear
 	make -C srcs/common_tools/ clean
 	@docker-compose -f docker-compose.yml stop
-	@docker ps -qa | xargs -r docker stop
-	@docker ps -qa | xargs -r docker rm
+	@docker ps -qa | xargs -r docker stop || true
+	@docker ps -qa | xargs -r docker rm || true
 	#@docker images -qa | xargs -r docker rmi -f
 	# @docker volume ls -q | xargs -r docker volume rm
 	# @docker network ls -q | awk '!$(echo bridge|host|none) {print}' | xargs -r docker network rm
