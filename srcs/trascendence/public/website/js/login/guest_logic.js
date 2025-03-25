@@ -3,7 +3,7 @@ import { user, profile, readCookie, eraseCookie} from "./user.js";
 import { update_image, change_name, updateUserProfile } from "../pages/modes.js";
 import { saveCookie } from "./user.js";
 
-export async function guest_login()
+export function guest_login()
 {
     let name = prompt("Enter your guest name:");
     if (!name) {

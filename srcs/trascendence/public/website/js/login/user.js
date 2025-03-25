@@ -85,13 +85,13 @@ export function restore_user()
     {
         sessionStorage.setItem("already in", '1');
         localStorage.setItem("session opened", '1');
-        if (!data || (!data.user && !data.guest)) 
+        /*if (!data || (!data.user && !data.guest)) 
         {
             nullify_user();
             alert("ERROR: no users found...");
             unauthorized_acess();
             return;
-        }
+        }*/
         let find_user = data.user?.find(u => u.token === token);
         if (!find_user)
             find_user = data.guest?.find(g => g.token === token);

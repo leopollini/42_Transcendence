@@ -66,8 +66,6 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     if (logout)
     {
         logout.addEventListener("click", () => {
-            localStorage.clear();
-            sessionStorage.clear();
             pop_false();
             if (!current_user)
             {

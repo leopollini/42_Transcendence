@@ -1,6 +1,7 @@
 import { guest_login } from "../../login/guest_logic.js";
 import { performLogin, popupOpened } from "../../login/login_logic.js";
 import { nullify_user } from "../modes.js";
+import { deleteAllCookies, readCookie, restore_user, saveCookie} from "../../login/user.js";
 export default function Login() {
     return `
         <h1 class="text">
@@ -35,9 +36,11 @@ function AllTabClosed()
     localStorage.clear();
     deleteAllCookies();
 }
-
-
-window.addEventListener('beforeunload', () => {
+ 
+window.addEventListener('beforeunload', () =>
+{
+    console.log("all storage local = ", localStorage);
+    console.log("all storage session = ", sessionStorage);
     if (sessionStorage.getItem("opened") === '1')
     {
         let openTabs = parseInt(localStorage.getItem('openTabs')) || 1;
@@ -48,12 +51,20 @@ window.addEventListener('beforeunload', () => {
         else if (sessionStorage.getItem("already in") === '1')
         {
             sessionStorage.setItem("already in", '0');
-            localStorage.setItem("session opened", '0');
+            localStorage.setItem("session opened", '1');
         }
     }
 });
 
 window.addEventListener('load', () => {
+    if (sessionStorage.getItem("prev_path") !== null)
+    {
+        if (sessionStorage.getItem("prev_path") === window.location.pathname)
+        {
+            console.log("🚀 Refresh detected!");
+            restore_user();
+        }
+    }
     if (sessionStorage.getItem("opened") === null)
     {
         let openTabs = parseInt(localStorage.getItem('openTabs')) || 0;
@@ -64,7 +75,6 @@ window.addEventListener('load', () => {
     if (sessionStorage.getItem("already in") === null)
         sessionStorage.setItem("already in", '0');
 });
-
 
 export const addLoginPageHandlers = () => {
     const loginButton = document.getElementById("loginButton");

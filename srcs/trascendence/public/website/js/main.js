@@ -19,7 +19,7 @@ import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import {deleteAllCookies, eraseCookie, readCookie, restore_user} from "./login/user.js";
+import {deleteAllCookies, eraseCookie, readCookie, saveCookie, restore_user} from "./login/user.js";
 let buttonTitle;
 let winner;
 let players;
@@ -79,8 +79,6 @@ function createPlayersArray(numPlayers) {
     return players;
 }
 
-
-
 function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
@@ -93,8 +91,23 @@ const loadContent = () => {
     
     let playerNames;
     let numPlayers = 4;
-    if (accessing_errors(path) === 1)
-        return;
+    
+    if (window.location.pathname !== '/')
+    {
+        if (sessionStorage.getItem("prev_path") === null)
+            sessionStorage.setItem("prev_path", window.location.pathname);
+    }
+    /*console.log("already in => " + sessionStorage.getItem("already in"));
+    console.log("session opened => " + localStorage.getItem("session opened"));
+    if (sessionStorage.getItem("already in") === '1' && localStorage.getItem("session opened") === '1' && path !== '/'
+    && !current_user)
+    {
+        console.log("refreshing page and data");
+        restore_user();
+        return(0);
+    }*/
+    /*if (accessing_errors(path) === 1)
+        return;*/
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
         || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
         numPlayers = parseInt(buttonTitle.replace(/\D/g, ""), 10);
@@ -115,13 +128,6 @@ const loadContent = () => {
         switch (path)
         {
             case "/":
-                if (sessionStorage.getItem("already in") === '1')
-                {
-                    deleteAllCookies();
-                    sessionStorage.clear();
-                    localStorage.clear();
-                    nullify_user();
-                }
                 addLoginPageHandlers();
                 break;
             case "/profile":
@@ -254,6 +260,16 @@ function accessing_errors(path)
             alert("ERROR: accessing unauthorized page...");
             unauthorized_acess();
             return (1);
+        }
+    }
+    else
+    {
+        if (sessionStorage.getItem("already in") === '1')
+        {
+            deleteAllCookies();
+            sessionStorage.clear();
+            localStorage.clear();
+            nullify_user();
         }
     }
 }
