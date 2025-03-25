@@ -1,7 +1,7 @@
 import { guest_login } from "../../login/guest_logic.js";
 import { performLogin, popupOpened } from "../../login/login_logic.js";
+import { eraseCookie } from "../../login/user.js";
 import { nullify_user } from "../modes.js";
-import { readCookie, restore_user, saveCookie} from "../../login/user.js";
 export default function Login() {
     return `
         <h1 class="text">
@@ -29,34 +29,11 @@ export default function Login() {
     `;
 }
 
-function AllTabClosed()
-{
-    nullify_user();
-    sessionStorage.clear();
-    localStorage.clear();
-}
- 
-window.addEventListener('beforeunload', () =>
-{
-    if (sessionStorage.getItem("already in") === '1')
-    {
-        sessionStorage.setItem("already in", '0');
-        localStorage.setItem("session opened", '1');
-    }
-    AllTabClosed();
-});
-
 window.addEventListener('load', () => {
-    if (sessionStorage.getItem("prev_path") !== null)
-    {
-        if (sessionStorage.getItem("prev_path") === window.location.pathname)
-        {
-            console.log("🚀 Refresh detected!");
-            restore_user();
-        }
-    }
     if (sessionStorage.getItem("already in") === null)
         sessionStorage.setItem("already in", '0');
+    if (localStorage.getItem("session opened") === null)
+        localStorage.setItem("session opened", '0');
 });
 
 export const addLoginPageHandlers = () => {

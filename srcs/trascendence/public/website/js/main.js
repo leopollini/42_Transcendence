@@ -19,6 +19,7 @@ import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
+import { eraseCookie, readCookie, restore_user } from "./login/user.js";
 let buttonTitle;
 let winner;
 let players;
@@ -49,7 +50,10 @@ const routes = {
 
 //restore logged da sistemare
 export const navigate = (path, title = "", lobbyPlayers) => {
-    history.pushState({ path }, title, path);
+    if (window.location.pathname !== path)
+        history.pushState({ path }, title, path);
+    else
+        history.replaceState({ path }, title, path);
     buttonTitle = title;
     players = lobbyPlayers;
     let data = JSON.stringify({ "params" : [{}]});
@@ -90,23 +94,8 @@ const loadContent = () => {
     
     let playerNames;
     let numPlayers = 4;
-    
-    if (window.location.pathname !== '/')
-    {
-        if (sessionStorage.getItem("prev_path") === null)
-            sessionStorage.setItem("prev_path", window.location.pathname);
-    }
-    /*console.log("already in => " + sessionStorage.getItem("already in"));
-    console.log("session opened => " + localStorage.getItem("session opened"));
-    if (sessionStorage.getItem("already in") === '1' && localStorage.getItem("session opened") === '1' && path !== '/'
-    && !current_user)
-    {
-        console.log("refreshing page and data");
-        restore_user();
-        return(0);
-    }*/
-    /*if (accessing_errors(path) === 1)
-        return;*/
+    if (check_valid_operation(path) === 1)
+        return;
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
         || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
         numPlayers = parseInt(buttonTitle.replace(/\D/g, ""), 10);
@@ -237,35 +226,58 @@ function initChat() {
 // Inizializzazione dell'app
 document.addEventListener("DOMContentLoaded", loadContent);
 
-export function unauthorized_acess()
-{
-    navigate("/", "home");
-}
+window.addEventListener('beforeunload', (event) => {
+    localStorage.setItem("session opened", '0');
+});
 
-function accessing_errors(path)
+function check_valid_operation(path)
 {
-    if (path !== "/")
+    if (localStorage.getItem("session opened") === '0')
     {
-        let session = 0;
-        let opened = 0;
-        if (sessionStorage.getItem("already in") === '0' || sessionStorage.getItem("already in") === null)
-            session = 1;
-        if (localStorage.getItem("session opened") === '1' || localStorage.getItem("session opened") === null)
-            opened = 1;
-        if (session === 1 && opened === 1)
+        let intervalID = setInterval(() => {
+        if (localStorage.getItem("session opened") === '0')
         {
-            alert("ERROR: accessing unauthorized page...");
-            unauthorized_acess();
-            return (1);
+            if (sessionStorage.getItem("already in") === '1')
+                localStorage.setItem("session opened", '1');
+            clearInterval(intervalID);
         }
+        }, 1000);
     }
-    else
+    if (sessionStorage.getItem("already in") === '1' && path === "/")
     {
+        nullify_user();
+        eraseCookie("user_token");
+        sessionStorage.setItem("already in", '0');
+        localStorage.setItem("session opened", '0');
+        return (0);
+    }
+    else if (path !== '/')
+    {
+        if (sessionStorage.getItem("already in") === null)
+            sessionStorage.setItem("already in", '0');
         if (sessionStorage.getItem("already in") === '1')
         {
-            sessionStorage.clear();
-            localStorage.clear();
-            nullify_user();
+            if (!sessionStorage.getItem("prev_path") && window.location.pathname !== "/")
+            {
+                sessionStorage.setItem("prev_path", window.location.pathname);
+                return (0);
+            }
+            else if (sessionStorage.getItem("prev_path") === window.location.pathname)
+            {
+                restore_user();
+                return (0);
+            }
+        }
+        else
+        {
+            if ((localStorage.getItem("session opened") === '1' && sessionStorage.getItem("already in") === '0') ||
+            (sessionStorage.getItem("already in") === '0' && localStorage.getItem("session opened") === '0'))
+            {
+                alert("ERROR: accessing unauthorized page...");
+                navigate("/", "home");
+                return (1);
+            }
         }
     }
+    return (0);
 }

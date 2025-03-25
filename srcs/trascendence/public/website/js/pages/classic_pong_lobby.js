@@ -76,7 +76,7 @@ function searchUser(username) {
             {
                 nullify_user();
                 alert("ERROR: no users found...");
-                unauthorized_acess();
+                navigate("/", "home");
                 return;
             }
             let user_name;

@@ -73,6 +73,7 @@ function update_guest(curr_guest)
         curr_guest.image,
         "guest"
     );
+    sessionStorage.setItem("prev_path", '/modes');
     sessionStorage.setItem("already in", 1);
     localStorage.setItem("session opened", 1);
     let data = JSON.stringify({data : {username : current_user.display_name}, login_as_guest : "true"});

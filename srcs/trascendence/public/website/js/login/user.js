@@ -1,5 +1,4 @@
 import { nullify_user, updateProfileUI} from "../pages/modes.js";
-import { unauthorized_acess } from "../main.js";
 export class user {
     constructor(image, name, login_name, email, bio) {
         this.image = image;
@@ -79,7 +78,7 @@ export function restore_user()
         {
             nullify_user();
             alert("ERROR: no users found...");
-            unauthorized_acess();
+            navigate("/", "home");
             return;
         }
         let type = 1;
@@ -104,8 +103,6 @@ export function restore_user()
                 "",
                 user_type
             );
-            sessionStorage.setItem("already in", '1');
-            localStorage.setItem("session opened", '1');
             localStorage.setItem('your_profile', JSON.stringify(ref_user));
             updateProfileUI(ref_user);
         }
@@ -113,7 +110,7 @@ export function restore_user()
         {
             nullify_user();
             alert("ERROR: finding logged user...");
-            unauthorized_acess();
+            navigate("/", "home");
         }
     });
 }
