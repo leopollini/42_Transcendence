@@ -33,7 +33,7 @@ export function savef4StatsData(game, isTie) {
     .then(data => {
         console.log("Save Forza4 Game response: ", data);
 
-        // Ora esegui la seconda chiamata fetch solo dopo che la prima ha avuto successo
+        // Second fetch call (only if first fetch was successful)   
         return fetch("http://localhost:8008", {
             method: "get_f4_games",
             body: JSON.stringify({

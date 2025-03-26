@@ -112,7 +112,7 @@ class Forza4Game {
             this.p1PowerupUsed = false;
             this.p2PowerupUsed = false;
     
-            // Aggiungi i listener per i pulsanti dei power-up
+            // Power-up buttons listeners
             document.getElementById('p1PowerupButton').addEventListener('click', () => activatePowerup(this, 'token1'));
             document.getElementById('p2PowerupButton').addEventListener('click', () => activatePowerup(this, 'token2'));
         } 
@@ -140,7 +140,7 @@ class Forza4Game {
            resetTimer(this);
         });
         
-        // Ricalcola la griglia al ridimensionamento della finestra
+        // Recalculate grid size on window resize
         window.addEventListener('resize', () => {
             createGrid(this);
             redrawGrid(this, this.rows, this.cols);

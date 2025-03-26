@@ -43,7 +43,7 @@ function saveUserStatsData(matchData) {
         console.log("saving...");
         console.log("Save Pong Game response: ", data);
 
-        // Ora esegui la seconda chiamata fetch solo dopo che la prima ha avuto successo
+        // Second fetch call (only if first fetch was successful)   
         return fetch("http://localhost:8008", {
             method: "get_pong_games",
             body: JSON.stringify({

@@ -11,11 +11,10 @@ export function createGrid(game) {
     const forza4Game = document.getElementById('forza4Game');
     boardElement.innerHTML = '';
 
-    const gap = window.innerWidth * 0.01; // Spazio tra le celle
-    const maxWidth = window.innerWidth * 0.6; // Larghezza massima del board (80% della finestra)
-    const maxHeight = window.innerHeight * 0.6; // Altezza massima del board (80% della finestra)
+    const gap = window.innerWidth * 0.01; // Spece between cells
+    const maxWidth = window.innerWidth * 0.6; // Max board width 
+    const maxHeight = window.innerHeight * 0.6; // Max board height 
     
-    // Calcolo della dimensione ottimale delle celle
     const cellSize = Math.min(
         Math.floor((maxWidth - game.cols * gap) / game.cols),
         Math.floor((maxHeight - game.rows * gap) / game.rows)
@@ -24,7 +23,7 @@ export function createGrid(game) {
     const boardWidth = game.cols * cellSize + (game.cols - 1) * gap;
     const boardHeight = game.rows * cellSize + (game.rows - 1) * gap;
 
-    // Stile della board
+    // Game board styling
     boardElement.style.display = 'grid';
     boardElement.style.gridTemplateRows = `repeat(${game.rows}, ${cellSize}px)`;
     boardElement.style.gridTemplateColumns = `repeat(${game.cols}, ${cellSize}px)`;
@@ -33,7 +32,7 @@ export function createGrid(game) {
     boardElement.style.height = `${boardHeight}px`;
     boardElement.style.margin = 'auto';
 
-    // Imposta il background dinamico
+    // Set background (based on customization settings)
     if (boardBackground === 'bg1') 
     {
         document.getElementById("app").style.background = 
@@ -56,7 +55,7 @@ export function createGrid(game) {
     document.body.style.backgroundSize = 'cover';
     document.body.style.backgroundPosition = 'center';
 
-    // Creazione delle celle della griglia
+    // Create grid cells
     for (let row = 0; row < game.rows; row++) {
         for (let col = 0; col < game.cols; col++) {
             const cell = document.createElement('div');
@@ -105,7 +104,7 @@ function checkGrid(event,game) {
                 } else {
                     console.error("I pulsanti Replay e Back to Menu non sono stati trovati nel DOM.");
                 }
-                clearInterval(game.timerInterval); // Ferma il timer
+                clearInterval(game.timerInterval); // Stop timer
                 savef4StatsData(game, false);
                 return;
             }
@@ -118,8 +117,8 @@ function checkGrid(event,game) {
                 } else {
                     console.error("I pulsanti Replay e Back to Menu non sono stati trovati nel DOM.");
                 }
-                clearInterval(game.timerInterval); // Ferma il timer
-                savef4StatsData(game, true); // Passa true per indicare un pareggio
+                clearInterval(game.timerInterval); // Stop timer
+                savef4StatsData(game, true); // Save data for statistics (true indicates a tie)
                 return;
             }
             game.currentPlayer = game.currentPlayer === 'token1' ? 'token2' : 'token1';
@@ -159,10 +158,10 @@ function isGridFull(game) {
     for (let row = 0; row < game.rows; row++) {
         for (let col = 0; col < game.cols; col++) {
             if (!game.board[row][col]) {
-                return false; // Se trovi una cella vuota, la griglia non è piena
+                return false; // Grid not full (you can still place tokens)
             }
         }
     }
-    return true; // Se tutte le celle sono occupate, la griglia è piena
+    return true; // Grid full
 }
 

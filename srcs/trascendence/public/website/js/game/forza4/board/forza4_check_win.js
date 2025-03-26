@@ -7,12 +7,12 @@ export function checkWin(game, row, col) {
 
 function checkDirection(game, row, col, rowDir, colDir) {
     let count = 1;
-    const winningCells = [{ row, col }]; // Inizializziamo l'array con la cella di partenza
+    const winningCells = [{ row, col }]; 
     count += countInDirection(game, row, col, rowDir, colDir, winningCells);
     count += countInDirection(game, row, col, -rowDir, -colDir, winningCells);
 
     if (count >= 4) {
-        // A questo punto `winningCells` contiene tutte le celle della serie vincente
+        // There's a winner! -> Highlight the winning cells 
         highlightWinningCells(winningCells);
         return true;
     }
@@ -25,7 +25,7 @@ function countInDirection(game, row, col, rowDir, colDir, winningCells) {
     let c = col + colDir;
     let count = 0;
     while (r >= 0 && r < game.rows && c >= 0 && c < game.cols && game.board[r][c] === game.currentPlayer) {
-        winningCells.push({ row: r, col: c });  // Aggiungi la cella alla lista delle celle vincenti
+        winningCells.push({ row: r, col: c });  // Add cell to the list of winning cells
         count++;
         r += rowDir;
         c += colDir;

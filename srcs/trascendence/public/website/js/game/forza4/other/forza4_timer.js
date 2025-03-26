@@ -15,6 +15,6 @@ export function updateTimer(game) {
 
 export function resetTimer(game) {
     clearInterval(game.timerInterval);
-    game.timerInterval = null; // Opzionale: resetta la variabile
+    game.timerInterval = null; 
     console.log("Timer azzerato.");
 }

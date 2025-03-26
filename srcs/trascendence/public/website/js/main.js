@@ -86,7 +86,7 @@ function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
 
-// Caricamento dinamico del contenuto
+// Dynamic content load
 const loadContent = () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
@@ -215,23 +215,23 @@ const loadContent = () => {
     if (chatRoutes.includes(path)) {
         initChat();
     } else {
-        // Se non serve, svuota il container della chat
+        // If don't needed, empty the chat content
         document.getElementById("chatApp").innerHTML = "";
     }
 };
 
-    // Gestione dei pulsanti "Indietro" e "Avanti" nel browser
+    // Handling "Forward" and "Backward" browser buttons
 window.addEventListener("popstate", loadContent);
 
 function initChat() {
     const chatContainer = document.getElementById("chatApp");
-    // Inserisce il template della chat
+    // Insert chat template
     chatContainer.innerHTML = LiveChat();
-    // Inizializza la logica della chat creando una nuova istanza di ChatApp
+    // Initialize chat logic by creating the ChatApp instance   
     new ChatApp();
 }
 
-// Inizializzazione dell'app
+// Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
 
 export function unauthorized_acess()

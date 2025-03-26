@@ -177,7 +177,7 @@ export class PongGame {
             requestAnimationFrame(() => this.render());
         }
         else if (this.gameEnd) {
-            // Resetta lo screen shake quando l'effetto è terminato
+            // Reset screenshake when game ends
             this.screenShake.reset(this.ctx);
         }
     }
@@ -192,7 +192,7 @@ export class PongGame {
     
         renderBackground(this);
     
-        // Controlla se gli oggetti esistono prima di chiamare il metodo resize
+        // Check if object exists before resizing
         if (this.ball) 
             this.ball.resize(this);
         if (this.paddle1) 
@@ -219,7 +219,7 @@ export class PongGame {
     }
 
     destroy() {
-        this.stop(); // Interrompe il gioco
+        this.stop(); // Stop game
         window.removeEventListener('resize', this.resize);
         document.removeEventListener('keydown', this.handleKeyDown);
         document.removeEventListener('keyup', this.handleKeyUp);

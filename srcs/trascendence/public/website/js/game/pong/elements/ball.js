@@ -273,7 +273,7 @@ export class Ball {
         this.x = ballRelativeX * game.canvas.width;
         this.y = ballRelativeY * game.canvas.height;
     
-        // Ricalcola la velocità della palla
+        // Recalculate ball speed
         this.speedX = ballRelativeSpeedX * game.canvas.width;
         this.speedY = ballRelativeSpeedY * game.canvas.height;
         // Calculate new radius
