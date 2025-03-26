@@ -75,7 +75,7 @@ export function restore_user()
     .then(response => response.json())
     .then(data =>
     {
-        console.log("(get_user)\nData login = ", data);
+        //console.log("(get_user)\nData login = ", data);
         if (!data || (!data.user && !data.guest)) 
         {
             nullify_user();
@@ -97,15 +97,12 @@ export function restore_user()
                 user_type = "user"
             else
                 user_type =  "guest";
-            let image;
-            if (!find_user.image)
-                image = "../../images/guest.jpg";
             let ref_user = new profile(
                 "",
                 find_user.username,
                 "",
                 "",
-                image || find_user.image,
+                "website/images/guest.jpg" || find_user.image,
                 user_type
             );
             localStorage.setItem('your_profile', JSON.stringify(ref_user));

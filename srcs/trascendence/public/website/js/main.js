@@ -56,17 +56,6 @@ export const navigate = (path, title = "", lobbyPlayers) => {
         history.replaceState({ path }, title, path);
     buttonTitle = title;
     players = lobbyPlayers;
-    let data = JSON.stringify({ "params" : [{}]});
-    fetch("http://localhost:8008",
-    {
-        method: "get_user",
-        body: data
-    })
-    .then(response => response.json())
-    .then(data =>
-    {
-        console.log("(get_user)\nData login = ", data);
-    });
     loadContent();
 };
 
@@ -266,7 +255,8 @@ function check_valid_operation(path)
                 sessionStorage.setItem("prev_path", window.location.pathname);
                 return (0);
             }
-            else if (sessionStorage.getItem("prev_path") === window.location.pathname)
+            else if (sessionStorage.getItem("prev_path") === window.location.pathname
+            && sessionStorage.getItem("already in") === '1')
             {
                 restore_user();
                 return (0);

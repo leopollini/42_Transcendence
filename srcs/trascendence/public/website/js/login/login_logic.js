@@ -80,7 +80,6 @@ function get_data()
             new_user.image,
             new_user.type
         );
-        sessionStorage.setItem("prev_path", '/modes');
         sessionStorage.setItem("already in", '1');
         localStorage.setItem("session opened", '1');
         updateUserProfile(current_user);

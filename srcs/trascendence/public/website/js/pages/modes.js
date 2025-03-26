@@ -111,7 +111,6 @@ export function updateUserProfile(newUserData) {
 
 export function updateProfileUI(profile)
 {
-    console.log("current_user = ", profile);
     if (profile !== undefined && profile !== null)
     {
         if (profile.image)

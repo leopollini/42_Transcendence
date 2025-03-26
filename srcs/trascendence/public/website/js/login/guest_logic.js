@@ -20,7 +20,6 @@ export function guest_login()
         alert('Name too long.');
         return ;
     }
-    addGuest(name);
     let data = JSON.stringify({"params" : {"username" : name}});
     fetch("http://localhost:8008",
     {
@@ -29,21 +28,14 @@ export function guest_login()
     })
     .then(response => response.json())
     .then(data => {
-        console.log("get name = ", data);
         if (data.status === "success")
         {
-            let value = 0;
-            if (data.user && Array.isArray(data.user))
-                value = data.user.some(user => user.username === name) ? 1 : 0;
-            if (value === 0 && data.guest && Array.isArray(data.guest))
-                value = data.guest.some(guest => guest.display_name === name) ? 1 : 0;
-            if (value === 1)
-            {
-                alert("Name already taken, try a different one");
-                return;
-            }
-            addGuest(name);
+            alert("ERROR: Name already taken, try a different one");
+            navigate("/", "home");
+            return;
         }
+        else
+            addGuest(name);
     })
     .catch(error => {
         console.error("Error:", error);
@@ -67,7 +59,6 @@ function update_guest(curr_guest)
         curr_guest.image,
         "guest"
     );
-    sessionStorage.setItem("prev_path", '/modes');
     sessionStorage.setItem("already in", 1);
     localStorage.setItem("session opened", 1);
     let data = JSON.stringify({data : {username : current_user.display_name}, login_as_guest : "true"});
@@ -79,7 +70,6 @@ function update_guest(curr_guest)
     .then(response => response.json())
     .then(data =>
     {
-        console.log("(LOGIN_USER)\n data guest = ", data);
         if (!data.token)
             saveCookie("user_token", "nulla", 1);
         else
