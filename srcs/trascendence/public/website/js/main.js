@@ -226,23 +226,27 @@ function initChat() {
 // Inizializzazione dell'app
 document.addEventListener("DOMContentLoaded", loadContent);
 
-window.addEventListener('beforeunload', (event) => {
-    localStorage.setItem("session opened", '0');
+const channel = new BroadcastChannel("session_sync");
+
+window.addEventListener('beforeunload', () =>
+{
+    if (sessionStorage.getItem("already in") === '1')
+    {
+        localStorage.setItem("session opened", '0');
+        channel.postMessage("session_closed");
+    }
+});
+
+channel.addEventListener("message", (event) => {
+    if (event.data === "session_closed")
+    {
+        console.log("updating for '/' tab");
+        localStorage.setItem("session opened", '0');
+    }
 });
 
 function check_valid_operation(path)
 {
-    if (localStorage.getItem("session opened") === '0')
-    {
-        let intervalID = setInterval(() => {
-        if (localStorage.getItem("session opened") === '0')
-        {
-            if (sessionStorage.getItem("already in") === '1')
-                localStorage.setItem("session opened", '1');
-            clearInterval(intervalID);
-        }
-        }, 1000);
-    }
     if (sessionStorage.getItem("already in") === '1' && path === "/")
     {
         nullify_user();

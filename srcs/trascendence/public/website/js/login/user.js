@@ -95,6 +95,8 @@ export function restore_user()
                 user_type = "user"
             else
                 user_type =  "guest";
+            if (!find_user.image)
+                image = "../../images/guest.jpg";
             let ref_user = new profile(
                 "",
                 find_user.username,
