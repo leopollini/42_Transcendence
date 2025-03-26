@@ -21,7 +21,7 @@ export function guest_login()
         return ;
     }
     addGuest(name);
-    /* let data = JSON.stringify({"params" : {}});
+    let data = JSON.stringify({"params" : {"username" : name}});
     fetch("http://localhost:8008",
     {
         method: "get_user",
@@ -30,30 +30,24 @@ export function guest_login()
     .then(response => response.json())
     .then(data => {
         console.log("get name = ", data);
-        if (data.user && Array.isArray(data.user)) {
-            let value = data.user.some(user => user.display_name === name) ? 1 : 0;
+        if (data.status === "success")
+        {
+            let value = 0;
+            if (data.user && Array.isArray(data.user))
+                value = data.user.some(user => user.username === name) ? 1 : 0;
+            if (value === 0 && data.guest && Array.isArray(data.guest))
+                value = data.guest.some(guest => guest.display_name === name) ? 1 : 0;
             if (value === 1)
             {
                 alert("Name already taken, try a different one");
                 return;
             }
-            else if (data.guest && Array.isArray(data.guest))
-            {
-                value = data.guest.some(guest => guest.display_name === name) ? 1 : 0;
-                if (value === 1)
-                {
-                    alert("Name already taken, try a different one");
-                    return;
-                }
-            }
             addGuest(name);
         }
-        else
-            alert("Failed to check name. Please try again later.");
     })
     .catch(error => {
         console.error("Error:", error);
-    }); */
+    });
 }
 
 function addGuest(name) {
