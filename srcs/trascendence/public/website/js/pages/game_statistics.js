@@ -172,7 +172,7 @@ async function forza4CalculateUserStatistics() {
 
     const victoryRate = totalMatches > 0 ? ((totalWins / totalMatches) * 100).toFixed(2) : 0;
 
-    const rankPoints = totalMatches + (totalWins * 10) - (totalLosses * 5);
+    let rankPoints = totalMatches + (totalWins * 10) - (totalLosses * 5);
     if (rankPoints < 0)
         rankPoints = 0;
 
