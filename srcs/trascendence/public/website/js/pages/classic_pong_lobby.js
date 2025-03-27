@@ -93,6 +93,7 @@ function searchUser(username) {
                 }
                 else if (user_name) 
                 {
+                    sessionStorage.setItem("opponent", user_name.username);
                     pongPlayerSearchResult.style.color = "green";
                     pongPlayerSearchResult.innerHTML = "User Found: " + user_name.username;
                     pongToggleAddUser.disabled = false;

@@ -36,7 +36,7 @@ export default function Modes()
             <button class="button-style" id="tournamentButton"><span class="text-animation">TOURNAMENT</span></button>
         </div>
         <div class="mode-button-container">
-            <button class="button-style" id="aiButton"><span class="text-animation">V.S._AI</span></button>
+            <button class="button-style" id="aiButton"><span class="text-animation">VS_AI</span></button>
         </div>
         <div class="mode-button-container">
             <button class="button-style" id="forza4Button"><span class="text-animation">FORZA 4</span></button>

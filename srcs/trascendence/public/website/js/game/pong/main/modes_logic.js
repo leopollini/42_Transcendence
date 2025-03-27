@@ -11,7 +11,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     });
     
     aiButton?.addEventListener('click', () => {
-        navigate("/V.S._AI", "Modalità AI");
+        navigate("/VS_AI", "Modalità AI");
     });
 
     tournamentButton?.addEventListener('click', () => {

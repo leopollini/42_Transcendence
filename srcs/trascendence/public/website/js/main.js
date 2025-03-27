@@ -29,7 +29,7 @@ const routes = {
     "/modes": Modes,
     "/classic": PongGame,
     "/classic/lobby": ClassicPongLobbyRoom,
-    "/V.S._AI": PongGame,
+    "/VS_AI": PongGame,
     "/tournament": Tournament,
     "/userstats": GameUserStatistics,
     "/forza4/game": Forza4,
@@ -81,7 +81,7 @@ const loadContent = () => {
     const app = document.getElementById("app");
     const component = routes[path];
     
-    console.log("path => " + path);
+    //console.log("path => " + path);
     let playerNames;
     let numPlayers = 4;
     if (check_valid_operation(path) === 1)
@@ -97,7 +97,7 @@ const loadContent = () => {
     if (component)
     {
         app.innerHTML = component();
-        if (path === "/classic" || path === "/V.S._AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
+        if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
             initializeGameCanvas(players);
             document.getElementById('app').classList.add('no-background');
         }
@@ -234,6 +234,8 @@ channel.addEventListener("message", (event) => {
 
 function check_valid_operation(path)
 {
+    if (sessionStorage.getItem("already in") === '1' && localStorage.getItem("session opened") === '0')
+        localStorage.setItem("session opened", '1');
     if (sessionStorage.getItem("already in") === '1' && path === "/")
     {
         nullify_user();
@@ -244,32 +246,52 @@ function check_valid_operation(path)
     }
     else if (path !== '/')
     {
-        if (sessionStorage.getItem("already in") === null)
-            sessionStorage.setItem("already in", '0');
-        if (sessionStorage.getItem("already in") === '1')
-        {
-            if (!sessionStorage.getItem("prev_path") && window.location.pathname !== "/")
-            {
-                sessionStorage.setItem("prev_path", window.location.pathname);
-                return (0);
-            }
-            else if (sessionStorage.getItem("prev_path") === window.location.pathname
-            && sessionStorage.getItem("already in") === '1')
-            {
-                restore_user();
-                return (0);
-            }
-        }
-        else
-        {
-            if ((localStorage.getItem("session opened") === '1' && sessionStorage.getItem("already in") === '0') ||
-            (sessionStorage.getItem("already in") === '0' && localStorage.getItem("session opened") === '0'))
-            {
-                alert("ERROR: accessing unauthorized page...");
-                navigate("/", "home");
-                return (1);
-            }
-        }
+        if (continue_error_check(path) === 1)
+            return (1);
     }
     return (0);
 }
+
+function continue_error_check(path)
+{
+    if (sessionStorage.getItem("already in") === null)
+        sessionStorage.setItem("already in", '0');
+    if (sessionStorage.getItem("already in") === '1')
+    {
+        if (path === window.location.pathname
+        && sessionStorage.getItem("already in") === '1')
+        {
+            if (sessionStorage.getItem("game ended") === 'true')
+            {
+                sessionStorage.removeItem("game ended");
+                alert("ERROR:(Invalid operation) going back to menu...");
+                navigate("/modes", "Return to Game Mode");
+                return (1);
+            }
+            restore_user();
+            return (0);
+        }
+    }
+    else
+    {
+        if ((localStorage.getItem("session opened") === '1' && sessionStorage.getItem("already in") === '0') ||
+        (sessionStorage.getItem("already in") === '0' && localStorage.getItem("session opened") === '0'))
+        {
+            alert("ERROR: accessing unauthorized page...");
+            navigate("/", "home");
+            return (1);
+        }
+    }
+}
+
+/*            if (window.location.pathname === "/classic" || window.location.pathname === "/VS_AI" || window.location.pathname === "/forza4/game")
+            {
+                console.log("prev_path: " + sessionStorage.getItem("prev_path"));
+                console.log("current_path: " + window.location.pathname);
+                if (sessionStorage.getItem("prev_path") === window.location.pathname)
+                {
+                    alert("ERROR:(Invalid operation) going back menu...");
+                    navigate("/modes", "Return to Game Mode");
+                    return (1);
+                }
+            }*/

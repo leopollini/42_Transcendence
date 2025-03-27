@@ -4,7 +4,7 @@ let gameInstance;
 
 // Funzione per aggiungere il canvas di gioco
 export function initializeGameCanvas(matchPlayers) {
-    console.log("Inizializzazione game canvas");
+    //console.log("Inizializzazione game canvas");
     const path = window.location.pathname;
     let players;
 
@@ -13,7 +13,6 @@ export function initializeGameCanvas(matchPlayers) {
         console.error("Canvas non trovato nel DOM!");
         return;
     }
-    console.log("user = ", current_user);   
     gameCanvas.width = window.innerWidth;
     gameCanvas.height = window.innerHeight;
     gameCanvas.style.display = "block";
@@ -21,7 +20,7 @@ export function initializeGameCanvas(matchPlayers) {
     if (current_user)
     {
         setTimeout(() => {
-            if (path === "/V.S._AI") {
+            if (path === "/VS_AI") {
                 players = [current_user.display_name, "AI"];
                 startPongGame(players, "ai");
             } 
