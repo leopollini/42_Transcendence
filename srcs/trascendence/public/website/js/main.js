@@ -81,6 +81,7 @@ const loadContent = () => {
     const app = document.getElementById("app");
     const component = routes[path];
     
+    console.log("path => " + path);
     let playerNames;
     let numPlayers = 4;
     if (check_valid_operation(path) === 1)

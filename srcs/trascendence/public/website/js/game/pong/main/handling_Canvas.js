@@ -13,7 +13,7 @@ export function initializeGameCanvas(matchPlayers) {
         console.error("Canvas non trovato nel DOM!");
         return;
     }
-
+    console.log("user = ", current_user);   
     gameCanvas.width = window.innerWidth;
     gameCanvas.height = window.innerHeight;
     gameCanvas.style.display = "block";

@@ -1,7 +1,7 @@
 import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
-
+import { current_user } from '../modes.js';
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -38,8 +38,8 @@ class ChatApp {
         this.initializeGeneralChat();
         //console.log("SET USERNAME PROPERLY PLEASE")
         // this.username = prompt("Inserisci il tuo username:");
-        this.username = "Dave_" + String(Math.random())
-
+        //this.username = "Dave_" + String(Math.random())
+        this.username = current_user.display_name;
         // Inizializza la connessione WebSocket
         this.socket = initSocket(this.username, this);
     }

@@ -1,6 +1,6 @@
 import { navigate } from "../main.js";
 import { user, profile, readCookie, eraseCookie} from "./user.js";
-import { update_image, change_name, updateUserProfile } from "../pages/modes.js";
+import { update_image, change_name, updateUserProfile, nullify_user } from "../pages/modes.js";
 import { saveCookie } from "./user.js";
 
 export function guest_login()
@@ -20,26 +20,7 @@ export function guest_login()
         alert('Name too long.');
         return ;
     }
-    let data = JSON.stringify({"params" : {"username" : name}});
-    fetch("http://localhost:8008",
-    {
-        method: "get_user",
-        body: data
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === "success")
-        {
-            alert("ERROR: Name already taken, try a different one");
-            navigate("/", "home");
-            return;
-        }
-        else
-            addGuest(name);
-    })
-    .catch(error => {
-        console.error("Error:", error);
-    });
+    addGuest(name);
 }
 
 function addGuest(name) {
@@ -70,6 +51,16 @@ function update_guest(curr_guest)
     .then(response => response.json())
     .then(data =>
     {
+        console.log("(LOGIN_USER)\ndatas = ", data);
+        if (data.status === "username already in use")
+        {
+            sessionStorage.setItem("already in", 0);
+            localStorage.setItem("session opened", 0);
+            eraseCookie("user_token");
+            nullify_user();
+            alert("ERROR: Name already taken, try a different one");
+            return;
+        }
         if (!data.token)
             saveCookie("user_token", "nulla", 1);
         else
