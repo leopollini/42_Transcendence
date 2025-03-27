@@ -105,6 +105,7 @@ export function restore_user()
                 "website/images/guest.jpg" || find_user.image,
                 user_type
             );
+            localStorage.setItem('session opened', 1);
             localStorage.setItem('your_profile', JSON.stringify(ref_user));
             updateProfileUI(ref_user);
         }

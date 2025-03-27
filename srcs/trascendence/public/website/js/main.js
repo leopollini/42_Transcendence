@@ -228,10 +228,7 @@ window.addEventListener('beforeunload', () =>
 
 channel.addEventListener("message", (event) => {
     if (event.data === "session_closed")
-    {
-        console.log("updating for '/' tab");
         localStorage.setItem("session opened", '0');
-    }
 });
 
 function check_valid_operation(path)

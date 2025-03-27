@@ -82,22 +82,9 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
                     console.log("(DROP_GUEST)\ndata delete from all users = ", data);
                 })
             }
-            else
-            {
-                let data = JSON.stringify({"realname" : current_user.realname})
-                fetch("http://localhost:8008",
-                {
-                    method: "drop_user",
-                    body: data
-                })
-                .then(data =>{
-                    console.log("(DROP_USER)\ndata update logged user = ", data);
-                })
-            }
             sessionStorage.clear();
             localStorage.clear();
             nullify_user();
-            localStorage.setItem('openTabs', 1);
             navigate("/", "login");
         });
     }

@@ -7,9 +7,9 @@ export function savebio(me, yourDataSection)
     polbio.style.width = "50%";
 
     if (!newBio)
-        return ("❌Error: No Bio saved(Please enter a bio next time)\n");
+        return ("Error: No Bio saved(Please enter a bio next time)\n");
     if (newBio.length >= 400)
-        return ("❌Error: Bio too big\n");
+        return ("Error: Bio too big\n");
     me.bio = JSON.stringify(newBio);
     return("✅saved bio successfully\n");
 }
@@ -24,18 +24,18 @@ export function savename(me, yourDataSection)
     polname.style.width = "50%";
     
     if (!newname)
-        return("❌Error: No Name saved(Please enter a name next time)\n");
+        return("Error: No Name saved(Please enter a name next time)\n");
     if (newname.length < 4)
-        return("❌Error: Name too short(" + newname + ")\n");
+        return("Error: Name too short(" + newname + ")\n");
     if (newname.length >= 15)
-        return("❌Error: Name too long(" + newname + ")\n");
+        return("Error: Name too long(" + newname + ")\n");
     if (me.display_name !== newname)
     {
         me.display_name = newname;
         return ("✅Saved name successfully(" + newname + ")\n");
     }
     else
-        return ("❌Error: name already taken(" + newname + ")\n");
+        return ("Error: name already taken(" + newname + ")\n");
 }
 
 export function saveimage(me, yourDataSection)
@@ -54,7 +54,7 @@ export function saveimage(me, yourDataSection)
         {
             if (!file.type.startsWith('image/'))
             {
-                alert("❌Error: Please select a valid image file.\n");
+                alert("Error: Please select a valid image file.\n");
                 return;
             }
             const reader = new FileReader();
@@ -67,7 +67,7 @@ export function saveimage(me, yourDataSection)
         }
         else
         {
-            alert("❌Error: No file selected.");
+            alert("Error: No file selected.");
             return;
         }
     });
