@@ -93,8 +93,11 @@ export function GameUserStatistics() {
                     </dl>
                 </div>
 
-                <!-- Sezione test per Ping Pong -->
+                <!-- Sezione charts Pong -->
                 <div class="stats-card hidden1" id="pongChartsSection">
+                    <div id="noMatchesMessage" class="no-matches-message">
+                        <h2>No matches played</h2>
+                    </div>
                     <div class="charts-container">
                         <div class="chart-item"><canvas id="matchLongestRallyChart"></canvas></div>
                         <div class="chart-item"><canvas id="winLossChart"></canvas></div>
@@ -104,7 +107,7 @@ export function GameUserStatistics() {
                             <h2>Average Match Duration</h2>
                             <h1 id="avgMatchTime"></h1>
                             <h2>Points</h2>
-                            <h1 id="points"></h1>
+                            <h1 id="rankPointsLabel"></h1>
                         </div>
                         <div class="chart-item"><canvas id="xpProgressChart"></canvas></div>
                     </div>
@@ -177,8 +180,6 @@ async function forza4CalculateUserStatistics() {
         rankPoints = 0;
 
     const averageMoves = totalMatches > 0 ? (totalMoves / totalMatches).toFixed(1) : 0;
-
-
     
     console.log("total time = " +totalTime);
     const averageTime = totalMatches > 0 ? (totalTime / totalMatches).toFixed(2) : 0;
