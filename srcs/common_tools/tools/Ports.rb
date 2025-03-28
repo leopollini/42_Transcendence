@@ -83,11 +83,16 @@ end
 
 module SimpleServer
   # JSON object (not in string form)
-  def self.method_req(method, msg = '', do_close = true)
+  def self.method_req(method, msg = {}, do_close = true)
     raise "Bad method request (#{method})" if Ports::HASH[method].nil?
     puts "Resolving host: #{Ports::HASH[method][0]}"
-    service = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
-    service.write msg if msg
+    begin
+      service = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
+    rescue => r
+      return {'status' => "connection failed. Maybe service closed? (#{r.to_s})", 'success' => 'false'}.to_s
+    end
+    msg['method'] = method if msg.is_a? Hash
+    service.write msg.to_json if msg
     IO.select [service], [], [], 1
     res = service.read_nonblock Ports::MAX_MSG_LEN
     service.close if do_close
