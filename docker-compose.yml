@@ -161,6 +161,7 @@ services:
       - .env
     ports:
       - "6087:6087"
+      - "6088:6088"
     entrypoint: /var/www/init.sh
     working_dir: /var/www
 

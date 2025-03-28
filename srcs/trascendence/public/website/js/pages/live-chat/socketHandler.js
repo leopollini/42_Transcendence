@@ -12,6 +12,12 @@ console.log(msg)
 
         if (msg.type === "message") {
             chatAppInstance.addMessageToChat('general', msg.data);
+        }
+        else if (msg.type === "match_request") {
+            // match request code
+        } 
+        else if (msg.type === "match_response") {
+            // match respone interpretation code
         } 
         else if (msg.type === "private_message") {
             const partner = username === msg.data.from ? msg.data.to : msg.data.from;

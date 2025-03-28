@@ -4,12 +4,6 @@
 require 'json'
 require 'digest'
 
-# load ((File.file? '/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')
-
-# load ((File.file? '/var/common/RequestUnpacker.rb') ? '/var/common/RequestUnpacker.rb' : '../common_tools/tools/RequestUnpacker.rb')
-
-# load ((File.file? '/var/common/BetterPG.rb') ? '/var/common/BetterPG.rb' : '../common_tools/tools/BetterPG.rb')
-
 Dir['/var/common/*.rb'].each { |file| require file }
 
 require_relative 'GuestsList'

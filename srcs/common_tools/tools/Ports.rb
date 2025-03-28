@@ -24,12 +24,16 @@ module Ports
     'logout_user' => ['user_manager', 7080],
     
     'chat' => ['chat', 6087],
+    'broadcast' => ['internal_chat_support', 6088],
+    'send_msg' => ['internal_chat_support', 6088],
 
     'save_pong_game' => ['game_data_manager', 8790],
     'get_pong_games' => ['game_data_manager', 8790],
     'save_f4_game' => ['game_data_manager', 8790],
     'get_f4_games' => ['game_data_manager', 8790],
-    'get_all_games' => ['game_data_manager', 8790]
+    'get_all_games' => ['game_data_manager', 8790],
+
+    'match_invitation_request' => ['matchmaking', 6009]
   }
   MAX_MSG_LEN = 100_000
 end

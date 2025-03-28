@@ -10,24 +10,18 @@ load(File.file?('/var/common/RequestUnpacker.rb') ? '/var/common/RequestUnpacker
 
 $stdout.sync = true
 SERVICE_NAME = 'chat'
+SERVICE_NAME_1 = 'internal_chat_support'
 PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
+PORT_1 = PortFinder::FindPort.new(SERVICE_NAME_1).getPort
 server = WEBrick::Websocket::HTTPServer.new(Port: PORT, DocumentRoot: File.dirname(__FILE__))
 
 class ChatService < WEBrick::Websocket::Servlet
-  # def socket_open(sock)
-  #   # optional
-  #   sock.puts 'Welcome' # send a text frame
-  # end
-  
-# message = {
-#     "date"    => Time.now.iso8601,
-#     "from"    => @username,
-#     "to"      => (data["chat"] == "general" ? "general" : data["to"].to_s.downcase),
-#     "content" => data["content"]
-# }
+  def socket_open(sock)
+    puts 'Socket created'
+  end
 
   def socket_close(sock)
-    ChatStore.clients[@username].close(@username, sock) if @username
+    ChatStore.close_client(@username) if @username
     puts "#{@username} left the chat"
   end
   
@@ -81,8 +75,17 @@ class ChatService < WEBrick::Websocket::Servlet
         ChatStore.block target, @username
 
       when "unblock_user"
-        ChatStore.clients[user].send_sys "You have unblocked #{target}"
-        ChatStore.clients[user].unblock_usr target
+        ChatStore.clients[@username].send_sys "You have unblocked #{target}"
+        ChatStore.clients[@username].unblock_usr target
+
+      when 'match_request'
+        ChatStore.clients[data['to']].send_me({'from' => @username}, "match_request")
+
+      when 'match_response'
+        ChatStore.clients[data['to']].send_me({'accepted' => data['accepted']}, "match_response")
+
+      when 'get_online_users'
+        ChatStore.clients[@username].send_me({'users' => ChatStore.clients.filter{|c| c.alive?}}, 'online_users_list')
 
       else
         puts "Unknown message type: #{data["type"]}"
@@ -94,5 +97,32 @@ class ChatService < WEBrick::Websocket::Servlet
 end
 
 server.mount('/', ChatService)
+
+def internal_call(client, server)
+  puts "internal call called"
+  t = select [client], [], [], 20 # waits for client, a few seconds
+  return if t.nil? || t[0].empty? || client.closed?
+
+  msg = client.read_nonblock Ports::MAX_MSG_LEN
+  # bobj = JSON.parse(msg)
+  bobj = RequestUnpacker::Unpacker.new.unpack msg
+
+  r = nil
+  case bobj['method']
+  when 'broadcast'
+    puts "Broadcast called from non client"
+    ChatStore.sys_broadcast bobj['content'] if bobj['content'] rescue r
+  when 'send_msg'
+    puts "Sending message to #{bobj['to']}: #{bobj['content']}"
+    r = "missing params" unless (['content', 'to'] - bobj.keys).empty?
+    ChatStore.clients[bobj['to']].send_me({'date' => Time.now.iso8601, 'from' => 'sys', 'content' => bobj['content']}, bobj['type'] ? bobj['type'] : 'message') rescue r
+  else
+    puts "Unknown method called (#{bobj['method']})"
+  end
+  puts r if r
+end
+
+puts 'Starting internal_chat_support at port ' + PORT_1.to_s + '!'
+Thread.start{(SimpleServer::SimplerTCP.new PORT_1, :internal_call).start_loop}
 
 server.start

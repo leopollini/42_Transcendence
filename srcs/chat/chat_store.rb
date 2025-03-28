@@ -38,12 +38,12 @@ class Client
       @unread << msg
       @unread = @unread[10..] if @unread.size > MAX_UNREAD_SIZE
     end rescue r
-    this.close if r
+    this.close_sock if r
   end
 
-  def close
+  def close_sock
     @socket_open = false
-    @socket.close unless @socket.closed?
+    # @socket.close
   end
 
   def load_unread
@@ -97,7 +97,7 @@ class ChatStore
   end
 
   def self.sys_broadcast(msg, avoid = "")
-    puts "broadcasting mesage: #{msg}"
+    puts "broadcasting message: #{msg}"
     @@mutex.synchronize do
       @@clients.each do | usr, cli |
         cli.send_me({ 'content' => msg }, 'system') unless usr == avoid
@@ -106,7 +106,7 @@ class ChatStore
   end
 
   def self.broadcast(content, type, avoid = "")
-    puts "broadcasting mesage: #{content}"
+    puts "broadcasting message: #{content}"
     @@mutex.synchronize do
       @@clients.each do | usr, cli |
         cli.send_me(content, type) unless usr == avoid
@@ -157,5 +157,9 @@ class ChatStore
 
   def self.clients
     @@clients
+  end
+
+  def self.close_client(username)
+    @@clients[username].close_sock
   end
 end
