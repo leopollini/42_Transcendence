@@ -1,3 +1,4 @@
+import { escapeHTML } from "../../login/user.js";
 import { navigate } from "../../main.js";
 import { current_user} from "../modes.js";
 
@@ -174,7 +175,7 @@ export function addLobbyPageHandlers() {
 
     toggleSearchUser?.addEventListener('click', () => {
         //console.log("searching user...." +pongPlayerSearch.value);
-
+        pongPlayerSearch.value = escapeHTML(pongPlayerSearch.value);
         searchUser(pongPlayerSearch.value);
     });
 

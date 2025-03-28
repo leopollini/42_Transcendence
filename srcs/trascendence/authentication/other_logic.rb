@@ -29,10 +29,10 @@ module Other_logic
       puts "Errore API 42: #{response.code}"
       return nil
     end
-    realname = user_data['usual_full_name']
-    email = user_data['email']
-    image = user_data['image']['link']
-    display_name = user_data['login']
+    realname = ERB::Util.html_escape(user_data['usual_full_name'])
+    email = ERB::Util.html_escape(user_data['email'])
+    image = ERB::Util.html_escape(user_data['image']['link'])
+    display_name = ERB::Util.html_escape(user_data['login'])
     payload = {
       data: {
         realname: realname,

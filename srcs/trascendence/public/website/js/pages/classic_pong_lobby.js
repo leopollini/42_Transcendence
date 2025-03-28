@@ -1,6 +1,6 @@
 import { navigate } from "../main.js";
 import { current_user } from "./modes.js";
-
+import { escapeHTML } from "../login/user.js";
 let matchPlayers = [];
 
 export default function ClassicPongLobbyRoom() {
@@ -125,7 +125,7 @@ export function addClassicPongLobbyPageHandlers() {
 
     pongToggleSearchUser?.addEventListener('click', () => {
         //console.log("searching user...." +pongPlayerSearch.value);
-
+        pongPlayerSearch.value = escapeHTML(pongPlayerSearch.value);
         searchUser(pongPlayerSearch.value);
     });
 

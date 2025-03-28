@@ -1,8 +1,7 @@
 import { navigate } from '../main.js';
-import {profile, restore_user} from "../login/user.js";
+import {profile, isValidImageUrl, escapeHTML} from "../login/user.js";
 import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
-import { readCookie } from '../login/user.js';
 
 export default function Modes()
 {
@@ -142,7 +141,10 @@ export function update_image(image)
         const avatarImage = document.getElementById('avatarImage');
         if (avatarImage)
         {
-            avatarImage.src = image;
+            if (!isValidImageUrl(image))
+                avatarImage.src = image;
+            else
+                alert("ERROR: Invalid image URL.");
             clearInterval(checkImageInterval);
         }
     }, 100);
@@ -153,8 +155,9 @@ export function change_name(name) {
         const avatarName = document.getElementById('avatarName');
         if (avatarName)
         {
-            avatarName.innerText = name;
-            setUserName(name);
+            const escapedName = escapeHTML(name);
+            avatarName.innerText = escapedName;
+            setUserName(escapedName);
             clearInterval(checknameInterval);
         }
     }, 100);
