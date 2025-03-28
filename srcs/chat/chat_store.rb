@@ -38,7 +38,7 @@ class Client
       @unread << msg
       @unread = @unread[10..] if @unread.size > MAX_UNREAD_SIZE
     end rescue r
-    close if r
+    this.close if r
   end
 
   def close
