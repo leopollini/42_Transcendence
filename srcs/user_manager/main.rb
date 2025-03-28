@@ -74,8 +74,8 @@ def login_user(client, obj)
 
   r = nil
   if (usr = LOGIN.select ['realname'], [data['realname']])[0]
-    LOGIN.valueManipulation 'realname', data['realname']
-    return usr.merge({'status' => 'success', 'success' => 'true'})
+    LOGIN.valueManipulation 'realname', data['realname'], 'loged_in = true'
+    return usr.merge({'status' => 'success', 'success' => 'true', 'token' => (LOGIN.select_specific(['token'], 'realname', data['realname']))['token']})
   end rescue r
   return {'status' => 'user_manager: bad request', 'success' => 'false'} unless r.nil?
   return add_user(client, obj) if obj['do_create']
@@ -87,7 +87,7 @@ def logout_user(client, obj)
   return GUEST.del_guest obj['username'] if obj['username']
   return DEFAULT_MISSING_PARAM.clone unless obj['realname']
 
-  LOGIN.valueManipulation 'realname', obj['realname']
+  LOGIN.valueManipulation 'realname', obj['realname'], 'logged_in = true'
 end
 
 def get_user(_client, obj = nil)
