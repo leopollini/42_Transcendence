@@ -36,7 +36,7 @@ export default function Modes()
             <button class="button-style" id="tournamentButton"><span class="text-animation">TOURNAMENT</span></button>
         </div>
         <div class="mode-button-container">
-            <button class="button-style" id="aiButton"><span class="text-animation">V.S._AI</span></button>
+            <button class="button-style" id="aiButton"><span class="text-animation">VS_AI</span></button>
         </div>
         <div class="mode-button-container">
             <button class="button-style" id="forza4Button"><span class="text-animation">FORZA 4</span></button>
@@ -109,8 +109,9 @@ export function updateUserProfile(newUserData) {
     localStorage.setItem("your_profile", JSON.stringify(current_user));
 }
 
-export function updateProfileUI(profile) {
-    if (current_user !== undefined && current_user !== null)
+export function updateProfileUI(profile)
+{
+    if (profile !== undefined && profile !== null)
     {
         if (profile.image)
             update_image(profile.image);

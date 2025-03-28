@@ -39,7 +39,8 @@ module Other_logic
         email: email,
         image: image,
         display_name: display_name
-      }
+      },
+      do_create: true
     }
     puts "adding token cookie"
     response = SimpleServer.method_req("login_user", payload.to_json)

@@ -12,6 +12,7 @@ import { matchData } from '../data/game_global.js';
 import { saveMatchStatsData, resetMatchStatsData } from '../data/game_stats.js';
 import { updateTimer } from '../other/timer.js';
 import { ballColor, paddleColor, ballTrailColor, wallsColor, powerUpActive, background } from '../data/game_global.js';
+import { current_user } from '../../../pages/modes.js';
 
 export let gameContainer;
 
@@ -58,10 +59,9 @@ export class PongGame {
         // Set canvas width and height as window dimensions
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        
         // Set game variables
-        this.p1Name = players[0]; 
-        this.p2Name = players[1];
+        this.p1Name = current_user.display_name;
+        this.p2Name = sessionStorage.getItem('opponent') || 'IA';
         this.scoreP1 = 0;
         this.scoreP2 = 0;
         this.maxScore = 2;
@@ -209,7 +209,7 @@ export class PongGame {
     }
 
     stop() {
-        console.log("cancelll");
+        //console.log("cancelll");
         this.running = false;
         if (this.loopId) {
             cancelAnimationFrame(this.loopId);

@@ -1,7 +1,7 @@
 import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
-
+import { current_user } from '../modes.js';
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -36,10 +36,10 @@ class ChatApp {
         this.updateFriendsList();
         this.updateFriendRequestsUI();
         this.initializeGeneralChat();
-        console.log("SET USERNAME PROPERLY PLEASE")
+        //console.log("SET USERNAME PROPERLY PLEASE")
         // this.username = prompt("Inserisci il tuo username:");
-        this.username = "Dave_" + String(Math.random())
-
+        //this.username = "Dave_" + String(Math.random())
+        this.username = current_user.display_name;
         // Inizializza la connessione WebSocket
         this.socket = initSocket(this.username, this);
     }
@@ -173,7 +173,7 @@ class ChatApp {
         
         // Notifica il server dell'evento di block (se il server lo gestisce)
         this.socket.send(JSON.stringify({ type: "block_user", to: user }));
-        console.log(`User ${user} has been blocked.`);
+        //console.log(`User ${user} has been blocked.`);
     }
 
     unblockUser(user) {
@@ -197,7 +197,7 @@ class ChatApp {
             }
             // Aggiorna la UI della lista bloccati
             this.updateBlockedUsersList();
-            console.log(`User ${user} has been unblocked.`);
+            //console.log(`User ${user} has been unblocked.`);
         }
     }    
 

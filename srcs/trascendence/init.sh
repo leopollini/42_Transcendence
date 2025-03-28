@@ -27,6 +27,10 @@ cd authentication
 
 echo "==============================="
 echo "Pulizia delle gemme..."
+
+echo "gemme mancanti"
+bundle fund
+echo "gemme aggiornate"
 if gem cleanup; then
     echo "✅ Pulizia delle gemme completata."
 else
@@ -55,8 +59,5 @@ else
     bundle install
 fi
 
-if [ "$SSL_RE" == "no" ]; then
-    ruby server.rb
-else
-    bash https.sh
-fi
+bash https.sh
+ruby server.rb

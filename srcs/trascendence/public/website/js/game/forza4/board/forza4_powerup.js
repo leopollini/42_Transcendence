@@ -3,7 +3,7 @@ import { redrawGrid } from "./forza4_grid.js";
 export function activatePowerup(game, player) {
     if (game.gameEnded) return;
 
-    console.log("game board = " + game.board);
+    //console.log("game board = " + game.board);
 
     if ((game.currentPlayer === 'token1' && player === 'token2') || (game.currentPlayer === 'token2' && player === 'token1')) {
         alert("Not your turn!");
@@ -43,9 +43,9 @@ export function activatePowerup(game, player) {
 
         // Verifica che la cella selezionata contenga una pedina dell'avversario
         const opponentToken = player === 'token1' ? 'token2' : 'token1';
-        console.log("row == " + row + " col == " + col);
-        console.log("game board after deleting");
-        console.log("whats in?  => " + game.board[row][col]);
+        //console.log("row == " + row + " col == " + col);
+        //console.log("game board after deleting");
+        //console.log("whats in?  => " + game.board[row][col]);
         if (game.board[row][col] === opponentToken) {
             // Elimina la pedina
             game.board[row][col] = null;
@@ -76,10 +76,10 @@ export function activatePowerup(game, player) {
 }
 
 function moveDownUpperTokens(game, row, col) {
-    console.log("moving down...");
+    //console.log("moving down...");
     for (let r = row - 1; r >= 0; r--) {
         if (game.board[r][col] !== null) {
-            console.log("sposta giù")
+            //console.log("sposta giù")
             game.board[r + 1][col] = game.board[r][col];
             game.board[r][col] = null;
         }

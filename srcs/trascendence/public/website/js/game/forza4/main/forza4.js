@@ -1,14 +1,14 @@
-import { navigate } from "../../../main.js";
-import { token1Color, token2Color, boardBackground, f4matchData, powerUpMode} from "../data/forza4_game_global.js";
+import { navigate} from "../../../main.js";
+import { token1Color, token2Color, powerUpMode} from "../data/forza4_game_global.js";
 import { createGrid, redrawGrid } from "../board/forza4_grid.js";
 import { updateTimer, resetTimer } from "../other/forza4_timer.js";
 import { activatePowerup } from "../board/forza4_powerup.js";
 
 let backImageButton;
-
-
+let matchPlayers = [];
 export function Forza4() {
-        return `
+
+    return `
             <div id="forza4Game">
             <div id="f4players">
                 <div id="p1" class="f4player-info">
@@ -34,11 +34,14 @@ export function Forza4() {
         `;
 }
 
-export function startForza4Game() {
+export function startForza4Game(players) {
     backImageButton = document.getElementById('backImageButton');
-
+    matchPlayers = players;
     let f4Game = new Forza4Game();
-
+    //console.log("playerzz:" +players);
+   
+    //console.log("match player 1:", matchPlayers[0]);
+    //console.log("match player 2:", matchPlayers[1]);
 }
 
 class Forza4Game {
@@ -67,9 +70,9 @@ class Forza4Game {
         this.board = Array.from({ length: this.rows }, () => Array(this.cols).fill(null));
         this.gameEnded = false;
 
-        this.f4Players = JSON.parse(sessionStorage.getItem('forza4players'));
-        this.p1 = this.f4Players[0];
-        this.p2 = this.f4Players[1];
+        //this.f4Players = JSON.parse(sessionStorage.getItem('forza4players'));
+        this.p1 = matchPlayers[0];
+        this.p2 = matchPlayers[1];
 
         this.p1Name.textContent = this.p1 + ":";
         this.p2Name.textContent = this.p2 + ":";
@@ -128,13 +131,13 @@ class Forza4Game {
     
         backImageButton?.addEventListener('click', () => {
              document.getElementById("app").style.background = 
-    "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
+    "linear-gradient(35deg, #491f1f, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
             resetTimer(this);
             navigate("/modes", "Return to Game Mode");
         });
         window.addEventListener("popstate", (event) => {
             document.getElementById("app").style.background = 
-            "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
+            "linear-gradient(35deg, #491f1f, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
            resetTimer(this);
         });
         

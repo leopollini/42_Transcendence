@@ -13,7 +13,7 @@ export function savef4StatsData(game, isTie) {
         else 
             winner = game.p2;
      }
-     console.log("elapsed time: " + game.elapsedTime);
+     //console.log("elapsed time: " + game.elapsedTime);
     fetch("http://localhost:8008", {
         method: "save_f4_game",
         body: JSON.stringify({
@@ -31,7 +31,7 @@ export function savef4StatsData(game, isTie) {
         return response.status === 204 ? {} : response.json();
     })
     .then(data => {
-        console.log("Save Forza4 Game response: ", data);
+        //console.log("Save Forza4 Game response: ", data);
 
         // Ora esegui la seconda chiamata fetch solo dopo che la prima ha avuto successo
         return fetch("http://localhost:8008", {
@@ -43,7 +43,7 @@ export function savef4StatsData(game, isTie) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Get Forza4 Game response: ", data);
+        //console.log("Get Forza4 Game response: ", data);
     })
     .catch(error => console.error("Fetch error:", error));
 }

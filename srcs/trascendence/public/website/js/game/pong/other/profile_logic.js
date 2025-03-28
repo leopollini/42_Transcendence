@@ -1,5 +1,3 @@
-import { current_user } from "../../../pages/modes.js";
-
 export function savebio(me, yourDataSection)
 {
     const bioInput = yourDataSection.querySelector('#bioInput');
@@ -13,7 +11,7 @@ export function savebio(me, yourDataSection)
     if (newBio.length >= 400)
         return ("Error: Bio too big\n");
     me.bio = JSON.stringify(newBio);
-    return("saved bio successfully\n");
+    return("✅saved bio successfully\n");
 }
 
 
@@ -34,7 +32,7 @@ export function savename(me, yourDataSection)
     if (me.display_name !== newname)
     {
         me.display_name = newname;
-        return ("Saved name successfully(" + newname + ")\n");
+        return ("✅Saved name successfully(" + newname + ")\n");
     }
     else
         return ("Error: name already taken(" + newname + ")\n");

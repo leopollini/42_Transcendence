@@ -1,7 +1,7 @@
 
 import { navigate } from "../main.js";
 import { update_image, change_name, updateUserProfile} from "../pages/modes.js";
-import { profile, readCookie, deleteAllCookies} from "./user.js";
+import { profile} from "./user.js";
 import { saveCookie } from "./user.js";
 export let popupOpened = false;
 
@@ -9,16 +9,6 @@ export function pop_false()
 {
     popupOpened = false;
     localStorage.setItem('popup_opened', 'false');
-}
-
-function checkLoginRestrictions()
-{
-    if (readCookie("logged") === 1)
-    {
-        alert("user already logged in");
-        return false;
-    }
-    return true;
 }
 
 function popupHandling(popup, data)
@@ -38,7 +28,7 @@ function popupHandling(popup, data)
             clearInterval(popupMonitor);
             localStorage.setItem('popup_opened', 'false');
             popupOpened = false;
-            window.removeEventListener("message", receiveMessage); // Rimuovi l'evento dopo la chiusura
+            window.removeEventListener("message", receiveMessage);
 
             console.log("log_succ = ", log_succ);
             if (log_succ === true)
@@ -66,7 +56,6 @@ function get_data()
         console.log("(GET_USER)\ndata login = ", data);
         if (data.status === "no users found")
         {;
-            deleteAllCookies();
             navigate("/", "login");
             return ;
         }
@@ -91,9 +80,6 @@ function get_data()
             new_user.image,
             new_user.type
         );
-        console.log("adding user hahahah");
-        saveCookie("user_token");
-        saveCookie("logged", 1, 1);
         sessionStorage.setItem("already in", '1');
         localStorage.setItem("session opened", '1');
         updateUserProfile(current_user);
@@ -105,8 +91,6 @@ function get_data()
 
 export function performLogin()
 {
-    if (!checkLoginRestrictions())
-        return ;
     fetch('/auth/login')
     .then(response => response.json())
     .then(data => {
