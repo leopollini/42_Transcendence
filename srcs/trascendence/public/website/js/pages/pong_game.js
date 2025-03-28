@@ -1,24 +1,5 @@
-import { navigate } from "../main.js";
-
-export default function PongGame() {
-    setTimeout(() => {
-        history.pushState(null, "", location.href);
-
-        function handlePopState() {
-            if (window.location.pathname.startsWith("/classic") ||
-            window.location.pathname.startsWith("/V.S._AI"))
-            {
-                navigate("/modes", "returning to modes...");
-                alert("quitting game ....");
-            }
-        }
-
-        window.onpopstate = handlePopState;
-
-        window.addEventListener("beforeunload", () => {
-            window.onpopstate = null;
-        });
-    }, 100);
+export default function PongGame()
+{
     return `
     <canvas id="gameCanvas"></canvas>
     <div style="margin-top: 100px;">

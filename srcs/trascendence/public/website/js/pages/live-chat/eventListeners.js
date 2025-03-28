@@ -18,7 +18,7 @@ function setupEventListeners(chatApp) {
     if (elems.blockedUsersList) {
         elems.blockedUsersList.addEventListener('click', (e) => {
             // Aggiungi un log di debug per verificare l'evento
-            console.log('Click in blockedUsersList', e.target);
+            //console.log('Click in blockedUsersList', e.target);
             if (e.target.classList.contains('blocked-user-item')) {
                 const user = e.target.dataset.user;
                 chatApp.showContextMenuForUser(user, e.clientX, e.clientY);

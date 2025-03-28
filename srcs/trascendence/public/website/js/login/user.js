@@ -1,5 +1,5 @@
 import { nullify_user, updateProfileUI} from "../pages/modes.js";
-import { unauthorized_acess } from "../main.js";
+import { navigate } from "../main.js";
 export class user {
     constructor(image, name, login_name, email, bio) {
         this.image = image;
@@ -13,7 +13,7 @@ export class user {
 export let profiles = [];
 
 export class profile {
-    constructor(email, display_name, realname, bio, image)
+    constructor(email, display_name, realname, bio, image, type)
     {
         this.email = email;
         this.display_name = display_name;
@@ -22,7 +22,7 @@ export class profile {
         this.image = image;
         this.num_friends = 0;
         this.myfriend = friend_list;
-
+        this.type = type
     }
 }
 
@@ -63,14 +63,6 @@ export function eraseCookie(name)
     document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
 }
 
-export function deleteAllCookies()
-{
-    document.cookie.split(";").forEach(cookie => {
-        let name = cookie.split("=")[0].trim();
-        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    });
-}
-
 export function restore_user()
 {
     let token = readCookie("user_token").replace(/"/g, '');
@@ -83,40 +75,45 @@ export function restore_user()
     .then(response => response.json())
     .then(data =>
     {
-        sessionStorage.setItem("already in", '1');
-        localStorage.setItem("session opened", '1');
+        //console.log("(get_user)\nData login = ", data);
         if (!data || (!data.user && !data.guest)) 
         {
             nullify_user();
             alert("ERROR: no users found...");
-            unauthorized_acess();
+            navigate("/", "home");
             return;
         }
-        let user = data.user?.find(u => u.token === token);
-        if (!user)
-            user = data.guest?.find(g => g.token === token);
-        if (user) 
+        let type = 1;
+        let find_user = data.user?.find(u => u.token === token);
+        if (!find_user)
         {
-            //console.log("save user = ", user );
-            let current_user = new profile(
+            find_user = data.guest?.find(g => g.token === token);
+            type = 0;
+        }
+        if (find_user) 
+        {
+            let user_type;
+            if (type === 1)
+                user_type = "user"
+            else
+                user_type =  "guest";
+            let ref_user = new profile(
                 "",
-                user.name,
+                find_user.username,
                 "",
                 "",
-                "",
-                "guest"
+                "website/images/guest.jpg" || find_user.image,
+                user_type
             );
-            /*sessionStorage.setItem("already in", '1');
-            localStorage.setItem("session opened", '1');
-            localStorage.setItem('your_profile', JSON.stringify(current_user));
-            updateProfileUI(user);
+            localStorage.setItem('session opened', 1);
+            localStorage.setItem('your_profile', JSON.stringify(ref_user));
+            updateProfileUI(ref_user);
         }
         else 
         {
             nullify_user();
             alert("ERROR: finding logged user...");
-            unauthorized_acess();
-        } */
+            navigate("/", "home");
         }
     });
 }

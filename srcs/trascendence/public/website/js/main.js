@@ -2,56 +2,60 @@ import Login, { addLoginPageHandlers } from "./pages/profile/login.js";
 import Modes, {addModesPageHandlers, current_user, nullify_user} from "./pages/modes.js";
 import Tournament, { addTournamentPageHandlers } from "./pages/tournament/tournament.js";
 import PongGame from "./pages/pong_game.js";
+import ClassicPongLobbyRoom, { handleClassicPongLobby, addClassicPongLobbyPageHandlers } from "./pages/classic_pong_lobby.js";
 import Knockout, { addKnockoutPageHandlers } from "./pages/tournament/knockout.js";
 import Customize, { addCustomizeGame } from "./pages/profile/customize.js";
 import Roundrobin, { addRoundRobinPageHandlers } from "./pages/tournament/roundrobin.js";
 import RobinRanking, { addRobinRankingPageHandlers, robinDraw, assignPointsToPlayer } from "./pages/tournament/robindraw.js";
-import { Charts, addChartsPageHandlers,showCharts } from "./pages/tournament/charts.js";
-import MatchDetails, {showMatchDetails } from "./pages/match_details.js";
+import LobbyRoom, { addLobbyPageHandlers, handleLobby } from "./pages/tournament/tournament_lobby.js";
 import Bracket, { addBracketPageHandlers, drawBracket, backToBracket, resetBracketState } from "./pages/tournament/bracket.js";
 import { initializeGameCanvas } from "./game/pong/main/handling_Canvas.js";
 import Profile, { profileHandler } from "./pages/profile/profile.js";
 import Settings, { addSettingsPageHandlers } from "./pages/profile/settings.js";
 import { userName } from "./pages/user_data.js";
-import { Forza4Home, showForza4HomeScreen, addForza4PageHandlers } from "./pages/forza4/forza4_home.js";
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
-import { Forza4UserStats, forza4ShowUserStatistics, forza4ShowMatchDetails, addForza4StatsPageHandlers } from "./pages/forza4/forza4_statistics.js";
-import Friends from "./pages/friends.js";
+import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers} from "./pages/game_statistics.js";
+import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import {deleteAllCookies, eraseCookie, readCookie, restore_user, saveCookie} from "./login/user.js";
+import { eraseCookie, readCookie, restore_user } from "./login/user.js";
 let buttonTitle;
 let winner;
-
+let players;
 // Mappa delle rotte
 const routes = {
     "/": Login,
     "/modes": Modes,
     "/classic": PongGame,
-    "/V.S._AI": PongGame,
+    "/classic/lobby": ClassicPongLobbyRoom,
+    "/VS_AI": PongGame,
     "/tournament": Tournament,
-    "/forza4": Forza4Home,
+    "/userstats": GameUserStatistics,
     "/forza4/game": Forza4,
-    "/forza4/userstats": Forza4UserStats,
+    "/forza4/findopponent": Forza4LobbyRoom,
     "/settings": Settings,
     "/settings/customizepong": Customize,
     "/settings/customizeforza4": Forza4Customize,
     "/tournament/knockout": Knockout,
+    "/tournament/knockout/lobby": LobbyRoom,
     "/tournament/roundrobin": Roundrobin,
     "/tournament/roundrobin/robinranking": RobinRanking,
     "/tournament/roundrobin/robinranking/game": PongGame,
-    "/tournament/userstats": Charts,
-    "/tournament/userstats/matchdetails": MatchDetails,
+    "/tournament/roundrobin/lobby": LobbyRoom,
     "/tournament/knockout/bracket": Bracket,
     "/tournament/knockout/bracket/game": PongGame,
     "/profile": Profile,
-    "/friends": Friends,
 };
 
-export const navigate = (path, title = "") => {
-    history.pushState({ path }, title, path);
+//restore logged da sistemare
+export const navigate = (path, title = "", lobbyPlayers) => {
+    if (window.location.pathname !== path)
+        history.pushState({ path }, title, path);
+    else
+        history.replaceState({ path }, title, path);
     buttonTitle = title;
+    players = lobbyPlayers;
     loadContent();
 };
 
@@ -67,8 +71,6 @@ function createPlayersArray(numPlayers) {
     return players;
 }
 
-
-
 function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
@@ -78,22 +80,25 @@ const loadContent = () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    let players;
+    
+    //console.log("path => " + path);
     let playerNames;
     let numPlayers = 4;
-    if (accessing_errors(path) === 1)
+    if (check_valid_operation(path) === 1)
         return;
-    if (buttonTitle === "4" || buttonTitle === "5" || buttonTitle === "6" || buttonTitle === "7" || buttonTitle === "8" || buttonTitle === "16")
-        numPlayers = +buttonTitle;
-    players = createPlayersArray(numPlayers);
+    if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
+        || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
+        numPlayers = parseInt(buttonTitle.replace(/\D/g, ""), 10);
+    if (!players)
+        players = createPlayersArray(numPlayers);
     //console.log("Players? " +players);
     playerNames = players;  
     //console.log("path => " + path);
     if (component)
     {
         app.innerHTML = component();
-        if (path === "/classic" || path === "/V.S._AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
-            initializeGameCanvas();
+        if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
+            initializeGameCanvas(players);
             document.getElementById('app').classList.add('no-background');
         }
         else
@@ -101,17 +106,16 @@ const loadContent = () => {
         switch (path)
         {
             case "/":
-                if (sessionStorage.getItem("already in") === '1')
-                {
-                    deleteAllCookies();
-                    sessionStorage.clear();
-                    localStorage.clear();
-                    nullify_user();
-                }
                 addLoginPageHandlers();
                 break;
             case "/profile":
                 profileHandler();
+                break;
+            case "/classic":
+                break;
+            case "/classic/lobby":
+                addClassicPongLobbyPageHandlers();
+                handleClassicPongLobby();
                 break;
             case "/modes":
                 addModesPageHandlers();
@@ -123,8 +127,16 @@ const loadContent = () => {
                     addTournamentPageHandlers();
                 break;
             case "/tournament/knockout":
-                    addKnockoutPageHandlers();
-                    resetBracketState();
+                addKnockoutPageHandlers();
+                resetBracketState();
+                break;
+            case "/tournament/knockout/lobby":
+                addKnockoutPageHandlers();
+                resetBracketState();
+                break;
+            case "/tournament/roundrobin/lobby":
+                addLobbyPageHandlers();
+                handleLobby("Robin", numPlayers);
                 break;
             case "/tournament/knockout/bracket":
                 addBracketPageHandlers();
@@ -156,24 +168,20 @@ const loadContent = () => {
             case "/settings/customizepong":
                 addCustomizeGame();
                 break;
-            case "/tournament/userstats":
-                addChartsPageHandlers();
-                showCharts();
-                break;
-            case "/tournament/userstats/matchdetails":
-                showMatchDetails();
-                break;
             case "/forza4":
                 showForza4HomeScreen();
-                addForza4PageHandlers();
                 break;
             case "/settings/customizeforza4":
                 forza4Config();
                 break;
-            case "/forza4/userstats":
-                Forza4UserStats();
-                addForza4StatsPageHandlers();
-                forza4ShowUserStatistics();
+            case "/userstats":
+                GameUserStatistics()
+                pongShowMatchDetails();
+                gameUserStatisticsPageHandlers();
+                break;
+            case "/forza4/findopponent":
+                handleForza4Lobby(); 
+                addForza4LobbyPageHandlers();
                 break;
             case "/forza4/game":
                 startForza4Game();
@@ -208,46 +216,82 @@ function initChat() {
 // Inizializzazione dell'app
 document.addEventListener("DOMContentLoaded", loadContent);
 
-export function unauthorized_acess()
+const channel = new BroadcastChannel("session_sync");
+
+window.addEventListener('beforeunload', () =>
 {
-    eraseCookie("logged");
-    eraseCookie("user_token");
-    navigate("/", "home");
+    if (sessionStorage.getItem("already in") === '1')
+    {
+        localStorage.setItem("session opened", '0');
+        channel.postMessage("session_closed");
+    }
+});
+
+channel.addEventListener("message", (event) => {
+    if (event.data === "session_closed")
+        localStorage.setItem("session opened", '0');
+});
+
+function check_valid_operation(path)
+{
+    if (sessionStorage.getItem("already in") === '1' && localStorage.getItem("session opened") === '0')
+        localStorage.setItem("session opened", '1');
+    if (sessionStorage.getItem("already in") === '1' && path === "/")
+    {
+        nullify_user();
+        eraseCookie("user_token");
+        sessionStorage.setItem("already in", '0');
+        localStorage.setItem("session opened", '0');
+        return (0);
+    }
+    else if (path !== '/')
+    {
+        if (continue_error_check(path) === 1)
+            return (1);
+    }
+    return (0);
 }
 
-function accessing_errors(path)
-{   
-    if ((current_user === null || current_user === undefined) && 
-    readCookie("logged") === "1" && readCookie("user_token") && sessionStorage.getItem("already in") === '1')
-        restore_user();
-    else if (sessionStorage.getItem("already in") === null && localStorage.getItem("session opened") === null)
+function continue_error_check(path)
+{
+    if (sessionStorage.getItem("already in") === null)
+        sessionStorage.setItem("already in", '0');
+    if (sessionStorage.getItem("already in") === '1')
     {
-        deleteAllCookies();
-        sessionStorage.clear();
-        localStorage.clear();
-        nullify_user();
+        if (path === window.location.pathname
+        && sessionStorage.getItem("already in") === '1')
+        {
+            if (sessionStorage.getItem("game ended") === 'true')
+            {
+                sessionStorage.removeItem("game ended");
+                alert("ERROR:(Invalid operation) going back to menu...");
+                navigate("/modes", "Return to Game Mode");
+                return (1);
+            }
+            restore_user();
+            return (0);
+        }
     }
-    else if (sessionStorage.getItem("already in") === '1' && localStorage.getItem("session opened") === '1' 
-    && readCookie("logged") === '1' && path === '/')
+    else
     {
-        deleteAllCookies();
-        sessionStorage.clear();
-        localStorage.clear();
-        nullify_user();
-    }
-    if (path !== "/")
-    {
-        let session = 0;
-        let opened = 0;
-        if (sessionStorage.getItem("already in") === '0' || sessionStorage.getItem("already in") === null)
-            session = 1;
-        if (localStorage.getItem("session opened") === '1' || localStorage.getItem("session opened") === null)
-            opened = 1;
-        if (session === 1 && opened === 1)
+        if ((localStorage.getItem("session opened") === '1' && sessionStorage.getItem("already in") === '0') ||
+        (sessionStorage.getItem("already in") === '0' && localStorage.getItem("session opened") === '0'))
         {
             alert("ERROR: accessing unauthorized page...");
-            unauthorized_acess();
+            navigate("/", "home");
             return (1);
         }
     }
 }
+
+/*            if (window.location.pathname === "/classic" || window.location.pathname === "/VS_AI" || window.location.pathname === "/forza4/game")
+            {
+                console.log("prev_path: " + sessionStorage.getItem("prev_path"));
+                console.log("current_path: " + window.location.pathname);
+                if (sessionStorage.getItem("prev_path") === window.location.pathname)
+                {
+                    alert("ERROR:(Invalid operation) going back menu...");
+                    navigate("/modes", "Return to Game Mode");
+                    return (1);
+                }
+            }*/

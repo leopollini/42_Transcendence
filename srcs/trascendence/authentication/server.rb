@@ -1,5 +1,6 @@
 require 'webrick/https'
 require 'colorize'
+require 'openssl'
 require_relative 'Oauth'
 require_relative 'session'
 require_relative 'error_logger'

@@ -1,4 +1,4 @@
-#forza4UserStats {
+#gameUserStats {
     position: relative;
     width: 80%;
     padding: 30px;
@@ -248,4 +248,56 @@
 
 .visible {
     display: block;
+}
+
+
+
+
+
+.gamestats-label {
+    display: flex; /* Cambiato da inline-flex a flex */
+    width: clamp(110px, 12vw, 200px);
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 5px;
+    background-color: rgb(0 255 247 / 16%);
+    box-shadow: 0 0 8px rgba(9, 160, 155, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.gamestats-checkbox {
+    display: none;
+}
+
+.gamestats-text {
+    font-family: "Liberty", sans-serif;
+    font-size: 18px;
+    text-align: center;
+    color: #122322;
+    transition: color 0.3s ease, transform 0.3s ease, text-shadow 0.3s ease;
+    user-select: none;
+    margin-left: 0; /* Rimosso il margine laterale */
+}
+
+
+.gamestats-checkbox:checked + .gamestats-text {
+    color: #ffffff;
+    transform: scale(1.1);
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.5), 0 0 1px rgba(255, 255, 255, 0.3), 0 0 1px #ffffff;
+}
+
+.gamestats-label:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(9, 160, 155, 0.4);
+}
+
+.gamestats-label:active {
+    color: #09a09b;
+    text-shadow: 0 0 5px rgba(9, 160, 155, 0.5), 0 0 10px rgba(9, 160, 155, 0.3), 0 0 15px #014C4A;
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(9, 160, 155, 0.3);
 }

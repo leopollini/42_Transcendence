@@ -3,7 +3,7 @@ import { current_user } from "../../../pages/modes.js";
 let gameInstance;
 
 // Funzione per aggiungere il canvas di gioco
-export function initializeGameCanvas() {
+export function initializeGameCanvas(matchPlayers) {
     //console.log("Inizializzazione game canvas");
     const path = window.location.pathname;
     let players;
@@ -13,7 +13,6 @@ export function initializeGameCanvas() {
         console.error("Canvas non trovato nel DOM!");
         return;
     }
-
     gameCanvas.width = window.innerWidth;
     gameCanvas.height = window.innerHeight;
     gameCanvas.style.display = "block";
@@ -21,13 +20,12 @@ export function initializeGameCanvas() {
     if (current_user)
     {
         setTimeout(() => {
-            if (path === "/V.S._AI") {
+            if (path === "/VS_AI") {
                 players = [current_user.display_name, "AI"];
                 startPongGame(players, "ai");
             } 
             else if (path === "/classic") {
-                players = [current_user.display_name, "Player 2"];
-                startPongGame(players, "classic");
+                startPongGame(matchPlayers, "classic");
             }
             else {
                 players = JSON.parse(sessionStorage.getItem('matchPlayers')) || ["Player 1", "Player 2"];
