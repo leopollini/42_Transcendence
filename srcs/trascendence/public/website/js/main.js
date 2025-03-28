@@ -17,10 +17,9 @@ import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.j
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
 import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers} from "./pages/game_statistics.js";
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
-import Friends from "./pages/friends.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import {deleteAllCookies, eraseCookie, readCookie, restore_user} from "./login/user.js";
+import { eraseCookie, readCookie, restore_user } from "./login/user.js";
 let buttonTitle;
 let winner;
 let players;
@@ -30,7 +29,7 @@ const routes = {
     "/modes": Modes,
     "/classic": PongGame,
     "/classic/lobby": ClassicPongLobbyRoom,
-    "/V.S._AI": PongGame,
+    "/VS_AI": PongGame,
     "/tournament": Tournament,
     "/userstats": GameUserStatistics,
     "/forza4/game": Forza4,
@@ -47,24 +46,16 @@ const routes = {
     "/tournament/knockout/bracket": Bracket,
     "/tournament/knockout/bracket/game": PongGame,
     "/profile": Profile,
-    "/friends": Friends,
 };
 
+//restore logged da sistemare
 export const navigate = (path, title = "", lobbyPlayers) => {
-    history.pushState({ path }, title, path);
+    if (window.location.pathname !== path)
+        history.pushState({ path }, title, path);
+    else
+        history.replaceState({ path }, title, path);
     buttonTitle = title;
     players = lobbyPlayers;
-    let data = JSON.stringify({ "params" : [{}]});
-    fetch("http://localhost:8008",
-    {
-        method: "get_user",
-        body: data
-    })
-    .then(response => response.json())
-    .then(data =>
-    {
-        console.log("(get_user)\nData login = ", data);
-    });
     loadContent();
 };
 
@@ -80,8 +71,6 @@ function createPlayersArray(numPlayers) {
     return players;
 }
 
-
-
 function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
@@ -92,9 +81,10 @@ const loadContent = () => {
     const app = document.getElementById("app");
     const component = routes[path];
     
+    //console.log("path => " + path);
     let playerNames;
     let numPlayers = 4;
-    if (accessing_errors(path) === 1)
+    if (check_valid_operation(path) === 1)
         return;
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
         || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
@@ -107,7 +97,7 @@ const loadContent = () => {
     if (component)
     {
         app.innerHTML = component();
-        if (path === "/classic" || path === "/V.S._AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
+        if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
             initializeGameCanvas(players);
             document.getElementById('app').classList.add('no-background');
         }
@@ -116,13 +106,6 @@ const loadContent = () => {
         switch (path)
         {
             case "/":
-                if (sessionStorage.getItem("already in") === '1')
-                {
-                    deleteAllCookies();
-                    sessionStorage.clear();
-                    localStorage.clear();
-                    nullify_user();
-                }
                 addLoginPageHandlers();
                 break;
             case "/profile":
@@ -234,46 +217,82 @@ function initChat() {
 // Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
 
-export function unauthorized_acess()
+const channel = new BroadcastChannel("session_sync");
+
+window.addEventListener('beforeunload', () =>
 {
-    eraseCookie("logged");
-    eraseCookie("user_token");
-    navigate("/", "home");
+    if (sessionStorage.getItem("already in") === '1')
+    {
+        localStorage.setItem("session opened", '0');
+        channel.postMessage("session_closed");
+    }
+});
+
+channel.addEventListener("message", (event) => {
+    if (event.data === "session_closed")
+        localStorage.setItem("session opened", '0');
+});
+
+function check_valid_operation(path)
+{
+    if (sessionStorage.getItem("already in") === '1' && localStorage.getItem("session opened") === '0')
+        localStorage.setItem("session opened", '1');
+    if (sessionStorage.getItem("already in") === '1' && path === "/")
+    {
+        nullify_user();
+        eraseCookie("user_token");
+        sessionStorage.setItem("already in", '0');
+        localStorage.setItem("session opened", '0');
+        return (0);
+    }
+    else if (path !== '/')
+    {
+        if (continue_error_check(path) === 1)
+            return (1);
+    }
+    return (0);
 }
 
-function accessing_errors(path)
-{   
-    if ((current_user === null || current_user === undefined) && 
-    readCookie("logged") === "1" && readCookie("user_token") && sessionStorage.getItem("already in") === '1')
-        restore_user();
-    else if (sessionStorage.getItem("already in") === null && localStorage.getItem("session opened") === null)
+function continue_error_check(path)
+{
+    if (sessionStorage.getItem("already in") === null)
+        sessionStorage.setItem("already in", '0');
+    if (sessionStorage.getItem("already in") === '1')
     {
-        deleteAllCookies();
-        sessionStorage.clear();
-        localStorage.clear();
-        nullify_user();
+        if (path === window.location.pathname
+        && sessionStorage.getItem("already in") === '1')
+        {
+            if (sessionStorage.getItem("game ended") === 'true')
+            {
+                sessionStorage.removeItem("game ended");
+                alert("ERROR:(Invalid operation) going back to menu...");
+                navigate("/modes", "Return to Game Mode");
+                return (1);
+            }
+            restore_user();
+            return (0);
+        }
     }
-    else if (sessionStorage.getItem("already in") === '1' && localStorage.getItem("session opened") === '1' 
-    && readCookie("logged") === '1' && path === '/')
+    else
     {
-        deleteAllCookies();
-        sessionStorage.clear();
-        localStorage.clear();
-        nullify_user();
-    }
-    if (path !== "/")
-    {
-        let session = 0;
-        let opened = 0;
-        if (sessionStorage.getItem("already in") === '0' || sessionStorage.getItem("already in") === null)
-            session = 1;
-        if (localStorage.getItem("session opened") === '1' || localStorage.getItem("session opened") === null)
-            opened = 1;
-        if (session === 1 && opened === 1)
+        if ((localStorage.getItem("session opened") === '1' && sessionStorage.getItem("already in") === '0') ||
+        (sessionStorage.getItem("already in") === '0' && localStorage.getItem("session opened") === '0'))
         {
             alert("ERROR: accessing unauthorized page...");
-            unauthorized_acess();
+            navigate("/", "home");
             return (1);
         }
     }
 }
+
+/*            if (window.location.pathname === "/classic" || window.location.pathname === "/VS_AI" || window.location.pathname === "/forza4/game")
+            {
+                console.log("prev_path: " + sessionStorage.getItem("prev_path"));
+                console.log("current_path: " + window.location.pathname);
+                if (sessionStorage.getItem("prev_path") === window.location.pathname)
+                {
+                    alert("ERROR:(Invalid operation) going back menu...");
+                    navigate("/modes", "Return to Game Mode");
+                    return (1);
+                }
+            }*/

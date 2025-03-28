@@ -237,10 +237,10 @@ export async function showCharts() {
           }),
         });
         const data = await response.json();
-        console.log("Get Pong Game response: ", data);
+        //console.log("Get Pong Game response: ", data);
         if (data.games) {
           userData = data.games;
-          console.log("userData aggiornata: ", userData);
+          //console.log("userData aggiornata: ", userData);
         }
       } catch (error) {
         console.error("Fetch error:", error);

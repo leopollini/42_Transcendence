@@ -5,7 +5,7 @@ import { token1Color, token2Color } from "../data/forza4_game_global.js";
 import { savef4StatsData } from "../data/forza4_game_stats.js";
 
 export function createGrid(game) {
-    console.log("Creo griglia Forza 4");
+    //console.log("Creo griglia Forza 4");
 
     const boardElement = document.getElementById('f4board');
     const forza4Game = document.getElementById('forza4Game');
@@ -89,7 +89,7 @@ function checkGrid(event,game) {
     const col = +event.target.dataset.col;
     for (let row = game.rows - 1; row >= 0; row--) {
         if (!game.board[row][col] && !game.powerUpActive) {
-            console.log("row selected = " +row);
+            //console.log("row selected = " +row);
             game.board[row][col] = game.currentPlayer;
             updateGrid(game, row, col);
             if (checkWin(game, row, col)) {

@@ -40,8 +40,8 @@ function saveUserStatsData(matchData) {
         return response.status === 204 ? {} : response.json();
     })
     .then(data => {
-        console.log("saving...");
-        console.log("Save Pong Game response: ", data);
+        //console.log("saving...");
+        //console.log("Save Pong Game response: ", data);
 
         // Second fetch call (only if first fetch was successful)   
         return fetch("http://localhost:8008", {
@@ -53,7 +53,7 @@ function saveUserStatsData(matchData) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Get Pong Game response: ", data);
+        //console.log("Get Pong Game response: ", data);
     })
     .catch(error => console.error("Fetch error:", error));
 }

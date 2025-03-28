@@ -1,7 +1,7 @@
 import { navigate } from "../../../main.js";
 import { pop_false } from "../../../login/login_logic.js";
 import { current_user, nullify_user} from "../../../pages/modes.js";
-import { deleteAllCookies} from "../../../login/user.js";
+import { eraseCookie } from "../../../login/user.js";
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
         history, logout)
@@ -11,7 +11,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     });
     
     aiButton?.addEventListener('click', () => {
-        navigate("/V.S._AI", "Modalità AI");
+        navigate("/VS_AI", "Modalità AI");
     });
 
     tournamentButton?.addEventListener('click', () => {
@@ -66,8 +66,6 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     if (logout)
     {
         logout.addEventListener("click", () => {
-            localStorage.clear();
-            sessionStorage.clear();
             pop_false();
             if (!current_user)
             {
@@ -84,23 +82,9 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
                     console.log("(DROP_GUEST)\ndata delete from all users = ", data);
                 })
             }
-            else
-            {
-                let data = JSON.stringify({"realname" : current_user.realname})
-                fetch("http://localhost:8008",
-                {
-                    method: "drop_user",
-                    body: data
-                })
-                .then(data =>{
-                    console.log("(DROP_USER)\ndata update logged user = ", data);
-                })
-            }
             sessionStorage.clear();
             localStorage.clear();
-            deleteAllCookies();
             nullify_user();
-            localStorage.setItem('openTabs', 1);
             navigate("/", "login");
         });
     }

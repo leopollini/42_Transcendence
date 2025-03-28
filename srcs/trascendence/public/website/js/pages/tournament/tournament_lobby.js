@@ -53,7 +53,7 @@ export default function LobbyRoom() {
 
 
 // export function handleLobby(tournamentType, totPlayers) {
-//     //console.log("total players = " + totPlayers);
+//     ////console.log("total players = " + totPlayers);
 //     const canvas = document.getElementById('lobbyUsersCanvas');
 //     //const ctx = canvas.getContext('2d');
 //     canvas.width = window.innerWidth * 0.5; 
@@ -84,10 +84,10 @@ function updateCanvas() {
     const numPlayersLabel = document.getElementById("numPlayers");
     numPlayersLabel.innerHTML = `${invitedPlayers.length}/${canvas.dataset.totalPlayers}`;
 
-    console.log(canvas.dataset.totalPlayers);
-    console.log("length: " +invitedPlayers.length);
+    //console.log(canvas.dataset.totalPlayers);
+    //console.log("length: " +invitedPlayers.length);
     if (invitedPlayers.length === Number(canvas.dataset.totalPlayers)) {
-        console.log("eoeijoeij")
+        //console.log("eoeijoeij")
         toggleStartTournament.disabled = false;
     }
 }
@@ -131,7 +131,7 @@ function searchUser(username) {
             {
                 nullify_user();
                 alert("ERROR: no users found...");
-                unauthorized_acess();
+                navigate("/", "home");
                 return;
             }
             let user_name;
@@ -175,7 +175,7 @@ export function addLobbyPageHandlers() {
     });
 
     toggleSearchUser?.addEventListener('click', () => {
-        console.log("searching user...." +pongPlayerSearch.value);
+        //console.log("searching user...." +pongPlayerSearch.value);
 
         searchUser(pongPlayerSearch.value);
     });
@@ -196,7 +196,7 @@ export function addLobbyPageHandlers() {
     /*toggleAddUserRaw?.addEventListener('click', () => {
         const playerName = pongPlayerSearch.value;
         if (!invitedPlayers.includes(playerName) && playerName && invitedPlayers.length < canvas.dataset.totalPlayers) {
-            console.log("adding player");
+            //console.log("adding player");
             invitedPlayers.push(playerName);
             updateCanvas(); 
         }

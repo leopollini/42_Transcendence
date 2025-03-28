@@ -44,7 +44,7 @@ export default function Forza4LobbyRoom() {
 export function handleForza4Lobby() {
     matchPlayers = [];
     matchPlayers.push(current_user.display_name);
-    console.log("match players = " +matchPlayers[0]);
+    //console.log("match players = " +matchPlayers[0]);
 }
 
 function searchUser(username) {
@@ -106,7 +106,7 @@ export function addForza4LobbyPageHandlers() {
     });
 
     f4ToggleSearchUser?.addEventListener('click', () => {
-        console.log("searching user...." +f4PlayerSearch.value);
+        //console.log("searching user...." +f4PlayerSearch.value);
 
         searchUser(f4PlayerSearch.value);
     });
