@@ -1,6 +1,6 @@
 import { navigate } from "../../main.js";
 import { current_user } from "../modes.js";
-
+import { escapeHTML } from "../../login/user.js";
 let matchPlayers = [];
 
 export default function Forza4LobbyRoom() {
@@ -107,7 +107,7 @@ export function addForza4LobbyPageHandlers() {
 
     f4ToggleSearchUser?.addEventListener('click', () => {
         //console.log("searching user...." +f4PlayerSearch.value);
-
+        f4PlayerSearch.value = escapeHTML(f4PlayerSearch.value);
         searchUser(f4PlayerSearch.value);
     });
 

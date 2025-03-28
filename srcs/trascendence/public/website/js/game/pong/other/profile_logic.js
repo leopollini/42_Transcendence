@@ -1,7 +1,11 @@
+import { escapeHTML, isValidImageExtension, isValidImageData} from "../../../login/user.js";
+
 export function savebio(me, yourDataSection)
 {
     const bioInput = yourDataSection.querySelector('#bioInput');
     const newBio = bioInput.value;
+
+    newBio = escapeHTML(newBio);
 
     let polbio = yourDataSection.querySelector('#bioSection');
     polbio.style.width = "50%";
@@ -20,6 +24,7 @@ export function savename(me, yourDataSection)
     const changeName = yourDataSection.querySelector('#displayNameInput');
     const newname = changeName.value;
     
+    newname = escapeHTML(newname);
     let polname = yourDataSection.querySelector('#changeDisplayName');
     polname.style.width = "50%";
     
@@ -57,9 +62,24 @@ export function saveimage(me, yourDataSection)
                 alert("Error: Please select a valid image file.\n");
                 return;
             }
+            if (!isValidImageExtension(file.name)) {
+                alert("Error: Invalid image file extension.\n");
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Error: Image file is too large. Maximum size is 5MB.\n");
+                return;
+            }
             const reader = new FileReader();
             reader.onload = (e) => {
                 const newImage = e.target.result;
+                if (isValidImageData(newImage))
+                {
+                    me.image = newImage;
+                    profileImage.src = newImage;
+                }
+                else
+                    alert("Error: Invalid image data.");
                 me.image = newImage;
                 profileImage.src = newImage;
             };
