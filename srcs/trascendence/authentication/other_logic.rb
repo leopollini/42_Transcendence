@@ -29,10 +29,10 @@ module Other_logic
       puts "Errore API 42: #{response.code}"
       return nil
     end
-    realname = user_data['usual_full_name']
-    email = user_data['email']
-    image = user_data['image']['link']
-    display_name = user_data['login']
+    realname = ERB::Util.html_escape(user_data['usual_full_name'])
+    email = ERB::Util.html_escape(user_data['email'])
+    image = ERB::Util.html_escape(user_data['image']['link'])
+    display_name = ERB::Util.html_escape(user_data['login'])
     payload = {
       data: {
         realname: realname,
@@ -43,12 +43,13 @@ module Other_logic
       do_create: true
     }
     puts "adding token cookie"
-    response = SimpleServer.method_req("login_user", payload.to_json)
+    response.body = SimpleServer.method_req("login_user", payload)
+    #  ####BROKEN####
+    # data = JSON.parse(response.body)
+    # if (data["token"])
+    #   token = data["token"]
+    #   response.data['cookies'] << WEBrick::Cookie.new("logged_token", token)
+    # end
     puts response
-    data = JSON.parse(response)
-    if (data["token"])
-      token = data["token"]
-      res.cookies << WEBrick::Cookie.new("logged_token", token)
-    end
   end
 end

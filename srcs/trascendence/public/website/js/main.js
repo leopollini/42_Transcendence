@@ -283,15 +283,3 @@ function continue_error_check(path)
         }
     }
 }
-
-/*            if (window.location.pathname === "/classic" || window.location.pathname === "/VS_AI" || window.location.pathname === "/forza4/game")
-            {
-                console.log("prev_path: " + sessionStorage.getItem("prev_path"));
-                console.log("current_path: " + window.location.pathname);
-                if (sessionStorage.getItem("prev_path") === window.location.pathname)
-                {
-                    alert("ERROR:(Invalid operation) going back menu...");
-                    navigate("/modes", "Return to Game Mode");
-                    return (1);
-                }
-            }*/

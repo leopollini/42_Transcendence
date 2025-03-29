@@ -1,7 +1,7 @@
 import { navigate } from "../main.js";
-import { user, profile, readCookie, eraseCookie} from "./user.js";
+import { user, profile, eraseCookie} from "./user.js";
 import { update_image, change_name, updateUserProfile, nullify_user } from "../pages/modes.js";
-import { saveCookie } from "./user.js";
+import { saveCookie, escapeHTML} from "./user.js";
 
 export function guest_login()
 {
@@ -10,7 +10,11 @@ export function guest_login()
         alert('No name. Please try again');
         return ;
     }
-    name = name.trim();
+    name = escapeHTML(name);
+    if (!name) {
+        alert('Name cannot be just spaces');
+        return;
+    }
     if (name.length < 4) {
         alert('Name too short.');
         return ;

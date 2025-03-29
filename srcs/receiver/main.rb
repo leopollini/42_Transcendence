@@ -29,7 +29,7 @@ class Receiver < WEBrick::HTTPServlet::AbstractServlet
       return res.body = {"status" => "receiver: empty request", 'success' => 'false'}.to_json if method.nil?
 
       puts "####", json_body, "####"
-      res.body = SimpleServer.method_req method, json_body.to_json
+      res.body = SimpleServer.method_req method, json_body
     rescue => r
       res.body = {"status" => "Server Error: #{r.to_s}", "success" => "false"}.to_json
     # raise r

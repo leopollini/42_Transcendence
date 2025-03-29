@@ -2,6 +2,7 @@ import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
 import { current_user } from '../modes.js';
+import { escapeHTML } from '../../login/user.js';
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -318,7 +319,7 @@ class ChatApp {
     }    
 
     sendMessage() {
-        const text = this.elements.messageInput.value.trim();
+        const text = escapeHTML(this.elements.messageInput.value);
         if (!text) return;
 
         const messagePayload = {

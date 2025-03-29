@@ -117,3 +117,46 @@ export function restore_user()
         }
     });
 }
+
+
+export function isValidImageUrl(url) {
+    const allowedDomains = ['example.com', 'trusted-source.com'];
+    try {
+        const parsedUrl = new URL(url);
+        if (allowedDomains.includes(parsedUrl.hostname) && isImageExtension(parsedUrl.pathname)) {
+            return true;
+        }
+    } catch (e) {
+        console.error("URL non valido:", e);
+    }
+    return false;
+}
+
+function isImageExtension(path)
+{
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp'];
+    return imageExtensions.some(ext => path.endsWith(ext));
+}
+
+export function escapeHTML(str)
+{
+    str = str.trim();
+    const div = document.createElement('div');
+    if (str) {
+        div.textContent = str;
+    }
+    return div.innerHTML;
+}
+
+export function isValidImageExtension(filename)
+{
+    const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp'];
+    const fileExtension = filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2).toLowerCase();
+    return validExtensions.includes(`.${fileExtension}`);
+}
+
+export function isValidImageData(imageData)
+{
+    const base64Header = imageData.substring(0, 5);
+    return base64Header === "data:";
+}

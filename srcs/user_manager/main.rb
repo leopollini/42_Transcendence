@@ -4,19 +4,13 @@
 require 'json'
 require 'digest'
 
-# load ((File.file? '/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')
-
-# load ((File.file? '/var/common/RequestUnpacker.rb') ? '/var/common/RequestUnpacker.rb' : '../common_tools/tools/RequestUnpacker.rb')
-
-# load ((File.file? '/var/common/BetterPG.rb') ? '/var/common/BetterPG.rb' : '../common_tools/tools/BetterPG.rb')
-
 Dir['/var/common/*.rb'].each { |file| require file }
 
 require_relative 'GuestsList'
 
-DEFAULT_ERROR_RES = { 'status' => 'user_manager: failed', 'success' => 'false' }
+DEFAULT_ERROR_RES = { 'service' => 'user_manager', 'status' => 'failed', 'success' => 'false' }
 DEFAULT_SUCCESS_RES = { 'status' => 'success', 'success' => 'true' }
-DEFAULT_MISSING_PARAM = { 'status' => 'user_manager: missing mandatory data', 'success' => 'false' }
+DEFAULT_MISSING_PARAM = { 'service' => 'user_manager', 'status' => 'missing mandatory data', 'success' => 'false' }
 
 $stdout.sync = true
 SERVICE_NAME = 'user_manager'
@@ -34,9 +28,9 @@ GUEST = GuestsList.new
 def add_user(_client, obj = nil)
   puts 'add_user called' if DEBUG_MODE
 
-  data = obj # ['data']
+  data = obj['data']
 
-  return GUEST.add_guest data['username'] if obj['login_as_guest']   # create user as guest
+  return GUEST.add_guest data['username'] if obj['login_as_guest'] == 'true'   # create a guest
 
   return DEFAULT_MISSING_PARAM.clone if data['realname'].nil?
 
@@ -58,6 +52,7 @@ def add_user(_client, obj = nil)
     values[f] = data[f] if data[f]
   end
   values['id'] = max['max'].to_i
+  values['created'] = Time.now.iso8601
   values['token'] = Digest::SHA256.hexdigest values['realname']
   puts "inserting new user: #{values}"
   LOGIN.addValues values.values, values.keys
@@ -67,33 +62,35 @@ end
 
 def login_user(client, obj)
   puts "login_user called"
+  puts "login info: #{obj.to_s}"
   data = obj['data']
 
   return GUEST.add_guest data['username'] if obj['login_as_guest'] == 'true'   # create a guest
 
-  if obj['token'].to_s == token
+  if token = obj['token']
     if usr = (LOGIN.select ['token'], [data['token']])[0]
       return usr.merge({'status' => 'success', 'success' => 'true'})
     end
     return GUEST.login_with_token(token)
   end
 
-  r = nil
-  if (usr = LOGIN.select ['realname'], [data['realname']])[0]
-    LOGIN.valueManipulation 'realname', data['realname']
-    return usr.merge({'status' => 'success', 'success' => 'true'})
-  end rescue r
-  return {'status' => 'user_manager: bad request', 'success' => 'false'} unless r.nil?
+  puts "looking in databaase for #{data['realname']}"
+  if usr = (LOGIN.select ['realname'], [data['realname']])[0]
+    # LOGIN.valueManipulation 'realname', data['realname'], 'loged_in = true'
+    return usr.merge({'status' => 'success', 'success' => 'true', 'token' => (LOGIN.select_specific(['token'], 'realname', data['realname']))['token']})
+  end
+  puts "#{data['realname']} not found in database"
+  return {'service' => 'user_manager', 'status' => 'bad request', 'success' => 'false'} if r
   return add_user(client, obj) if obj['do_create']
   
-  {'status' => 'user_manager: user not found', 'success' => 'false'}
+  {'service' => 'user_manager', 'status' => 'user not found', 'success' => 'false'}
 end
 
 def logout_user(client, obj)
   return GUEST.del_guest obj['username'] if obj['username']
   return DEFAULT_MISSING_PARAM.clone unless obj['realname']
 
-  LOGIN.valueManipulation 'realname', obj['realname']
+  LOGIN.valueManipulation 'realname', obj['realname'], 'logged_in = true'
 end
 
 def get_user(_client, obj = nil)
@@ -153,7 +150,7 @@ def update_user(_client, obj = nil)
   r = nil
   res = DEFAULT_ERROR_RES.clone
   return res if !obj || !(params = obj['new_params']) || !(lname = obj['display_name'])
-  return { 'status' => 'user_manager: Invalid login name change request', 'success' => 'false' } if params.include? 'display_name'
+  return { 'service' => 'user_manager', 'status' => 'Invalid login name change request', 'success' => 'false' } if params.include? 'display_name'
 
   # (LOGIN.select ["display_name"], [lname])[0] rescue r
   usr = begin
@@ -161,7 +158,7 @@ def update_user(_client, obj = nil)
   rescue StandardError
     r
   end
-  return { 'status' => 'user_manager: display_name not found', 'success' => 'false' } if r || usr.nil?
+  return { 'service' => 'user_manager', 'status' => 'display_name not found', 'success' => 'false' } if r || usr.nil?
 
   cols = []
   keys = []
@@ -186,12 +183,13 @@ def drop_users(_client, _obj = nil)
 end
 
 def user_manager(client, _server)
+  puts "user manager called"
   res = DEFAULT_ERROR_RES.clone
   t = select [client], [], [], 20 # waits for client, a few seconds
   return if t.nil? || t[0].empty? || client.closed?
 
   msg = client.read_nonblock Ports::MAX_MSG_LEN
-  bobj = JSON.parse(msg)
+  bobj = JSON.parse msg
   # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
   begin
     res = case bobj['method'].to_s
@@ -204,18 +202,19 @@ def user_manager(client, _server)
     when 'drop_users'
       drop_users client, bobj
     when 'drop_guests'
+      puts "dropping all guests"
       exit
     when 'login_user'
       login_user client, bobj
     when 'logout_user'
       logout_user client, bobj
     else
-      {'status' => 'user_manager: unknown method: ' + bobj['method'].to_s, 'success' => 'false'}
+      {'service' => 'user_manager', 'status' => "unknown method: #{bobj['method'].to_s}", 'success' => 'false'}
     end
   rescue => r
-    return {'status' => "user_manager: error: #{r.to_s}", 'success' => 'false'}.to_json
+    return {'service' => 'user_manager', 'status' => "error: #{r.to_s}", 'success' => 'false'}.to_json
   end
-
+  puts res
   client.puts res.to_json
 end
 
