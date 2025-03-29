@@ -31,12 +31,14 @@ class Client
   # send content (Hash object)
   def send_me(content, type = 'message')
     msg = {'type' => type, 'data'=>content}.to_json
-    if @socket_open == true
+    r = nil
+    if alive?
       @socket.puts msg
     else
       @unread << msg
       @unread = @unread[10..] if @unread.size > MAX_UNREAD_SIZE
-    end
+    end rescue r
+    this.close if r
   end
 
   def close
