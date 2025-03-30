@@ -74,10 +74,10 @@ def login_user(client, obj)
     return GUEST.login_with_token(token)
   end
 
-  puts "looking in databaase for #{data['realname']}"
+  puts "looking in database for #{data['realname']}"
   if usr = (LOGIN.select ['realname'], [data['realname']])[0]
     # LOGIN.valueManipulation 'realname', data['realname'], 'loged_in = true'
-    return usr.merge({'status' => 'success', 'success' => 'true', 'token' => (LOGIN.select_specific(['token'], 'realname', data['realname']))['token']})
+    return usr.merge({'status' => 'success', 'success' => 'true', 'token' => ((LOGIN.select_specific(['token'], 'realname', data['realname']))[0])['token']})
   end
   puts "#{data['realname']} not found in database"
   return {'service' => 'user_manager', 'status' => 'bad request', 'success' => 'false'} if r

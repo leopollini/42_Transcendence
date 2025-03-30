@@ -55,7 +55,7 @@ export function readCookie(name)
             return cookie.substring(nameCookie.length);
         }
     }
-    return null;
+    return "";
 }
 
 export function eraseCookie(name)

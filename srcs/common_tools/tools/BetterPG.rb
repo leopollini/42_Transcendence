@@ -101,12 +101,13 @@ module BetterPG
     end
 
     def select_specific(cols, key, val)
-      (better_return exec("SELECT #{cols.join ' '} FROM #{@name} WHERE #{key} = '#{val}'"))[0]
+      t = (better_return exec("SELECT #{cols.join ' '} FROM #{@name} WHERE #{key} = '#{val}'"))
+      better_return t
     end
 
     # perform select for data fetching
     def select(cols = [], keys = [], fullkeys = [], logic = 'AND')
-      raise 'Bad logic identifier' unless %w[AND OR].include? logic
+      raise 'Bad logic operator' unless %w[AND OR].include? logic
 
       req = []
       begin
