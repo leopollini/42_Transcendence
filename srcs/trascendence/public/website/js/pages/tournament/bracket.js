@@ -210,6 +210,7 @@ export function resetBracketState() {
     currentRound = 0;
     firstDraw = true;
     matchBoxPos = [];
+    
 }
 
 // When a match ends...
@@ -251,11 +252,14 @@ export const addBracketPageHandlers = () => {
         const matchPlayers = [];
         matchPlayers.push(bracketPlayers[currentRound][currentMatch * 2]);
         matchPlayers.push(bracketPlayers[currentRound][currentMatch * 2 + 1]);
+        console.log("match players => " + matchPlayers);
         sessionStorage.setItem('matchPlayers', JSON.stringify(matchPlayers)); // Salva i giocatori della partita
-        navigate("/tournament/knockout/bracket/game", "Bracket Pong Game");
+        navigate("/tournament/knockout/bracket/game", "Bracket Pong Game", matchPlayers);
     });
 
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");
+        resetBracketState();
+        bracketPlayers = [];
     });
 };

@@ -15,11 +15,11 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     });
 
     tournamentButton?.addEventListener('click', () => {
-        if (current_user.type === "guest")
+        /*if (current_user.type === "guest")
         {
             alert("You must be logged to use this feature!");
             return;
-        }
+        }*/
         navigate("/tournament", "Modalità Torneo");
     });
 
@@ -53,11 +53,11 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     if (history)
     {
         history.addEventListener("click", () => {
-        if (current_user.type == "guest")
-            {
-                alert("You must be logged to use this feature!");
-                return;
-            }
+        /*if (current_user.type == "guest")
+        {
+            alert("You must be logged to use this feature!");
+            return;
+        }*/
             navigate("/userstats", "Game User Statistics");
         });
     }

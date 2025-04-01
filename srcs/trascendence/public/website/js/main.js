@@ -15,7 +15,7 @@ import Settings, { addSettingsPageHandlers } from "./pages/profile/settings.js";
 import { userName } from "./pages/user_data.js";
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
-import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers} from "./pages/game_statistics.js";
+import { GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers} from "./pages/game_statistics.js";
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
@@ -98,6 +98,7 @@ const loadContent = () => {
     {
         app.innerHTML = component();
         if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
+            console.log("playerzzzz2: " + players);
             initializeGameCanvas(players);
             document.getElementById('app').classList.add('no-background');
         }
@@ -121,9 +122,9 @@ const loadContent = () => {
                 addModesPageHandlers();
                 break;
             case "/tournament":
-                if (current_user.type === "guest")
+                /*if (current_user.type === "guest")
                     alert("You must be logged to use this feature!");
-                else
+                else*/
                     addTournamentPageHandlers();
                 break;
             case "/tournament/knockout":
@@ -255,34 +256,34 @@ function check_valid_operation(path)
 
 function continue_error_check(path)
 {
-    if (sessionStorage.getItem("already in") === null)
-        sessionStorage.setItem("already in", '0');
-    if (sessionStorage.getItem("already in") === '1')
-    {
-        if (path === window.location.pathname
-        && sessionStorage.getItem("already in") === '1')
-        {
-            if (sessionStorage.getItem("game ended") === 'true')
-            {
-                sessionStorage.removeItem("game ended");
-                alert("ERROR:(Invalid operation) going back to menu...");
-                navigate("/modes", "Return to Game Mode");
-                return (1);
-            }
-            restore_user();
-            return (0);
-        }
-    }
-    else
-    {
-        if ((localStorage.getItem("session opened") === '1' && sessionStorage.getItem("already in") === '0') ||
-        (sessionStorage.getItem("already in") === '0' && localStorage.getItem("session opened") === '0'))
-        {
-            alert("ERROR: accessing unauthorized page...");
-            navigate("/", "home");
-            return (1);
-        }
-    }
+    // if (sessionStorage.getItem("already in") === null)
+    //     sessionStorage.setItem("already in", '0');
+    // if (sessionStorage.getItem("already in") === '1')
+    // {
+    //     if (path === window.location.pathname
+    //     && sessionStorage.getItem("already in") === '1')
+    //     {
+    //         if (sessionStorage.getItem("game ended") === 'true')
+    //         {
+    //             sessionStorage.removeItem("game ended");
+    //             alert("ERROR:(Invalid operation) going back to menu...");
+    //             navigate("/modes", "Return to Game Mode");
+    //             return (1);
+    //         }
+    //         restore_user();
+    //         return (0);
+    //     }
+    // }
+    // else
+    // {
+    //     if ((localStorage.getItem("session opened") === '1' && sessionStorage.getItem("already in") === '0') ||
+    //     (sessionStorage.getItem("already in") === '0' && localStorage.getItem("session opened") === '0'))
+    //     {
+    //         alert("ERROR: accessing unauthorized page...");
+    //         navigate("/", "home");
+    //         return (1);
+    //     }
+    // }
 }
 
 /*            if (window.location.pathname === "/classic" || window.location.pathname === "/VS_AI" || window.location.pathname === "/forza4/game")

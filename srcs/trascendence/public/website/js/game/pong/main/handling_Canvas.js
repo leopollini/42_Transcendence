@@ -8,6 +8,7 @@ export function initializeGameCanvas(matchPlayers) {
     const path = window.location.pathname;
     let players;
 
+    console.log("PATH =>" +path);
     const gameCanvas = document.getElementById('gameCanvas');
     if (!gameCanvas) {
         console.error("Canvas non trovato nel DOM!");
@@ -28,9 +29,10 @@ export function initializeGameCanvas(matchPlayers) {
                 startPongGame(matchPlayers, "classic");
             }
             else {
-                players = JSON.parse(sessionStorage.getItem('matchPlayers')) || ["Player 1", "Player 2"];
+                //players = JSON.parse(sessionStorage.getItem('matchPlayers')) || ["Player 1", "Player 2"];
+                console.log("inizio partita torneo => "+matchPlayers);
                 const mode = path.includes("knockout") ? "knockout" : "roundrobin";
-                startPongGame(players, mode);
+                startPongGame(matchPlayers, mode);
             }
             
             gameInstance = new PongGame();

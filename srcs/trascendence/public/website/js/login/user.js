@@ -76,13 +76,13 @@ export function restore_user()
     .then(data =>
     {
         //console.log("(get_user)\nData login = ", data);
-        if (!data || (!data.user && !data.guest)) 
+        /*if (!data || (!data.user && !data.guest)) 
         {
             nullify_user();
             alert("ERROR: no users found...");
             navigate("/", "home");
             return;
-        }
+        }*/
         let type = 1;
         let find_user = data.user?.find(u => u.token === token);
         if (!find_user)
@@ -111,9 +111,9 @@ export function restore_user()
         }
         else 
         {
-            nullify_user();
-            alert("ERROR: finding logged user...");
-            navigate("/", "home");
+            // nullify_user();
+            // alert("ERROR: finding logged user...");
+            // navigate("/", "home");
         }
     });
 }

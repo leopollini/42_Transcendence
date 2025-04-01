@@ -52,7 +52,7 @@ function update_guest(curr_guest)
     .then(data =>
     {
         console.log("(LOGIN_USER)\ndatas = ", data);
-        if (data.status === "username already in use")
+        /*if (data.status === "username already in use")
         {
             sessionStorage.setItem("already in", 0);
             localStorage.setItem("session opened", 0);
@@ -60,7 +60,7 @@ function update_guest(curr_guest)
             nullify_user();
             alert("ERROR: Name already taken, try a different one");
             return;
-        }
+        }*/
         if (!data.token)
             saveCookie("user_token", "nulla", 1);
         else

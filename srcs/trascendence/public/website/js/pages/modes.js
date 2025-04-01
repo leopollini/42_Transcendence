@@ -107,6 +107,20 @@ export function updateUserProfile(newUserData) {
         newUserData.type
     );
     localStorage.setItem("your_profile", JSON.stringify(current_user));
+    fetch("http://localhost:8008", {
+                method: "get_user",
+                body: JSON.stringify({ 
+                    "params" : [{}] 
+                }) 
+            })
+            .then(response => response.json())
+            .then(data =>
+            {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error("Error fetching user data:", error);
+            });
 }
 
 export function updateProfileUI(profile)
