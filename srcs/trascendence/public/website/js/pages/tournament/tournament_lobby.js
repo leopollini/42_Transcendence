@@ -35,7 +35,7 @@ export default function LobbyRoom() {
             <div class="lobbyBox" id="onlinePlayers">
                 <!-- Lista dei giocatori online -->
             </div>
-            <button id="addButton" class="button-style" disabled>Invite →</button>
+            <button id="inviteButton" class="button-style" disabled>Invite →</button>
             <div id="numPlayersLabel"></div>
             <div class="lobbyBox" id="tournamentPlayers">
                 <!-- Lista dei giocatori nel torneo -->
@@ -48,7 +48,7 @@ export default function LobbyRoom() {
 export function handleLobby(type, totPlayers) {
     const onlinePlayers = document.getElementById("onlinePlayers");
     const tournamentPlayers = document.getElementById("tournamentPlayers");
-    const addButton = document.getElementById("addButton");
+    const inviteButton = document.getElementById("inviteButton");
     numPlayersLabel = document.getElementById("numPlayersLabel");
     
     invitedPlayers = [];
@@ -57,6 +57,16 @@ export function handleLobby(type, totPlayers) {
     totalPlayers = Number(totPlayers);
     tournament = type;
     numPlayersLabel.textContent = "0/" + totalPlayers;
+
+    if (current_user) {
+        const creatorDiv = document.createElement("div");
+        creatorDiv.classList.add("player");
+        creatorDiv.textContent = current_user.display_name;
+        tournamentPlayers.appendChild(creatorDiv);
+        invitedPlayers.push(current_user.display_name);
+        numPlayersAccepted++;
+        numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
+    }
     const players = ["Alice", "Bob", "Charlie", "David"];
     players.forEach(player => {
         const div = document.createElement("div");
@@ -67,7 +77,7 @@ export function handleLobby(type, totPlayers) {
             div.style.background = "#007bff";
             div.style.color = "white";
             selectedPlayer = div;
-            addButton.disabled = false;
+            inviteButton.disabled = false;
         };
         onlinePlayers.appendChild(div);
     });
@@ -77,8 +87,8 @@ export function handleLobby(type, totPlayers) {
 
 export function addLobbyPageHandlers() {
     const toggleStartTournament = document.getElementById("toggleStartTournament");
-    addButton.onclick = () => {
-        if (selectedPlayer) {
+    inviteButton.onclick = () => {
+        if (selectedPlayer && numPlayersAccepted < totalPlayers) {
             const newPlayer = selectedPlayer.cloneNode(true);
             newPlayer.style.background = "";
             newPlayer.style.color = "white";
@@ -89,7 +99,7 @@ export function addLobbyPageHandlers() {
             invitedPlayers.push(selectedPlayer.textContent);
             selectedPlayer.remove();
             selectedPlayer = null;
-            addButton.disabled = true;
+            inviteButton.disabled = true;
             if (numPlayersAccepted === totalPlayers)
                 toggleStartTournament.disabled = false;
         }

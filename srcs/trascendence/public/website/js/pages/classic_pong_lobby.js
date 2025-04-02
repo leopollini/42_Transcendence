@@ -27,21 +27,21 @@ export default function ClassicPongLobbyRoom() {
             <div class="lobbyBox" id="onlinePlayers">
                 <!-- Lista dei giocatori online -->
             </div>
-            <button id="addButton" class="button-style" disabled>Invite →</button>
-            <div id="numPlayersLabel"></div>
-            <div class="lobbyBox" id="matchPlayers">
+            <button id="pongInviteButton" class="button-style" disabled>Invite →</button>
+            <div id="pongNumPlayersLabel"></div>
+            <div class="lobbyBox" id="pongMatchPlayers">
                 <!-- Lista dei giocatori nel torneo -->
             </div>
         </div>
-        <button id="toggleStartMatch" class="button-style" disabled>Start Match</button>`;
+        <button id="pongToggleStartMatch" class="button-style" disabled>Start Match</button>`;
 }
 
 
 export function handleClassicPongLobby() {
     const onlinePlayers = document.getElementById("onlinePlayers");
-    const matchPlayers = document.getElementById("matchPlayers");
-    const addButton = document.getElementById("addButton");
-    numPlayersLabel = document.getElementById("numPlayersLabel");
+    const matchPlayers = document.getElementById("pongMatchPlayers");
+    const inviteButton = document.getElementById("pongInviteButton");
+    numPlayersLabel = document.getElementById("pongNumPlayersLabel");
     
     numPlayersAccepted = 0;
     selectedPlayer = null;
@@ -67,7 +67,7 @@ export function handleClassicPongLobby() {
             div.style.background = "#007bff";
             div.style.color = "white";
             selectedPlayer = div;
-            addButton.disabled = false;
+            inviteButton.disabled = false;
         };
         onlinePlayers.appendChild(div);
     });
@@ -76,8 +76,10 @@ export function handleClassicPongLobby() {
 }
 
 export function addClassicPongLobbyPageHandlers() {
-    const toggleStartMatch = document.getElementById("toggleStartMatch");
-    addButton.onclick = () => {
+    const toggleStartMatch = document.getElementById("pongToggleStartMatch");
+    const matchPlayers = document.getElementById("pongMatchPlayers");
+    const inviteButton = document.getElementById("pongInviteButton");
+    inviteButton.onclick = () => {
         if (selectedPlayer && numPlayersAccepted < totalPlayers) {
             const newPlayer = selectedPlayer.cloneNode(true);
             newPlayer.style.background = "";
@@ -89,7 +91,7 @@ export function addClassicPongLobbyPageHandlers() {
             invitedPlayers.push(selectedPlayer.textContent);
             selectedPlayer.remove();
             selectedPlayer = null;
-            addButton.disabled = true;
+            inviteButton.disabled = true;
             console.log("invited: " + invitedPlayers);
             if (numPlayersAccepted === totalPlayers)
                 toggleStartMatch.disabled = false;

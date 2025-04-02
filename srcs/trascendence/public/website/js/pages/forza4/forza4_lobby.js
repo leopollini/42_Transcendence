@@ -1,7 +1,11 @@
 import { navigate } from "../../main.js";
 import { current_user } from "../modes.js";
 
-let matchPlayers = [];
+let invitedPlayers = [];
+let selectedPlayer;
+let numPlayersLabel;
+let numPlayersAccepted = 0;
+let totalPlayers = 2;
 
 export default function Forza4LobbyRoom() {
     return `
@@ -22,106 +26,88 @@ export default function Forza4LobbyRoom() {
             <span class="letter letter-13">m</span>
             <span class="letter letter-14">e</span>
         </h1>
-        <div id="f4LobbyRoom">
-            <div class="form" id="f4playerSearchForm">
-                <div>
-                    <h2 id="f4PlayerText">Search for opponent</h2> 
-                    <input type="text" id="f4PlayerSearch" class="form__field" placeholder="Search a player..." autocomplete="off">
-                    <button id="f4ToggleSearchUser" class="button-style">Search</button>
-                </div>
-                <div>
-                    <h2 id="f4PlayerSearchResult">Waiting for User...</h2>
-                    <button id="f4ToggleAddUser" class="button-style" disabled>Add</button>
-                </div>
-                <div>
-                    <h2 id="f4PlayerInviteResult">Waiting for Response...</h2>
-                    <button id="f4ToggleStartGame" class="button-style" disabled>Start Game</button>
-                </div>
+        <div class="lobbyContainer">
+            <div class="lobbyLabel">Online</div>
+            <div class="lobbyBox" id="f4OnlinePlayers">
+                <!-- Lista dei giocatori online -->
             </div>
-        </div>`;
+            <button id="f4InviteButton" class="button-style" disabled>Invite →</button>
+            <div id="f4NumPlayersLabel"></div>
+            <div class="lobbyBox" id="f4MatchPlayers">
+                <!-- Lista dei giocatori nel torneo -->
+            </div>
+        </div>
+        <button id="f4ToggleStartMatch" class="button-style" disabled>Start Match</button>`;
 }
+
 
 export function handleForza4Lobby() {
-    matchPlayers = [];
-    matchPlayers.push(current_user.display_name);
-    //console.log("match players = " +matchPlayers[0]);
-}
-
-function searchUser(username) {
-    const f4PlayerSearchResult = document.getElementById("f4PlayerSearchResult");
-    const f4ToggleAddUser = document.getElementById('f4ToggleAddUser');
+    const onlinePlayers = document.getElementById("f4OnlinePlayers");
+    const matchPlayers = document.getElementById("f4MatchPlayers");
+    const inviteButton = document.getElementById("f4InviteButton");
+    numPlayersLabel = document.getElementById("f4NumPlayersLabel");
     
-    if (!username)
-        return;
-    fetch("http://localhost:8008", {
-            method: "get_user",
-            body: JSON.stringify({ 
-                "params" : [{}] 
-            }) 
-        })
-        .then(response => response.json())
-        .then(data =>
-        {    
-            let user_name;
-            let find_user = data.user?.find(u => u.username === username);
-            if (!find_user)
-                find_user = data.guest?.find(g => g.username === username);
-            if (find_user) 
-            {
-                user_name = find_user;
-                if (user_name && matchPlayers.includes(user_name.username)) {
-                    f4PlayerSearchResult.style.color = "red";
-                    f4PlayerSearchResult.innerHTML = "Cannot add urself as opponent"
-                    f4ToggleAddUser.disabled = true;
-                }
-                else if (user_name) 
-                {
-                    f4PlayerSearchResult.style.color = "green";
-                    f4PlayerSearchResult.innerHTML = "User Found: " + user_name.username;
-                    f4ToggleAddUser.disabled = false;
-                }
-            }
-            else {
-                f4PlayerSearchResult.style.color = "red";
-                f4PlayerSearchResult.innerHTML = "User Not Found";
-                f4ToggleAddUser.disabled = true;
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching user data:", error);
-        });
-}
+    numPlayersAccepted = 0;
+    selectedPlayer = null;
+    numPlayersLabel.textContent = "0/" + totalPlayers;
+    
+    if (current_user) {
+        const creatorDiv = document.createElement("div");
+        creatorDiv.classList.add("player");
+        creatorDiv.textContent = current_user.display_name;
+        matchPlayers.appendChild(creatorDiv);
+        invitedPlayers.push(current_user.display_name);
+        numPlayersAccepted++;
+        numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
+    }
+    
+    const players = ["Alice", "Bob", "Charlie", "David"];
+    players.forEach(player => {
+        const div = document.createElement("div");
+        div.classList.add("player");
+        div.textContent = player;
+        div.onclick = () => {
+            document.querySelectorAll(".player").forEach(el => el.style.background = "");
+            div.style.background = "#007bff";
+            div.style.color = "white";
+            selectedPlayer = div;
+            inviteButton.disabled = false;
+        };
+        onlinePlayers.appendChild(div);
+    });
 
+    
+}
 
 export function addForza4LobbyPageHandlers() {
-    const backImageButton = document.getElementById('backImageButton');
-    const f4ToggleSearchUser = document.getElementById('f4ToggleSearchUser');
-    const f4PlayerSearch = document.getElementById('f4PlayerSearch');
-    const f4ToggleStartGame = document.getElementById('f4ToggleStartGame');
-    //const toggleAddUserRaw = document.getElementById('toggleAddUserRaw');
+    const toggleStartMatch = document.getElementById("f4ToggleStartMatch");
+    const matchPlayers = document.getElementById("f4MatchPlayers");
+    const inviteButton = document.getElementById("f4InviteButton");
+    f4InviteButton.onclick = () => {
+        if (selectedPlayer && numPlayersAccepted < totalPlayers) {
+            const newPlayer = selectedPlayer.cloneNode(true);
+            newPlayer.style.background = "";
+            newPlayer.style.color = "white";
+            newPlayer.onclick = null;
+            matchPlayers.appendChild(newPlayer);
+            numPlayersAccepted++;
+            numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
+            invitedPlayers.push(selectedPlayer.textContent);
+            selectedPlayer.remove();
+            selectedPlayer = null;
+            inviteButton.disabled = true;
+            console.log("invited: " + invitedPlayers);
+            if (numPlayersAccepted === totalPlayers)
+                toggleStartMatch.disabled = false;
+        }
+    };
+
+    toggleStartMatch?.addEventListener('click', () => {
+        navigate( "/forza4/game", "Forza 4 Game", invitedPlayers);
+    });
 
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");   
-        matchPlayers = [];     
+        invitedPlayers = [];     
     });
-
-    f4ToggleSearchUser?.addEventListener('click', () => {
-        //console.log("searching user...." +f4PlayerSearch.value);
-
-        searchUser(f4PlayerSearch.value);
-    });
-
-    f4ToggleAddUser?.addEventListener('click', () => {
-        const f4PlayerInviteResult = document.getElementById("f4PlayerInviteResult");
-
-        f4PlayerInviteResult.innerHTML = "Player Added: " + f4PlayerSearch.value;
-        f4ToggleStartGame.disabled = false;
-        matchPlayers.push(f4PlayerSearch.value)
-    });
-
-
-    f4ToggleStartGame?.addEventListener('click', () => {
-       navigate( "/forza4/game", "Forza 4 Game", matchPlayers);
-    });
-
 }
