@@ -59,21 +59,6 @@
     width: 100%;
 }
 
-#forza4StatsSection::-webkit-scrollbar {
-    width: 8px;
-}
-
-#forza4StatsSection::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, #09A09B, #04BFBF);
-    border-radius: 10px;
-    transition: background 0.3s ease-in-out;
-}
-
-#forza4StatsSection::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-}
-
 .stat-item {
     background: rgba(0, 0, 0, 0.15);
     padding: 1rem;
@@ -87,14 +72,12 @@
 
 .stat-item dt {
     color: #aaa;
-    font-family: 'Liberty', sans-serif;
     font-size: 1rem;
     margin-bottom: 0.5rem;
 }
 
 .stat-item dd {
     color: #fff;
-    font-family: 'Liberty', sans-serif;
     font-size: 1rem;
     font-weight: 400;
     margin: 0;
@@ -107,23 +90,7 @@
     padding-right: 10px;
 }
 
-#f4MatchDetailsContainer::-webkit-scrollbar {
-    width: 8px;
-}
-
-#f4MatchDetailsContainer::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, #09A09B, #04BFBF);
-    border-radius: 10px;
-    transition: background 0.3s ease-in-out;
-}
-
-#f4MatchDetailsContainer::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-}
-
 .match-card {
-    font-family: "Liberty", sans-serif;
     background-color: rgba(9, 160, 155, 0.1);
     box-shadow: 0 0 12px rgba(9, 160, 155, 0.3);
     border-radius: 13px;
@@ -274,7 +241,6 @@
 }
 
 .gamestats-text {
-    font-family: "Liberty", sans-serif;
     font-size: 18px;
     text-align: center;
     color: #122322;
@@ -287,7 +253,6 @@
 .gamestats-checkbox:checked + .gamestats-text {
     color: #ffffff;
     transform: scale(1.1);
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.5), 0 0 1px rgba(255, 255, 255, 0.3), 0 0 1px #ffffff;
 }
 
 .gamestats-label:hover {
@@ -297,7 +262,6 @@
 
 .gamestats-label:active {
     color: #09a09b;
-    text-shadow: 0 0 5px rgba(9, 160, 155, 0.5), 0 0 10px rgba(9, 160, 155, 0.3), 0 0 15px #014C4A;
     transform: translateY(0);
     box-shadow: 0 4px 8px rgba(9, 160, 155, 0.3);
 }

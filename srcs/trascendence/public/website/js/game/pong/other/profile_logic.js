@@ -1,4 +1,5 @@
 import { escapeHTML, isValidImageExtension, isValidImageData} from "../../../login/user.js";
+import { showInfoModal } from "../../../modal.js";
 
 export function savebio(me, yourDataSection)
 {
@@ -59,15 +60,15 @@ export function saveimage(me, yourDataSection)
         {
             if (!file.type.startsWith('image/'))
             {
-                alert("Error: Please select a valid image file.\n");
+                showInfoModal("Error: Please select a valid image file.\n", () => {});
                 return;
             }
             if (!isValidImageExtension(file.name)) {
-                alert("Error: Invalid image file extension.\n");
+                showInfoModal("Error: Invalid image file extension.\n", () => {});
                 return;
             }
             if (file.size > 5 * 1024 * 1024) {
-                alert("Error: Image file is too large. Maximum size is 5MB.\n");
+                showInfoModal("Error: Image file is too large. Maximum size is 5MB.\n", () => {});
                 return;
             }
             const reader = new FileReader();
@@ -79,7 +80,7 @@ export function saveimage(me, yourDataSection)
                     profileImage.src = newImage;
                 }
                 else
-                    alert("Error: Invalid image data.");
+                showInfoModal("Error: Invalid image data.", () => {});
                 me.image = newImage;
                 profileImage.src = newImage;
             };
@@ -87,7 +88,7 @@ export function saveimage(me, yourDataSection)
         }
         else
         {
-            alert("Error: No file selected.");
+            showInfoModal("Error: No file selected.", () => {});
             return;
         }
     });

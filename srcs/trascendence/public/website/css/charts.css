@@ -28,11 +28,6 @@
     min-height: 200px;
 }
 
-canvas {
-    width: 100% !important;
-    height: 100% !important;
-}
-
 h2 {
     color: white;
     text-align: center;

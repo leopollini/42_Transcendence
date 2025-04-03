@@ -2,6 +2,7 @@ import { navigate } from '../main.js';
 import {profile, isValidImageUrl, escapeHTML} from "../login/user.js";
 import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
+import { showInfoModal } from '../modal.js';
 
 export default function Modes()
 {
@@ -144,7 +145,7 @@ export function update_image(image)
             if (!isValidImageUrl(image))
                 avatarImage.src = image;
             else
-                alert("ERROR: Invalid image URL.");
+                showInfoModal("ERROR: Invalid image URL.", () => {});
             clearInterval(checkImageInterval);
         }
     }, 100);

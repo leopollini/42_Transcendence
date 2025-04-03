@@ -1,6 +1,7 @@
 import { navigate } from "../../main.js";
 import { current_user } from "../modes.js";
 import { escapeHTML } from "../../login/user.js";
+import { sendMessage } from "../live-chat/socketHandler.js";
 let matchPlayers = [];
 
 export default function Forza4LobbyRoom() {
@@ -117,6 +118,13 @@ export function addForza4LobbyPageHandlers() {
         f4PlayerInviteResult.innerHTML = "Player Added: " + f4PlayerSearch.value;
         f4ToggleStartGame.disabled = false;
         matchPlayers.push(f4PlayerSearch.value)
+
+        const matchRequest = {
+            type: "match_request",
+            to: f4PlayerSearch.value, // "userB"
+            from: current_user.username // "userA"
+        };
+        sendMessage(matchRequest);
     });
 
 

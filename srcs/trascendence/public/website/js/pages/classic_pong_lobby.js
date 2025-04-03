@@ -1,6 +1,8 @@
 import { navigate } from "../main.js";
 import { current_user } from "./modes.js";
 import { escapeHTML } from "../login/user.js";
+import { showInfoModal } from "../modal.js";
+
 let matchPlayers = [];
 
 export default function ClassicPongLobbyRoom() {
@@ -75,7 +77,7 @@ function searchUser(username) {
             if (!data || (!data.user && !data.guest)) 
             {
                 nullify_user();
-                alert("ERROR: no users found...");
+                showInfoModal("ERROR: no users found...", () => {});
                 navigate("/", "home");
                 return;
             }

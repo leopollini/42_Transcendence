@@ -3,6 +3,7 @@ import { userName } from "./user_data.js";
 import { formatTime } from "../game/pong/other/timer.js";
 import { showCharts } from "./tournament/charts.js";
 import { current_user, change_name, update_image } from "./modes.js";
+import { showInfoModal } from "../modal.js";
 
 let wins = 0;
 let losses = 0;
@@ -201,7 +202,7 @@ export async function forza4ShowUserStatistics() {
     const stats = await forza4CalculateUserStatistics();
 
     if (!stats) {
-        alert("No statistics available for this player.");
+        showInfoModal("No statistics available for this player.", () => {});
         return;
     }
 

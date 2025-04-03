@@ -65,7 +65,7 @@ export default function LiveChat()
                 </header>
                 <div class="messages-container" id="messages"></div>
                 <div class="input-area">
-                    <input type="text" class="message-input" id="messageInput" placeholder="Type your message...">
+                    <input type="text" class="message-input" id="messageInput" placeholder="Type your message..." autocomplete="off">
                     <button class="send-button" id="sendButton">Send</button>
                 </div>
             </div>

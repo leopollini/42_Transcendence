@@ -1,5 +1,6 @@
 import { navigate } from "../../main.js";
 import { current_user } from "../modes.js";
+import { showInfoModal } from "../../modal.js";
 
 export default function Roundrobin() {
     return `
@@ -92,7 +93,7 @@ export function setupRoundRobinPlayers() {
             }
         } else {
             console.error("No radio button selected");
-            alert('Please select the number of players.');
+            showInfoModal('Please select the number of players.', () => {});
         }
     });
 }

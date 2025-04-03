@@ -1,5 +1,7 @@
 import { nullify_user, updateProfileUI} from "../pages/modes.js";
 import { navigate } from "../main.js";
+import { showInfoModal } from "../modal.js";
+
 export class user {
     constructor(image, name, login_name, email, bio) {
         this.image = image;
@@ -79,7 +81,7 @@ export function restore_user()
         if (!data || (!data.user && !data.guest)) 
         {
             nullify_user();
-            alert("ERROR: no users found...");
+            showInfoModal("ERROR: no users found...", () => {});
             navigate("/", "home");
             return;
         }
@@ -112,7 +114,7 @@ export function restore_user()
         else 
         {
             nullify_user();
-            alert("ERROR: finding logged user...");
+            showInfoModal("ERROR: finding logged user...", () => {});
             navigate("/", "home");
         }
     });

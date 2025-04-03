@@ -1,6 +1,7 @@
 import { current_user, updateUserProfile} from "../modes.js";
 import { profile, profiles} from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
+import { showInfoModal } from "../../modal.js";
 
 export default function Profile() {
   return `
@@ -103,7 +104,7 @@ function saveProfile(infoContainer) {
       //console.log("(UPDATE_USER)\ndata update user profile = ", data);
     })
   }
-  alert(saving);
+  showInfoModal(saving, () => {});
   updateUserProfile(current_user);
   history.back();
 }

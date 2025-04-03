@@ -2,29 +2,34 @@ import { navigate } from "../main.js";
 import { user, profile, eraseCookie} from "./user.js";
 import { update_image, change_name, updateUserProfile, nullify_user } from "../pages/modes.js";
 import { saveCookie, escapeHTML} from "./user.js";
+import { showInputModal, showInfoModal } from "../modal.js"
 
-export function guest_login()
-{
-    let name = prompt("Enter your guest name:");
-    if (!name) {
-        alert('No name. Please try again');
-        return ;
-    }
-    name = escapeHTML(name);
-    if (!name) {
-        alert('Name cannot be just spaces');
+export function guest_login() {
+    showInputModal("Inserisci il tuo nickname", (name) => {
+      if (!name.trim()) {
+        showInfoModal("No name. Please try again.", guest_login);
         return;
-    }
-    if (name.length < 4) {
-        alert('Name too short.');
-        return ;
-    }
-    if (name.length >= 15)
-    {
-        alert('Name too long.');
-        return ;
-    }
-    addGuest(name);
+      }
+      
+      name = escapeHTML(name);
+      
+      if (!name.trim()) {
+        showInfoModal("Name cannot be just spaces.", guest_login);
+        return;
+      }
+      
+      if (name.length < 4) {
+        showInfoModal("Name too short.", guest_login);
+        return;
+      }
+      
+      if (name.length >= 15) {
+        showInfoModal("Name too long.", guest_login);
+        return;
+      }
+      
+      addGuest(name);
+    });
 }
 
 function addGuest(name) {
@@ -62,7 +67,7 @@ function update_guest(curr_guest)
             localStorage.setItem("session opened", 0);
             eraseCookie("user_token");
             nullify_user();
-            alert("ERROR: Name already taken, try a different one");
+            showInfoModal("Name already taken, try a different one", () => {});
             return;
         }
         if (!data.token)

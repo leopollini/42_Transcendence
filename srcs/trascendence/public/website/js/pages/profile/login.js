@@ -2,6 +2,8 @@ import { guest_login } from "../../login/guest_logic.js";
 import { performLogin, popupOpened } from "../../login/login_logic.js";
 import { eraseCookie } from "../../login/user.js";
 import { nullify_user } from "../modes.js";
+import { showInfoModal } from "../../modal.js";
+
 export default function Login() {
     return `
         <h1 class="text">
@@ -48,19 +50,19 @@ function handle_access(loginButton, guestButton)
 {
     loginButton.addEventListener("click", () => {
         if (popupOpened === true)
-            alert("popup already open finish authentication before continuing")
+            showInfoModal("popup already open finish authentication before continuing", () => {});
         else if (sessionStorage.getItem("already in") === '0'
         && localStorage.getItem("session opened") === '1')
-            alert("You've already logged in!");
+            showInfoModal("You've already logged in!", () => {});
         else
             performLogin();
     });
     guestButton.addEventListener("click", () => {
         if (popupOpened === true)
-            alert("Authenticating in progress....\nPlease wait.");
+            showInfoModal("Authenticating in progress....\nPlease wait.", () => {});
         else if (sessionStorage.getItem("already in") === '0'
         && localStorage.getItem("session opened") === '1')
-            alert("You've already logged in!");
+            showInfoModal("You've already logged in!", () => {});
         else
             guest_login();
     });
