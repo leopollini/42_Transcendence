@@ -77,7 +77,7 @@ function initSocket(username, chatAppInstance) {
                 date: new Date().toISOString(),
                 from: 'system',
                 to: chatId,
-                content: `Private chat with ${msg.data.from.charAt(0).toUpperCase() + msg.data.from.slice(1)} started.`
+                content: `Private chat with ${msg.data.from.charAt(0) + msg.data.from.slice(1)} started.`
             });
         }        
         else if (msg.type === "system") {
