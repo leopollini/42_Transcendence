@@ -1,6 +1,8 @@
 import { eraseCookie } from "../../../login/user.js";
 import { navigate, current_user, nullify_user} from "../../../main.js";
 import { free_users } from "../../../security/security.js";
+import { showInfoModal } from "../../../modal.js";
+
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
         history, logout)
@@ -16,7 +18,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     tournamentButton?.addEventListener('click', () => {
         if (current_user.type === "guest")
         {
-            alert("You must be logged to use this feature!");
+            showInfoModal("You must be logged to use this feature!", () => {}); showInfoModal("Select an opponent token!", () => {});
             return;
         }
         navigate("/tournament", "Modalità Torneo");
@@ -54,7 +56,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         history.addEventListener("click", () => {
         if (current_user.type == "guest")
             {
-                alert("You must be logged to use this feature!");
+                showInfoModal("You must be logged to use this feature!", () => {});
                 return;
             }
             navigate("/userstats", "Game User Statistics");

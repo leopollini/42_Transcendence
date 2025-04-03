@@ -1,6 +1,7 @@
 import { escapeHTML, free_users} from '../security/security.js';
 import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
+import { showInfoModal } from '../modal.js';
 import { nullify_user } from '../main.js';
 import { eraseCookie } from '../login/user.js';
 
@@ -102,7 +103,10 @@ export function update_image(image)
         const avatarImage = document.getElementById('avatarImage');
         if (avatarImage)
         {
-            avatarImage.src = image;
+            if (!isValidImageUrl(image))
+                avatarImage.src = image;
+            else
+                showInfoModal("ERROR: Invalid image URL.", () => {});
             clearInterval(checkImageInterval);
         }
     }, 100);

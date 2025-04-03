@@ -100,13 +100,17 @@ module BetterPG
       reslst
     end
 
+    def select_specific(cols, key, val)
+      (better_return exec("SELECT #{cols.join ' '} FROM #{@name} WHERE #{key} = '#{val}'"))[0]
+    end
+
     # perform select for data fetching
     def select(cols = [], keys = [], fullkeys = [], logic = 'AND')
       raise 'Bad logic identifier' unless %w[AND OR].include? logic
 
       req = []
       begin
-        req = ['SELECT ' + @columns.join(', ') + ' FROM', @name]
+        req = ['SELECT ' + (@columns - ['token']).join(', ') + ' FROM', @name]
         t = []
         keys.each_with_index do |k, i|
           t.append cols[i] + "='" + k.to_s + "'" if i < cols.count && cols[i] && k && !k.to_s.empty?

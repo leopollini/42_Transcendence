@@ -2,28 +2,33 @@ import { navigate, update_user } from "../main.js";
 import { user, profile, eraseCookie, saveCookie} from "./user.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { escapeHTML } from "../security/security.js";
-export function guest_login()
-{
-    let name = prompt("Enter your guest name:");
-    if (!name) {
-        alert('No name. Please try again');
-        return ;
-    }
-    name = escapeHTML(name);
-    if (!name) {
-        alert('Name cannot be just spaces');
+import { showInputModal, showInfoModal } from "../modal.js"
+export function guest_login() {
+    showInputModal("Inserisci il tuo nickname", (name) => {
+      if (!name) {
+        showInfoModal("No name. Please try again.", guest_login);
         return;
-    }
-    if (name.length < 4) {
-        alert('Name too short.');
-        return ;
-    }
-    if (name.length >= 15)
-    {
-        alert('Name too long.');
-        return ;
-    }
-    addGuest(name);
+      }
+      
+      name = escapeHTML(name);
+      
+      if (!name) {
+        showInfoModal("Name cannot be just spaces.", guest_login);
+        return;
+      }
+      
+      if (name.length < 4) {
+        showInfoModal("Name too short.", guest_login);
+        return;
+      }
+      
+      if (name.length >= 15) {
+        showInfoModal("Name too long.", guest_login);
+        return;
+      }
+      
+      addGuest(name);
+    });
 }
 
 function addGuest(name) {

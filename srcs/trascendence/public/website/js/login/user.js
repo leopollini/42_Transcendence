@@ -1,5 +1,7 @@
 import { navigate, nullify_user } from "../main.js";
 import {updateProfileUI} from "../pages/modes.js";
+import { showInfoModal } from "../modal.js";
+
 export class user {
     constructor(image, name, login_name, email, bio) {
         this.image = image;

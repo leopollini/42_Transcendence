@@ -1,4 +1,5 @@
 import { escapeHTML, validateUploadedImage} from "../../../security/security.js";
+import { showInfoModal } from "../../../modal.js";
 export function savebio(me, yourDataSection)
 {
     const bioInput = yourDataSection.querySelector('#bioInput');
@@ -77,6 +78,9 @@ export async function saveimage(me, yourDataSection) {
             }
         }
         else
-            alert("Error: No file selected.");
+        {
+            showInfoModal("Error: No file selected.", () => {});
+            return;
+        }
     });
 }

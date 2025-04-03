@@ -20,10 +20,13 @@ import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
 import { eraseCookie, readCookie, restore_user } from "./login/user.js";
+import { showInfoModal } from "./modal.js";
+
 import { free_users } from "./security/security.js";
 let buttonTitle;
 let winner;
 let players;
+
 // Mappa delle rotte
 const routes = {
     "/": Login,
@@ -149,7 +152,7 @@ const loadContent = async () => {
                 break;
             case "/tournament":
                 if (current_user.type === "guest")
-                    alert("You must be logged to use this feature!");
+                    showInfoModal("You must be logged to use this feature!", () => {});
                 else
                     addTournamentPageHandlers();
                 break;
@@ -307,7 +310,7 @@ function continue_error_check(path)
             if (sessionStorage.getItem('game ended') === 'true')
             {
                 sessionStorage.removeItem("game ended");
-                alert("ERROR:(Invalid operation) going back to menu...");
+                showInfoModal("ERROR:(Invalid operation) going back to menu...", () => {});
                 navigate("/modes", "Return to Game Mode");
                 return (1);
             }
@@ -319,7 +322,7 @@ function continue_error_check(path)
         if ((localStorage.getItem('session opened') === '1' && sessionStorage.getItem('already in') === '0') ||
         (sessionStorage.getItem('already in') === '0' && localStorage.getItem('session opened') === '0'))
         {
-            alert("ERROR: accessing unauthorized page...");
+            showInfoModal("ERROR: accessing unauthorized page...", () => {});
             navigate("/", "home");
             return (1);
         }

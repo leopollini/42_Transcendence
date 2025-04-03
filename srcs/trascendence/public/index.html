@@ -3,9 +3,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link
-            href="https://fonts.googleapis.com/css2?family=Notable&display=swap"
-            rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Notable&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
         <title>Project FT_Transcendence</title>
         <link rel="stylesheet" href="/website/css/main.css">
         <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -16,6 +15,40 @@
         </main>
         <div id="chatApp"></div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.4/purify.min.js"></script>
+
+        <!-- Modal di conferma -->
+        <div class="modal-overlay" id="confirmModal">
+            <div class="modal">
+                <h2 id="confirmMessage">Messaggio</h2>
+                <div class="modal-actions">
+                    <button class="accept" id="confirmAccept">Accept</button>
+                    <button class="reject" id="confirmReject">Reject</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal informativo -->
+        <div class="modal-overlay" id="infoModal">
+            <div class="modal">
+                <h2 id="infoMessage">Messaggio</h2>
+                <div class="modal-actions">
+                    <button class="accept" id="infoOk">Ok</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal per inserire il nickname -->
+        <div class="modal-overlay" id="inputModal">
+            <div class="modal">
+                <h2 id="inputModalTitle">Choose your nickname</h2>
+                <div class="modal-content">
+                    <input type="text" id="nicknameInput" placeholder="Your nickname is..." />
+                </div>
+                <div class="modal-actions">
+                    <button class="accept" id="inputConfirm">Confirm</button>
+                </div>
+            </div>
+        </div>  
         <script type="module" src="/website/js/main.js"></script>
     </body>
 </html>

@@ -17,5 +17,3 @@ openssl x509 -in ./ssl_certs/server.crt -noout -text
 
 echo "==============================="
 echo "Script completato. Avvio server..."
-
-bundle exec ruby server.rb

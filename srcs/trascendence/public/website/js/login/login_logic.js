@@ -1,8 +1,18 @@
+import { navigate } from "../main.js";
+import { update_image, change_name, updateUserProfile} from "../pages/modes.js";
+import { profile} from "./user.js";
+import { saveCookie } from "./user.js";
+import { showInfoModal } from "../modal.js";
 
-import { navigate, update_user } from "../main.js";
-import { update_image, change_name} from "../pages/modes.js";
+export let popupOpened = false;
 
-function popupHandling(popup)
+export function pop_false()
+{
+    popupOpened = false;
+    localStorage.setItem('popup_opened', 'false');
+}
+
+function popupHandling(popup, data)
 {
     localStorage.setItem("popup opened", true);
     let log_succ = false
@@ -23,12 +33,12 @@ function popupHandling(popup)
                 get_data();
                 localStorage.removeItem("popup opened");
                 navigate("/modes", "Modalità di gioco");
-                alert("You are logged in successfully.\nTo change user, close this tab first!");
+                showInfoModal("You are logged in successfully.\nTo change user, close this tab first!", () => {});
             }
             else if (log_succ === false)
                 localStorage.removeItem("popup opened");
             else
-                alert("Error: Unexpected popup closure, authentication failed.");
+                showInfoModal("Error: Unexpected popup closure, authentication failed.", () => {});
         }
     }, 10);
 }

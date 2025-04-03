@@ -1,6 +1,7 @@
 import { profile} from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
-import { navigate, update_user, current_user} from "../../main.js";
+import { showInfoModal } from "../../modal.js";
+import { navigate, current_user} from "../../main.js";
 
 export default function Profile() {
   return `
@@ -136,8 +137,8 @@ function saveProfile(infoContainer) {
     else
       updateLogin(current_user);
   }
-  alert(saving);
-  update_user(current_user);
+  showInfoModal(saving, () => {});
+  updateUserProfile(current_user);
   history.back();
 }
 

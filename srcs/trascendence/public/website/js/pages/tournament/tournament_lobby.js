@@ -1,5 +1,6 @@
 import { navigate, current_user } from "../../main.js";
 import { escapeHTML } from "../../security/security.js";
+import { showInfoModal } from "../../modal.js";
 let invitedPlayers = [];
 let tournament;
 
@@ -129,8 +130,8 @@ function searchUser(username) {
         {
             if (!data || (!data.user && !data.guest)) 
             {
-                current_user = null;
-                alert("ERROR: no users found...");
+                nullify_user();
+                showInfoModal("ERROR: no users found...", () => {});
                 navigate("/", "home");
                 return;
             }

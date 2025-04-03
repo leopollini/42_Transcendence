@@ -21,9 +21,9 @@ Dir['/var/common/*.rb'].each { |file| require file }
 
 require_relative 'GuestsList'
 
-DEFAULT_ERROR_RES = { 'status' => 'user_manager: failed', 'success' => 'false' }
+DEFAULT_ERROR_RES = { 'service' => 'user_manager', 'status' => 'failed', 'success' => 'false' }
 DEFAULT_SUCCESS_RES = { 'status' => 'success', 'success' => 'true' }
-DEFAULT_MISSING_PARAM = { 'status' => 'user_manager: missing mandatory data', 'success' => 'false' }
+DEFAULT_MISSING_PARAM = { 'service' => 'user_manager', 'status' => 'missing mandatory data', 'success' => 'false' }
 
 $stdout.sync = true
 SERVICE_NAME = 'user_manager'
@@ -136,7 +136,7 @@ def login_user(client, obj)
   return {'status' => 'user_manager: bad request', 'success' => 'false'} unless r.nil?
   return add_user(client, obj) if obj['do_create']
   
-  {'status' => 'user_manager: user not found', 'success' => 'false'}
+  {'service' => 'user_manager', 'status' => 'user not found', 'success' => 'false'}
 end
 
 def logout_user(client, obj)
@@ -215,14 +215,14 @@ def update_user(_client, obj = nil)
   res = DEFAULT_ERROR_RES.clone
   puts "params: #{obj}".yellow
   return res if !obj || !(params = obj['new_params']) || !(lname = obj['display_name'])
-  return { 'status' => 'user_manager: Invalid login name change request', 'success' => 'false' } if params.include? 'display_name'
+  return { 'service' => 'user_manager', 'status' => 'Invalid login name change request', 'success' => 'false' } if params.include? 'display_name'
 
   usr = begin
     (LOGIN.select ['display_name'], ['?'], [lname])[0]
   rescue StandardError
     r
   end
-  return { 'status' => 'user_manager: display_name not found', 'success' => 'false' } if r || usr.nil?
+  return { 'service' => 'user_manager', 'status' => 'display_name not found', 'success' => 'false' } if r || usr.nil?
 
   cols = []
   keys = []
@@ -247,12 +247,13 @@ def drop_users(_client, _obj = nil)
 end
 
 def user_manager(client, _server)
+  puts "user manager called"
   res = DEFAULT_ERROR_RES.clone
   t = select [client], [], [], 20 # waits for client, a few seconds
   return if t.nil? || t[0].empty? || client.closed?
 
   msg = client.read_nonblock Ports::MAX_MSG_LEN
-  bobj = JSON.parse(msg)
+  bobj = JSON.parse msg
   # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
   begin
     res = case bobj['method'].to_s
@@ -265,20 +266,21 @@ def user_manager(client, _server)
     when 'drop_users'
       drop_users client, bobj
     when 'drop_guests'
+      puts "dropping all guests"
       exit
     when 'login_user'
       login_user client, bobj
     when 'logout_user'
       logout_user client, bobj
     else
-      {'status' => 'user_manager: unknown method: ' + bobj['method'].to_s, 'success' => 'false'}
+      {'service' => 'user_manager', 'status' => "unknown method: #{bobj['method'].to_s}", 'success' => 'false'}
     end
   rescue => r
     puts "Errore: #{r.message}".red
     puts "Backtrace: #{r.backtrace.join("\n")}".red
     return {'status' => "user_manager: error: #{r.to_s}", 'success' => 'false'}.to_json
   end
-
+  puts res
   client.puts res.to_json
 end
 

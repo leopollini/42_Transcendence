@@ -15,6 +15,8 @@ class ChatApp {
         this.username = null;
         this.blockedUsers = new Set();
         this.disabledChats = {};
+        this.userColors = new Map(); // Mappa per tenere traccia dei colori assegnati agli utenti
+        this.assignedColors = new Set();
         this.initialize();
     }
 
@@ -142,11 +144,56 @@ class ChatApp {
             return `<div class="message system"><div class="text">${msg.content}</div></div>`;
         } else {
             const className = msg.from === this.username ? 'self' : 'other';
+            const senderColor = this.getUserColor(msg.from); // Ora `getUserColor` funziona correttamente
+    
+            // Ottieni l'orario corrente in formato 24h
+            const time = new Date();
+            const hours = time.getHours().toString().padStart(2, '0');
+            const minutes = time.getMinutes().toString().padStart(2, '0');
+            const formattedTime = `${hours}:${minutes}`;
+    
             return `<div class="message ${className}">
-                        <div class="sender">${msg.from.charAt(0).toUpperCase() + msg.from.slice(1)}:</div>
+                        <div class="sender" style="color: ${senderColor};">
+                            ${msg.from.charAt(0).toUpperCase() + msg.from.slice(1)}
+                        </div>
                         <div class="text">${msg.content}</div>
+                        <div class="time">${formattedTime}</div>
                     </div>`;
         }
+    }    
+
+    getUserColor(username) {
+        if (this.userColors.has(username)) {
+            return this.userColors.get(username);
+        }
+
+        let color;
+        do {
+            color = this.generateRandomColor();
+        } while (this.assignedColors.has(color));
+
+        this.userColors.set(username, color);
+        this.assignedColors.add(color);
+        return color;
+    }
+
+    generateRandomColor() {
+        let color;
+        do {
+            const hue = Math.floor(Math.random() * 360);
+            color = `hsl(${hue}, 70%, 50%)`;
+        } while (this.isForbiddenColor(color));
+        return color;
+    }
+
+    isForbiddenColor(color) {
+        const forbiddenColors = ['rgb(255, 255, 255)', 'rgb(72, 31, 31)'];
+        const div = document.createElement('div');
+        div.style.color = color;
+        document.body.appendChild(div);
+        const computedColor = window.getComputedStyle(div).color;
+        document.body.removeChild(div);
+        return forbiddenColors.includes(computedColor);
     }
 
     // IMPLEMENTAZIONE DEL BLOCK USER
@@ -583,7 +630,7 @@ class ChatApp {
         const profileStatusElement = document.getElementById('profileStatus');
         document.getElementById('profileName').textContent =
             this.selectedUser.charAt(0).toUpperCase() + this.selectedUser.slice(1);
-
+    
         if (this.selectedUser === this.username) {
             profileStatusElement.style.display = 'none';
         } else {
