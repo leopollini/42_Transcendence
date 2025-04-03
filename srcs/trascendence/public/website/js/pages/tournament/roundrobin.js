@@ -1,5 +1,4 @@
 import { navigate } from "../../main.js";
-import { current_user } from "../modes.js";
 import { showInfoModal } from "../../modal.js";
 
 export default function Roundrobin() {

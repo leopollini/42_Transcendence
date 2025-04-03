@@ -1,4 +1,3 @@
-
 require 'json'
 require 'pg'
 require 'colorize'
@@ -51,5 +50,17 @@ module Other_logic
     #   response.data['cookies'] << WEBrick::Cookie.new("logged_token", token)
     # end
     puts response
+    data = JSON.parse(response)
+    if data["token"]
+      token = data["token"]
+      
+      cookie = WEBrick::Cookie.new("logged_token", token)
+      
+      cookie.secure = true 
+      cookie.http_only = true
+      cookie.same_site = 'Strict'
+
+      res.cookies << cookie
+    end
   end
 end

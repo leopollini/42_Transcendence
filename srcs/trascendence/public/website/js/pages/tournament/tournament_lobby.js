@@ -1,8 +1,6 @@
-import { escapeHTML } from "../../login/user.js";
-import { navigate } from "../../main.js";
-import { current_user} from "../modes.js";
+import { navigate, current_user } from "../../main.js";
+import { escapeHTML } from "../../security/security.js";
 import { showInfoModal } from "../../modal.js";
-
 let invitedPlayers = [];
 let tournament;
 
@@ -85,7 +83,7 @@ function updateCanvas() {
 
     // Aggiorniamo anche il contatore dei giocatori
     const numPlayersLabel = document.getElementById("numPlayers");
-    numPlayersLabel.innerHTML = `${invitedPlayers.length}/${canvas.dataset.totalPlayers}`;
+    numPlayersLabel.textContent = `${invitedPlayers.length}/${canvas.dataset.totalPlayers}`;
 
     //console.log(canvas.dataset.totalPlayers);
     //console.log("length: " +invitedPlayers.length);
@@ -145,12 +143,12 @@ function searchUser(username) {
             {
                 user_name = find_user;
                 if (user_name) {
-                    playerSearchResult.innerHTML = "User Found: " + user_name.username;
+                    playerSearchResult.textContent = "User Found: " + user_name.username;
                     toggleInviteUser.disabled = false;
                 }
             }
             else {
-                playerSearchResult.innerHTML = "User Not Found";
+                playerSearchResult.textContent = "User Not Found";
                 toggleInviteUser.disabled = true;
             }
         })

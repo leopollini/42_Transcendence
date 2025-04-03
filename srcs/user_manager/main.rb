@@ -3,6 +3,19 @@
 # require 'timeout'
 require 'json'
 require 'digest'
+require 'openssl'
+require 'base64'
+require 'dotenv'
+require 'securerandom'
+require 'colorize'
+
+Dotenv.load
+
+# load ((File.file? '/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')
+
+# load ((File.file? '/var/common/RequestUnpacker.rb') ? '/var/common/RequestUnpacker.rb' : '../common_tools/tools/RequestUnpacker.rb')
+
+# load ((File.file? '/var/common/BetterPG.rb') ? '/var/common/BetterPG.rb' : '../common_tools/tools/BetterPG.rb')
 
 Dir['/var/common/*.rb'].each { |file| require file }
 
@@ -24,77 +37,123 @@ LOGIN = BetterPG::SimplePG.new 'users',
 GUEST = GuestsList.new
 # REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image]
 
+def decrypt_token(encrypted_token)
+  decoded = Base64.strict_decode64(encrypted_token)
+  iv = decoded[0..15]
+  encrypted_data = decoded[16..-1]
+
+  decipher = OpenSSL::Cipher.new('AES-256-CBC')
+  decipher.decrypt
+  decipher.key = ENV['ENCRYPTION_KEY'].to_s.ljust(32, "\0")[0, 32]
+  decipher.iv = iv
+
+  decrypted_token = decipher.update(encrypted_data) + decipher.final
+  return decrypted_token
+end
+
+def encrypt_token(token)
+  token = token.to_s.force_encoding('BINARY')
+
+  cipher = OpenSSL::Cipher.new('AES-256-CBC')
+  cipher.encrypt
+
+  key = ENV['ENCRYPTION_KEY'].to_s.ljust(32, "\0")[0, 32]
+  if key.nil? || key.empty?
+    raise "Error: ENCRYPTION_KEY is missing or empty"
+    return nil
+  end
+  cipher.key = key
+  
+  iv = cipher.random_iv
+
+  if iv.nil? || iv.bytesize != 16
+    raise "Errore: IV non valido!"
+  end
+  
+  encrypted = cipher.update(token) + cipher.final
+
+  encrypted_token = Base64.strict_encode64(iv + encrypted)
+  return encrypted_token
+end
 
 def add_user(_client, obj = nil)
-  puts 'add_user called' if DEBUG_MODE
-
-  data = obj['data']
-
-  return GUEST.add_guest data['username'] if obj['login_as_guest'] == 'true'   # create a guest
-
-  return DEFAULT_MISSING_PARAM.clone if data['realname'].nil?
-
-  if (LOGIN.select ['realname'], [data['realname']])[0]
-    puts "user already present (#{data['realname']})"
+  puts 'add_user called'.green if DEBUG_MODE
+  
+  return DEFAULT_ERROR_RES.clone unless obj && obj.is_a?(Hash)
+  
+  data = obj
+  
+  return GUEST.add_guest(data['username']) if obj['login_as_guest']
+  
+  return DEFAULT_MISSING_PARAM.clone unless data['realname'].is_a?(String) && !data['realname'].empty?
+  
+  existing_user = LOGIN.select(['realname'], ['realname = ?'], [data['realname']]).first
+  if existing_user
+    puts "User already present (#{data['realname']})".yellow
     return { 'status' => 'user_manager: user with same login_name already in database', 'success' => 'false' }
   end
-
+  
   begin
-    max = (LOGIN.exec 'SELECT MAX(id) FROM users')[0]
+    max = LOGIN.exec('SELECT MAX(id) AS max FROM users', []).first || { 'max' => 0 }
   rescue StandardError
     max = { 'max' => 0 }
   end
-
+  
   fields = LOGIN.getColumns
   values = {}
-
+  
   fields.each do |f|
-    values[f] = data[f] if data[f]
+    values[f] = data[f].to_s.strip if data[f].is_a?(String)
   end
-  values['id'] = max['max'].to_i
-  values['created'] = Time.now.iso8601
-  values['token'] = Digest::SHA256.hexdigest values['realname']
-  puts "inserting new user: #{values}"
-  LOGIN.addValues values.values, values.keys
-  puts "Success! User token: #{values['token']}"
-  {'status' => 'success', 'success' => 'true', 'token' => values['token']}
+  
+  values['id'] = max['max'].to_i + 1
+  values['token'] = Digest::SHA256.hexdigest(values['realname'])
+  
+  LOGIN.addValues(values.values, values.keys, ['?'] * values.keys.size)
+  
+  puts "Success! User token: #{values['token']}".green
+  { 'status' => 'success', 'success' => 'true', 'token' => values['token'] }
 end
 
 def login_user(client, obj)
-  puts "login_user called"
-  puts "login info: #{obj.to_s}"
+  puts "login_user called".green
   data = obj['data']
 
-  return GUEST.add_guest data['username'] if obj['login_as_guest'] == 'true'   # create a guest
+  return GUEST.add_guest data if obj['login_as_guest'] == 'true'   # create a guest
 
-  if token = obj['token']
-    if usr = (LOGIN.select ['token'], [data['token']])[0]
+  if obj['token'].to_s == 'token'
+    if usr = (LOGIN.select ['token'], ['token = ?'], [obj['token']])[0]
       return usr.merge({'status' => 'success', 'success' => 'true'})
     end
-    return GUEST.login_with_token(token)
+    return GUEST.login_with_token(obj['token'])
   end
 
-  puts "looking in databaase for #{data['realname']}"
-  if usr = (LOGIN.select ['realname'], [data['realname']])[0]
-    # LOGIN.valueManipulation 'realname', data['realname'], 'loged_in = true'
-    return usr.merge({'status' => 'success', 'success' => 'true', 'token' => (LOGIN.select_specific(['token'], 'realname', data['realname']))['token']})
-  end
-  puts "#{data['realname']} not found in database"
-  return {'service' => 'user_manager', 'status' => 'bad request', 'success' => 'false'} if r
+  r = nil
+  if (usr = LOGIN.select ['realname'], ['realname = ?'], [data['realname']])[0]
+    LOGIN.valueManipulation 'realname', data['realname'], ['?'] => [data['realname']]
+    return usr.merge({'status' => 'success', 'success' => 'true'})
+  end rescue r
+  return {'status' => 'user_manager: bad request', 'success' => 'false'} unless r.nil?
   return add_user(client, obj) if obj['do_create']
   
   {'service' => 'user_manager', 'status' => 'user not found', 'success' => 'false'}
 end
 
 def logout_user(client, obj)
-  return GUEST.del_guest obj['username'] if obj['username']
-  return DEFAULT_MISSING_PARAM.clone unless obj['realname']
+  puts 'logout_user called'.green if DEBUG_MODE
+  if (obj['token'])
+    token = decrypt_token(obj['token'].gsub('"', ''))
+    return GUEST.del_guest_by_token(token)
+  end
+  #return GUEST.del_guest obj['username'] if obj['username']
+  #return DEFAULT_MISSING_PARAM.clone unless obj['realname']
 
-  LOGIN.valueManipulation 'realname', obj['realname'], 'logged_in = true'
+  #realname = obj['realname'].strip.gsub(/[^a-zA-Z0-9\s]/, '')
+  #LOGIN.valueManipulation 'realname', realname, ['?'] => [realname]
 end
 
 def get_user(_client, obj = nil)
-  puts 'get_user called' if DEBUG_MODE
+  puts 'get_user called'.green if DEBUG_MODE
   res = DEFAULT_ERROR_RES.clone
   
   return res unless obj
@@ -105,15 +164,15 @@ def get_user(_client, obj = nil)
   params = obj['params']
   params = [params] if params.class.to_s == 'Hash'
   if params.nil? || params == [{}]
-    puts 'Returning whole database'
+    puts 'Returning whole database'.yellow
     users = LOGIN.select
-    # puts "####", users
     res = DEFAULT_SUCCESS_RES.clone
     res['user'] = users
     res['guest'] = GUEST.get_all_guests
     res['status'] = 'no users found' if users.empty? && res['guest'].empty?
     return res
   end
+  
   if params.class.to_s == 'Array'
     puts 'looking for users with ' + params.to_s if DEBUG_MODE
     params.each do |p|
@@ -125,13 +184,18 @@ def get_user(_client, obj = nil)
         cols.append key.to_s
         keys.append val.to_s
       end
+      if p  && p['token']
+        token = decrypt_token(p['token'])
+        status = GUEST.get_token_name(token)
+        return status
+      end
       if p['username'] && p['type'].to_s != 'login'
-        t = GUEST.get_guests(p['username'], (p['logged_in'].to_s == 'true' ? true : false))
+        t = GUEST.get_guests(['username = ?'], [p['username']], (p['logged_in'].to_s == 'true' ? true : false))
         lst_guest += t if t
       end
       if !cols.empty?
-        users = LOGIN.select cols, keys
-      lst = lst + users
+        users = LOGIN.select(cols, ['?'] * cols.size, keys)
+        lst = lst + users
       end
     end
     res = DEFAULT_SUCCESS_RES.clone
@@ -145,16 +209,16 @@ def get_user(_client, obj = nil)
 end
 
 def update_user(_client, obj = nil)
-  puts 'update_user called' if DEBUG_MODE
+  puts 'update_user called'.green if DEBUG_MODE
 
   r = nil
   res = DEFAULT_ERROR_RES.clone
+  puts "params: #{obj}".yellow
   return res if !obj || !(params = obj['new_params']) || !(lname = obj['display_name'])
   return { 'service' => 'user_manager', 'status' => 'Invalid login name change request', 'success' => 'false' } if params.include? 'display_name'
 
-  # (LOGIN.select ["display_name"], [lname])[0] rescue r
   usr = begin
-    (LOGIN.select ['display_name'], [lname])[0]
+    (LOGIN.select ['display_name'], ['?'], [lname])[0]
   rescue StandardError
     r
   end
@@ -167,14 +231,14 @@ def update_user(_client, obj = nil)
     keys.append val.to_s
   end
 
-  LOGIN.update cols, keys, "display_name = '" + lname + "'"
+  LOGIN.update cols, keys, ['display_name = :lname'], [lname: lname]
   DEFAULT_SUCCESS_RES.clone
 end
 
 def drop_users(_client, _obj = nil)
   does = 'yesiam' # obj['reallysure']
   if does.to_s == 'yesiam'
-    LOGIN.dropTable
+    LOGIN.dropTable ['?'], ['yesiam']
     _client.puts DEFAULT_SUCCESS_RES.to_json
     _client.close
     exit
@@ -212,7 +276,9 @@ def user_manager(client, _server)
       {'service' => 'user_manager', 'status' => "unknown method: #{bobj['method'].to_s}", 'success' => 'false'}
     end
   rescue => r
-    return {'service' => 'user_manager', 'status' => "error: #{r.to_s}", 'success' => 'false'}.to_json
+    puts "Errore: #{r.message}".red
+    puts "Backtrace: #{r.backtrace.join("\n")}".red
+    return {'status' => "user_manager: error: #{r.to_s}", 'success' => 'false'}.to_json
   end
   puts res
   client.puts res.to_json

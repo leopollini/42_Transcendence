@@ -1,8 +1,8 @@
 import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
-import { current_user } from '../modes.js';
-import { escapeHTML } from '../../login/user.js';
+import { current_user } from '../../main.js';
+import { escapeHTML } from '../../security/security.js';
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -39,7 +39,13 @@ class ChatApp {
         this.updateFriendsList();
         this.updateFriendRequestsUI();
         this.initializeGeneralChat();
-        this.username = current_user.display_name;
+        //console.log("SET USERNAME PROPERLY PLEASE")
+        // this.username = prompt("Inserisci il tuo username:");
+        //this.username = "Dave_" + String(Math.random())
+        if (current_user && current_user.display_name)
+            this.username = current_user.display_name;
+        else
+            this.username = "default";
         // Inizializza la connessione WebSocket
         this.socket = initSocket(this.username, this);
     }
@@ -137,6 +143,7 @@ class ChatApp {
         if (msg.from === 'system') {
             return `<div class="message system"><div class="text">${msg.content}</div></div>`;
         } else {
+            console.log("this.username = ", this.username);
             const className = msg.from === this.username ? 'self' : 'other';
             const senderColor = this.getUserColor(msg.from); // Ora `getUserColor` funziona correttamente
     
@@ -233,7 +240,7 @@ class ChatApp {
                     date: new Date().toISOString(),
                     from: 'system',
                     to: chatId,
-                    content: `You have unblocked ${user.charAt(0)+ user.slice(1)}.`
+                    content: `You have unblocked ${user.charAt(0) + user.slice(1)}.`
                 });
                 // Abilita l'input solo se i due sono amici
                 if (this.currentChat === chatId && this.friends.has(user)) {
@@ -403,13 +410,26 @@ class ChatApp {
             const formattedName = req.from.charAt(0) + req.from.slice(1);
             const item = document.createElement('div');
             item.className = 'friend-request-item';
-            item.innerHTML = `<span>${formattedName}</span>
-                <div>
-                    <button data-index="${index}" class="accept-request"></button>
-                    <button data-index="${index}" class="reject-request"></button>
-                </div>`;
+        
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = formattedName;
+        
+            const buttonsDiv = document.createElement('div');
+            const acceptButton = document.createElement('button');
+            acceptButton.className = 'accept-request';
+            acceptButton.dataset.index = index;
+            const rejectButton = document.createElement('button');
+            rejectButton.className = 'reject-request';
+            rejectButton.dataset.index = index;
+        
+            buttonsDiv.appendChild(acceptButton);
+            buttonsDiv.appendChild(rejectButton);
+            item.appendChild(nameSpan);
+            item.appendChild(buttonsDiv);
+        
             this.elements.friendRequestsList.appendChild(item);
         });
+        
         const acceptButtons = document.querySelectorAll('.accept-request');
         acceptButtons.forEach(btn => {
             btn.onclick = (e) => {
@@ -495,7 +515,7 @@ class ChatApp {
         const blockItem = menu.querySelector('[data-action="block"]');
     
         // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
-        if (user === this.username) {
+        if (user === this.username && sessionStorage.getItem("type") === "true"){
             chatItem.style.display = 'none';
             addFriendItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';

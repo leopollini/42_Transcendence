@@ -27,10 +27,6 @@ fi
 
 cd authentication
 
-if [ -f "Gemfile.lock" ]; then
-    rm Gemfile.lock
-fi
-
 echo "==============================="
 echo "Pulizia delle gemme..."
 

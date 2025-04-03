@@ -1,5 +1,5 @@
 import Login, { addLoginPageHandlers } from "./pages/profile/login.js";
-import Modes, {addModesPageHandlers, current_user, nullify_user} from "./pages/modes.js";
+import Modes, {addModesPageHandlers} from "./pages/modes.js";
 import Tournament, { addTournamentPageHandlers } from "./pages/tournament/tournament.js";
 import PongGame from "./pages/pong_game.js";
 import ClassicPongLobbyRoom, { handleClassicPongLobby, addClassicPongLobbyPageHandlers } from "./pages/classic_pong_lobby.js";
@@ -19,9 +19,10 @@ import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import { eraseCookie, readCookie, restore_user } from "./login/user.js";
+import { eraseCookie, restore_user } from "./login/user.js";
 import { showInfoModal } from "./modal.js";
 
+import { free_users } from "./security/security.js";
 let buttonTitle;
 let winner;
 let players;
@@ -51,6 +52,31 @@ const routes = {
     "/profile": Profile,
 };
 
+export let current_user = null;
+
+export async function initUser()
+{
+    current_user = await restore_user();
+}
+
+
+export function update_user(user)
+{
+    current_user = user;
+}
+
+export function nullify_user()
+{
+    current_user = null;
+}
+
+window.addEventListener('load', () => {
+    if (sessionStorage.getItem('already in') === null)
+        sessionStorage.setItem('already in', 0);
+    if (localStorage.getItem('session opened') === null)
+        localStorage.setItem('session opened', 0);
+});
+
 //restore logged da sistemare
 export const navigate = (path, title = "", lobbyPlayers) => {
     if (window.location.pathname !== path)
@@ -79,7 +105,8 @@ function restoreBackground() {
 }
 
 // Caricamento dinamico del contenuto
-const loadContent = () => {
+const loadContent = async () => {
+    await initUser();
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
@@ -223,28 +250,44 @@ const channel = new BroadcastChannel("session_sync");
 
 window.addEventListener('beforeunload', () =>
 {
-    if (sessionStorage.getItem("already in") === '1')
+    if (sessionStorage.getItem('already in') === '1')
     {
-        localStorage.setItem("session opened", '0');
+        localStorage.setItem('session opened', 0);
         channel.postMessage("session_closed");
     }
 });
 
-channel.addEventListener("message", (event) => {
+window.addEventListener('storage', (event) =>
+{
+    if (event.key === 'popup opened')
+    {
+        if (event.newValue === 'true')
+            localStorage.setItem('popup opened', true);
+    }
+})
+
+channel.addEventListener("message", (event) =>
+{
     if (event.data === "session_closed")
-        localStorage.setItem("session opened", '0');
+    {
+        localStorage.setItem('session opened', 0);
+        free_users();
+    }
 });
 
 function check_valid_operation(path)
 {
-    if (sessionStorage.getItem("already in") === '1' && localStorage.getItem("session opened") === '0')
-        localStorage.setItem("session opened", '1');
-    if (sessionStorage.getItem("already in") === '1' && path === "/")
+    
+    if (sessionStorage.getItem('already in') === '1' && localStorage.getItem('session opened') === '0')
+        localStorage.setItem('session opened', 1);
+    if (sessionStorage.getItem('already in') === '1' && path === "/")
     {
+        free_users();
         nullify_user();
         eraseCookie("user_token");
-        sessionStorage.setItem("already in", '0');
-        localStorage.setItem("session opened", '0');
+        localStorage.setItem('session opened', 0);
+        sessionStorage.setItem('already in', 0);
+        sessionStorage.removeItem("type");
         return (0);
     }
     else if (path !== '/')
@@ -257,28 +300,26 @@ function check_valid_operation(path)
 
 function continue_error_check(path)
 {
-    if (sessionStorage.getItem("already in") === null)
-        sessionStorage.setItem("already in", '0');
-    if (sessionStorage.getItem("already in") === '1')
+
+    if (sessionStorage.getItem('already in') === '1')
     {
         if (path === window.location.pathname
-        && sessionStorage.getItem("already in") === '1')
+        && sessionStorage.getItem('already in') === '1')
         {
-            if (sessionStorage.getItem("game ended") === 'true')
+            if (sessionStorage.getItem('game ended') === 'true')
             {
                 sessionStorage.removeItem("game ended");
                 showInfoModal("ERROR:(Invalid operation) going back to menu...", () => {});
                 navigate("/modes", "Return to Game Mode");
                 return (1);
             }
-            restore_user();
             return (0);
         }
     }
     else
     {
-        if ((localStorage.getItem("session opened") === '1' && sessionStorage.getItem("already in") === '0') ||
-        (sessionStorage.getItem("already in") === '0' && localStorage.getItem("session opened") === '0'))
+        if ((localStorage.getItem('session opened') === '1' && sessionStorage.getItem('already in') === '0') ||
+        (sessionStorage.getItem('already in') === '0' && localStorage.getItem('session opened') === '0'))
         {
             showInfoModal("ERROR: accessing unauthorized page...", () => {});
             navigate("/", "home");

@@ -1,10 +1,9 @@
 import { startPongGame, PongGame } from "./pong.js";
-import { current_user } from "../../../pages/modes.js";
+import { current_user } from "../../../main.js";
 let gameInstance;
 
-// Funzione per aggiungere il canvas di gioco
 export function initializeGameCanvas(matchPlayers) {
-    //console.log("Inizializzazione game canvas");
+    console.log("Inizializzazione game canvas");
     const path = window.location.pathname;
     let players;
 
@@ -20,7 +19,7 @@ export function initializeGameCanvas(matchPlayers) {
     if (current_user)
     {
         setTimeout(() => {
-            if (path === "/VS_AI") {
+            if (path === "/V.S._AI") {
                 players = [current_user.display_name, "AI"];
                 startPongGame(players, "ai");
             } 

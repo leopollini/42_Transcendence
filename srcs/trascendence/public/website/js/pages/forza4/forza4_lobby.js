@@ -1,6 +1,5 @@
-import { navigate } from "../../main.js";
-import { current_user } from "../modes.js";
-import { escapeHTML } from "../../login/user.js";
+import {current_user, navigate } from "../../main.js";
+import { escapeHTML } from "../../security/security.js";
 import { sendMessage } from "../live-chat/socketHandler.js";
 let matchPlayers = [];
 
@@ -72,19 +71,19 @@ function searchUser(username) {
                 user_name = find_user;
                 if (user_name && matchPlayers.includes(user_name.username)) {
                     f4PlayerSearchResult.style.color = "red";
-                    f4PlayerSearchResult.innerHTML = "Cannot add urself as opponent"
+                    f4PlayerSearchResult.textContent = "Cannot add urself as opponent"
                     f4ToggleAddUser.disabled = true;
                 }
                 else if (user_name) 
                 {
                     f4PlayerSearchResult.style.color = "green";
-                    f4PlayerSearchResult.innerHTML = "User Found: " + user_name.username;
+                    f4PlayerSearchResult.textContent = "User Found: " + user_name.username;
                     f4ToggleAddUser.disabled = false;
                 }
             }
             else {
                 f4PlayerSearchResult.style.color = "red";
-                f4PlayerSearchResult.innerHTML = "User Not Found";
+                f4PlayerSearchResult.textContent = "User Not Found";
                 f4ToggleAddUser.disabled = true;
             }
         })
@@ -115,7 +114,7 @@ export function addForza4LobbyPageHandlers() {
     f4ToggleAddUser?.addEventListener('click', () => {
         const f4PlayerInviteResult = document.getElementById("f4PlayerInviteResult");
 
-        f4PlayerInviteResult.innerHTML = "Player Added: " + f4PlayerSearch.value;
+        f4PlayerInviteResult.textContent = "Player Added: " + f4PlayerSearch.value;
         f4ToggleStartGame.disabled = false;
         matchPlayers.push(f4PlayerSearch.value)
 
