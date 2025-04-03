@@ -60,10 +60,10 @@ function friend_searcher(friend_list) {
         updateFriendList(friend_list, friendSearchInput.value);
     });
 }
-
 function updateFriendList(friend_list, searchTerm) {
     const friendsListContainer = document.querySelector("#friendsList");
 
+    // Filtra gli amici online
     const filteredFriends = searchTerm === ''
         ? friend_list.filter(friend => friend.status.toLowerCase() === "online")
         : friend_list.filter(friend => 
@@ -71,21 +71,37 @@ function updateFriendList(friend_list, searchTerm) {
             friend.status.toLowerCase() === "online"
         );
 
-    if (filteredFriends.length === 0)
-        friendsListContainer.innerHTML = `<p>No friends found.</p>`;
-    else 
-    {
-        friendsListContainer.innerHTML = `
-            <h3>Your Friends</h3>
-            ${filteredFriends.map(friend => `  
-                <div class="friend-item ${friend.status.toLowerCase()}">
-                    <span class="friend-status">${friend.status}</span>
-                    <span class="friend-name">${friend.name}</span>
-                </div>
-            `).join('')}
-        `;
+    // Svuota il contenitore
+    friendsListContainer.innerHTML = '';
+
+    if (filteredFriends.length === 0) {
+        const noFriendsMessage = document.createElement("p");
+        noFriendsMessage.textContent = "No friends found.";
+        friendsListContainer.appendChild(noFriendsMessage);
+    } else {
+        const title = document.createElement("h3");
+        title.textContent = "Your Friends";
+        friendsListContainer.appendChild(title);
+
+        filteredFriends.forEach(friend => {
+            const friendItem = document.createElement("div");
+            friendItem.classList.add("friend-item", friend.status.toLowerCase());
+
+            const friendStatus = document.createElement("span");
+            friendStatus.classList.add("friend-status");
+            friendStatus.textContent = friend.status;
+
+            const friendName = document.createElement("span");
+            friendName.classList.add("friend-name");
+            friendName.textContent = friend.name;
+
+            friendItem.appendChild(friendStatus);
+            friendItem.appendChild(friendName);
+            friendsListContainer.appendChild(friendItem);
+        });
     }
 }
+
 
 function handleFriendsButton() {
     const toggleFriendsButton = document.querySelector("#toggleFriends");
@@ -105,21 +121,25 @@ function handleShowAllFriendsButton(friend_list) {
     const allFriendsListContainer = document.querySelector("#allFriendsList");
 
     showAllFriendsButton.addEventListener("click", () => {
-        if (allFriendsListContainer.style.display === "none" || allFriendsListContainer.style.display === "") {
+        if (allFriendsListContainer.style.display === "none" || allFriendsListContainer.style.display === "")
             allFriendsListContainer.style.display = "block";
-        } else {
+        else
             allFriendsListContainer.style.display = "none";
-        }
 
         if (allFriendsListContainer.style.display === "block") {
             allFriendsListContainer.innerHTML = `
                 <h3>All your Friends</h3>
-                ${friend_list.map(friend => `
-                    <div class="friend-item ${friend.status.toLowerCase()}">
-                        <span class="friend-status">${friend.status}</span>
-                        <span class="friend-name">${friend.name}</span>
-                    </div>
-                `).join('')}
+                ${friend_list.map(friend => {
+                    const safeStatus = DOMPurify.sanitize(friend.status);
+                    const safeName = DOMPurify.sanitize(friend.name);
+
+                    return `
+                        <div class="friend-item ${safeStatus.toLowerCase()}">
+                            <span class="friend-status">${safeStatus}</span>
+                            <span class="friend-name">${safeName}</span>
+                        </div>
+                    `;
+                }).join('')}
             `;
         }
     });

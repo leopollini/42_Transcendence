@@ -1,7 +1,6 @@
 import { navigate } from "../../main.js";
 import { token1Color, token2Color, powerUpMode } from "../../game/forza4/data/forza4_game_global.js";
 import { setToken1Color, setToken2Color, setBoardBackground, setPowerUpState } from "../../game/forza4/data/forza4_game_global.js";
-import { current_user, change_name, update_image} from "../modes.js";
 export function Forza4Customize() {
     const html = `
     <div id="forza4Customize">
@@ -66,17 +65,20 @@ export function forza4Config() {
     });
 
     f4ButtonBackground1.addEventListener('click', () => {
-        f4BackgroundSelected.innerHTML = 'Background Selected: Classic';
+        f4BackgroundSelected.textContent = 'Background Selected: Classic';
         setBoardBackground("bg1");
     });
+    
     f4ButtonBackground2.addEventListener('click', () => {
-        f4BackgroundSelected.innerHTML = 'Background Selected: Neon';
+        f4BackgroundSelected.textContent = 'Background Selected: Neon';
         setBoardBackground("bg2");
     });
+    
     f4ButtonBackground3.addEventListener('click', () => {
-        f4BackgroundSelected.innerHTML = 'Background Selected: Faded 70s';
+        f4BackgroundSelected.textContent = 'Background Selected: Faded 70s';
         setBoardBackground("bg3");
     });
+    
 
     f4powerupCheckbox.addEventListener('change', (event) => {
             if (f4powerupCheckbox.checked) {

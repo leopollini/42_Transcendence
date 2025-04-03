@@ -1,5 +1,4 @@
 import { navigate } from "../../main.js";
-import { current_user, change_name, update_image} from "../modes.js";
 
 let playerList;
 let playerNames = [];
@@ -60,6 +59,7 @@ function findNextMatch(rankingRobinCtx) {
     let attempts;
     let tiebreaker;
     attempts = 0;
+
 
     //console.log("find the next match");
     if (matchesListRobin.length === 0) {
@@ -134,7 +134,7 @@ function populateMatchesList(playerList) {
     for (let i = 0; i < playerList.length; i++) {
         for (let j = i + 1; j < playerList.length; j++) {
             matchesListRobin.push({player1: playerList[i].name, player2: playerList[j].name});
-            //console.log(playerList[i].name + " vs " + playerList[j].name);
+            console.log(playerList[i].name + " vs " + playerList[j].name);
         }
     }
     shuffleMatchesArray(matchesListRobin);
@@ -151,11 +151,13 @@ export function robinDraw(players) {
     playRobinMatchButton.style.display = "block";
     rankingRobinCanvas.style.display = "block";
 
+
     if (!playerList)
         playerList = initializePlayers(players);
 
     playerList.sort((a, b) => b.points - a.points);
     
+
     // Ranking (Player name and points)
     for (var i = 0; i < playerList.length; i++) {
         rankingRobinCtx.font = '30px Liberty';
@@ -183,6 +185,7 @@ export const addRobinRankingPageHandlers = () => {
     const playRobinMatchButton = document.getElementById('playRobinMatchButton');
     const robinBackToMenuButton = document.getElementById('robinBackToMenuButton');
     const backImageButton = document.getElementById('backImageButton');
+
 
     playRobinMatchButton?.addEventListener('click', () => {
         const players = [];

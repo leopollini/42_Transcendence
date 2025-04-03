@@ -9,8 +9,9 @@ export function createGrid(game) {
 
     const boardElement = document.getElementById('f4board');
     const forza4Game = document.getElementById('forza4Game');
-    boardElement.innerHTML = '';
-
+    while (boardElement.firstChild)
+        boardElement.removeChild(boardElement.firstChild);
+    
     const gap = window.innerWidth * 0.01; // Spazio tra le celle
     const maxWidth = window.innerWidth * 0.6; // Larghezza massima del board (80% della finestra)
     const maxHeight = window.innerHeight * 0.6; // Altezza massima del board (80% della finestra)

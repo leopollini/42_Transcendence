@@ -1,4 +1,3 @@
-
 require 'json'
 require 'pg'
 require 'colorize'
@@ -46,9 +45,16 @@ module Other_logic
     response = SimpleServer.method_req("login_user", payload.to_json)
     puts response
     data = JSON.parse(response)
-    if (data["token"])
+    if data["token"]
       token = data["token"]
-      res.cookies << WEBrick::Cookie.new("logged_token", token)
+      
+      cookie = WEBrick::Cookie.new("logged_token", token)
+      
+      cookie.secure = true 
+      cookie.http_only = true
+      cookie.same_site = 'Strict'
+
+      res.cookies << cookie
     end
   end
 end

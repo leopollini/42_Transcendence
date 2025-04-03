@@ -1,6 +1,6 @@
 import { navigate } from "../main.js";
-import { current_user } from "./modes.js";
-import { escapeHTML } from "../login/user.js";
+import { current_user } from "../main.js";
+import { escapeHTML } from "../security/security.js";
 let matchPlayers = [];
 
 export default function ClassicPongLobbyRoom() {
@@ -57,6 +57,10 @@ export function handleClassicPongLobby() {
     //console.log("match players = " +matchPlayers[0]);
 }
 
+async function name(params) {
+    
+}
+
 function searchUser(username) {
     const pongPlayerSearchResult = document.getElementById("pongPlayerSearchResult");
     const pongToggleAddUser = document.getElementById('pongToggleAddUser');
@@ -74,7 +78,7 @@ function searchUser(username) {
         {
             if (!data || (!data.user && !data.guest)) 
             {
-                nullify_user();
+                current_user = null;
                 alert("ERROR: no users found...");
                 navigate("/", "home");
                 return;
@@ -88,20 +92,15 @@ function searchUser(username) {
                 user_name = find_user;
                 if (user_name && matchPlayers.includes(user_name.username)) {
                     pongPlayerSearchResult.style.color = "red";
-                    pongPlayerSearchResult.innerHTML = "Cannot add urself as opponent"
+                    pongPlayerSearchResult.textContent = "Cannot add urself as opponent"
                     pongToggleAddUser.disabled = true;
                 }
                 else if (user_name) 
-                {
-                    sessionStorage.setItem("opponent", user_name.username);
-                    pongPlayerSearchResult.style.color = "green";
-                    pongPlayerSearchResult.innerHTML = "User Found: " + user_name.username;
-                    pongToggleAddUser.disabled = false;
-                }
+                    fined_oppenet(user_name);
             }
             else {
                 pongPlayerSearchResult.style.color = "red";
-                pongPlayerSearchResult.innerHTML = "User Not Found";
+                pongPlayerSearchResult.textContent = "User Not Found";
                 pongToggleAddUser.disabled = true;
             }
         })
@@ -132,7 +131,7 @@ export function addClassicPongLobbyPageHandlers() {
     pongToggleAddUser?.addEventListener('click', () => {
         const pongPlayerInviteResult = document.getElementById("pongPlayerInviteResult");
 
-        pongPlayerInviteResult.innerHTML = "Player Added: " + pongPlayerSearch.value;
+        pongPlayerInviteResult.textContent = "Player Added: " + pongPlayerSearch.value;
         pongToggleStartGame.disabled = false;
         matchPlayers.push(pongPlayerSearch.value)
     });

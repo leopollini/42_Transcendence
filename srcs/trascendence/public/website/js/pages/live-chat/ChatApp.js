@@ -1,8 +1,8 @@
 import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
-import { current_user } from '../modes.js';
-import { escapeHTML } from '../../login/user.js';
+import { current_user } from '../../main.js';
+import { escapeHTML } from '../../security/security.js';
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -40,7 +40,10 @@ class ChatApp {
         //console.log("SET USERNAME PROPERLY PLEASE")
         // this.username = prompt("Inserisci il tuo username:");
         //this.username = "Dave_" + String(Math.random())
-        this.username = current_user.display_name;
+        if (current_user && current_user.display_name)
+            this.username = current_user.display_name;
+        else
+            this.username = "default";
         // Inizializza la connessione WebSocket
         this.socket = initSocket(this.username, this);
     }
@@ -128,7 +131,7 @@ class ChatApp {
 
     updateMessagesDisplay() {
         const messages = this.chats.get(this.currentChat) || [];
-        this.elements.messagesContainer.innerHTML = messages
+        this.elements.messagesContainer.textContent = messages
             .map((msg) => this.createMessageElement(msg))
             .join('');
         this.scrollToBottom();
@@ -359,13 +362,26 @@ class ChatApp {
             const formattedName = req.from.charAt(0).toUpperCase() + req.from.slice(1);
             const item = document.createElement('div');
             item.className = 'friend-request-item';
-            item.innerHTML = `<span>${formattedName}</span>
-                <div>
-                    <button data-index="${index}" class="accept-request"></button>
-                    <button data-index="${index}" class="reject-request"></button>
-                </div>`;
+        
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = formattedName;
+        
+            const buttonsDiv = document.createElement('div');
+            const acceptButton = document.createElement('button');
+            acceptButton.className = 'accept-request';
+            acceptButton.dataset.index = index;
+            const rejectButton = document.createElement('button');
+            rejectButton.className = 'reject-request';
+            rejectButton.dataset.index = index;
+        
+            buttonsDiv.appendChild(acceptButton);
+            buttonsDiv.appendChild(rejectButton);
+            item.appendChild(nameSpan);
+            item.appendChild(buttonsDiv);
+        
             this.elements.friendRequestsList.appendChild(item);
         });
+        
         const acceptButtons = document.querySelectorAll('.accept-request');
         acceptButtons.forEach(btn => {
             btn.onclick = (e) => {

@@ -1,5 +1,4 @@
 import { navigate } from "../../main.js";
-import { current_user } from "../modes.js";
 
 export default function Roundrobin() {
     return `

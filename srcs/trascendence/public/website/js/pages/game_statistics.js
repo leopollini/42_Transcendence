@@ -2,7 +2,6 @@ import { navigate } from "../main.js";
 import { userName } from "./user_data.js";
 import { formatTime } from "../game/pong/other/timer.js";
 import { showCharts } from "./tournament/charts.js";
-import { current_user, change_name, update_image } from "./modes.js";
 
 let wins = 0;
 let losses = 0;
@@ -223,7 +222,6 @@ export function forza4ShowMatchDetails() {
     const f4MatchDetailsContainer = document.getElementById("f4MatchDetailsContainer");
     
     f4MatchDetailsContainer.innerHTML = "";
-    
 
     if (f4UserData && f4UserData.length > 0) {
         f4UserData.forEach(match => {
@@ -233,44 +231,72 @@ export function forza4ShowMatchDetails() {
             let resultClass;
 
             let isTie = false;
-            if (match.winner === 'tie')
-            {
+            if (match.winner === 'tie') {
                 isTie = true;
                 resultText = "Tie";
                 resultClass = "tie";
-            }
-            else
-            {
+            } else {
                 resultText = isWinner ? "Victory" : "Defeat";
                 resultClass = isWinner ? "win" : "loss";
             }
-         
-            const matchTime = formatTime(match.begin_time);
-            //const matchDate = new Date(match.date).toLocaleDateString();
 
-            const matchHtml = `
-                <div class="match-card collapsed">
-                    <div class="match-summary ${resultClass}">
-                        <div class="players">${userName} vs ${opponent}</div>
-                        <div class="match-info">
-                            <span class="result">${resultText}</span>
-                        </div>
-                    </div>
-                    <div class="match-details">
-                        <div class="detail-item">
-                            <span>Moves:</span>
-                            <span>${match.moves}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span>Duration:</span>
-                            <span>${matchTime}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            f4MatchDetailsContainer.innerHTML += matchHtml;
+            const matchTime = formatTime(match.begin_time);
+
+           
+            const matchCard = document.createElement('div');
+            matchCard.classList.add('match-card', 'collapsed');
+
+            const matchSummary = document.createElement('div');
+            matchSummary.classList.add('match-summary', resultClass);
+
+            const playersDiv = document.createElement('div');
+            playersDiv.classList.add('players');
+            playersDiv.textContent = `${userName} vs ${opponent}`;
+
+            const matchInfoDiv = document.createElement('div');
+            matchInfoDiv.classList.add('match-info');
+
+            const resultSpan = document.createElement('span');
+            resultSpan.classList.add('result');
+            resultSpan.textContent = resultText;
+
+            matchInfoDiv.appendChild(resultSpan);
+            matchSummary.appendChild(playersDiv);
+            matchSummary.appendChild(matchInfoDiv);
+
+           
+            const matchDetails = document.createElement('div');
+            matchDetails.classList.add('match-details');
+
+            const movesItem = document.createElement('div');
+            movesItem.classList.add('detail-item');
+            const movesSpan = document.createElement('span');
+            movesSpan.textContent = `Moves:`;
+            const movesValueSpan = document.createElement('span');
+            movesValueSpan.textContent = match.moves;
+            movesItem.appendChild(movesSpan);
+            movesItem.appendChild(movesValueSpan);
+
+            const durationItem = document.createElement('div');
+            durationItem.classList.add('detail-item');
+            const durationSpan = document.createElement('span');
+            durationSpan.textContent = `Duration:`;
+            const durationValueSpan = document.createElement('span');
+            durationValueSpan.textContent = matchTime;
+            durationItem.appendChild(durationSpan);
+            durationItem.appendChild(durationValueSpan);
+
+            matchDetails.appendChild(movesItem);
+            matchDetails.appendChild(durationItem);
+
+            matchCard.appendChild(matchSummary);
+            matchCard.appendChild(matchDetails);
+
+           
+            f4MatchDetailsContainer.appendChild(matchCard);
         });
 
+       
         document.querySelectorAll('.match-card').forEach(card => {
             card.addEventListener('click', function() {
                 this.classList.toggle('collapsed');
@@ -280,6 +306,7 @@ export function forza4ShowMatchDetails() {
         f4MatchDetailsContainer.innerHTML = `<p class="no-matches">No matches found</p>`;
     }
 }
+
 
 
 async function getPongMatchesData() {
@@ -306,15 +333,11 @@ export async function pongShowMatchDetails() {
     
     await getPongMatchesData();
 
-
-    //console.log("pong show match details");
-
     if (!pongUserData) {
         return null;
     }
-    
+
     pongMatchDetailsContainer.innerHTML = "";
-    
 
     if (pongUserData && pongUserData.length > 0) {
         pongUserData.forEach(match => {
@@ -323,36 +346,66 @@ export async function pongShowMatchDetails() {
             let resultText;
             let resultClass;
 
-        
             resultText = isWinner ? "Victory" : "Defeat";
             resultClass = isWinner ? "win" : "loss";
-         
-            const matchTime = formatTime(match.begin_time);
-            //const matchDate = new Date(match.date).toLocaleDateString();
 
-            const matchHtml = `
-                <div class="match-card collapsed">
-                    <div class="match-summary ${resultClass}">
-                        <div class="players">${userName} vs ${opponent}</div>
-                        <div class="match-info">
-                            <span class="result">${resultText}</span>
-                        </div>
-                    </div>
-                    <div class="match-details">
-                        <div class="detail-item">
-                            <span>Score:</span>
-                            <span>${match.score1} - ${match.score2}</span>
-                        </div>
-                        <div class="detail-item">
-                            <span>Duration:</span>
-                            <span>${matchTime}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            pongMatchDetailsContainer.innerHTML += matchHtml;
+            const matchTime = formatTime(match.begin_time);
+
+           
+            const matchCard = document.createElement('div');
+            matchCard.classList.add('match-card', 'collapsed');
+
+            const matchSummary = document.createElement('div');
+            matchSummary.classList.add('match-summary', resultClass);
+
+            const playersDiv = document.createElement('div');
+            playersDiv.classList.add('players');
+            playersDiv.textContent = `${userName} vs ${opponent}`;
+
+            const matchInfoDiv = document.createElement('div');
+            matchInfoDiv.classList.add('match-info');
+
+            const resultSpan = document.createElement('span');
+            resultSpan.classList.add('result');
+            resultSpan.textContent = resultText;
+
+            matchInfoDiv.appendChild(resultSpan);
+            matchSummary.appendChild(playersDiv);
+            matchSummary.appendChild(matchInfoDiv);
+
+           
+            const matchDetails = document.createElement('div');
+            matchDetails.classList.add('match-details');
+
+            const scoreItem = document.createElement('div');
+            scoreItem.classList.add('detail-item');
+            const scoreSpan = document.createElement('span');
+            scoreSpan.textContent = `Score:`;
+            const scoreValueSpan = document.createElement('span');
+            scoreValueSpan.textContent = `${match.score1} - ${match.score2}`;
+            scoreItem.appendChild(scoreSpan);
+            scoreItem.appendChild(scoreValueSpan);
+
+            const durationItem = document.createElement('div');
+            durationItem.classList.add('detail-item');
+            const durationSpan = document.createElement('span');
+            durationSpan.textContent = `Duration:`;
+            const durationValueSpan = document.createElement('span');
+            durationValueSpan.textContent = matchTime;
+            durationItem.appendChild(durationSpan);
+            durationItem.appendChild(durationValueSpan);
+
+            matchDetails.appendChild(scoreItem);
+            matchDetails.appendChild(durationItem);
+
+            matchCard.appendChild(matchSummary);
+            matchCard.appendChild(matchDetails);
+
+           
+            pongMatchDetailsContainer.appendChild(matchCard);
         });
 
+       
         document.querySelectorAll('.match-card').forEach(card => {
             card.addEventListener('click', function() {
                 this.classList.toggle('collapsed');
@@ -362,6 +415,7 @@ export async function pongShowMatchDetails() {
         pongMatchDetailsContainer.innerHTML = `<p class="no-matches">No matches found</p>`;
     }
 }
+
 
 export function gameUserStatisticsPageHandlers() {
     const backImageButton = document.getElementById('backImageButton');

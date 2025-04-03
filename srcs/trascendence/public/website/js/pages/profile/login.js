@@ -1,7 +1,5 @@
 import { guest_login } from "../../login/guest_logic.js";
-import { performLogin, popupOpened } from "../../login/login_logic.js";
-import { eraseCookie } from "../../login/user.js";
-import { nullify_user } from "../modes.js";
+import { performLogin } from "../../login/login_logic.js";
 export default function Login() {
     return `
         <h1 class="text">
@@ -29,13 +27,6 @@ export default function Login() {
     `;
 }
 
-window.addEventListener('load', () => {
-    if (sessionStorage.getItem("already in") === null)
-        sessionStorage.setItem("already in", '0');
-    if (localStorage.getItem("session opened") === null)
-        localStorage.setItem("session opened", '0');
-});
-
 export const addLoginPageHandlers = () => {
     const loginButton = document.getElementById("loginButton");
     const guestButton = document.getElementById("guestButton");
@@ -47,19 +38,19 @@ export const addLoginPageHandlers = () => {
 function handle_access(loginButton, guestButton)
 {
     loginButton.addEventListener("click", () => {
-        if (popupOpened === true)
+        if (localStorage.getItem('popup opened') === 'true')
             alert("popup already open finish authentication before continuing")
-        else if (sessionStorage.getItem("already in") === '0'
-        && localStorage.getItem("session opened") === '1')
+        else if (sessionStorage.getItem('already in') === '0'
+        && localStorage.getItem('session opened') === '1')
             alert("You've already logged in!");
         else
             performLogin();
     });
     guestButton.addEventListener("click", () => {
-        if (popupOpened === true)
+        if (localStorage.getItem('popup opened') === 'true')
             alert("Authenticating in progress....\nPlease wait.");
-        else if (sessionStorage.getItem("already in") === '0'
-        && localStorage.getItem("session opened") === '1')
+        else if (sessionStorage.getItem('already in') === '0'
+        && localStorage.getItem('session opened') === '1')
             alert("You've already logged in!");
         else
             guest_login();

@@ -1,7 +1,6 @@
-import { navigate } from "../../../main.js";
-import { pop_false } from "../../../login/login_logic.js";
-import { current_user, nullify_user} from "../../../pages/modes.js";
 import { eraseCookie } from "../../../login/user.js";
+import { navigate, current_user, nullify_user} from "../../../main.js";
+import { free_users } from "../../../security/security.js";
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
         history, logout)
@@ -66,25 +65,18 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     if (logout)
     {
         logout.addEventListener("click", () => {
-            pop_false();
+            localStorage.setItem("popup opened", false);
             if (!current_user)
             {
                 navigate("/", "logout");
                 return;
             }
-            if (current_user.type === "guest")
-            {
-                fetch("http://localhost:8008",
-                {
-                    method: "drop_guest"
-                })
-                .then(data =>{
-                    console.log("(DROP_GUEST)\ndata delete from all users = ", data);
-                })
-            }
-            sessionStorage.clear();
-            localStorage.clear();
+            free_users();
             nullify_user();
+            eraseCookie("user_token");
+            sessionStorage.removeItem("type");
+            sessionStorage.setItem("already in", 0);
+            localStorage.setItem("session opened", 0);
             navigate("/", "login");
         });
     }
