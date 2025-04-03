@@ -1,5 +1,6 @@
 import { readCookie } from "../login/user.js";
 import { current_user } from "../main.js";
+import { showInfoModal } from "../modal.js";
 
 export async function validateUploadedImage(file)
 {
@@ -7,14 +8,14 @@ export async function validateUploadedImage(file)
     {
         if (file.size > 5 * 1024 * 1024) 
         {
-            alert("Error: Image file is too large. Maximum size is 5MB.");
+            showInfoModal("Error: Image file is too large. Maximum size is 5MB.", () => {});
             return reject();
         }
 
         const validFormats = ['image/jpeg', 'image/png'];
         if (!validFormats.includes(file.type))
         {
-            alert("Error: Invalid image format. Only JPEG and PNG are allowed.");
+            showInfoModal("Error: Invalid image format. Only JPEG and PNG are allowed.", () => {});
             return reject();
         }
 
@@ -29,7 +30,7 @@ export async function validateUploadedImage(file)
             {
                 if (uint8Array[0] !== 137 || uint8Array[1] !== 80 || uint8Array[2] !== 78 || uint8Array[3] !== 71)
                 {
-                    alert("Error: Invalid PNG file.");
+                    showInfoModal("Error: Invalid PNG file.", () => {});
                     return reject();
                 }
             } else if (file.type === 'image/jpeg')
@@ -37,7 +38,7 @@ export async function validateUploadedImage(file)
     
                 if (uint8Array[0] !== 0xFF || uint8Array[1] !== 0xD8)
                 {
-                    alert("Error: Invalid JPEG file.");
+                    showInfoModal("Error: Invalid JPEG file.", () => {});
                     return reject();
                 }
             }
@@ -47,7 +48,7 @@ export async function validateUploadedImage(file)
 
         reader.onerror = function ()
         {
-            alert("Error: Unable to read file.");
+            showInfoModal("Error: Unable to read file.", () => {});
             return reject();
         };
 

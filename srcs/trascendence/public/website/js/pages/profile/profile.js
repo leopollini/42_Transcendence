@@ -138,7 +138,6 @@ function saveProfile(infoContainer) {
       updateLogin(current_user);
   }
   showInfoModal(saving, () => {});
-  updateUserProfile(current_user);
   history.back();
 }
 

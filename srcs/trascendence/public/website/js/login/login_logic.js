@@ -1,5 +1,5 @@
 import { navigate } from "../main.js";
-import { update_image, change_name, updateUserProfile} from "../pages/modes.js";
+import { update_image, change_name} from "../pages/modes.js";
 import { profile} from "./user.js";
 import { saveCookie } from "./user.js";
 import { showInfoModal } from "../modal.js";
@@ -75,7 +75,7 @@ function get_data()
         }
         else
         {
-            alert("ERROR: An error has occured(\"" + data.status + "\")");
+            showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});;
             sessionStorage.setItem("already in", 0);
             localStorage.setItem("session opened", 0);
             sessionStorage.removeItem("type");

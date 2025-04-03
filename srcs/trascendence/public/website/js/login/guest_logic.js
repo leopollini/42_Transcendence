@@ -76,9 +76,9 @@ function update_guest(curr_guest)
             eraseCookie("user_token");
             guest_user = null;
             if (data.status === "no users found")
-                alert("ERROR: Name already taken, try a different one");
+              showInfoModal("ERROR: Name already taken, try a different one", () => {});
             else
-                alert("ERROR: An error has occured(\"" + data.status + "\")");
+              showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});
             return;
         }
     })

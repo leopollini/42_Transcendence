@@ -2,7 +2,6 @@ import { navigate } from "../main.js";
 import { userName } from "./user_data.js";
 import { formatTime } from "../game/pong/other/timer.js";
 import { showCharts } from "./tournament/charts.js";
-import { current_user, change_name, update_image } from "./modes.js";
 import { showInfoModal } from "../modal.js";
 
 let wins = 0;

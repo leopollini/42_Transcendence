@@ -108,7 +108,7 @@ export async function restore_user()
             }
             else
             {
-                alert("ERROR: An error has occured(\"" + result.status + "\")");
+                showInfoModal("ERROR: An error has occured(\"" + result.status + "\")", () => {});
                 nullify_user();
                 sessionStorage.removeItem("type");
                 navigate("/", "home");
@@ -116,7 +116,7 @@ export async function restore_user()
             }
         }
         else
-            alert("no result??");
+            showInfoModal("no result??", () => {});
             
     }
     catch (error)

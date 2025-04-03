@@ -64,12 +64,12 @@ export async function saveimage(me, yourDataSection) {
                     const newImage = e.target.result;
                     if (profileImage.src === newImage)
                     {
-                        alert("This image is already selected.");
+                        showInfoModal("This image is already selected.", () => {});
                         return;
                     }
                     me.image = newImage;
                     profileImage.src = newImage;
-                    alert("image changed successfully");
+                    showInfoModal("image changed successfully", () => {});
                 };
                 reader.readAsDataURL(file);
             }

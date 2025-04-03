@@ -112,7 +112,7 @@ class ChatApp {
         this.elements.currentChatTitle.textContent =
             chatId === 'general'
                     ? 'General Chat'
-                    : chatId.replace('private-', '').charAt(0).toUpperCase() +
+                    : chatId.replace('private-', '').charAt(0) +
                     chatId.replace('private-', '').slice(1);
         this.unreadCounts[chatId] = 0;
         this.updateBadge(chatId);
@@ -133,7 +133,7 @@ class ChatApp {
 
     updateMessagesDisplay() {
         const messages = this.chats.get(this.currentChat) || [];
-        this.elements.messagesContainer.textContent = messages
+        this.elements.messagesContainer.innerHTML = messages
             .map((msg) => this.createMessageElement(msg))
             .join('');
         this.scrollToBottom();
@@ -143,6 +143,7 @@ class ChatApp {
         if (msg.from === 'system') {
             return `<div class="message system"><div class="text">${msg.content}</div></div>`;
         } else {
+            console.log("this.username = ", this.username);
             const className = msg.from === this.username ? 'self' : 'other';
             const senderColor = this.getUserColor(msg.from); // Ora `getUserColor` funziona correttamente
     
@@ -154,7 +155,7 @@ class ChatApp {
     
             return `<div class="message ${className}">
                         <div class="sender" style="color: ${senderColor};">
-                            ${msg.from.charAt(0).toUpperCase() + msg.from.slice(1)}
+                            ${msg.from.charAt(0) + msg.from.slice(1)}
                         </div>
                         <div class="text">${msg.content}</div>
                         <div class="time">${formattedTime}</div>
@@ -218,7 +219,7 @@ class ChatApp {
                 date: new Date().toISOString(),
                 from: 'system',
                 to: chatId,
-                content: `You have blocked ${user.charAt(0).toUpperCase() + user.slice(1)}.`
+                content: `You have blocked ${user.charAt(0) + user.slice(1)}.`
             });
         }
         
@@ -239,7 +240,7 @@ class ChatApp {
                     date: new Date().toISOString(),
                     from: 'system',
                     to: chatId,
-                    content: `You have unblocked ${user.charAt(0).toUpperCase() + user.slice(1)}.`
+                    content: `You have unblocked ${user.charAt(0) + user.slice(1)}.`
                 });
                 // Abilita l'input solo se i due sono amici
                 if (this.currentChat === chatId && this.friends.has(user)) {
@@ -300,7 +301,7 @@ class ChatApp {
         const chatTab = document.createElement('div');
         chatTab.className = 'chat-tab active';
         chatTab.dataset.chat = chatId;
-        chatTab.textContent = title.charAt(0).toUpperCase() + title.slice(1);
+        chatTab.textContent = title.charAt(0) + title.slice(1);
         const badge = document.createElement('span');
         badge.className = 'unread-badge';
         badge.textContent = '0';
@@ -337,7 +338,7 @@ class ChatApp {
                 date: new Date().toISOString(),
                 from: 'system',
                 to: chatId,
-                content: `Private chat with ${user.charAt(0).toUpperCase() + user.slice(1)} started.`
+                content: `Private chat with ${user.charAt(0) + user.slice(1)} started.`
             });
             this.socket.send(JSON.stringify({ type: "private_chat_started", to: user }));
         }
@@ -397,7 +398,7 @@ class ChatApp {
             const friendItem = document.createElement('div');
             friendItem.className = 'friend-item';
             friendItem.dataset.user = user;
-            friendItem.textContent = user.charAt(0).toUpperCase() + user.slice(1);
+            friendItem.textContent = user.charAt(0) + user.slice(1);
             this.elements.friendsList.appendChild(friendItem);
         });
     }
@@ -406,7 +407,7 @@ class ChatApp {
         if (!this.elements.friendRequestsList) return;
         this.elements.friendRequestsList.innerHTML = '';
         this.receivedRequests.forEach((req, index) => {
-            const formattedName = req.from.charAt(0).toUpperCase() + req.from.slice(1);
+            const formattedName = req.from.charAt(0) + req.from.slice(1);
             const item = document.createElement('div');
             item.className = 'friend-request-item';
         
@@ -479,7 +480,7 @@ class ChatApp {
             const blockedItem = document.createElement('div');
             blockedItem.className = 'blocked-user-item';
             blockedItem.dataset.user = user;
-            blockedItem.textContent = user.charAt(0).toUpperCase() + user.slice(1);
+            blockedItem.textContent = user.charAt(0) + user.slice(1);
             this.elements.blockedUsersList.appendChild(blockedItem);
         });
     }
@@ -514,7 +515,7 @@ class ChatApp {
         const blockItem = menu.querySelector('[data-action="block"]');
     
         // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
-        if (user === this.username) {
+        if (user === this.username && sessionStorage.getItem("type") === "true"){
             chatItem.style.display = 'none';
             addFriendItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
@@ -588,7 +589,7 @@ class ChatApp {
                         date: new Date().toISOString(),
                         from: 'system',
                         to: this.currentChat,
-                        content: `You cannot send a friend request to ${this.selectedUser.charAt(0).toUpperCase() + this.selectedUser.slice(1)} because you blocked him.`
+                        content: `You cannot send a friend request to ${this.selectedUser.charAt(0) + this.selectedUser.slice(1)} because you blocked him.`
                     });
                 } else {
                     if (this.friends.has(this.selectedUser)) {
@@ -629,7 +630,7 @@ class ChatApp {
         const modal = this.elements.profileModal;
         const profileStatusElement = document.getElementById('profileStatus');
         document.getElementById('profileName').textContent =
-            this.selectedUser.charAt(0).toUpperCase() + this.selectedUser.slice(1);
+            this.selectedUser.charAt(0) + this.selectedUser.slice(1);
     
         if (this.selectedUser === this.username) {
             profileStatusElement.style.display = 'none';

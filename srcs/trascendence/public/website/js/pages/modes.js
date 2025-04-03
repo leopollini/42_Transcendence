@@ -61,7 +61,7 @@ window.onpopstate = function ()
 {
     if (location.pathname === "/")
     {
-        alert("you have quitted the active session");
+        showInfoModal("you have quitted the active session", () => {});;
         sessionStorage.setItem("already in", 0);
         localStorage.setItem("session opened", 0);
         nullify_user();
@@ -103,10 +103,7 @@ export function update_image(image)
         const avatarImage = document.getElementById('avatarImage');
         if (avatarImage)
         {
-            if (!isValidImageUrl(image))
-                avatarImage.src = image;
-            else
-                showInfoModal("ERROR: Invalid image URL.", () => {});
+            avatarImage.src = image;
             clearInterval(checkImageInterval);
         }
     }, 100);
