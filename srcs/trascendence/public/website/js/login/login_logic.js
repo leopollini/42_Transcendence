@@ -1,7 +1,5 @@
 import { navigate } from "../main.js";
 import { update_image, change_name} from "../pages/modes.js";
-import { profile} from "./user.js";
-import { saveCookie } from "./user.js";
 import { showInfoModal } from "../modal.js";
 
 export let popupOpened = false;
