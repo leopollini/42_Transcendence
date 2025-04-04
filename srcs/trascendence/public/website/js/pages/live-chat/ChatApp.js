@@ -3,7 +3,7 @@ import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
 import { current_user } from '../../main.js';
 import { escapeHTML } from '../../security/security.js';
-
+import { showInfoModal } from '../../modal.js';
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -468,8 +468,9 @@ class ChatApp {
         const inviteItem = menu.querySelector('[data-action="invite"]');
         const profileItem = menu.querySelector('[data-action="profile"]');
         const blockItem = menu.querySelector('[data-action="block"]');
-
-        if (user === this.username) {
+    
+        // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
+        if (user === this.username && sessionStorage.getItem("type") === "login"){
             chatItem.style.display = 'none';
             addFriendItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
@@ -573,6 +574,39 @@ class ChatApp {
         this.hideContextMenu();
     }
 
+    set_profile_info()
+    {
+        console.log("user = ", current_user);
+        const userimage = document.querySelector("#profileAvatar");
+        const profileDetails = document.querySelector('.profile-details');
+        const lastOnline = profileDetails.querySelector('#lastOnline');
+        const statusIndicator = profileDetails.querySelector('#statusIndicator');
+        const realname = document.querySelector('p > #realname').parentElement;
+        const userEmail = document.querySelector('p > #userEmail').parentElement;
+        const userBio = document.querySelector('#userBio');
+        if (current_user)
+        {
+            lastOnline.textContent = "Online";
+            statusIndicator.classList.remove('offline');
+            statusIndicator.classList.add('online');
+            if (sessionStorage.getItem("type", 1) === "login")
+            {
+                realname.textContent = current_user.realname;
+                userEmail.textContent = current_user.email;
+            }
+            else
+            {
+                realname.style.display = 'none';
+                userEmail.style.display = 'none';
+            }
+            if (!current_user.bio)
+                userBio.textContent = "no bio yet";
+            else
+                userBio.textContent = current_user.bio;
+            userimage.src = current_user.image;
+        }
+    }
+
     showUserProfile() {
         const modal = this.elements.profileModal;
         const profileStatusElement = document.getElementById('profileStatus');
@@ -585,6 +619,7 @@ class ChatApp {
             profileStatusElement.style.display = 'block';
             profileStatusElement.textContent = this.friends.has(this.selectedUser) ? 'Friend' : 'Not a Friend';
         }
+        this.set_profile_info();
         modal.style.display = 'block';
     }
 }
