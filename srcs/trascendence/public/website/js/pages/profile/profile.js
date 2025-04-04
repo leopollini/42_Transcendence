@@ -1,6 +1,7 @@
-import { current_user, updateUserProfile} from "../modes.js";
-import { profile, profiles} from "../../login/user.js";
+import { profile} from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
+import { showInfoModal } from "../../modal.js";
+import { navigate, current_user} from "../../main.js";
 
 export default function Profile() {
   return `
@@ -27,7 +28,7 @@ export default function Profile() {
       </div>
       <div class="profile-actions">
         <button id="save" class="button-style">Save Changes</button>
-        <button id="back" class="button-style" onclick="history.back()">Back To Menu</button>
+        <button id="back" class="button-style" >Back To Menu</button>
       </div>
     </div>
   `;
@@ -35,17 +36,23 @@ export default function Profile() {
 
 export let me = new profile(null, null, null, null, null, null);
 
-function insert_user_data() {
+function insert_user_data(current_user)
+{
   me.display_name = current_user.display_name;
   me.realname = current_user.realname || null;
   me.image = current_user.image;
   me.bio = (current_user.bio || "").replace(/^"/, '').replace(/"$/, '').replace(/\\n/g, "\n");
-  profiles.push(me);
+  return current_user;
 }
 
 export function profileHandler()
 {
-  insert_user_data();
+  let back_to_menu = document.querySelector("#back");
+  back_to_menu.addEventListener("click", () =>
+  {
+    navigate("/modes", "Return to Game Mode");
+  });
+  insert_user_data(current_user);
   document.querySelector("#profileImage").src = me.image;
   document.getElementById("imageUploadInput").style.display = "none";
   if (current_user.type === "guest")
@@ -70,8 +77,41 @@ export function profileHandler()
   });
 }
 
+function updateLogin(current_user)
+{
+  let data = "{ display_name :" + JSON.stringify(current_user.display_name) + ", bio :" + JSON.stringify(current_user.bio) + ", image : " + current_user.image + " }";
+  fetch("http://localhost:8008",
+  {
+    method: "update_user",
+    body: data
+  })
+  .then(data =>{
+    //console.log("(UPDATE_USER)\ndata update user profile = ", data);
+  })
+  .catch(error => console.error("Error with update_user:", error));
+}
+
+function updateGuest(current_user)
+{
+  let data = "{ bio :" + current_user.bio + ", image : " + JSON.stringify(current_user.image) + " }";
+  fetch("http://localhost:8008",
+    {
+      method: "update_user",
+      body: data
+    })
+    .then(data =>
+    {
+      console.log("(UPDATE_USER)\ndata update user profile for guest  = ", data);
+    })
+    .catch(error => console.error("Error with update_user:", error));
+}
+
 function saveProfile(infoContainer) {
-  let saving = "✅saved image successfully\n";
+  let saving;
+  if (current_user.image === me.image)
+    saving = "no canges in image have been made\n";
+  else
+  saving = "✅saved image successfully\n";
   current_user.image = me.image;
   let checkbio;
   if (current_user.bio)
@@ -92,19 +132,12 @@ function saveProfile(infoContainer) {
   }
   else
   {
-    let data = JSON.stringify({"display_name" : current_user.display_name, "image" : current_user.image, 
-    "bio" : current_user.bio});
-    fetch("http://localhost:8008",
-    {
-      method: "update_user",
-      body: data
-    })
-    .then(data =>{
-      //console.log("(UPDATE_USER)\ndata update user profile = ", data);
-    })
+    if (sessionStorage.getItem('type') === "guest")
+      updateGuest(current_user);
+    else
+      updateLogin(current_user);
   }
-  alert(saving);
-  updateUserProfile(current_user);
+  showInfoModal(saving, () => {});
   history.back();
 }
 

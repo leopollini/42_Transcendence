@@ -1,17 +1,15 @@
-import { escapeHTML, isValidImageExtension, isValidImageData} from "../../../login/user.js";
-
+import { escapeHTML, validateUploadedImage} from "../../../security/security.js";
+import { showInfoModal } from "../../../modal.js";
 export function savebio(me, yourDataSection)
 {
     const bioInput = yourDataSection.querySelector('#bioInput');
-    const newBio = bioInput.value;
-
-    newBio = escapeHTML(newBio);
+    const newBio = escapeHTML(bioInput.value);
 
     let polbio = yourDataSection.querySelector('#bioSection');
     polbio.style.width = "50%";
 
     if (!newBio)
-        return ("Error: No Bio saved(Please enter a bio next time)\n");
+        return ("No Bio saved(Please enter a bio next time)\n");
     if (newBio.length >= 400)
         return ("Error: Bio too big\n");
     me.bio = JSON.stringify(newBio);
@@ -22,9 +20,8 @@ export function savebio(me, yourDataSection)
 export function savename(me, yourDataSection)
 {
     const changeName = yourDataSection.querySelector('#displayNameInput');
-    const newname = changeName.value;
-    
-    newname = escapeHTML(newname);
+    const newname = escapeHTML(changeName.value);
+
     let polname = yourDataSection.querySelector('#changeDisplayName');
     polname.style.width = "50%";
     
@@ -43,51 +40,46 @@ export function savename(me, yourDataSection)
         return ("Error: name already taken(" + newname + ")\n");
 }
 
-export function saveimage(me, yourDataSection)
-{
-    //const changeProfileImageBtn = yourDataSection.querySelector('#changeProfileImageBtn');
+export async function saveimage(me, yourDataSection) {
     const imageUploadInput = yourDataSection.querySelector('#imageUploadInput');
     const profileImage = yourDataSection.querySelector('#profileImage');
-    
-    profileImage.addEventListener('click', () => {
+
+    profileImage.addEventListener('click', () =>
+    {
+        imageUploadInput.value = '';
         imageUploadInput.click();
     });
 
-    imageUploadInput.addEventListener('change', (event) => {
+    imageUploadInput.addEventListener('change', async (event) =>
+    {
         const file = event.target.files[0];
         if (file)
         {
-            if (!file.type.startsWith('image/'))
+            try
             {
-                alert("Error: Please select a valid image file.\n");
-                return;
-            }
-            if (!isValidImageExtension(file.name)) {
-                alert("Error: Invalid image file extension.\n");
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                alert("Error: Image file is too large. Maximum size is 5MB.\n");
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const newImage = e.target.result;
-                if (isValidImageData(newImage))
+                await validateUploadedImage(file);
+                const reader = new FileReader();
+                reader.onload = async (e) => 
                 {
+                    const newImage = e.target.result;
+                    if (profileImage.src === newImage)
+                    {
+                        showInfoModal("This image is already selected.", () => {});
+                        return;
+                    }
                     me.image = newImage;
                     profileImage.src = newImage;
-                }
-                else
-                    alert("Error: Invalid image data.");
-                me.image = newImage;
-                profileImage.src = newImage;
-            };
-            reader.readAsDataURL(file);
+                    showInfoModal("image changed successfully", () => {});
+                };
+                reader.readAsDataURL(file);
+            }
+            catch (error)
+            {
+            }
         }
         else
         {
-            alert("Error: No file selected.");
+            showInfoModal("Error: No file selected.", () => {});
             return;
         }
     });

@@ -2,9 +2,9 @@
 
 /var/common/setup_tools.sh
 
-GEMS=("pg" "digest")
+GEMS=("pg" "digest" "dotenv" "openssl" "base64" "colorize" "securerandom")
 
-for gm in $GEMS
+for gm in "${GEMS[@]}"
 do
     if [ -z "$(gem list | grep $gm)" ]; then
         gem install $gm

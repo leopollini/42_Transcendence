@@ -3,10 +3,8 @@ require 'json'
 require 'oauth2'
 require 'rack'
 require 'colorize'
-#INIZIO per salvare dati nella sessione
 require 'rack/session/cookie'
 require 'securerandom'
-#FINE per salvare dati nella sessione
 require_relative 'Oauth'
 require_relative 'logic'
 require_relative 'other_logic'
@@ -17,16 +15,20 @@ Dotenv.load
 class App
   include AuthMethods
   include Other_logic
-
+  
   def initialize(client, logger)
     @client = client
     @logger = logger
     @spa_route = JSON.parse(ENV['SPA_ROUTES'] || '[]')
     @app = Rack::Builder.new do
-      use Rack::Session::Cookie, secret: SecureRandom.hex(64), httponly: true, secure: true
+      use Rack::Session::Cookie, 
+          secret: ENV['SECRET_PASSWORD'] || SecureRandom.hex(64), 
+          httponly: true, 
+          secure: true, 
+          same_site: 'strict'
+
       run self
     end
-    # @is_logged_in = false
   end
 
   def call(env)

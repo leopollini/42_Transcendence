@@ -10,11 +10,11 @@
 }
 
 #avatarName {
-    font-family: 'Liberty', sans-serif;
     font-size: clamp(15px, 2vw, 25px);
     color: #ffffff;
-    text-shadow: 0 0 5px rgb(255 255 255 / 50%), 0 0 10px rgb(255 255 255 / 30%), 0 0 15px #ffffff;
     position: relative;
+    font-family: 'Inter', sans-serif;
+    font-variant: normal;
 }
 
 .avatar-image {

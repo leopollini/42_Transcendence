@@ -1,47 +1,47 @@
 import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
-import { current_user } from '../modes.js';
-import { escapeHTML } from '../../login/user.js';
+import { current_user } from '../../main.js';
+import { escapeHTML } from '../../security/security.js';
+
 class ChatApp {
     constructor() {
         this.chats = new Map();
-        this.unreadCounts = {}; // { chatId: numeroMessaggiNonLetti }
+        this.unreadCounts = {}; // { chatId: number of unread messages }
         this.currentChat = 'general';
         this.friends = new Set();
         this.pendingRequests = new Set();
-        this.receivedRequests = []; // Array di oggetti { from }
+        this.receivedRequests = []; // Array of objects { from }
         this.selectedUser = null;
         this.username = null;
         this.blockedUsers = new Set();
         this.disabledChats = {};
+        this.userColors = new Map(); // Map to store assigned colors for users
+        this.assignedColors = new Set();
         this.initialize();
     }
 
-    // Ritorna il partner della chat privata
+    // Returns the chat partner for a private chat
     getChatPartner(chatId) {
         const parts = chatId.replace('private-', '').split('-');
         return parts[0] === this.username ? parts[1] : parts[0];
     }
 
-    // Genera l'ID della chat privata in base ai nomi degli utenti
+    // Generates the private chat ID based on the usernames
     getPrivateChatId(user1, user2) {
-        user1 = user1;
-        user2 = user2;
         return user1 < user2 ? `private-${user1}-${user2}` : `private-${user2}-${user1}`;
     }
 
     initialize() {
         this.initializeElements();
         setupEventListeners(this);
-        this.updateFriendsList();
-        this.updateFriendRequestsUI();
         this.initializeGeneralChat();
-        //console.log("SET USERNAME PROPERLY PLEASE")
-        // this.username = prompt("Inserisci il tuo username:");
-        //this.username = "Dave_" + String(Math.random())
-        this.username = current_user.display_name;
-        // Inizializza la connessione WebSocket
+
+        if (current_user && current_user.display_name)
+            this.username = current_user.display_name;
+        else
+            this.username = "default";
+
         this.socket = initSocket(this.username, this);
     }
 
@@ -57,19 +57,17 @@ class ChatApp {
             currentChatTitle: document.getElementById('currentChatTitle'),
             friendsList: document.getElementById('friendsList'),
             friendRequestsList: document.getElementById('friendRequestsList'),
-            blockedUsersList: document.getElementById('blockedUsersList'), // Nuovo elemento
+            blockedUsersList: document.getElementById('blockedUsersList'),
             contextMenu: document.getElementById('contextMenu'),
             profileModal: document.getElementById('profileModal'),
             closeProfile: document.getElementById('closeProfile'),
             friendsButton: document.getElementById('friendsButton'),
             friendRequestsButton: document.getElementById('friendRequestsButton'),
-            blockedUsersButton: document.getElementById('blockedUsersButton') // Nuovo elemento
+            blockedUsersButton: document.getElementById('blockedUsersButton')
         };
 
-        // Rendi draggable il menu contestuale
         makeDraggable(this.elements.contextMenu);
 
-        // Aggiungi l'evento per mostrare la lista degli utenti bloccati
         this.elements.blockedUsersButton.addEventListener('click', () => {
             this.switchToBlockedUsers();
         });
@@ -78,13 +76,6 @@ class ChatApp {
     initializeGeneralChat() {
         if (!this.chats.has('general')) {
             this.chats.set('general', []);
-            const generalChat = this.chats.get('general');
-            // generalChat.push({
-            //     date: new Date().toISOString(),
-            //     from: 'system',
-            //     to: 'general',
-            //     content: 'Welcome to General Chat!'
-            // });
             this.createChatElement('general', 'General Chat', false);
             this.updateMessagesDisplay();
         }
@@ -106,19 +97,18 @@ class ChatApp {
         this.updateMessagesDisplay();
         this.elements.currentChatTitle.textContent =
             chatId === 'general'
-                    ? 'General Chat'
-                    : chatId.replace('private-', '').charAt(0).toUpperCase() +
-                    chatId.replace('private-', '').slice(1);
+                ? 'General Chat'
+                : chatId.replace('private-', '').charAt(0) +
+                  chatId.replace('private-', '').slice(1);
         this.unreadCounts[chatId] = 0;
         this.updateBadge(chatId);
-    
-        // Se siamo nella chat generale o la chat privata non è disabilitata, abilita l'input
+
         if (chatId === 'general' || !this.disabledChats[chatId]) {
             this.elements.messageInput.disabled = false;
         } else {
             this.elements.messageInput.disabled = true;
         }
-    }    
+    }
 
     updateActiveTab() {
         document.querySelectorAll('.chat-tab').forEach((tab) => {
@@ -139,28 +129,65 @@ class ChatApp {
             return `<div class="message system"><div class="text">${msg.content}</div></div>`;
         } else {
             const className = msg.from === this.username ? 'self' : 'other';
+            const senderColor = this.getUserColor(msg.from);
+            const time = new Date();
+            const hours = time.getHours().toString().padStart(2, '0');
+            const minutes = time.getMinutes().toString().padStart(2, '0');
+            const formattedTime = `${hours}:${minutes}`;
+
             return `<div class="message ${className}">
-                        <div class="sender">${msg.from.charAt(0).toUpperCase() + msg.from.slice(1)}:</div>
+                        <div class="sender" style="color: ${senderColor};">
+                            ${msg.from.charAt(0) + msg.from.slice(1)}
+                        </div>
                         <div class="text">${msg.content}</div>
+                        <div class="time">${formattedTime}</div>
                     </div>`;
         }
     }
 
-    // IMPLEMENTAZIONE DEL BLOCK USER
-    blockUser(user) {
-        user = user;
+    getUserColor(username) {
+        if (this.userColors.has(username)) {
+            return this.userColors.get(username);
+        }
 
-        // Aggiunge l'utente alla lista dei bloccati
+        let color;
+        do {
+            color = this.generateRandomColor();
+        } while (this.assignedColors.has(color));
+
+        this.userColors.set(username, color);
+        this.assignedColors.add(color);
+        return color;
+    }
+
+    generateRandomColor() {
+        let color;
+        do {
+            const hue = Math.floor(Math.random() * 360);
+            color = `hsl(${hue}, 70%, 50%)`;
+        } while (this.isForbiddenColor(color));
+        return color;
+    }
+
+    isForbiddenColor(color) {
+        const forbiddenColors = ['rgb(255, 255, 255)', 'rgb(72, 31, 31)'];
+        const div = document.createElement('div');
+        div.style.color = color;
+        document.body.appendChild(div);
+        const computedColor = window.getComputedStyle(div).color;
+        document.body.removeChild(div);
+        return forbiddenColors.includes(computedColor);
+    }
+
+    blockUser(user) {
         this.blockedUsers.add(user);
-        
-        // Se l'utente è già un amico, rimuovilo e aggiorna la lista amici
+
         if (this.friends.has(user)) {
             this.socket.send(JSON.stringify({ type: "remove_friend", to: user }));
             this.friends.delete(user);
             this.updateFriendsList();
         }
-        
-        // Se esiste una chat privata con l'utente, disabilita l'input e notifica l'evento
+
         const chatId = this.getPrivateChatId(this.username, user);
         if (this.chats.has(chatId)) {
             this.disablePrivateChat(chatId);
@@ -168,20 +195,16 @@ class ChatApp {
                 date: new Date().toISOString(),
                 from: 'system',
                 to: chatId,
-                content: `You have blocked ${user.charAt(0).toUpperCase() + user.slice(1)}.`
+                content: `You have blocked ${user.charAt(0) + user.slice(1)}.`
             });
         }
-        
-        // Notifica il server dell'evento di block (se il server lo gestisce)
+
         this.socket.send(JSON.stringify({ type: "block_user", to: user }));
-        //console.log(`User ${user} has been blocked.`);
     }
 
     unblockUser(user) {
-        user = user;
         if (this.blockedUsers.has(user)) {
             this.blockedUsers.delete(user);
-            // Notifica il server dell'unblock (se previsto)
             this.socket.send(JSON.stringify({ type: "unblock_user", to: user }));
             const chatId = this.getPrivateChatId(this.username, user);
             if (this.chats.has(chatId)) {
@@ -189,35 +212,29 @@ class ChatApp {
                     date: new Date().toISOString(),
                     from: 'system',
                     to: chatId,
-                    content: `You have unblocked ${user.charAt(0).toUpperCase() + user.slice(1)}.`
+                    content: `You have unblocked ${user.charAt(0) + user.slice(1)}.`
                 });
-                // Abilita l'input solo se i due sono amici
                 if (this.currentChat === chatId && this.friends.has(user)) {
                     this.enablePrivateChat();
                 }
             }
-            // Aggiorna la UI della lista bloccati
             this.updateBlockedUsersList();
-            //console.log(`User ${user} has been unblocked.`);
         }
-    }    
+    }
 
     addMessageToChat(chatId, msg) {
-        // Assicurati che msg.from sia definito, altrimenti assegnalo come 'system'
         const sender = msg.from || 'system';
-        msg.from = sender; // Aggiorna il messaggio con il sender garantito
-    
-        // Se il messaggio non proviene dal sistema e il mittente è bloccato, ignora il messaggio
+        msg.from = sender;
+
         if (sender !== 'system' && this.blockedUsers.has(sender)) {
             return;
         }
-    
+
         if (!this.chats.has(chatId)) {
             this.chats.set(chatId, []);
         }
         this.chats.get(chatId).push(msg);
-        
-        // Gestione dei badge per messaggi non letti in chat private diverse da quella attuale
+
         if (chatId !== this.currentChat && chatId.startsWith('private-')) {
             if (!this.unreadCounts[chatId]) {
                 this.unreadCounts[chatId] = 0;
@@ -228,7 +245,7 @@ class ChatApp {
         if (this.currentChat === chatId) {
             this.updateMessagesDisplay();
         }
-    }    
+    }
 
     updateBadge(chatId) {
         const tab = document.querySelector(`.chat-tab[data-chat="${chatId}"]`);
@@ -250,7 +267,7 @@ class ChatApp {
         const chatTab = document.createElement('div');
         chatTab.className = 'chat-tab active';
         chatTab.dataset.chat = chatId;
-        chatTab.textContent = title.charAt(0).toUpperCase() + title.slice(1);
+        chatTab.textContent = title.charAt(0) + title.slice(1);
         const badge = document.createElement('span');
         badge.className = 'unread-badge';
         badge.textContent = '0';
@@ -273,13 +290,11 @@ class ChatApp {
         if (this.currentChat === chatId) {
             this.switchChat('general');
         }
-    }    
+    }
 
     openPrivateChat(user) {
-        user = user;
         if (!this.friends.has(user)) return;
         const chatId = this.getPrivateChatId(this.username, user);
-        // Controlla se la chat esiste già sia nel Map che nel DOM
         if (!this.chats.has(chatId) && !document.querySelector(`.chat-tab[data-chat="${chatId}"]`)) {
             this.chats.set(chatId, []);
             this.createChatElement(chatId, user, true);
@@ -287,14 +302,14 @@ class ChatApp {
                 date: new Date().toISOString(),
                 from: 'system',
                 to: chatId,
-                content: `Private chat with ${user.charAt(0).toUpperCase() + user.slice(1)} started.`
+                content: `Private chat with ${user.charAt(0) + user.slice(1)} started.`
             });
             this.socket.send(JSON.stringify({ type: "private_chat_started", to: user }));
         }
         this.selectedUser = user;
         this.switchChat(chatId);
         this.enablePrivateChat();
-    }    
+    }
 
     disablePrivateChat(chatId) {
         if (!this.disabledChats[chatId]) {
@@ -312,11 +327,10 @@ class ChatApp {
     }
 
     enablePrivateChat() {
-        // Attiva l'input solo se la chat attuale è privata.
         if (this.currentChat !== 'general') {
             this.elements.messageInput.disabled = false;
         }
-    }    
+    }
 
     sendMessage() {
         const text = escapeHTML(this.elements.messageInput.value);
@@ -347,7 +361,7 @@ class ChatApp {
             const friendItem = document.createElement('div');
             friendItem.className = 'friend-item';
             friendItem.dataset.user = user;
-            friendItem.textContent = user.charAt(0).toUpperCase() + user.slice(1);
+            friendItem.textContent = user.charAt(0) + user.slice(1);
             this.elements.friendsList.appendChild(friendItem);
         });
     }
@@ -356,16 +370,29 @@ class ChatApp {
         if (!this.elements.friendRequestsList) return;
         this.elements.friendRequestsList.innerHTML = '';
         this.receivedRequests.forEach((req, index) => {
-            const formattedName = req.from.charAt(0).toUpperCase() + req.from.slice(1);
+            const formattedName = req.from.charAt(0) + req.from.slice(1);
             const item = document.createElement('div');
             item.className = 'friend-request-item';
-            item.innerHTML = `<span>${formattedName}</span>
-                <div>
-                    <button data-index="${index}" class="accept-request"></button>
-                    <button data-index="${index}" class="reject-request"></button>
-                </div>`;
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = formattedName;
+
+            const buttonsDiv = document.createElement('div');
+            const acceptButton = document.createElement('button');
+            acceptButton.className = 'accept-request';
+            acceptButton.dataset.index = index;
+            const rejectButton = document.createElement('button');
+            rejectButton.className = 'reject-request';
+            rejectButton.dataset.index = index;
+
+            buttonsDiv.appendChild(acceptButton);
+            buttonsDiv.appendChild(rejectButton);
+            item.appendChild(nameSpan);
+            item.appendChild(buttonsDiv);
+
             this.elements.friendRequestsList.appendChild(item);
         });
+
         const acceptButtons = document.querySelectorAll('.accept-request');
         acceptButtons.forEach(btn => {
             btn.onclick = (e) => {
@@ -395,8 +422,7 @@ class ChatApp {
                 this.updateFriendRequestsUI();
             };
         });
-    
-        // Aggiorna il badge: se ci sono richieste, mostra il badge con il conteggio, altrimenti nascondilo
+
         const badge = document.getElementById('friendRequestsBadge');
         if (badge) {
             if (this.receivedRequests.length > 0) {
@@ -406,9 +432,8 @@ class ChatApp {
                 badge.style.display = 'none';
             }
         }
-    }    
+    }
 
-    // METODO PER AGGIORNARE LA LISTA DEGLI UTENTI BLOCCATI
     updateBlockedUsersList() {
         if (!this.elements.blockedUsersList) return;
         this.elements.blockedUsersList.innerHTML = '';
@@ -416,23 +441,18 @@ class ChatApp {
             const blockedItem = document.createElement('div');
             blockedItem.className = 'blocked-user-item';
             blockedItem.dataset.user = user;
-            blockedItem.textContent = user.charAt(0).toUpperCase() + user.slice(1);
+            blockedItem.textContent = user.charAt(0) + user.slice(1);
             this.elements.blockedUsersList.appendChild(blockedItem);
         });
     }
 
-    // METODO PER PASSARE AL TAB DEGLI UTENTI BLOCCATI
     switchToBlockedUsers() {
-        // Nascondi le altre liste
         this.elements.friendsList.style.display = 'none';
         this.elements.friendRequestsList.style.display = 'none';
-        // Mostra la lista degli utenti bloccati
         this.elements.blockedUsersList.style.display = 'block';
-        // Aggiorna lo stato "active" degli elementi dei tab
         this.elements.friendsButton.classList.remove('active');
         this.elements.friendRequestsButton.classList.remove('active');
         this.elements.blockedUsersButton.classList.add('active');
-        // Aggiorna la lista degli utenti bloccati
         this.updateBlockedUsersList();
     }
 
@@ -442,15 +462,13 @@ class ChatApp {
         menu.style.display = 'block';
         menu.style.left = `${x}px`;
         menu.style.top = `${y}px`;
-    
-        // Recupera gli elementi del menu contestuale
+
         const chatItem = menu.querySelector('[data-action="chat"]');
         const addFriendItem = menu.querySelector('[data-action="addFriend"]');
         const inviteItem = menu.querySelector('[data-action="invite"]');
         const profileItem = menu.querySelector('[data-action="profile"]');
         const blockItem = menu.querySelector('[data-action="block"]');
-    
-        // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
+
         if (user === this.username) {
             chatItem.style.display = 'none';
             addFriendItem.style.display = 'none';
@@ -458,14 +476,11 @@ class ChatApp {
             profileItem.style.display = 'block';
             blockItem.style.display = 'none';
             return;
-        }
-    
-        // Se l'utente è bloccato, mostra SOLO le opzioni: Add Friend, View Profile, Unblock User
+        }        
+
         if (this.blockedUsers.has(user)) {
-            // Nascondi le opzioni non utili per un utente bloccato
             chatItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
-            // Mostra Add Friend (con logica già presente)
             addFriendItem.style.display = 'block';
             if (this.friends.has(user)) {
                 addFriendItem.textContent = 'Remove Friend';
@@ -477,17 +492,14 @@ class ChatApp {
                 addFriendItem.textContent = 'Add Friend';
                 addFriendItem.style.opacity = '1';
             }
-            // Mostra View Profile
             profileItem.style.display = 'block';
-            // Imposta l'opzione block come "Unblock User"
             blockItem.style.display = 'block';
             blockItem.textContent = 'Unblock User';
             return;
         }
-    
-        // Se l'utente non è bloccato, usa la logica standard
+
         chatItem.style.display = this.friends.has(user) ? 'block' : 'none';
-    
+
         if (user === 'general') {
             addFriendItem.style.display = 'none';
         } else {
@@ -503,12 +515,12 @@ class ChatApp {
                 addFriendItem.style.opacity = '1';
             }
         }
-    
+
         if (inviteItem) inviteItem.style.display = 'block';
         profileItem.style.display = 'block';
         blockItem.style.display = 'block';
         blockItem.textContent = 'Block User';
-    }    
+    }
 
     hideContextMenu() {
         this.elements.contextMenu.style.display = 'none';
@@ -525,7 +537,7 @@ class ChatApp {
                         date: new Date().toISOString(),
                         from: 'system',
                         to: this.currentChat,
-                        content: `You cannot send a friend request to ${this.selectedUser.charAt(0).toUpperCase() + this.selectedUser.slice(1)} because you blocked him.`
+                        content: `You cannot send a friend request to ${this.selectedUser.charAt(0) + this.selectedUser.slice(1)} because you blocked him.`
                     });
                 } else {
                     if (this.friends.has(this.selectedUser)) {
@@ -542,12 +554,11 @@ class ChatApp {
                         }
                     }
                 }
-                break;                
+                break;
             case 'profile':
                 this.showUserProfile();
                 break;
             case 'invite':
-                // Logica per l'invito
                 break;
             case 'block':
                 if (this.blockedUsers.has(this.selectedUser)) {
@@ -566,7 +577,7 @@ class ChatApp {
         const modal = this.elements.profileModal;
         const profileStatusElement = document.getElementById('profileStatus');
         document.getElementById('profileName').textContent =
-            this.selectedUser.charAt(0).toUpperCase() + this.selectedUser.slice(1);
+            this.selectedUser.charAt(0) + this.selectedUser.slice(1);
 
         if (this.selectedUser === this.username) {
             profileStatusElement.style.display = 'none';
