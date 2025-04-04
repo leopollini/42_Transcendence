@@ -50,7 +50,7 @@ class GuestsList
   end
   def login_with_token(token)
     @guests.each do |entry|
-      return @guest.to_json.merge({'status' => 'success', 'success' => 'true'}) if entry['token'].to_s == token
+      return entry.merge({'status' => 'success', 'success' => 'true'}) if entry['token'].to_s == token
     end
     return {'status' => 'invalid token', 'success' => 'false'}
   end
