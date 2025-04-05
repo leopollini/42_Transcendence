@@ -1,4 +1,3 @@
-import { eraseCookie } from "../../../login/user.js";
 import { navigate, current_user, nullify_user} from "../../../main.js";
 import { free_users } from "../../../security/security.js";
 import { showInfoModal } from "../../../modal.js";
@@ -75,8 +74,6 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             }
             free_users();
             nullify_user();
-            eraseCookie("user_token");
-            sessionStorage.removeItem("type");
             sessionStorage.setItem("already in", 0);
             localStorage.setItem("session opened", 0);
             navigate("/", "login");

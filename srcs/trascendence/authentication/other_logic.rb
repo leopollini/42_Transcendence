@@ -43,12 +43,6 @@ module Other_logic
     }
     puts "adding token cookie"
     response.body = SimpleServer.method_req("login_user", payload)
-    #  ####BROKEN####
-    # data = JSON.parse(response.body)
-    # if (data["token"])
-    #   token = data["token"]
-    #   response.data['cookies'] << WEBrick::Cookie.new("logged_token", token)
-    # end
     puts response
     data = JSON.parse(response)
     if data["token"]

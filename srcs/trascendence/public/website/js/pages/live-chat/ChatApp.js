@@ -516,7 +516,7 @@ class ChatApp {
         const blockItem = menu.querySelector('[data-action="block"]');
     
         // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
-        if (user === this.username && sessionStorage.getItem("type") === "login"){
+        if (user === this.username && current_user.type === "login"){
             chatItem.style.display = 'none';
             addFriendItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
@@ -642,7 +642,7 @@ class ChatApp {
             lastOnline.textContent = "Online";
             statusIndicator.classList.remove('offline');
             statusIndicator.classList.add('online');
-            if (sessionStorage.getItem("type", 1) === "login")
+            if (current_user.type === "login")
             {
                 realname.textContent = current_user.realname;
                 userEmail.textContent = current_user.email;

@@ -3,7 +3,6 @@ import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
 import { showInfoModal } from '../modal.js';
 import { nullify_user } from '../main.js';
-import { eraseCookie } from '../login/user.js';
 
 export default function Modes()
 {
@@ -66,7 +65,6 @@ window.onpopstate = function ()
         localStorage.setItem("session opened", 0);
         nullify_user();
         free_users();
-        eraseCookie("user_token");
     }
 };
 

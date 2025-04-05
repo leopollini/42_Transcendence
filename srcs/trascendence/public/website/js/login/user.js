@@ -36,43 +36,13 @@ export class Friend {
     }
 }
 
-export function readCookie(name)
-{
-    let nameCookie = name + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let cookieArray = decodedCookie.split(';');
-
-    for (let i = 0; i < cookieArray.length; i++) {
-        let cookie = cookieArray[i].trim();
-        if (cookie.startsWith(nameCookie)) {
-            return cookie.substring(nameCookie.length);
-        }
-    }
-    return null;
-}
-
-export function eraseCookie(name)
-{
-    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-}
-
-export function saveCookie(name, element, days)
-{
-    let data = new Date();
-    data.setTime(data.getTime() + (days * 24 * 60 * 60 * 1000));
-    let expire_date = "expires=" + data.toUTCString();
-    document.cookie = name + "=" + encodeURIComponent(JSON.stringify(element)) + ";" + expire_date + ";path=/";
-}
-
-
 export async function restore_user()
 {
     if (window.location.pathname === '/' || (sessionStorage.getItem('already in') !== '1' && localStorage.getItem('session opened', 0) !== '1'))
         return null;
-    let token = readCookie("user_token").replace(/"/g, '');
     try
     {
-        let data = JSON.stringify({ "params" : [{'token' : token}]});
+        let data = JSON.stringify({ "params" : [{'token' : 'token'}]});
         const response = await fetch("http://localhost:8008",
         {
             method: "get_user",
@@ -85,21 +55,13 @@ export async function restore_user()
         {
             if (result.success === "true" && result.status === "success")
             {
-                let type = -1;
-                if (sessionStorage.getItem("type", 1) === "guest")
-                    type = 0;
-                else if (sessionStorage.getItem("type", 1) === "login")
-                    type = 1;
-                else
-                    return null;
-                let user_type = type === 1 ? "user" : "guest";
                 const ref_user = new profile(
                     "",
                     result.username,
                     "",
                     result.bio,
                     result.image,
-                    user_type
+                    result.type
                 );
                 sessionStorage.setItem('already in', 1);
                 localStorage.setItem('session opened',1);
@@ -110,14 +72,12 @@ export async function restore_user()
             {
                 showInfoModal("ERROR: An error has occured(\"" + result.status + "\")", () => {});
                 nullify_user();
-                sessionStorage.removeItem("type");
                 navigate("/", "home");
                 return null;
             }
         }
         else
             showInfoModal("no result??", () => {});
-            
     }
     catch (error)
     {

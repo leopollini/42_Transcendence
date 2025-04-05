@@ -88,7 +88,14 @@ function updateLogin(current_user)
   .then(data =>{
     //console.log("(UPDATE_USER)\ndata update user profile = ", data);
   })
-  .catch(error => console.error("Error with update_user:", error));
+  .catch(error =>
+  {
+    console.error("Error with update_user:", error);
+    if (error instanceof SyntaxError)
+      console.error("This is a syntax error, potentially related to invalid JSON formatting.");
+    else if (error instanceof TypeError)
+      console.error("This is a type error, possibly due to network issues or response problems.");
+  });
 }
 
 function updateGuest(current_user)
@@ -103,7 +110,14 @@ function updateGuest(current_user)
     {
       console.log("(UPDATE_USER)\ndata update user profile for guest  = ", data);
     })
-    .catch(error => console.error("Error with update_user:", error));
+    .catch(error =>
+      {
+        console.error("Error with update_user:", error);
+        if (error instanceof SyntaxError)
+          console.error("This is a syntax error, potentially related to invalid JSON formatting.");
+        else if (error instanceof TypeError)
+          console.error("This is a type error, possibly due to network issues or response problems.");
+      });
 }
 
 function saveProfile(infoContainer) {

@@ -43,7 +43,7 @@ function popupHandling(popup, data)
 
 function get_data()
 {
-    let data = JSON.stringify({"params" :{}});
+    let data = JSON.stringify({"params" :{'token' : 'token'}});
     fetch("http://localhost:8008", {
         method: "get_user",
         body: data
@@ -51,7 +51,7 @@ function get_data()
     .then(response => response.json())
     .then(data =>
     {
-        console.log("(GET_USER)\ndata login = ", data);
+        //console.log("(GET_USER)\ndata login = ", data);
         if (data.success === "true" && data.status === "success")
         {
             let user = data.user[0];
@@ -66,7 +66,6 @@ function get_data()
         
             change_name(new_user.login_name);
             update_image(new_user.image);
-            sessionStorage.setItem("type", "login");
             sessionStorage.setItem("already in", 1);
             localStorage.setItem("session opened", 1);
             update_user(new_user);   
@@ -76,13 +75,13 @@ function get_data()
             showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});;
             sessionStorage.setItem("already in", 0);
             localStorage.setItem("session opened", 0);
-            sessionStorage.removeItem("type");
             navigate("/", "login");
             return ;
         }
     })
-    .catch(error => {
-        console.error("Error fetching user data:", error);
+    .catch(error =>
+    {
+        console.error("Error with get_user:", error);
     });
 }
 

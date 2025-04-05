@@ -1,5 +1,3 @@
-import { readCookie } from "../login/user.js";
-import { current_user } from "../main.js";
 import { showInfoModal } from "../modal.js";
 
 export async function validateUploadedImage(file)
@@ -67,20 +65,22 @@ export function escapeHTML(str)
 
 export function free_users()
 {
-    if (readCookie("user_token"))
+    let data = JSON.stringify({});
+    fetch("http://localhost:8008",
     {
-        let user_token = readCookie("user_token");
-        let data = JSON.stringify({"token" : user_token});
-        fetch("http://localhost:8008",
-        {
-            method: "logout_user",
-            body: data
-        })
-        .then(data =>{
+        method: "logout_user",
+        body: data
+    })
+    .then(response => response.json())
+    .then(data =>
+    {
+        if (data.status !== "success" && data.success !== "true")
+            showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});
+        else
             console.log("deleting current user");
-        })
-        .catch(error => console.error("Error with logout_user:", error));
-    }
-    else
-        console.log("user_token not found");
+    })
+    .catch(error =>
+    {
+        console.error("Error with logout_user:", error);
+    });
 }

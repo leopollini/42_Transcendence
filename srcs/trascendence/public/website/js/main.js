@@ -19,7 +19,7 @@ import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import { eraseCookie, restore_user } from "./login/user.js";
+import {restore_user } from "./login/user.js";
 import { showInfoModal } from "./modal.js";
 
 import { free_users } from "./security/security.js";
@@ -283,10 +283,8 @@ function check_valid_operation(path)
     {
         free_users();
         nullify_user();
-        eraseCookie("user_token");
         localStorage.setItem('session opened', 0);
         sessionStorage.setItem('already in', 0);
-        sessionStorage.removeItem("type");
         return (0);
     }
     else if (path !== '/')

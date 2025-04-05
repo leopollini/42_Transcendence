@@ -3,13 +3,8 @@
 # require 'timeout'
 require 'json'
 require 'digest'
-require 'openssl'
-require 'base64'
-require 'dotenv'
 require 'securerandom'
 require 'colorize'
-
-Dotenv.load
 
 # load ((File.file? '/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')
 
@@ -37,43 +32,29 @@ LOGIN = BetterPG::SimplePG.new 'users',
 GUEST = GuestsList.new
 # REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image]
 
-def decrypt_token(encrypted_token)
-  decoded = Base64.strict_decode64(encrypted_token)
-  iv = decoded[0..15]
-  encrypted_data = decoded[16..-1]
+class TokenManager
+  TOKEN_GUEST_FILE = '/var/token.txt'
+  TOKEN_LOGIN_FILE = '/var/token_login.txt'
 
-  decipher = OpenSSL::Cipher.new('AES-256-CBC')
-  decipher.decrypt
-  decipher.key = ENV['ENCRYPTION_KEY'].to_s.ljust(32, "\0")[0, 32]
-  decipher.iv = iv
-
-  decrypted_token = decipher.update(encrypted_data) + decipher.final
-  return decrypted_token
-end
-
-def encrypt_token(token)
-  token = token.to_s.force_encoding('BINARY')
-
-  cipher = OpenSSL::Cipher.new('AES-256-CBC')
-  cipher.encrypt
-
-  key = ENV['ENCRYPTION_KEY'].to_s.ljust(32, "\0")[0, 32]
-  if key.nil? || key.empty?
-    raise "Error: ENCRYPTION_KEY is missing or empty"
-    return nil
+  def self.save_token_login(token)
+    `echo -n "#{token}" > #{TOKEN_LOGIN_FILE}`
   end
-  cipher.key = key
-  
-  iv = cipher.random_iv
 
-  if iv.nil? || iv.bytesize != 16
-    raise "Errore: IV non valido!"
+  def self.read_token_login
+    `cat #{TOKEN_LOGIN_FILE}`
   end
-  
-  encrypted = cipher.update(token) + cipher.final
 
-  encrypted_token = Base64.strict_encode64(iv + encrypted)
-  return encrypted_token
+  def self.save_token_guest(token)
+    `echo "#{token}" > #{TOKEN_GUEST_FILE}`
+  end
+
+  def self.read_token_guest
+    `cat #{TOKEN_GUEST_FILE}`
+  end
+
+  def self.delete_token
+    `rm #{TOKEN_GUEST_FILE}`
+  end
 end
 
 def add_user(_client, obj = nil)
@@ -119,13 +100,10 @@ def login_user(client, obj)
   puts "login_user called".green
   data = obj['data']
 
-  return GUEST.add_guest data if obj['login_as_guest'] == 'true'   # create a guest
-
-  if obj['token'].to_s == 'token'
-    if usr = (LOGIN.select ['token'], ['token = ?'], [obj['token']])[0]
-      return usr.merge({'status' => 'success', 'success' => 'true'})
-    end
-    return GUEST.login_with_token(obj['token'])
+  if obj['login_as_guest'] == 'true' && data.has_key?('image') && data.has_key?('username')
+    token = Digest::SHA256.hexdigest(SecureRandom.alphanumeric(8))
+    TokenManager.save_token_guest("#{token}")
+    return GUEST.add_guest(data, token)
   end
 
   r = nil
@@ -141,15 +119,14 @@ end
 
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
-  if (obj['token'])
-    token = decrypt_token(obj['token'].gsub('"', ''))
-    return GUEST.del_guest_by_token(token)
+  token = TokenManager.read_token_guest
+  status = GUEST.del_guest_by_token(token)
+  if status['success'] == 'true'
+    TokenManager.delete_token
+    return status
+  else
+    return status
   end
-  #return GUEST.del_guest obj['username'] if obj['username']
-  #return DEFAULT_MISSING_PARAM.clone unless obj['realname']
-
-  #realname = obj['realname'].strip.gsub(/[^a-zA-Z0-9\s]/, '')
-  #LOGIN.valueManipulation 'realname', realname, ['?'] => [realname]
 end
 
 def get_user(_client, obj = nil)
@@ -184,14 +161,12 @@ def get_user(_client, obj = nil)
         cols.append key.to_s
         keys.append val.to_s
       end
-      if p  && p['token']
-        token = decrypt_token(p['token'])
+      if p  && p['token'] == "token"
+        token = TokenManager.read_token_guest
         status = GUEST.get_token_name(token)
+        #senno login
+        puts "get_user #{status}".green
         return status
-      end
-      if p['username'] && p['type'].to_s != 'login'
-        t = GUEST.get_guests(['username = ?'], [p['username']], (p['logged_in'].to_s == 'true' ? true : false))
-        lst_guest += t if t
       end
       if !cols.empty?
         users = LOGIN.select(cols, ['?'] * cols.size, keys)
@@ -235,17 +210,6 @@ def update_user(_client, obj = nil)
   DEFAULT_SUCCESS_RES.clone
 end
 
-def drop_users(_client, _obj = nil)
-  does = 'yesiam' # obj['reallysure']
-  if does.to_s == 'yesiam'
-    LOGIN.dropTable ['?'], ['yesiam']
-    _client.puts DEFAULT_SUCCESS_RES.to_json
-    _client.close
-    exit
-  end
-  DEFAULT_ERROR_RES.clone
-end
-
 def user_manager(client, _server)
   puts "user manager called"
   res = DEFAULT_ERROR_RES.clone
@@ -263,11 +227,6 @@ def user_manager(client, _server)
       get_user client, bobj
     when 'update_user'
       update_user client, bobj
-    when 'drop_users'
-      drop_users client, bobj
-    when 'drop_guests'
-      puts "dropping all guests"
-      exit
     when 'login_user'
       login_user client, bobj
     when 'logout_user'
@@ -280,7 +239,7 @@ def user_manager(client, _server)
     puts "Backtrace: #{r.backtrace.join("\n")}".red
     return {'status' => "user_manager: error: #{r.to_s}", 'success' => 'false'}.to_json
   end
-  puts res
+  puts "res = #{res}".green
   client.puts res.to_json
 end
 
