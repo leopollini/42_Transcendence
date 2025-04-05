@@ -24,6 +24,7 @@
 @import url("live-chat/responsive.css");
 @import url("live-chat/friends.css");
 @import url("modal.css");
+@import url("game-section/forza4-customization.css");
 
 
 * {
@@ -41,7 +42,6 @@ html, body {
     text-align: center;
     height: 100%;
     margin: 0;
-    font-family: 'Liberty', sans-serif;
 }
 
 body {
