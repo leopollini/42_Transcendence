@@ -144,7 +144,6 @@ class ChatApp {
         if (msg.from === 'system') {
             return `<div class="message system"><div class="text">${msg.content}</div></div>`;
         } else {
-            console.log("this.username = ", this.username);
             const className = msg.from === this.username ? 'self' : 'other';
             const senderColor = this.getUserColor(msg.from); // Ora `getUserColor` funziona correttamente
     

@@ -81,8 +81,6 @@ export function free_users()
             else
                 console.log("deleting current user");
         }
-        else
-            showInfoModal("ERROR: No users", () => {});
     })
     .catch(error =>
     {
