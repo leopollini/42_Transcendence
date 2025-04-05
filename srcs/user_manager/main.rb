@@ -121,7 +121,7 @@ def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
   token = TokenManager.read_token_guest
   status = GUEST.del_guest_by_token(token)
-  if status['success'] == 'true'
+  if status && status['success'] == 'true'
     TokenManager.delete_token
     return status
   else
@@ -184,7 +184,8 @@ def get_user(_client, obj = nil)
 end
 
 def update_user(_client, obj = nil)
-  puts 'update_user called'.green if DEBUG_MODE
+  puts "\n\n\n\nhahahahhahahahahahah\n\n\n\n".yellow
+  puts 'update_user called' if DEBUG_MODE
 
   r = nil
   res = DEFAULT_ERROR_RES.clone

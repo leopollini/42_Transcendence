@@ -64,6 +64,7 @@ class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
     # return request_sorter req if req.method == "OPTIONS"
     status, headers, body = APP.call(req.meta_vars)
     res.status = status
+    res['Content-Security-Policy'] = "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com; style-src 'self' https://fonts.googleapis.com; img-src 'self' data:; connect-src 'self' http://localhost:8008; object-src 'none'"
     headers.each { |k, v| res[k] = v }
     log_error_details(req, status, body, LOGGER)
   

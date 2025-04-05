@@ -50,15 +50,9 @@ function update_guest(curr_guest)
       curr_guest.image,
       "guest"
   );
-  sessionStorage.setItem("already in", 1);
-  let data = JSON.stringify({
-  data : 
-  {
-    username : guest_user.display_name,
-    image : guest_user.image,
-  },
-    login_as_guest : "true"
-  });
+  let data = {"data" : {"username":guest_user.display_name,"image":guest_user.image},"login_as_guest":"true"};
+  data = JSON.stringify(data);
+  console.log("data risultante = ", data);
   fetch("http://localhost:8008",
   {
       method: "login_user",

@@ -85,39 +85,37 @@ function updateLogin(current_user)
     method: "update_user",
     body: data
   })
+  .then(response => response.json())
   .then(data =>{
     //console.log("(UPDATE_USER)\ndata update user profile = ", data);
   })
   .catch(error =>
   {
     console.error("Error with update_user:", error);
-    if (error instanceof SyntaxError)
-      console.error("This is a syntax error, potentially related to invalid JSON formatting.");
-    else if (error instanceof TypeError)
-      console.error("This is a type error, possibly due to network issues or response problems.");
   });
 }
 
 function updateGuest(current_user)
 {
-  let data = "{ bio :" + current_user.bio + ", image : " + JSON.stringify(current_user.image) + " }";
+  console.log("hello");
+  let data = JSON.stringify({
+    bio: current_user.bio,
+    image: current_user.image
+  });
   fetch("http://localhost:8008",
-    {
-      method: "update_user",
-      body: data
-    })
-    .then(data =>
-    {
-      console.log("(UPDATE_USER)\ndata update user profile for guest  = ", data);
-    })
-    .catch(error =>
-      {
-        console.error("Error with update_user:", error);
-        if (error instanceof SyntaxError)
-          console.error("This is a syntax error, potentially related to invalid JSON formatting.");
-        else if (error instanceof TypeError)
-          console.error("This is a type error, possibly due to network issues or response problems.");
-      });
+  {
+    method: "update_user",
+    body: data
+  })
+  .then(response => response.json())
+  .then(data =>
+  {
+    console.log("(UPDATE_USER)\ndata update user profile for guest  = ", data);
+  })
+  .catch(error =>
+  {
+    console.error("Error with update_user:", error);
+  });
 }
 
 function saveProfile(infoContainer) {
@@ -146,7 +144,7 @@ function saveProfile(infoContainer) {
   }
   else
   {
-    if (sessionStorage.getItem('type') === "guest")
+    if (current_user.type === "guest")
       updateGuest(current_user);
     else
       updateLogin(current_user);

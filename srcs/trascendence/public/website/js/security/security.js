@@ -74,10 +74,15 @@ export function free_users()
     .then(response => response.json())
     .then(data =>
     {
-        if (data.status !== "success" && data.success !== "true")
-            showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});
+        if (data && data.status && data.success)
+        {
+            if (data.status !== "success" && data.success !== "true")
+                showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});
+            else
+                console.log("deleting current user");
+        }
         else
-            console.log("deleting current user");
+            showInfoModal("ERROR: No users", () => {});
     })
     .catch(error =>
     {
