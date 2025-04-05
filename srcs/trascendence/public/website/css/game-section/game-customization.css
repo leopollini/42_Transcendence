@@ -118,12 +118,7 @@
     gap: 5px;
 }
 
-.background-canvas {
-    width: 210px;
-    height: 130px;
-    border: 1px solid #09a09b;
-    border-radius: 10px;
-}
+
 
 .background-label {
     display: inline-flex;
