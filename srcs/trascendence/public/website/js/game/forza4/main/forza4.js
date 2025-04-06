@@ -124,7 +124,8 @@ class Forza4Game {
 
 
     addEventListeners() {
-        f4BackToMenuButton.addEventListener('click', (event) => {
+        f4BackToMenuButton.addEventListener('click', () => {
+            sessionStorage.setItem("game ended", false);
             document.getElementById("app").style.background = 
             "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
             resetTimer(this);

@@ -197,6 +197,7 @@ export const addRobinRankingPageHandlers = () => {
     });
 
     robinBackToMenuButton?.addEventListener('click', () => {
+        sessionStorage.setItem("game ended", false);
         playerList = [];
         robinBackToMenuButton.style.display = "none";
         navigate("/modes", "Return to Game Mode");

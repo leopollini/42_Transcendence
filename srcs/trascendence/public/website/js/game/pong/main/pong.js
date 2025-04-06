@@ -141,7 +141,7 @@ export class PongGame {
             this.ball.checkPosition(this);
             if (powerUpActive) 
                 handlePowerups(this);
-            checkScore(this, mode);
+            checkScore(this);
         }
 
         if (background == "space")
@@ -277,7 +277,7 @@ export class PongGame {
         })
 
         backToMenuButton.addEventListener('click', () => {
-           
+            sessionStorage.setItem("game ended", false);
             gameCanvas.style.display = "none";  
             backToMenuButton.hidden = true;
             sessionStorage.setItem("winner", this.winner);
