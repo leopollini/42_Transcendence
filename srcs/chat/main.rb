@@ -69,7 +69,7 @@ class ChatService < WEBrick::Websocket::Servlet
         ChatStore.remove_friend target, @username
 
       when "private_chat_started"
-        ChatStore.clients[target].send_me({"from" => @username}, 'private_chat_started')
+        ChatStore.start_private_chat(@username)
 
       when "block_user"
         ChatStore.block target, @username
@@ -86,6 +86,9 @@ class ChatService < WEBrick::Websocket::Servlet
 
       when 'get_online_users'
         ChatStore.clients[@username].send_me({'users' => ChatStore.clients.filter{|c| c.alive?}}, 'online_users_list')
+
+      when 'get_state'
+        ChatStore.get_client_state(@username)
 
       else
         puts "Unknown message type: #{data["type"]}"

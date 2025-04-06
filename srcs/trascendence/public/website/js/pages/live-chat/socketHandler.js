@@ -15,7 +15,9 @@ function initSocket(username, chatAppInstance) {
         const msg = JSON.parse(event.data);
 
         if (msg.type === "state") {
-            const { friends, friendRequests, blockedUsers } = msg.data;
+            const friends = msg.data.friends
+            const friendRequests = msg.data.friend_requests
+            const blockedUsers = msg.data.blocked_users
             chatAppInstance.friends = new Set(friends);
             chatAppInstance.receivedRequests = friendRequests;
             chatAppInstance.blockedUsers = new Set(blockedUsers);
