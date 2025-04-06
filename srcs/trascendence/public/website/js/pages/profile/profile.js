@@ -18,7 +18,7 @@ export default function Profile() {
           <div id="changeDisplayName" class="form-group display-name-group">
             <label for="displayNameInput">Change your display name:</label>
             <input type="text" id="displayNameInput" class="input-field" autocomplete="off" placeholder="Insert your new name">
-            <span id="displayNameLabel" style="display: none;"></span>
+            <span id="displayNameLabel" class="is-hidden"></span>
           </div>
           <div id="bioSection" class="form-group bio-group">
             <label for="bioInput">Modify your bio:</label>

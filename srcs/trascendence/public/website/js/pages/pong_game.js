@@ -2,10 +2,10 @@ export default function PongGame()
 {
     return `
     <canvas id="gameCanvas"></canvas>
-    <div style="margin-top: 100px;">
-        <button class="button-style" id="backToBracketButton" style="display: none;">Back to Bracket</button>  
-        <button class="button-style" id="backToRobinButton" style="display: none;">Back to Ranking</button>
-        <button class="button-style" id="backToMenuButton" style="display: none;">Back to Menu</button>
+    <div class="menu-button-wrapper">
+        <button class="button-style hidden-button" id="backToBracketButton">Back to Bracket</button>  
+        <button class="button-style hidden-button" id="backToRobinButton">Back to Ranking</button>
+        <button class="button-style hidden-button" id="backToMenuButton">Back to Menu</button>
     </div>
     `;
 }

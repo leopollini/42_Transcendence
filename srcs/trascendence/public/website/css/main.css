@@ -89,3 +89,18 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #732a2a;
 }
+
+#gameCanvas {
+    display: block;
+    margin: 0 auto;
+}
+  
+.menu-button-wrapper {
+    margin-top: 100px;
+    text-align: center;
+}
+  
+.hidden-button {
+    display: none;
+}
+  

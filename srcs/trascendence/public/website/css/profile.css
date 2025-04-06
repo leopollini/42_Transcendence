@@ -148,3 +148,8 @@ textarea.input-field {
         height: 150px;
     }
 }
+
+.is-hidden {
+    display: none;
+  }
+  
