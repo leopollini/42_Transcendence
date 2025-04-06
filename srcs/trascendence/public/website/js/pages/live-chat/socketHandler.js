@@ -7,22 +7,25 @@ function initSocket(username, chatAppInstance) {
 
     socket.onopen = () => {
         socket.send(JSON.stringify({ type: "join", username }));
+
+        socket.send(JSON.stringify({ type: "get_state", username }));
     };
 
     socket.onmessage = (event) => {
         const msg = JSON.parse(event.data);
 
-//console.log(msg)
-
-        if (msg.type === "message") {
+        if (msg.type === "state") {
+            const { friends, friendRequests, blockedUsers } = msg.data;
+            chatAppInstance.friends = new Set(friends);
+            chatAppInstance.receivedRequests = friendRequests;
+            chatAppInstance.blockedUsers = new Set(blockedUsers);
+            chatAppInstance.updateFriendsList();
+            chatAppInstance.updateFriendRequestsUI();
+            chatAppInstance.updateBlockedUsersList();
+        }
+        else if (msg.type === "message") {
             chatAppInstance.addMessageToChat('general', msg.data);
         }
-        else if (msg.type === "match_request") {
-            // match request code
-        } 
-        else if (msg.type === "match_response") {
-            // match respone interpretation code
-        } 
         else if (msg.type === "private_message") {
             const partner = username === msg.data.from ? msg.data.to : msg.data.from;
             const chatId = chatAppInstance.getPrivateChatId(username, partner);
@@ -77,7 +80,7 @@ function initSocket(username, chatAppInstance) {
                 date: new Date().toISOString(),
                 from: 'system',
                 to: chatId,
-                content: `Private chat with ${msg.data.from.charAt(0).toUpperCase() + msg.data.from.slice(1)} started.`
+                content: `Private chat with ${msg.data.from.charAt(0) + msg.data.from.slice(1)} started.`
             });
         }        
         else if (msg.type === "system") {
@@ -102,7 +105,7 @@ function initSocket(username, chatAppInstance) {
             }
             chatAppInstance.addMessageToChat(chatAppInstance.currentChat, msg.data);
         }
-        if (msg.type === "match_request") {
+        else if (msg.type === "match_request") {
             // L'utente ricevente visualizza la richiesta di partita tramite modal di conferma
             const sender = msg.data ? msg.data.from : msg.from; // "userA"
             showConfirmModal(

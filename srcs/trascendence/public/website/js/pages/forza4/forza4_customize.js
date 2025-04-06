@@ -1,39 +1,49 @@
 import { navigate } from "../../main.js";
 import { token1Color, token2Color, powerUpMode } from "../../game/forza4/data/forza4_game_global.js";
 import { setToken1Color, setToken2Color, setBoardBackground, setPowerUpState } from "../../game/forza4/data/forza4_game_global.js";
+
 export function Forza4Customize() {
-    const html = `
-    <div id="forza4Customize">
-        <h1>Forza 4 Customize</h1>
-        <div id="forza4-elements-color">
-            <div>
-                <label for="token1Color">Token Player 1 Color:</label>
-                <input type="color" id="token1ColorPicker" value="#ffffff">
-            </div>
-            <div>
-                <label for="token2Color">Token Player 2 Color:</label>
-                <input type="color" id="token2ColorPicker" value="#ffffff">
-            </div>
+  const html = `
+    <section id="forza4Customize" class="customize-container">
+      <h1 class="page-title">Forza 4 Customization</h1>
+      <div class="customize-options">
+      
+        <!-- Color Settings -->
+        <div class="option-group color-options">
+          <div class="color-picker">
+            <label for="token1ColorPicker">Token Player 1 Color:</label>
+            <input type="color" id="token1ColorPicker" value="${token1Color}">
+          </div>
+          <div class="color-picker">
+            <label for="token2ColorPicker">Token Player 2 Color:</label>
+            <input type="color" id="token2ColorPicker" value="${token2Color}">
+          </div>
         </div>
-        <div id="forza4-backgrounds">
-                <label for="forza4-backgrounds" align="left">Backgrounds</label>
-                <div id="f4-backgrounds-container">
-                    <button id="f4ButtonBackground1" class="f4ButtonBackground">Classic</button>
-                    <button id="f4ButtonBackground2" class="f4ButtonBackground">Neon</button>
-                    <button id="f4ButtonBackground3" class="f4ButtonBackground">Faded 70's</button>
-                </div>
+        
+        <!-- Background Settings -->
+        <div class="option-group background-options">
+          <h2 class="section-title">Backgrounds</h2>
+          <div class="background-buttons">
+            <button id="f4ButtonBackground1" class="bg-button">Classic</button>
+            <button id="f4ButtonBackground2" class="bg-button">Neon</button>
+            <button id="f4ButtonBackground3" class="bg-button">Faded 70's</button>
+          </div>
+          <div id="f4BackgroundSelected" class="background-selected">Background Selected: None</div>
         </div>
-        <div id="powerup-checkbox-container" class="powerup-container">
-            <label class="powerup-label">
-                <input type="checkbox" id="powerup-checkbox" class="powerup-checkbox" />
-                <span class="powerup-text">Power-ups</span>
-            </label>
+        
+        <!-- Power-Up Setting -->
+        <div class="option-group powerup-options">
+          <label class="powerup-label">
+            <input type="checkbox" id="powerup-checkbox" class="powerup-checkbox" ${powerUpMode ? "checked" : ""} />
+            <span class="powerup-text">Power-ups</span>
+          </label>
         </div>
-        <label id="f4-background-selected">Background Selected: </label>
-    </div>
-    <button id="forza4ApplyCustom">Apply</button>
-    `;
-    return html;
+      
+      </div>
+      <button id="forza4ApplyCustom" class="customization-button">Apply</button>
+    </section>
+  `;
+  return html;
 }
 
 
@@ -46,7 +56,7 @@ export function forza4Config() {
     const f4ButtonBackground1 = document.getElementById('f4ButtonBackground1'); 
     const f4ButtonBackground2 = document.getElementById('f4ButtonBackground2');
     const f4ButtonBackground3 = document.getElementById('f4ButtonBackground3');
-    const f4BackgroundSelected = document.getElementById('f4-background-selected');
+    const f4BackgroundSelected = document.getElementById('f4BackgroundSelected');
     const f4powerupCheckbox = document.getElementById('powerup-checkbox');
 
     token1ColorPicker.value = token1Color;
