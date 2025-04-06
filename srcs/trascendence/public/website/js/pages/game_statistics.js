@@ -223,7 +223,7 @@ export async function forza4ShowUserStatistics() {
 export function forza4ShowMatchDetails() {
     const f4MatchDetailsContainer = document.getElementById("f4MatchDetailsContainer");
     
-    f4MatchDetailsContainer.innerHTML = "";
+    f4MatchDetailsContainer.textContent = "";
 
     if (f4UserData && f4UserData.length > 0) {
         f4UserData.forEach(match => {
@@ -304,9 +304,17 @@ export function forza4ShowMatchDetails() {
                 this.classList.toggle('collapsed');
             });
         });
-    } else {
-        f4MatchDetailsContainer.innerHTML = `<p class="no-matches">No matches found</p>`;
     }
+    else
+    {
+        f4MatchDetailsContainer.textContent = '';
+
+        const p = document.createElement('p');
+        p.classList.add('no-matches');
+        p.textContent = 'No matches found';
+        f4MatchDetailsContainer.appendChild(p);
+    }
+
 }
 
 
@@ -339,7 +347,7 @@ export async function pongShowMatchDetails() {
         return null;
     }
 
-    pongMatchDetailsContainer.innerHTML = "";
+    pongMatchDetailsContainer.textContent = "";
 
     if (pongUserData && pongUserData.length > 0) {
         pongUserData.forEach(match => {
@@ -413,8 +421,16 @@ export async function pongShowMatchDetails() {
                 this.classList.toggle('collapsed');
             });
         });
-    } else {
-        pongMatchDetailsContainer.innerHTML = `<p class="no-matches">No matches found</p>`;
+    }
+    else
+    {
+        pongMatchDetailsContainer.textContent = '';
+
+        const p = document.createElement('p');
+        p.classList.add('no-matches');
+        p.textContent = 'No matches found';
+
+        pongMatchDetailsContainer.appendChild(p);
     }
 }
 
