@@ -38,12 +38,12 @@ export function Charts() {
                 <div class="chart-item"><canvas id="matchLongestRallyChart"></canvas></div>
                 <div class="chart-item"><canvas id="winLossChart"></canvas></div>
                 <div class="chart-item">
-                    <h2>Matches Played</h2>
-                    <h1 id="matchesPlayed"></h1>
-                    <h2>Average Match Duration</h2>
-                    <h1 id="avgMatchTime"></h1>
-                    <h2>Points</h2>
-                    <h1 id="points"></h1>
+                    <h5>Matches Played</h5>
+                    <h4 id="matchesPlayed"></h4>
+                    <h3>Average Match Duration</h3>
+                    <h4 id="avgMatchTime"></h4>
+                    <h3>Points</h3>
+                    <h4 id="rankPointsLabel"></h4>
                 </div>
                 <div class="chart-item"><canvas id="xpProgressChart"></canvas></div>
             </div>
@@ -197,10 +197,10 @@ function drawWinLossHistoryChart(matchesData) {
 
 function matchesTimeRank() {
     const matchesPlayed = wins + losses;
+    const pointsLabel = document.getElementById('rankPointsLabel');
     const matchesPlayedLabel = document.getElementById('matchesPlayed');
     const avgMatchTimeLabel = document.getElementById('avgMatchTime');
-    const pointsLabel = document.getElementById('points');
-
+    
     let totalSeconds = 0;
     matchesPlayedLabel.textContent = matchesPlayed;
 
@@ -216,9 +216,12 @@ function matchesTimeRank() {
     const totalMatches = wins + losses;
     //const victoryRate = wins / (totalMatches) * 100;
 
-    const rankPoints = totalMatches + (wins * 10) - (losses * 5);
+    let rankPoints = totalMatches + (wins * 10) - (losses * 5);
+    
     if (rankPoints < 0)
         rankPoints = 0;
+
+    console.log("rankpointss => " + rankPoints);
     pointsLabel.textContent = rankPoints;
 }
 
@@ -241,21 +244,20 @@ export async function showCharts() {
         console.error("Fetch error:", error);
     }
 
-    //const noMatchesMessage = document.getElementById('noMatchesMessage');
-    //const chartsContainer = document.querySelector('.charts-container');
+    const noMatchesMessage = document.getElementById('noMatchesMessage');
+    const chartsContainer = document.querySelector('.charts-container');
     //const chartsButtonContainer = document.querySelector('.charts-button-container');
 
     if (!userData || userData.length === 0) {
-        //noMatchesMessage.style.display = 'block';
-        //chartsContainer.style.display = 'none'; // If no matches don't show charts
+        noMatchesMessage.style.display = 'block';
+        chartsContainer.style.display = 'none'; // If no matches don't show chartss
         //chartsButtonContainer.style.display = 'none';
         return;
     }
 
-    //noMatchesMessage.style.display = 'none';
+    noMatchesMessage.style.display = 'none';
     //chartsContainer.style.display = 'flex'; 
     //chartsButtonContainer.style.display = 'block';
-
     let lastMatchesData = userData.slice(-10);
 
     Chart.defaults.color = "#ffffff";
@@ -266,6 +268,7 @@ export async function showCharts() {
     drawWinLossChart();
     matchesTimeRank(lastMatchesData);
     drawWinLossHistoryChart(lastMatchesData);
+   
 }
 
 

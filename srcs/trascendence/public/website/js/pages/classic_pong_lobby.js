@@ -3,7 +3,11 @@ import { current_user } from "../main.js";
 import { escapeHTML } from "../security/security.js";
 import { showInfoModal } from "../modal.js";
 
-let matchPlayers = [];
+let invitedPlayers = [];
+let selectedPlayer;
+let numPlayersLabel;
+let numPlayersAccepted = 0;
+let totalPlayers = 2;
 
 export default function ClassicPongLobbyRoom() {
     return `
@@ -15,132 +19,95 @@ export default function ClassicPongLobbyRoom() {
             <span class="letter letter-4">g</span>
             <span class="letter letter-5"> </span>
             <span class="letter letter-6"> </span>
-            <span class="letter letter-7">g</span>
+            <span class="letter letter-7">G</span>
             <span class="letter letter-8">a</span>
             <span class="letter letter-9">m</span>
             <span class="letter letter-10">e</span>
         </h1>
-        <div id="pongLobbyRoom">
-            <div class="form" id="pongPlayerSearchForm">
-                <div>
-                    <h2 id="pongPlayerText">Search for opponent</h2> 
-                    <input type="text" id="pongPlayerSearch" class="form__field" placeholder="Search a player..." autocomplete="off">
-                    <button id="pongToggleSearchUser" class="button-style">Search</button>
-                </div>
-                <div>
-                    <h2 id="pongPlayerSearchResult">Waiting for User...</h2>
-                    <button id="pongToggleAddUser" class="button-style" disabled>Add</button>
-                </div>
-                <div>
-                    <h2 id="pongPlayerInviteResult">Waiting for Response...</h2>
-                    <button id="pongToggleStartGame" class="button-style" disabled>Start Game</button>
-                </div>
+        <div class="lobbyContainer">
+            <div class="lobbyLabel">Online</div>
+            <div class="lobbyBox" id="onlinePlayers">
+                <!-- Lista dei giocatori online -->
             </div>
-        </div>`;
+            <button id="pongInviteButton" class="button-style" disabled>Invite →</button>
+            <div id="pongNumPlayersLabel"></div>
+            <div class="lobbyBox" id="pongMatchPlayers">
+                <!-- Lista dei giocatori nel torneo -->
+            </div>
+        </div>
+        <button id="pongToggleStartMatch" class="button-style" disabled>Start Match</button>`;
 }
-
-
-// export function handleLobby(tournamentType, totPlayers) {
-//     //console.log("total players = " + totPlayers);
-//     const canvas = document.getElementById('lobbyUsersCanvas');
-//     //const ctx = canvas.getContext('2d');
-//     canvas.width = window.innerWidth * 0.5; 
-//     canvas.height = window.innerHeight * 0.9; 
-
-//     const numPlayersLabel = document.getElementById("numPlayers");
-//     numPlayersLabel.innerHTML = "0/" + Number(totPlayers);
-// }
-
 
 
 export function handleClassicPongLobby() {
-    matchPlayers = [];
-    matchPlayers.push(current_user.display_name);
-    //console.log("match players = " +matchPlayers[0]);
-}
+    const onlinePlayers = document.getElementById("onlinePlayers");
+    const matchPlayers = document.getElementById("pongMatchPlayers");
+    const inviteButton = document.getElementById("pongInviteButton");
+    numPlayersLabel = document.getElementById("pongNumPlayersLabel");
+    
+    numPlayersAccepted = 0;
+    selectedPlayer = null;
+    numPlayersLabel.textContent = "0/" + totalPlayers;
+    
+    if (current_user) {
+        const creatorDiv = document.createElement("div");
+        creatorDiv.classList.add("player");
+        creatorDiv.textContent = current_user.display_name;
+        matchPlayers.appendChild(creatorDiv);
+        invitedPlayers.push(current_user.display_name);
+        numPlayersAccepted++;
+        numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
+    }
+    
+    const players = ["Alice", "Bob", "Charlie", "David"];
+    players.forEach(player => {
+        const div = document.createElement("div");
+        div.classList.add("player");
+        div.textContent = player;
+        div.onclick = () => {
+            document.querySelectorAll(".player").forEach(el => el.style.background = "");
+            div.style.background = "#007bff";
+            div.style.color = "white";
+            selectedPlayer = div;
+            inviteButton.disabled = false;
+        };
+        onlinePlayers.appendChild(div);
+    });
 
-async function name(params) {
     
 }
-
-function searchUser(username) {
-    const pongPlayerSearchResult = document.getElementById("pongPlayerSearchResult");
-    const pongToggleAddUser = document.getElementById('pongToggleAddUser');
-    
-    if (!username)
-        return;
-    fetch("http://localhost:8008", {
-            method: "get_user",
-            body: JSON.stringify({ 
-                "params" : [{}] 
-            }) 
-        })
-        .then(response => response.json())
-        .then(data =>
-        {
-            if (!data || (!data.user && !data.guest)) 
-            {
-                nullify_user();
-                showInfoModal("ERROR: no users found...", () => {});
-                navigate("/", "home");
-                return;
-            }
-            let user_name;
-            let find_user = data.user?.find(u => u.username === username);
-            if (!find_user)
-                find_user = data.guest?.find(g => g.username === username);
-            if (find_user) 
-            {
-                user_name = find_user;
-                if (user_name && matchPlayers.includes(user_name.username)) {
-                    pongPlayerSearchResult.style.color = "red";
-                    pongPlayerSearchResult.textContent = "Cannot add urself as opponent"
-                    pongToggleAddUser.disabled = true;
-                }
-                else if (user_name) 
-                    fined_oppenet(user_name);
-            }
-            else {
-                pongPlayerSearchResult.style.color = "red";
-                pongPlayerSearchResult.textContent = "User Not Found";
-                pongToggleAddUser.disabled = true;
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching user data:", error);
-        });
-}
-
 
 export function addClassicPongLobbyPageHandlers() {
-    const backImageButton = document.getElementById('backImageButton');
-    const pongToggleSearchUser = document.getElementById('pongToggleSearchUser');
-    const pongPlayerSearch = document.getElementById('pongPlayerSearch');
-    const pongToggleStartGame = document.getElementById('pongToggleStartGame');
-    //const toggleAddUserRaw = document.getElementById('toggleAddUserRaw');
+    const toggleStartMatch = document.getElementById("pongToggleStartMatch");
+    const matchPlayers = document.getElementById("pongMatchPlayers");
+    const inviteButton = document.getElementById("pongInviteButton");
+    inviteButton.onclick = () => {
+        if (selectedPlayer && numPlayersAccepted < totalPlayers) {
+            const newPlayer = selectedPlayer.cloneNode(true);
+            newPlayer.style.background = "";
+            newPlayer.style.color = "white";
+            newPlayer.onclick = null;
+            matchPlayers.appendChild(newPlayer);
+            numPlayersAccepted++;
+            numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
+            invitedPlayers.push(selectedPlayer.textContent);
+            selectedPlayer.remove();
+            selectedPlayer = null;
+            inviteButton.disabled = true;
+            console.log("invited: " + invitedPlayers);
+            if (numPlayersAccepted === totalPlayers)
+                toggleStartMatch.disabled = false;
+        }
+    };
+
+    toggleStartMatch?.addEventListener('click', () => {
+
+        navigate( "/classic", "Pong Classic Game", invitedPlayers);
+    });
 
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");   
-        matchPlayers = [];     
+        invitedPlayers = [];     
     });
-
-    pongToggleSearchUser?.addEventListener('click', () => {
-        //console.log("searching user...." +pongPlayerSearch.value);
-        pongPlayerSearch.value = escapeHTML(pongPlayerSearch.value);
-        searchUser(pongPlayerSearch.value);
-    });
-
-    pongToggleAddUser?.addEventListener('click', () => {
-        const pongPlayerInviteResult = document.getElementById("pongPlayerInviteResult");
-
-        pongPlayerInviteResult.textContent = "Player Added: " + pongPlayerSearch.value;
-        pongToggleStartGame.disabled = false;
-        matchPlayers.push(pongPlayerSearch.value)
-    });
-
-
-    pongToggleStartGame?.addEventListener('click', () => {
-       navigate( "/classic", "Forza 4 Game", matchPlayers);
-    });
-
 }
+

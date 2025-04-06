@@ -15,11 +15,11 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     });
 
     tournamentButton?.addEventListener('click', () => {
-        if (current_user.type === "guest")
+        /*if (current_user.type === "guest")
         {
             showInfoModal("You must be logged to use this feature!", () => {}); showInfoModal("Select an opponent token!", () => {});
             return;
-        }
+        }*/
         navigate("/tournament", "Modalità Torneo");
     });
 

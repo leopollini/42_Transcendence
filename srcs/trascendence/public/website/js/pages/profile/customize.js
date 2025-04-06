@@ -1,6 +1,11 @@
 import { navigate } from "../../main.js";
-import { ballColor, paddleColor, ballTrailColor, wallsColor } from "../../game/pong/data/game_global.js";
+import { ballColor, paddleColor, ballTrailColor, wallsColor, background } from "../../game/pong/data/game_global.js";
 import { setBallColor, setBallTrailColor, setPaddleColor, setWallsColor, setPowerUpState, setBackground} from "../../game/pong/data/game_global.js";
+
+let previewCanvas;
+let ctx;
+let stars = [];
+const starCount = 30;
 
 export default function Customize() {
     return `
@@ -38,21 +43,18 @@ export default function Customize() {
             <h2 class="section-title">Backgrounds</h2>
             <div id="backgrounds-container" class="backgrounds-grid">
                 <div class="background-item">
-                    <canvas id="backgroundCanvas1" class="background-canvas"></canvas>
                     <label class="background-label">
                         <input type="radio" id="backgroundCheckbox1" name="background" class="background-checkbox" checked />
                         <span class="background-text">Space</span>
                     </label>
                 </div>
                 <div class="background-item">
-                    <canvas id="backgroundCanvas2" class="background-canvas"></canvas>
                     <label class="background-label">
                         <input type="radio" id="backgroundCheckbox2" name="background" class="background-checkbox" />
                         <span class="background-text">Classic</span>
                     </label>
                 </div>
                 <div class="background-item">
-                    <canvas id="backgroundCanvas3" class="background-canvas"></canvas>
                     <label class="background-label">
                         <input type="radio" id="backgroundCheckbox3" name="background" class="background-checkbox" />
                         <span class="background-text">Ping Pong</span>
@@ -70,21 +72,107 @@ export default function Customize() {
     `;
 }
 
-export function addCustomizeGame() {
+function initializeStarsPreviewBackground(width, height) {
+    stars = [];
+    for (let i = 0; i < starCount; i++) {
+        const starX = Math.random() * width;
+        const starY = Math.random() * height;
+        const starRadius = Math.random() * 0.5; // variazione di dimensione
+        stars.push({ x: starX, y: starY, radius: starRadius });
+    }
+}
 
+function drawPreview() {
+    // Recupera le dimensioni attuali del canvas
+    const width = previewCanvas.width;
+    const height = previewCanvas.height;
+    ctx.clearRect(0, 0, width, height);
+
+    // Black bg
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, width, height);
+
+    if (background === "space") {
+            // Initialize stars preview bg
+        if (stars.length === 0 || stars[0].x > width || stars[0].y > height) {
+            initializeStarsPreviewBackground(width, height);
+        }
+        // Draw stars
+        ctx.fillStyle = "white";
+        stars.forEach(star => {
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    else if (background === "classic") {
+        ctx.fillStyle = wallsColor;
+        for (let y = ctx.lineWidth; y < height - ctx.lineWidth; y += height * 0.05) {
+            ctx.fillRect(width / 2, y, ctx.lineWidth * 0.5, height* 0.03);
+        }
+    }
+
+    else if (background === "pingpong") {
+        ctx.fillStyle = "#1d8819";
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(ctx.lineWidth*0.5, height / 2, width - ctx.lineWidth*0.5, ctx.lineWidth*0.5);
+        ctx.fillRect(width / 2, ctx.lineWidth*0.5, ctx.lineWidth*0.5, height - ctx.lineWidth*0.5);
+    }
+
+    // Draw walls
+    ctx.fillStyle = wallsColor;
+     const wallWOffset = width * 0.005
+     const wallHOffset = height * 0.005
+     ctx.strokeStyle = wallsColorPicker.value;
+     setWallsColor(wallsColorPicker.value);
+     ctx.lineWidth = Math.max(2, width * 0.02); 
+     ctx.strokeRect(wallWOffset, wallHOffset, width - wallWOffset, height - wallHOffset);
+  
+    // Define ball and paddle size
+    const paddleWidth = width * 0.025;  
+    const paddleHeight = height * 0.2;   
+    const ballRadius = Math.min(width, height) * 0.025; 
+
+    // Draw paddle
+    ctx.fillStyle = paddleColorPicker.value;
+    ctx.fillRect(width * 0.05, height * 0.4, paddleWidth, paddleHeight);
+    ctx.fillRect(width * 0.95 - paddleWidth, height * 0.4, paddleWidth, paddleHeight);
+
+    // Draw ball
+    ctx.fillStyle = ballColorPicker.value;
+    ctx.beginPath();
+    ctx.arc(width / 3, height / 3, ballRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw ball trail
+    const trailCount = 5; 
+    for (let i = 1; i <= trailCount; i++) {
+        const alpha = 0.5 * (1 - i / (trailCount + 1));
+        ctx.globalAlpha = alpha;
+        const offsetX = -i * (ballRadius * 1.5);
+        ctx.beginPath();
+        ctx.arc(width / 3 + offsetX, height / 3, ballRadius* 0.8, 0, Math.PI * 2);
+        ctx.fillStyle = ballTrailColorPicker.value;
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1.0; // Reset opacity
+}
+
+export function addCustomizeGame() {
     const applyCustomization = document.getElementById('applyCustomization');
     let ballColorPicker = document.getElementById('ballColorPicker');
     let paddleColorPicker = document.getElementById('paddleColorPicker');
     let ballTrailColorPicker = document.getElementById('ballTrailColorPicker');
     let wallsColorPicker = document.getElementById('wallsColorPicker');
+
     let powerupCheckbox = document.getElementById('powerup-checkbox');
     let powerupSelected;
     let backgroundCheckbox1 = document.getElementById('backgroundCheckbox1');
     let backgroundCheckbox2 = document.getElementById('backgroundCheckbox2');
     let backgroundCheckbox3 = document.getElementById('backgroundCheckbox3');
-    //let buttonBackGround1 = document.getElementById('buttonBackground1');
-    //let buttonBackGround2 = document.getElementById('buttonBackground2');
-    //let buttonBackGround3 = document.getElementById('buttonBackground3');
+
     let backgroundSelected = document.getElementById('background-selected');
     
     ballColorPicker.value = ballColor;
@@ -100,36 +188,36 @@ export function addCustomizeGame() {
             setPowerUpState(false);
         }
     });
+    
+    previewCanvas = document.getElementById('previewCanvas');
+    ctx = previewCanvas.getContext('2d');
+    previewCanvas.width = 200; // Dimensioni ridotte per anteprima
+    previewCanvas.height = 100;
 
-    /*buttonBackGround1.addEventListener('click', () => {
-        backgroundSelected.innerHTML = 'Background Selected: Space';
-        setBackground("space");
+    // Update preview on color picker change
+    ballColorPicker.addEventListener('input', drawPreview);
+    paddleColorPicker.addEventListener('input', drawPreview);
+    ballTrailColorPicker.addEventListener('input', drawPreview);
+    wallsColorPicker.addEventListener('input', drawPreview);
 
-    })
-
-    buttonBackGround2.addEventListener('click', () => {
-        backgroundSelected.innerHTML = 'Background Selected: Classic';
-        setBackground("classic");
-    })
-
-    buttonBackGround3.addEventListener('click', () => {
-        backgroundSelected.innerHTML = 'Background Selected: Ping Pong';
-        setBackground("pingpong");
-    })*/
+    drawPreview();
 
     backgroundCheckbox1.addEventListener('change', () => {
-        if (backgroundCheckbox1.checked) {
-            setBackground("space");
-        }
+    if (backgroundCheckbox1.checked) {
+        setBackground("space");
+        drawPreview();
+    }
     })
     backgroundCheckbox2.addEventListener('change', () => {
         if (backgroundCheckbox2.checked) {
             setBackground("classic");
+            drawPreview();
         }
     })
     backgroundCheckbox3.addEventListener('change', () => {
         if (backgroundCheckbox3.checked) {
             setBackground("pingpong");
+            drawPreview();
         }
     })
 

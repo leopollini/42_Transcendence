@@ -15,7 +15,7 @@ import Settings, { addSettingsPageHandlers } from "./pages/profile/settings.js";
 import { userName } from "./pages/user_data.js";
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
-import {GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers} from "./pages/game_statistics.js";
+import { GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers} from "./pages/game_statistics.js";
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
@@ -128,6 +128,7 @@ const loadContent = async () => {
     {
         app.innerHTML = component();
         if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
+            console.log("playerzzzz2: " + players);
             initializeGameCanvas(players);
             document.getElementById('app').classList.add('no-background');
         }
@@ -161,7 +162,8 @@ const loadContent = async () => {
                 resetBracketState();
                 break;
             case "/tournament/knockout/lobby":
-                addKnockoutPageHandlers();
+                addLobbyPageHandlers();
+                handleLobby("Bracket", numPlayers);
                 resetBracketState();
                 break;
             case "/tournament/roundrobin/lobby":
@@ -214,7 +216,7 @@ const loadContent = async () => {
                 addForza4LobbyPageHandlers();
                 break;
             case "/forza4/game":
-                startForza4Game();
+                startForza4Game(players);
                 break;
             default:
                 break;
@@ -227,23 +229,23 @@ const loadContent = async () => {
     if (chatRoutes.includes(path)) {
         initChat();
     } else {
-        // Se non serve, svuota il container della chat
+        // If don't needed, empty the chat content
         document.getElementById("chatApp").innerHTML = "";
     }
 };
 
-    // Gestione dei pulsanti "Indietro" e "Avanti" nel browser
+    // Handling "Forward" and "Backward" browser buttons
 window.addEventListener("popstate", loadContent);
 
 function initChat() {
     const chatContainer = document.getElementById("chatApp");
-    // Inserisce il template della chat
+    // Insert chat template
     chatContainer.innerHTML = LiveChat();
-    // Inizializza la logica della chat creando una nuova istanza di ChatApp
+    // Initialize chat logic by creating the ChatApp instance   
     new ChatApp();
 }
 
-// Inizializzazione dell'app
+// Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
 
 const channel = new BroadcastChannel("session_sync");

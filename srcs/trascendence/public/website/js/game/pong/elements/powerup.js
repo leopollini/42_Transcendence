@@ -10,12 +10,12 @@ export class Powerup {
 
         this.sprites = {};
         this.loadImages();
-        this.frameIndex = 0;   // Frame attuale dell'animazione
-        this.frameWidth = 182;  // Larghezza di ogni frame nel file (modifica secondo il tuo spritesheet)
-        this.frameHeight = 182; // Altezza di ogni frame
-        this.totalFrames = 8;  // Numero di frame dell’animazione
-        this.frameDelay = 4;  // Velocità dell'animazione (più alto = più lento)
-        this.frameCounter = 0; // Contatore per cambiare frame
+        this.frameIndex = 0;   // Current animation frame
+        this.frameWidth = 182; 
+        this.frameHeight = 182;
+        this.totalFrames = 8; 
+        this.frameDelay = 4;  // Animation speed (bigger value = slower amim)
+        this.frameCounter = 0; // For frame change
     }
 
 
@@ -23,9 +23,9 @@ export class Powerup {
         const types = ["shrinker", "teleport", "invisible"];
         types.forEach(type => {
             this.sprites[type] = new Image();
-            this.sprites[type].src = `website/images/${type}_spritesheet.png`; // Assicurati che il percorso sia corretto
+            this.sprites[type].src = `website/images/${type}_spritesheet.png`; // Sprites path
 
-            // Gestione degli errori di caricamento
+            // Handling errors
             this.sprites[type].onerror = () => {
                 console.error(`Errore nel caricamento dell'immagine: ${type}.png`);
             };
@@ -71,15 +71,15 @@ export class Powerup {
     
     render() {
         this.sprite = this.sprites[this.type];
-        this.updateAnimation();  // Aggiorna l’animazione
+        this.updateAnimation();  
         
-        if (this.sprite.complete) {  // Controlla che l'immagine sia caricata
+        if (this.sprite.complete) {  // If sprite loaded
             this.ctx.drawImage(
                 this.sprite, 
-                this.frameIndex * this.frameWidth, 0, // Seleziona il frame giusto
-                this.frameWidth, this.frameHeight,   // Dimensioni del frame
-                this.x, this.y,                      // Posizione sul canvas
-                this.width, this.height              // Ridimensionamento
+                this.frameIndex * this.frameWidth, 0, // Select correct frame
+                this.frameWidth, this.frameHeight,   // Frame dimensions
+                this.x, this.y,                      // Frame position
+                this.width, this.height             
             );
         } else {
             console.warn(`Sprite non ancora caricata: website/images/${this.type}_spritesheet.png`);

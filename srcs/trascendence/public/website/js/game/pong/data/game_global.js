@@ -1,7 +1,7 @@
 export let ballColor = "#ffffff";
 export let paddleColor = "#ffffff";
-export let ballTrailColor = "#014c4a";
-export let wallsColor = "#014c4a";
+export let ballTrailColor = "#ffffff";
+export let wallsColor = "#ffffff";
 export let background = "space";
 export let powerUpActive = false;
 

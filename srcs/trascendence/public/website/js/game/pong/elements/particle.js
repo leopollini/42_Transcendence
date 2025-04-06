@@ -55,8 +55,8 @@ export function updateParticles(game) {
         for (let i = game.particles.length - 1; i >= 0; i--) {
             game.particles[i].update();
             if (game.particles[i].size <= 0) {
-                game.particlePool.releaseParticle(game.particles[i]); // Rilascia la particella
-                game.particles.splice(i, 1); // Rimuovi dalla lista attiva
+                game.particlePool.releaseParticle(game.particles[i]); // Release particle
+                game.particles.splice(i, 1); // Remove particle from array
             }
         }
 }

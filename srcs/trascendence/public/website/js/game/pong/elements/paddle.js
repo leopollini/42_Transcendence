@@ -35,7 +35,7 @@ export class Paddle {
         this.x = paddleRelativeX * game.canvas.width;
         this.y = paddleRelativeY * game.canvas.height;
     
-        // Ricalcola la velocità della palla
+        // Recalculate paddle speed
         this.baseSpeed = paddleRelativeSpeed * game.canvas.height;
         // Calculate new radius
         this.radius = game.canvas.width * 0.006;
@@ -54,12 +54,12 @@ export class Paddle {
         this.height = this.canvas.height * 0.2;
     }
 
-    // Metodo per muovere la racchetta
+    // Move paddle
     move(direction) {
         if (direction === 'up')
-            this.y = Math.max(0, this.y - this.speed); //sposto su senza superare 0
+            this.y = Math.max(0, this.y - this.speed); //block paddle from going out of screen (up)
         else if (direction === 'down')
-            this.y = Math.min(window.innerHeight - this.height, this.y + this.speed); //sposto giu senza superare la finestra
+            this.y = Math.min(window.innerHeight - this.height, this.y + this.speed); //block paddle from going out of screen (down)
     }
 
     shrink() {
@@ -90,25 +90,25 @@ export class Paddle {
         if (now - lastMoveTime > 1000) // 1 secondo
             lastMoveTime = now;
         
-        if (ball.speedX > 0) { // Solo se la palla si muove verso destra
+        if (ball.speedX > 0) { // Ball moving from left to right
             this.speed = this.baseSpeed * this.speedPercentage;
     
-            let targetY = this.predictBallY(ball);  // Previsione posizione futura della palla
-            let currentCenter = this.y + this.height / 2; // Centro della paddle
-            let distance = targetY - currentCenter;  // Differenza tra paddle e palla
-            let direction = Math.sign(distance);  // Direzione del movimento
+            let targetY = this.predictBallY(ball);  // Future ball y prevision
+            let currentCenter = this.y + this.height / 2; // Current paddle center
+            let distance = targetY - currentCenter;  // Distance between ball and paddle
+            let direction = Math.sign(distance);  // Move direction
     
-            // Smorzamento per evitare oscillazioni brusche
-            let smoothingFactor = 4; // Riduci se l'IA si muove troppo lenta
+            // Smoothing to avoid sudden paddle AI oscillations
+            let smoothingFactor = 4; // Reduce if AI is too slow
             let aiSpeed = this.speed * game.deltaTime * smoothingFactor; 
     
-            // Se la distanza è maggiore della velocità calcolata, muoviti gradualmente
+            // If distance is bigger than paddle speed, move gradually
             if (Math.abs(distance) > aiSpeed)
                 this.y += aiSpeed * direction;
             else
-                this.y += distance; // Muoviti direttamente alla posizione target se molto vicina
+                this.y += distance; // Move directly to target position if the ball is near
     
-            // Limita il movimento della paddle dentro i confini del canvas
+            // Limit paddle range movement 
             this.y = Math.max(game.wallThickness * 1.5, Math.min(this.canvas.height - this.height - game.wallThickness * 1.5, this.y));
         }
     }

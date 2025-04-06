@@ -8,14 +8,14 @@ export class UI {
         this.canvas = canvas;
         this.ctx = ctx;
         this.originalFontSize = 80;
-        // Usa il minimo tra larghezza e altezza per il calcolo del font size
+        // Calculate font size based on canvas dimensions
         this.fontSize = (this.originalFontSize / 1600) * Math.min(this.canvas.width, this.canvas.height);
         this.isCountingDown = false;
         this.countdownValue = 3;
     }
 
     updateFontSize() {
-        // Usa il minimo tra larghezza e altezza per il calcolo del font size
+        // Calculate font size based on canvas dimensions
         this.fontSize = (this.originalFontSize / 1600) * Math.min(this.canvas.width, this.canvas.height);
         this.ctx.font = `${this.fontSize}px Liberty`;
     }
@@ -45,20 +45,20 @@ export class UI {
         if (pong.gamePaused && !pong.gameEnd && !pong.backToGameTimer) {
             const pauseText = "GAME PAUSED";
             const pauseTextWidth = this.ctx.measureText(pauseText).width;
-            const pauseTextY = this.canvas.height / 2 + this.getTextHeight() / 2; // Centred
+            const pauseTextY = this.canvas.height / 2 + this.getTextHeight() / 2; // Centered
             this.ctx.fillText(pauseText, (this.canvas.width - pauseTextWidth) / 2, pauseTextY);
         }
         else if (pong.backToGameTimer && !pong.gameEnd) {
             // Show countdown
             const countdownText = this.countdownValue.toString();
             const countdownTextWidth = this.ctx.measureText(countdownText).width;
-            const countdownTextY = this.canvas.height / 2 + this.getTextHeight() / 2; // Centred
+            const countdownTextY = this.canvas.height / 2 + this.getTextHeight() / 2; // Centered
             this.ctx.fillText(countdownText, (this.canvas.width - countdownTextWidth) / 2, countdownTextY);
         }
         else if (pong.gameEnd) {
             const winnerText = scoreP1 > scoreP2 ? this.player1Name + " WIN!" : this.player2Name + " WIN!";
             const winnerTextWidth = this.ctx.measureText(winnerText).width;
-            const winnerTextY = this.canvas.height / 2 + this.getTextHeight() / 2; // Centred
+            const winnerTextY = this.canvas.height / 2 + this.getTextHeight() / 2; // Centered
             this.ctx.fillText(winnerText, (this.canvas.width - winnerTextWidth) / 2, winnerTextY);
         }
     }     

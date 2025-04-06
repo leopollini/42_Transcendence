@@ -25,8 +25,6 @@ else
     echo "✅ Bundler installato correttamente."
 fi
 
-cd authentication
-
 echo "==============================="
 echo "Pulizia delle gemme..."
 
@@ -40,6 +38,7 @@ else
     echo "❌ Errore durante la pulizia delle gemme."
 fi
 
+cd authentication/
 echo "==============================="
 echo "Aggiornamento delle gemme con Bundler..."
 if bundle update; then
@@ -57,6 +56,9 @@ else
     echo "Ecco i dettagli dell'errore:"
     bundle install
 fi
+
+echo "==============================="
+echo "Script completato. Avvio server..."
 
 bash https.sh
 ruby server.rb

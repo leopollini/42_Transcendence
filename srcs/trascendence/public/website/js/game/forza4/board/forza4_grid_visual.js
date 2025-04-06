@@ -18,6 +18,6 @@ export function highlightColumn(game, col, highlight) {
 export function resetCellBorders() {
     const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => {
-        cell.style.border = '1px solid #fff'; // Ripristina il bordo a quello iniziale
+        cell.style.border = '1px solid #fff'; // Reset initial cell border color (white)
     });
 }

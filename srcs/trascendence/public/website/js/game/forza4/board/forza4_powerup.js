@@ -18,7 +18,7 @@ export function activatePowerup(game, player) {
     game.f4PowerupInfo.textContent = "Select an opponent token to remove";
        
     game.powerUpActive = true;
-    // Disabilita il pulsante del power-up dopo l'uso
+    // Deactivate power-up after using it
     if (player === 'token1') {
         game.p1PowerupUsed = true;
         document.getElementById('p1PowerupButton').disabled = true;
@@ -27,7 +27,7 @@ export function activatePowerup(game, player) {
         document.getElementById('p2PowerupButton').disabled = true;
     }
 
-    // Abilita la selezione della pedina da eliminare
+    // Select token to remove
     const cells = document.querySelectorAll('.cell');
     const handlePowerupClick = (event) => handlePowerupSelection(event, game, player);
 
@@ -37,18 +37,17 @@ export function activatePowerup(game, player) {
 
 
     
-    // Funzione per gestire la selezione della pedina
     function handlePowerupSelection(event, game, player) {
         const row = +event.target.dataset.row;
         const col = +event.target.dataset.col;
 
-        // Verifica che la cella selezionata contenga una pedina dell'avversario
+        // Check if the cell selected contains an opponent's token
         const opponentToken = player === 'token1' ? 'token2' : 'token1';
         //console.log("row == " + row + " col == " + col);
         //console.log("game board after deleting");
         //console.log("whats in?  => " + game.board[row][col]);
         if (game.board[row][col] === opponentToken) {
-            // Elimina la pedina
+            // Remove token
             game.board[row][col] = null;
             if (row > 0)
             {
@@ -60,12 +59,12 @@ export function activatePowerup(game, player) {
             cell.style.backgroundColor = 'rgba(240, 240, 240, 0.5)'; // Ripristina il colore della cella
             
 
-            // Rimuovi i listener di selezione dalle altre celle
+            // Remove listener from all cells
             cells.forEach(cell => {
                 cell.removeEventListener('click', handlePowerupClick);
             });
 
-            // Passa il turno all'avversario
+            // Pass turn to opponent
             game.currentPlayer = opponentToken;
             game.printPlayerTurnMessage();
             game.powerUpActive = false;
