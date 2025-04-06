@@ -15,12 +15,13 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     });
 
     tournamentButton?.addEventListener('click', () => {
-        /*if (current_user.type === "guest")
+        if (current_user.type === "guest")
         {
-            showInfoModal("You must be logged to use this feature!", () => {}); showInfoModal("Select an opponent token!", () => {});
+            showInfoModal("You must be logged to use this feature!", () => {});
             return;
-        }*/
-        navigate("/tournament", "Modalità Torneo");
+        }
+        else
+            navigate("/tournament", "Modalità Torneo");
     });
 
     forza4Button?.addEventListener('click', () => {
@@ -58,7 +59,8 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
                 showInfoModal("You must be logged to use this feature!", () => {});
                 return;
             }
-            navigate("/userstats", "Game User Statistics");
+            else
+                navigate("/userstats", "Game User Statistics");
         });
     }
     else 
