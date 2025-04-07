@@ -6,8 +6,6 @@ YELLOW='\e[33m'
 BLUE='\e[34m'
 RESET='\e[0m'  
 
-echo "127.0.0.1 transcendence" | sudo tee -a /etc/hosts
-
 if ! command -v ufw &> /dev/null
 then
     echo -e "\n${YELLOW}ufw non è installato. Procedo con l'installazione...\n${RESET}"
