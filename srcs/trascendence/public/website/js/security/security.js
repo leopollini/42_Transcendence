@@ -78,8 +78,6 @@ export function free_users()
         {
             if (data.status !== "success" && data.success !== "true")
                 showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});
-            else
-                console.log("deleting current user");
         }
     })
     .catch(error =>

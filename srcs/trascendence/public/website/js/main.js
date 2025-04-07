@@ -296,6 +296,12 @@ channel.addEventListener("message", (event) =>
 
 function check_valid_operation(path)
 {
+    if (!sessionStorage.getItem('already in'))
+        sessionStorage.setItem('already in', '0');
+    if (!localStorage.getItem('session opened'))
+        localStorage.setItem('session opened', '0');
+    if (sessionStorage.getItem('already in') === '0' && localStorage.getItem('session opened') === '0')
+        free_users();
     if (sessionStorage.getItem('already in') === '1' && localStorage.getItem('session opened') === '0')
         localStorage.setItem('session opened', 1);
     if (sessionStorage.getItem('already in') === '1' && path === "/")
@@ -334,10 +340,6 @@ function continue_error_check(path)
     }
     else
     {
-        if (!sessionStorage.getItem('already in'))
-            sessionStorage.setItem('already in', '0');
-        if (!localStorage.getItem('session opened'))
-            localStorage.setItem('session opened', '0');
         if ((localStorage.getItem('session opened') === '1' && sessionStorage.getItem('already in') === '0') ||
         (sessionStorage.getItem('already in') === '0' && localStorage.getItem('session opened') === '0'))
         {
