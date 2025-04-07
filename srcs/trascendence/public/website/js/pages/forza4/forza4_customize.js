@@ -90,7 +90,7 @@ export function forza4Config() {
     });
     
 
-    f4powerupCheckbox.addEventListener('change', (event) => {
+    f4powerupCheckbox.addEventListener('change', () => {
             if (f4powerupCheckbox.checked) {
                 setPowerUpState(true);
             }

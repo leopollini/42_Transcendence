@@ -117,13 +117,8 @@ const loadContent = async () => {
     const path = window.location.pathname;
     if (check_valid_operation(path) === 1)
         return;
-    await initUser();
-    console.log("session opened = " + localStorage.getItem('session opened'));
-    console.log("already in = " + sessionStorage.getItem('already in'));
     const app = document.getElementById("app");
     const component = routes[path];
-    console.log("start checking \n\n\n");
-
     if (handle_history(path) === 1)
         return;
     currentPage = path;
@@ -314,7 +309,6 @@ function check_valid_operation(path)
         free_users();
     if (sessionStorage.getItem('already in') === '1' && localStorage.getItem('session opened') === '0')
         localStorage.setItem('session opened', 1);
-    console.log("path of invalid = ", path);
     if (sessionStorage.getItem('already in') === '1' && path === "/")
     {
         free_users();
@@ -333,7 +327,6 @@ function check_valid_operation(path)
 
 function continue_error_check(path)
 {
-    console.log("already in ");
     if (sessionStorage.getItem('already in') === '1')
     {
         if (path === window.location.pathname
@@ -352,7 +345,6 @@ function continue_error_check(path)
     }
     else
     {
-        console.log("invalid operation");
         if ((localStorage.getItem('session opened') === '1' && sessionStorage.getItem('already in') === '0') ||
         (sessionStorage.getItem('already in') === '0' && localStorage.getItem('session opened') === '0'))
         {

@@ -180,7 +180,7 @@ export function addCustomizeGame() {
     ballTrailColorPicker.value = ballTrailColor;
     wallsColorPicker.value = wallsColor;
 
-    powerupCheckbox.addEventListener('change', (event) => {
+    powerupCheckbox.addEventListener('change', () => {
         if (powerupCheckbox.checked) {
             setPowerUpState(true);
         }
@@ -221,7 +221,7 @@ export function addCustomizeGame() {
         }
     })
 
-    applyCustomization.addEventListener('click', (event) => {
+    applyCustomization.addEventListener('click', () => {
         ballColorPicker = document.getElementById('ballColorPicker');
         paddleColorPicker = document.getElementById('paddleColorPicker');
         setBallColor(ballColorPicker.value);

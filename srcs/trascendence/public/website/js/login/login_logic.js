@@ -88,7 +88,6 @@ export function performLogin()
     .then(response => response.json())
     .then(data => {
         setpopup(window.open(data.auth_url, 'Login', 'width=800,height=800'));
-        console.log("popup = ", popup);
         popupHandling(popup, data);
     })
 }

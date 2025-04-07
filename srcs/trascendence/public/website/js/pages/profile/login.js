@@ -39,7 +39,6 @@ export const addLoginPageHandlers = () => {
 
 function handle_access(loginButton, guestButton)
 {
-    console.log("popup = ", localStorage.getItem('popup opened'));
     loginButton.addEventListener("click", () => {
         if (localStorage.getItem('popup opened') === 'true')
             showInfoModal("popup already open finish authentication before continuing", () => {});

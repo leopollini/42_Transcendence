@@ -28,7 +28,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     forza4Button?.addEventListener('click', () => {
         navigate("/forza4/findopponent", "Forza 4 Find Opponent");
     })
-    avatarImage.addEventListener("click", (event) => {
+    avatarImage.addEventListener("click", () => {
         menuContainer.classList.toggle("visible");
     });
 
