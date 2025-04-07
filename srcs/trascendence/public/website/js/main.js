@@ -113,13 +113,9 @@ const loadContent = async () => {
     const app = document.getElementById("app");
     const component = routes[path];
     console.log("path => " + path);
-    if ((path === "/classic" || path === "/forza4/game")
-    && sessionStorage.getItem("start") !== 'true')
-    {
-        showInfoModal("ERROR:(Invalid operation) going back to menu...", () => {});
-        navigate("/modes", "no you can't");
+    console.log("currentPage => " + currentPage);
+    if (handle_history(path) === 1)
         return;
-    }
     currentPage = path;
     let playerNames;
     let numPlayers = 4;
@@ -350,4 +346,21 @@ function continue_error_check(path)
             return (1);
         }
     }
+}
+
+function handle_history(path)
+{
+    if ((path === "/forza4/game" || path === "/classic") && currentPage === "/modes")
+    {
+        navigate("/", "exit");
+        return 1;
+    }
+    if ((path === "/classic" || path === "/forza4/game")
+    && sessionStorage.getItem("start") !== 'true')
+    {
+        showInfoModal("ERROR:(Invalid operation) going back to menu...", () => {});
+        navigate("/modes", "no you can't");
+        return 1;
+    }
+    return 0;
 }
