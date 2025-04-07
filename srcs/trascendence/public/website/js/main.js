@@ -242,7 +242,6 @@ const loadContent = async () => {
     else
     {
         sessionStorage.removeItem("start");
-        sessionStorage.removeItem("path game");
         navigate("/modes", "Return to Game Mode");
         showInfoModal("the operation you are doing is forbidden", () => {});
     }
@@ -309,8 +308,10 @@ channel.addEventListener("message", (event) =>
     }
 });
 
-function check_valid_operation(path)
+function reset_value()
 {
+    if (sessionStorage.getItem("path game"))
+        sessionStorage.removeItem("path game");
     if (!sessionStorage.getItem('already in'))
         sessionStorage.setItem('already in', '0');
     if (!localStorage.getItem('session opened'))
@@ -319,6 +320,11 @@ function check_valid_operation(path)
         free_users();
     if (sessionStorage.getItem('already in') === '1' && localStorage.getItem('session opened') === '0')
         localStorage.setItem('session opened', 1);
+}
+
+function check_valid_operation(path)
+{
+    reset_value();
     if (sessionStorage.getItem('already in') === '1' && path === "/")
     {
         free_users();
