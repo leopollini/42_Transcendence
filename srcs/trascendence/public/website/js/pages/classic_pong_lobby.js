@@ -102,7 +102,6 @@ export function addClassicPongLobbyPageHandlers() {
 
     toggleStartMatch?.addEventListener('click', () => {
         sessionStorage.setItem("opponent", invitedPlayers[1]);
-        sessionStorage.setItem("start", "true");
         navigate( "/classic", "Pong Classic Game", invitedPlayers);
     });
 

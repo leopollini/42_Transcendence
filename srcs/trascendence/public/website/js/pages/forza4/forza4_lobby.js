@@ -103,7 +103,6 @@ export function addForza4LobbyPageHandlers() {
     };
 
     toggleStartMatch?.addEventListener('click', () => {
-        sessionStorage.setItem("start", "true");
         navigate( "/forza4/game", "Forza 4 Game", invitedPlayers);
     });
 

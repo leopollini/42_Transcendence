@@ -110,18 +110,26 @@ function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
 
-let currentPage = window.location.pathname;
-
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
     const path = window.location.pathname;
-    if (check_valid_operation(path) === 1)
-        return;
     const app = document.getElementById("app");
     const component = routes[path];
-    if (handle_history(path) === 1)
+    if (check_valid_operation(path) === 1)
         return;
-    currentPage = path;
+    else
+        await initUser();
+    console.log(path + " === " + sessionStorage.getItem("path game"));
+    if (path === sessionStorage.getItem("path game"))
+    {
+        sessionStorage.removeItem("path game");
+        sessionStorage.removeItem("start");
+        sessionStorage.setItem("already in", 0);
+        localStorage.setItem("session opened", 0);
+        navigate("/", "home");
+        showInfoModal("you have quitted the active session", () => {});
+        return;
+    }
     let playerNames;
     let numPlayers = 4;
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
@@ -132,7 +140,7 @@ const loadContent = async () => {
     //console.log("Players? " +players);
     playerNames = players;  
     //console.log("path => " + path);
-    if (component)
+    if (component && sessionStorage.getItem("start") !== 'true')
     {
         app.innerHTML = component();//sicuro se lo purifichi blocca codici
         if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
@@ -151,6 +159,8 @@ const loadContent = async () => {
                 profileHandler();
                 break;
             case "/classic":
+                sessionStorage.setItem("start", "true");
+                sessionStorage.setItem("path game", path);
                 break;
             case "/classic/lobby":
                 addClassicPongLobbyPageHandlers();
@@ -222,6 +232,8 @@ const loadContent = async () => {
                 break;
             case "/forza4/game":
                 startForza4Game(players);
+                sessionStorage.setItem("path game", path);
+                sessionStorage.setItem("start", "true");
                 break;
             default:
                 break;
@@ -229,11 +241,17 @@ const loadContent = async () => {
     }
     else
     {
+        navigate("/modes", "Return to Game Mode");
+        showInfoModal("the operation you are doing is forbidden", () => {});
+        sessionStorage.removeItem("start");
+    }
+    /*else
+    {
         const h1 = document.createElement("h1");
         h1.className = "text";
         h1.textContent = "404 - Pagina non trovata";
         app.replaceChildren(h1); // Sostituisce tutto il contenuto con h1
-    }
+    }*/
     
 
     const chatRoutes = ["/modes"]; // aggiungi qui le rotte dove vuoi visualizzare la chat
@@ -258,15 +276,6 @@ function initChat() {
 
 // Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
-
-window.addEventListener('popstate', function()
-{
-    if (currentPage === '/classic' || currentPage === '/forza4/game' || currentPage === '/VS_AI')
-    {
-        sessionStorage.removeItem("start");
-        showInfoModal("you have quitted the game succesfully", () => {});
-    }
-});
 
 const channel = new BroadcastChannel("session_sync");
 
@@ -336,7 +345,7 @@ function continue_error_check(path)
             {
                 sessionStorage.removeItem("game ended");
                 sessionStorage.removeItem("start");
-                showInfoModal("ERROR:(Invalid operation) going back to menu...", () => {});
+                showInfoModal("the operation you are doing is forbidden", () => {});
                 navigate("/modes", "Return to Game Mode");
                 return (1);
             }
@@ -353,23 +362,4 @@ function continue_error_check(path)
             return (1);
         }
     }
-}
-
-function handle_history(path)
-{
-    if ((path === "/forza4/game" || path === "/classic") && currentPage === "/modes")
-    {
-        localStorage.setItem("session opened", 0);
-        sessionStorage.setItem("already in", 0);
-        navigate("/", "exit");
-        return 1;
-    }
-    if ((path === "/classic" || path === "/forza4/game")
-    && sessionStorage.getItem("start") !== 'true' && sessionStorage.getItem('already in') === '1')
-    {
-        showInfoModal("ERROR:(Invalid operation) going back to menu...", () => {});
-        navigate("/modes", "no you can't");
-        return 1;
-    }
-    return 0;
 }
