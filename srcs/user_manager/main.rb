@@ -272,6 +272,7 @@ def user_manager(client, _server)
       login_user client, bobj
     when 'logout_user'
       logout_user client, bobj
+      exit
     else
       {'service' => 'user_manager', 'status' => "unknown method: #{bobj['method'].to_s}", 'success' => 'false'}
     end
