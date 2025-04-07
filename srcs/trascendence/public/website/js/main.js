@@ -114,18 +114,21 @@ let currentPage = window.location.pathname;
 
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
-    await initUser();
-    console.log("popup: " + popup);
     const path = window.location.pathname;
+    if (check_valid_operation(path) === 1)
+        return;
+    await initUser();
+    console.log("session opened = " + localStorage.getItem('session opened'));
+    console.log("already in = " + sessionStorage.getItem('already in'));
     const app = document.getElementById("app");
     const component = routes[path];
+    console.log("start checking \n\n\n");
+
     if (handle_history(path) === 1)
         return;
     currentPage = path;
     let playerNames;
     let numPlayers = 4;
-    if (check_valid_operation(path) === 1)
-        return;
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
         || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
         numPlayers = parseInt(buttonTitle.replace(/\D/g, ""), 10);
@@ -311,6 +314,7 @@ function check_valid_operation(path)
         free_users();
     if (sessionStorage.getItem('already in') === '1' && localStorage.getItem('session opened') === '0')
         localStorage.setItem('session opened', 1);
+    console.log("path of invalid = ", path);
     if (sessionStorage.getItem('already in') === '1' && path === "/")
     {
         free_users();
@@ -329,6 +333,7 @@ function check_valid_operation(path)
 
 function continue_error_check(path)
 {
+    console.log("already in ");
     if (sessionStorage.getItem('already in') === '1')
     {
         if (path === window.location.pathname
@@ -347,6 +352,7 @@ function continue_error_check(path)
     }
     else
     {
+        console.log("invalid operation");
         if ((localStorage.getItem('session opened') === '1' && sessionStorage.getItem('already in') === '0') ||
         (sessionStorage.getItem('already in') === '0' && localStorage.getItem('session opened') === '0'))
         {
@@ -361,11 +367,13 @@ function handle_history(path)
 {
     if ((path === "/forza4/game" || path === "/classic") && currentPage === "/modes")
     {
+        localStorage.setItem("session opened", 0);
+        sessionStorage.setItem("already in", 0);
         navigate("/", "exit");
         return 1;
     }
     if ((path === "/classic" || path === "/forza4/game")
-    && sessionStorage.getItem("start") !== 'true')
+    && sessionStorage.getItem("start") !== 'true' && sessionStorage.getItem('already in') === '1')
     {
         showInfoModal("ERROR:(Invalid operation) going back to menu...", () => {});
         navigate("/modes", "no you can't");
