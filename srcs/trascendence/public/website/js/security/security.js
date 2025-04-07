@@ -60,7 +60,7 @@ export function escapeHTML(str)
     const div = document.createElement('div');
     if (str) 
         div.textContent = str;
-    return div.innerHTML;
+    return div.innerHTML;//sicuro
 }
 
 export function free_users()

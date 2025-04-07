@@ -126,7 +126,7 @@ const loadContent = async () => {
     //console.log("path => " + path);
     if (component)
     {
-        app.innerHTML = component();
+        app.innerHTML = component();//sicuro se lo purifichi blocca codici
         if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
             console.log("playerzzzz2: " + players);
             initializeGameCanvas(players);
@@ -220,14 +220,20 @@ const loadContent = async () => {
         }
     }
     else
-        app.innerHTML = "<h1 class='text'>404 - Pagina non trovata</h1>"; // Pagina non trovata
+    {
+        const h1 = document.createElement("h1");
+        h1.className = "text";
+        h1.textContent = "404 - Pagina non trovata";
+        app.replaceChildren(h1); // Sostituisce tutto il contenuto con h1
+    }
+    
 
     const chatRoutes = ["/modes"]; // aggiungi qui le rotte dove vuoi visualizzare la chat
     if (chatRoutes.includes(path)) {
         initChat();
     } else {
         // If don't needed, empty the chat content
-        document.getElementById("chatApp").innerHTML = "";
+        document.getElementById("chatApp").innerHTML = "";//sicuro
     }
 };
 
@@ -237,7 +243,7 @@ window.addEventListener("popstate", loadContent);
 function initChat() {
     const chatContainer = document.getElementById("chatApp");
     // Insert chat template
-    chatContainer.innerHTML = LiveChat();
+    chatContainer.innerHTML = LiveChat();//sicuro
     // Initialize chat logic by creating the ChatApp instance   
     new ChatApp();
 }
