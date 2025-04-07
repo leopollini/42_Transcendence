@@ -36,14 +36,7 @@ export class Friend {
     }
 }
 
-export function saveCookie(name, element, days) {
-    let data = new Date();
-    data.setTime(data.getTime() + (days * 24 * 60 * 60 * 1000));
-    let expire_date = "expires=" + data.toUTCString();
-    document.cookie = name + "=" + encodeURIComponent(JSON.stringify(element)) + ";" + expire_date + ";path=/";
-}
-
-export async function readCookie(name)
+export async function restore_user()
 {
     if (window.location.pathname === '/' || (sessionStorage.getItem('already in') !== '1' && localStorage.getItem('session opened', 0) !== '1'))
         return null;

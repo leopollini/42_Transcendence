@@ -20,7 +20,7 @@ export function initializeGameCanvas(matchPlayers) {
     if (current_user)
     {
         setTimeout(() => {
-            if (path === "/V.S._AI") {
+            if (path === "/VS_AI") {
                 players = [current_user.display_name, "AI"];
                 startPongGame(players, "ai");
             } 

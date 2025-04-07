@@ -19,7 +19,7 @@ import { GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandler
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import {restore_user } from "./login/user.js";
+import { restore_user } from "./login/user.js";
 import { showInfoModal } from "./modal.js";
 
 import { free_users } from "./security/security.js";
@@ -84,6 +84,7 @@ export const navigate = (path, title = "", lobbyPlayers) => {
     else
         history.replaceState({ path }, title, path);
     buttonTitle = title;
+    console.log("lobby playrs" + lobbyPlayers);
     players = lobbyPlayers;
     loadContent();
 };
@@ -119,8 +120,8 @@ const loadContent = async () => {
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
         || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
         numPlayers = parseInt(buttonTitle.replace(/\D/g, ""), 10);
-    if (!players)
-        players = createPlayersArray(numPlayers);
+    // if (!players)
+    //     players = createPlayersArray(numPlayers);
     //console.log("Players? " +players);
     playerNames = players;  
     //console.log("path => " + path);
