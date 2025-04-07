@@ -95,7 +95,6 @@ export function addClassicPongLobbyPageHandlers() {
             selectedPlayer.remove();
             selectedPlayer = null;
             inviteButton.disabled = true;
-            console.log("invited: " + invitedPlayers);
             if (numPlayersAccepted === totalPlayers)
                 toggleStartMatch.disabled = false;
         }
@@ -103,6 +102,7 @@ export function addClassicPongLobbyPageHandlers() {
 
     toggleStartMatch?.addEventListener('click', () => {
         sessionStorage.setItem("opponent", invitedPlayers[1]);
+        sessionStorage.setItem("start", "true");
         navigate( "/classic", "Pong Classic Game", invitedPlayers);
     });
 

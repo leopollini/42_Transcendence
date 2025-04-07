@@ -7,7 +7,7 @@ export function initializeGameCanvas(matchPlayers) {
     const path = window.location.pathname;
     let players;
 
-    console.log("PATH =>" +path);
+    //console.log("PATH =>" +path);
     const gameCanvas = document.getElementById('gameCanvas');
     if (!gameCanvas) {
         console.error("Canvas non trovato nel DOM!");

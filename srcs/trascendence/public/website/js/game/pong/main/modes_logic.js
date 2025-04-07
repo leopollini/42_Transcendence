@@ -11,16 +11,17 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     });
     
     aiButton?.addEventListener('click', () => {
+        sessionStorage.setItem("start", "true");
         navigate("/VS_AI", "Modalità AI");
     });
 
     tournamentButton?.addEventListener('click', () => {
-        if (current_user.type === "guest")
+        /*if (current_user.type === "guest")
         {
             showInfoModal("You must be logged to use this feature!", () => {});
             return;
         }
-        else
+        else*/
             navigate("/tournament", "Modalità Torneo");
     });
 

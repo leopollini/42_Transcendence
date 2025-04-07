@@ -197,6 +197,7 @@ export const addRobinRankingPageHandlers = () => {
     });
 
     robinBackToMenuButton?.addEventListener('click', () => {
+        sessionStorage.removeItem("start");
         sessionStorage.setItem("game ended", false);
         playerList = [];
         robinBackToMenuButton.style.display = "none";

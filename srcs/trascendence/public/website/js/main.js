@@ -20,7 +20,7 @@ import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
 import {restore_user } from "./login/user.js";
-import { showInfoModal } from "./modal.js";
+import { showConfirmModal, showInfoModal } from "./modal.js";
 
 import { free_users } from "./security/security.js";
 let buttonTitle;
@@ -104,14 +104,23 @@ function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
 
+let currentPage = window.location.pathname;
+
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
     await initUser();
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    
-    //console.log("path => " + path);
+    console.log("path => " + path);
+    if ((path === "/classic" || path === "/forza4/game")
+    && sessionStorage.getItem("start") !== 'true')
+    {
+        showInfoModal("ERROR:(Invalid operation) going back to menu...", () => {});
+        navigate("/modes", "no you can't");
+        return;
+    }
+    currentPage = path;
     let playerNames;
     let numPlayers = 4;
     if (check_valid_operation(path) === 1)
@@ -128,7 +137,7 @@ const loadContent = async () => {
     {
         app.innerHTML = component();//sicuro se lo purifichi blocca codici
         if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
-            console.log("playerzzzz2: " + players);
+            //console.log("playerzzzz2: " + players);
             initializeGameCanvas(players);
             document.getElementById('app').classList.add('no-background');
         }
@@ -251,6 +260,15 @@ function initChat() {
 // Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
 
+window.addEventListener('popstate', function()
+{
+    if (currentPage === '/classic' || currentPage === '/forza4/game' || currentPage === '/VS_AI')
+    {
+        sessionStorage.removeItem("start");
+        showInfoModal("you have quitted the game succesfully", () => {});
+    }
+});
+
 const channel = new BroadcastChannel("session_sync");
 
 window.addEventListener('beforeunload', () =>
@@ -310,6 +328,7 @@ function continue_error_check(path)
             if (sessionStorage.getItem('game ended') === 'true')
             {
                 sessionStorage.removeItem("game ended");
+                sessionStorage.removeItem("start");
                 showInfoModal("ERROR:(Invalid operation) going back to menu...", () => {});
                 navigate("/modes", "Return to Game Mode");
                 return (1);

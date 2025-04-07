@@ -277,6 +277,7 @@ export class PongGame {
         })
 
         backToMenuButton.addEventListener('click', () => {
+            sessionStorage.removeItem("start");
             sessionStorage.setItem("game ended", false);
             gameCanvas.style.display = "none";  
             backToMenuButton.hidden = true;
@@ -289,7 +290,7 @@ export class PongGame {
         })
 
         window.addEventListener('resize', () => this.resize());
-        window.addEventListener("popstate", (event) => {
+        window.addEventListener("popstate", () => {
             //clearInterval(matchData.timer);
             this.destroy();
         });

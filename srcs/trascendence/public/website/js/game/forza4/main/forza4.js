@@ -125,6 +125,7 @@ class Forza4Game {
 
     addEventListeners() {
         f4BackToMenuButton.addEventListener('click', () => {
+            sessionStorage.removeItem("start");
             sessionStorage.setItem("game ended", false);
             document.getElementById("app").style.background = 
             "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
@@ -138,7 +139,7 @@ class Forza4Game {
             resetTimer(this);
             navigate("/modes", "Return to Game Mode");
         });
-        window.addEventListener("popstate", (event) => {
+        window.addEventListener("popstate", () => {
             document.getElementById("app").style.background = 
             "linear-gradient(35deg, #491f1f, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
            resetTimer(this);
