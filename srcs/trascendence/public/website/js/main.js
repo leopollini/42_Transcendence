@@ -20,8 +20,8 @@ import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
 import {restore_user } from "./login/user.js";
-import { showConfirmModal, showInfoModal } from "./modal.js";
-
+import {showInfoModal } from "./modal.js";
+import { cant_go_back, check_valid_operation} from "./error_main.js";
 import { free_users } from "./security/security.js";
 let buttonTitle;
 let winner;
@@ -76,13 +76,6 @@ export function nullify_user()
     current_user = null;
 }
 
-window.addEventListener('load', () => {
-    if (sessionStorage.getItem('already in') === null)
-        sessionStorage.setItem('already in', 0);
-    if (localStorage.getItem('session opened') === null)
-        localStorage.setItem('session opened', 0);
-});
-
 //restore logged da sistemare
 export const navigate = (path, title = "", lobbyPlayers) => {
     if (window.location.pathname !== path)
@@ -115,21 +108,10 @@ const loadContent = async () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    if (check_valid_operation(path) === 1)
+    if (check_valid_operation(path) === 1 || cant_go_back(path) === 1)
         return;
     else
         await initUser();
-    console.log(path + " === " + sessionStorage.getItem("path game"));
-    if (path === sessionStorage.getItem("path game"))
-    {
-        sessionStorage.removeItem("path game");
-        sessionStorage.removeItem("start");
-        sessionStorage.setItem("already in", 0);
-        localStorage.setItem("session opened", 0);
-        navigate("/", "home");
-        showInfoModal("you have quitted the active session", () => {});
-        return;
-    }
     let playerNames;
     let numPlayers = 4;
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
@@ -307,66 +289,3 @@ channel.addEventListener("message", (event) =>
         free_users();
     }
 });
-
-function reset_value()
-{
-    if (sessionStorage.getItem("path game"))
-        sessionStorage.removeItem("path game");
-    if (!sessionStorage.getItem('already in'))
-        sessionStorage.setItem('already in', '0');
-    if (!localStorage.getItem('session opened'))
-        localStorage.setItem('session opened', '0');
-    if (sessionStorage.getItem('already in') === '0' && localStorage.getItem('session opened') === '0')
-        free_users();
-    if (sessionStorage.getItem('already in') === '1' && localStorage.getItem('session opened') === '0')
-        localStorage.setItem('session opened', 1);
-}
-
-function check_valid_operation(path)
-{
-    reset_value();
-    if (sessionStorage.getItem('already in') === '1' && path === "/")
-    {
-        free_users();
-        nullify_user();
-        localStorage.setItem('session opened', 0);
-        sessionStorage.setItem('already in', 0);
-        return (0);
-    }
-    else if (path !== '/')
-    {
-        if (continue_error_check(path) === 1)
-            return (1);
-    }
-    return (0);
-}
-
-function continue_error_check(path)
-{
-    if (sessionStorage.getItem('already in') === '1')
-    {
-        if (path === window.location.pathname
-        && sessionStorage.getItem('already in') === '1')
-        {
-            if (sessionStorage.getItem('game ended') === 'true')
-            {
-                sessionStorage.removeItem("game ended");
-                sessionStorage.removeItem("start");
-                showInfoModal("the operation you are doing is forbidden", () => {});
-                navigate("/modes", "Return to Game Mode");
-                return (1);
-            }
-            return (0);
-        }
-    }
-    else
-    {
-        if ((localStorage.getItem('session opened') === '1' && sessionStorage.getItem('already in') === '0') ||
-        (sessionStorage.getItem('already in') === '0' && localStorage.getItem('session opened') === '0'))
-        {
-            showInfoModal("ERROR: accessing unauthorized page...", () => {});
-            navigate("/", "home");
-            return (1);
-        }
-    }
-}
