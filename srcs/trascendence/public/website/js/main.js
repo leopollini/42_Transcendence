@@ -241,9 +241,10 @@ const loadContent = async () => {
     }
     else
     {
+        sessionStorage.removeItem("start");
+        sessionStorage.removeItem("path game");
         navigate("/modes", "Return to Game Mode");
         showInfoModal("the operation you are doing is forbidden", () => {});
-        sessionStorage.removeItem("start");
     }
     /*else
     {
