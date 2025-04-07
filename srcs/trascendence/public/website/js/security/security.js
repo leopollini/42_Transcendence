@@ -74,6 +74,8 @@ export function free_users()
     .then(response => response.json())
     .then(data =>
     {
+        if (data.status === " (guest) does not exist")
+            return;
         if (data && data.status && data.success)
         {
             if (data.status !== "success" && data.success !== "true")

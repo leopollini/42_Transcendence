@@ -52,7 +52,13 @@ const routes = {
     "/profile": Profile,
 };
 
+export let popup = null;
 export let current_user = null;
+
+export function setpopup(new_popup)
+{
+    popup = new_popup;
+}
 
 export async function initUser()
 {
@@ -109,11 +115,10 @@ let currentPage = window.location.pathname;
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
     await initUser();
+    console.log("popup: " + popup);
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    console.log("path => " + path);
-    console.log("currentPage => " + currentPage);
     if (handle_history(path) === 1)
         return;
     currentPage = path;
@@ -269,6 +274,8 @@ const channel = new BroadcastChannel("session_sync");
 
 window.addEventListener('beforeunload', () =>
 {
+    if (popup)
+        popup.close();
     if (sessionStorage.getItem('already in') === '1')
     {
         localStorage.setItem('session opened', 0);

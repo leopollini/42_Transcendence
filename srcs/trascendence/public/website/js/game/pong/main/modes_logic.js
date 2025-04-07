@@ -69,7 +69,6 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     if (logout)
     {
         logout.addEventListener("click", () => {
-            localStorage.setItem("popup opened", false);
             if (!current_user)
             {
                 navigate("/", "logout");

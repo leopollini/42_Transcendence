@@ -1,31 +1,28 @@
-import { navigate } from "../main.js";
+import { navigate, popup, setpopup} from "../main.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 
-export let popupOpened = false;
-
 export function pop_false()
 {
-    popupOpened = false;
     localStorage.setItem('popup_opened', 'false');
 }
 
-function popupHandling(popup, data)
+function popupHandling(popup)
 {
     localStorage.setItem("popup opened", true);
     let log_succ = false
-    function receiveMessage(event) {
-        if (event.data.access_granted === true) {
+    function receiveMessage(event)
+    {
+        if (event.data.access_granted === true)
             log_succ = true;
-        }
     }
     window.addEventListener("message", receiveMessage);
     let popupMonitor = setInterval(() => {
-        if (popup.closed) {
+        if (popup.closed)
+        {
             clearInterval(popupMonitor);
             localStorage.setItem("popup opened", false);
             window.removeEventListener("message", receiveMessage);
-            console.log("log_succ = ", log_succ);
             if (log_succ === true)
             {
                 get_data();
@@ -90,7 +87,8 @@ export function performLogin()
     fetch('/auth/login')
     .then(response => response.json())
     .then(data => {
-        const popup = window.open(data.auth_url, 'Login', 'width=800,height=800');
+        setpopup(window.open(data.auth_url, 'Login', 'width=800,height=800'));
+        console.log("popup = ", popup);
         popupHandling(popup, data);
     })
 }
