@@ -74,7 +74,7 @@ services:
     stdin_open: true # docker run -i
     tty: true        # docker run -t
 
-  receiver:                                             # net open service. Creates gateways
+  receiver:                                             # net open service. Creates gateways. Used for APIs
     image: ruby:latest
     restart: always
     volumes:
@@ -161,6 +161,7 @@ services:
       - .env
     ports:
       - "6087:6087"
+      - "6088:6088"
     entrypoint: /var/www/init.sh
     working_dir: /var/www
 

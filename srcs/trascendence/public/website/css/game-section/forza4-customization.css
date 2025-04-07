@@ -1,0 +1,131 @@
+.customize-container {
+    width: 95%;
+    max-width: 1400px;
+    margin: 3rem auto;
+    padding: 3rem;
+    background-color: rgba(9, 160, 155, 0.1); /* simile alla profile-page */
+    border-radius: 13px;
+    box-shadow: 0 0 12px rgba(9, 160, 155, 0.3); /* idem */
+    color: #f1f1f1; /* così resta coerente con il tema */
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.8s ease-out;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  
+  
+  .page-title {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: 3rem;
+    color: #ffffff;
+  }
+  
+  .customize-options {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+  
+  .option-group {
+    padding: 2rem;
+    border-radius: 8px;
+    background: #2222225c;
+  }
+  
+  .section-title {
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+    font-size: 2rem;
+  }
+  
+  .color-picker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+ }
+ .color-picker:not(:last-child) {
+    margin-bottom: 1.5rem;
+}
+
+  .color-picker label {
+    margin-right: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .background-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1rem;
+  }
+  
+  .bg-button {
+    flex: 1;
+    margin: 0 0.5rem;
+    padding: 0.75rem;
+    background: #491f1f;
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .bg-button:hover {
+    background: #732a2a;
+  }
+  
+  .background-selected {
+    text-align: center;
+    font-style: italic;
+    color: #cccccc;
+    font-size: 1.1rem;
+    padding: 0.5rem 0;
+  }
+  
+  /* power-up centrale */
+  .powerup-options {
+    text-align: center;
+  }
+  
+  .powerup-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: bold;
+    font-size: 1.3rem;
+  }
+  
+  /* responsive */
+  @media (max-width: 768px) {
+    .customize-container {
+      padding: 2rem;
+    }
+  
+    .page-title {
+      font-size: 2.3rem;
+    }
+  
+    .section-title {
+      font-size: 1.6rem;
+    }
+  
+    .bg-button, .apply-button {
+      font-size: 1rem;
+      padding: 0.75rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .color-picker {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .background-buttons {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }

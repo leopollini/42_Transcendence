@@ -23,17 +23,25 @@
 @import url("live-chat/context.css");
 @import url("live-chat/responsive.css");
 @import url("live-chat/friends.css");
+@import url("modal.css");
+@import url("game-section/forza4-customization.css");
 
 
 * {
     box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #491f1f #1e1e1e;
+    font-family: 'Notable', sans-serif;
+    font-variant: small-caps;
+    text-shadow: 
+        0 0 4px rgba(255, 255, 255, 0.4),
+        0 0 8px rgba(255, 255, 255, 0.2);
 }
 
 html, body {
     text-align: center;
     height: 100%;
     margin: 0;
-    font-family: 'Liberty', sans-serif;
 }
 
 body {
@@ -61,3 +69,38 @@ body {
 .no-background {
     background: none !important;
 }
+
+/* Per Chrome, Edge e Safari */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #491f1f;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #732a2a;
+}
+
+#gameCanvas {
+    display: block;
+    margin: 0 auto;
+}
+  
+.menu-button-wrapper {
+    margin-top: 100px;
+    text-align: center;
+}
+  
+.hidden-button {
+    display: none;
+}
+  

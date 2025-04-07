@@ -1,20 +1,16 @@
 
 /*------------------------------------------ Page Customize Styles start----------------------------------------*/
 .customize-title {
-    font-family: "Liberty", sans-serif;
     font-size: 36px;
     text-align: center;
     color: #ffffff;
-    text-shadow: 0 0 5px rgb(255 255 255 / 50%), 0 0 10px rgb(255 255 255 / 30%), 0 0 15px #ffffff;
     margin: 50px 0 20px;
 }
 
 .section-title {
-    font-family: "Liberty", sans-serif;
     font-size: 24px;
     text-align: center;
     color: #ffffff;
-    text-shadow: 0 0 5px rgb(255 255 255 / 50%), 0 0 10px rgb(255 255 255 / 30%), 0 0 15px #ffffff;
     margin-bottom: 8px;
 }
 
@@ -49,7 +45,6 @@
 .color-picker-section {
     display: flex;
     flex-direction: column;
-    gap: 15px;
     width: 100%;
 }
 
@@ -65,7 +60,6 @@
 }
 
 .color-picker label {
-    font-family: "Liberty", sans-serif;
     font-size: 14px;
     color: #ffffff;
 }
@@ -87,7 +81,7 @@
 
 .preview-canvas {
     width: 100%;
-    height: 230px;
+    height: 255px;
     border: 2px solid #09a09b;
     border-radius: 15px;
     box-shadow: 0 0 8px rgba(9, 160, 155, 0.3);
@@ -140,7 +134,6 @@
 }
 
 .background-text {
-    font-family: "Liberty", sans-serif;
     font-size: 18px;
     color: #122322;
     transition: color 0.3s ease, transform 0.3s ease, text-shadow 0.3s ease;
@@ -151,7 +144,6 @@
 .background-checkbox:checked + .background-text {
     color: #ffffff;
     transform: scale(1.1);
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.5), 0 0 1px rgba(255, 255, 255, 0.3), 0 0 1px #ffffff;
 }
 
 .background-label:hover {
@@ -161,17 +153,14 @@
 
 .background-label:active {
     color: #09a09b;
-    text-shadow: 0 0 5px rgba(9, 160, 155, 0.5), 0 0 10px rgba(9, 160, 155, 0.3), 0 0 15px #014C4A;
     transform: translateY(0);
     box-shadow: 0 4px 8px rgba(9, 160, 155, 0.3);
 }
 
 .customization-button {
-    font-family: 'Liberty', sans-serif;
     font-size: clamp(0.8rem, 1.5vw, 1.4rem);
     padding: 0.3em 0.6em;
     color: #ffffff;
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.5), 0 0 1px rgba(255, 255, 255, 0.3), 0 0 1px #ffffff;
     background-color: transparent;
     border: 2px solid #0fffcf;
     border-radius: 5px;
@@ -200,7 +189,6 @@
 }
 
 .powerup-text {
-    font-family: "Liberty", sans-serif;
     font-size: 18px;
     color: #122322;
     transition: color 0.3s ease, transform 0.3s ease, text-shadow 0.3s ease;
@@ -209,7 +197,6 @@
 .powerup-checkbox:checked + .powerup-text {
     color: #ffffff;
     transform: scale(1.1);
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.5), 0 0 1px rgba(255, 255, 255, 0.3), 0 0 1px #ffffff;
 }
 
 .powerup-label {
@@ -233,5 +220,4 @@
 
 .powerup-label:active {
     color: #09a09b;
-    text-shadow: 0 0 5px rgba(9, 160, 155, 0.5), 0 0 10px rgba(9, 160, 155, 0.3), 0 0 15px #014C4A;
 }/*------------------------------------------ Page Customize Styles end----------------------------------------*/

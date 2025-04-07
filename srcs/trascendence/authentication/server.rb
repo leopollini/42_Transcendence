@@ -50,10 +50,12 @@ server = WEBrick::HTTPServer.new(
   DocumentRoot: File.expand_path("../../public", __FILE__),
   RequestCallback: proc { |req, res| res['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0' },
   SSLEnable: true,
-  SSLCertificate: cert,
-  SSLPrivateKey: key,
+  SSLCertificate: OpenSSL::X509::Certificate.new(File.read("./ssl_certs/server.crt")),
+  SSLPrivateKey: OpenSSL::PKey::RSA.new(File.read("./ssl_certs/server.key")),
   SSLOptions: OpenSSL::SSL::OP_NO_SSLv3 | OpenSSL::SSL::OP_NO_SSLv2,
-  SSLVerifyClient: OpenSSL::SSL::VERIFY_NONE
+  SSLVerifyClient: OpenSSL::SSL::VERIFY_NONE,
+  SSLVerifyMode: OpenSSL::SSL::VERIFY_NONE,
+  ServerName: 'transcendence'
 )
 
 class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
@@ -62,7 +64,16 @@ class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
     # return request_sorter req if req.method == "OPTIONS"
     status, headers, body = APP.call(req.meta_vars)
     res.status = status
-    headers.each { |k, v| res[k] = v }
+    res['Content-Security-Policy'] =
+    "default-src 'self'; " \
+    "script-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com; " \
+    "style-src 'self' https://fonts.googleapis.com; " \
+    "font-src 'self' https://fonts.gstatic.com; " \
+    "img-src 'self' data:; " \
+    "connect-src 'self' http://localhost:8008 ws://localhost:6087; " \
+    "object-src 'none'"
+  
+      headers.each { |k, v| res[k] = v }
     log_error_details(req, status, body, LOGGER)
   
     if body.nil?

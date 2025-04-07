@@ -1,0 +1,108 @@
+/* Modal Overlay ottimizzato */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-out, visibility 0s linear 0.2s; /* Ritardo per evitare flash */
+    will-change: opacity, visibility;
+    z-index: 1;
+}
+
+.modal {
+    background: #1e1e1e;
+    padding: 30px 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    transform: scale(0.8);
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+    width: 90%;
+    max-width: 400px;
+    will-change: transform, opacity;
+    opacity: 0;
+}
+ 
+/* Titoli dei modali */
+.modal h2 {
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+/* Contenuto del modal (es. campo input) */
+.modal-content {
+    margin: 20px 0;
+}
+
+.modal-content input[type="text"] {
+    width: 80%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: #f9f9f9;
+    transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+    font-family: 'Inter', sans-serif;
+    font-variant: normal;
+}
+
+.modal-content input[type="text"]::placeholder {
+    color: #aaa;
+}
+
+.modal-content input[type="text"]:focus {
+    border-color: #4285f4;
+    outline: none;
+    box-shadow: 0 0 8px rgba(66, 133, 244, 0.5);
+}
+
+/* Azioni del modal */
+.modal-actions {
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+    transition: background 0.2s ease-out;
+}
+
+.accept {
+    background: #4CAF50;
+    color: white;
+}
+
+.accept:hover {
+    background: #45a049;
+}
+
+.reject {
+    background: #F44336;
+    color: white;
+}
+
+.reject:hover {
+    background: #d32f2f;
+}
+  
+  /* Stato attivo del modal */
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-overlay.active .modal {
+    transform: scale(1);
+    opacity: 1;
+}

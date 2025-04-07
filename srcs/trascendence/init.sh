@@ -2,6 +2,8 @@
 
 set -e
 
+gem cleanup
+
 echo "==============================="
 echo "Controllo installazione di Ruby..."
 if ruby --version; then
@@ -9,7 +11,7 @@ if ruby --version; then
 else
     echo "❌ Ruby non è installato. Installazione Ruby..."
     apt-get update
-    apt-get install ruby-full -y
+    apt-get install ruby-dev -y
     echo "✅ Ruby installato correttamente."
 fi
 
@@ -25,6 +27,11 @@ fi
 
 echo "==============================="
 echo "Pulizia delle gemme..."
+
+echo "gemme mancanti"
+bundle install --jobs=4
+
+echo "gemme aggiornate"
 if gem cleanup; then
     echo "✅ Pulizia delle gemme completata."
 else

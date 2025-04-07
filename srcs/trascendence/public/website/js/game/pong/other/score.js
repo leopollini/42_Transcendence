@@ -19,7 +19,7 @@ export function checkScore(game, mode) {
             backToMenuButton.hidden = false;
         }
           
+
         game.ui.render(game, game.scoreP1, game.scoreP2); 
-        sessionStorage.setItem("game ended", true);
     }
 }

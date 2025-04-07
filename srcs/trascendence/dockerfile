@@ -7,7 +7,7 @@ RUN apt-get update -y && \
     libpq-dev \
     nodejs \
     ca-certificates \
-    openssl && \  
+    openssl && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -22,7 +22,8 @@ RUN gem install bundler
 
 WORKDIR /var/www
 
-COPY srcs/trascendence/authentication /var/www/authentication
+COPY srcs/trascendence/authentication/Gemfile /var/www/authentication/Gemfile
+COPY srcs/trascendence/authentication/Gemfile.lock /var/www/authentication/Gemfile.lock
 
 WORKDIR /var/www/authentication
 

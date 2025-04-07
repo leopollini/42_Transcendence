@@ -1,18 +1,31 @@
+import { showConfirmModal, showInfoModal } from "../../modal.js";
+
+let socket;
+
 function initSocket(username, chatAppInstance) {
-    const socket = new WebSocket('ws://localhost:6087');
+    socket = new WebSocket('ws://localhost:6087');
 
     socket.onopen = () => {
         socket.send(JSON.stringify({ type: "join", username }));
+
+        socket.send(JSON.stringify({ type: "get_state", username }));
     };
 
     socket.onmessage = (event) => {
         const msg = JSON.parse(event.data);
 
-//console.log(msg)
-
-        if (msg.type === "message") {
+        if (msg.type === "state") {
+            const { friends, friendRequests, blockedUsers } = msg.data;
+            chatAppInstance.friends = new Set(friends);
+            chatAppInstance.receivedRequests = friendRequests;
+            chatAppInstance.blockedUsers = new Set(blockedUsers);
+            chatAppInstance.updateFriendsList();
+            chatAppInstance.updateFriendRequestsUI();
+            chatAppInstance.updateBlockedUsersList();
+        }
+        else if (msg.type === "message") {
             chatAppInstance.addMessageToChat('general', msg.data);
-        } 
+        }
         else if (msg.type === "private_message") {
             const partner = username === msg.data.from ? msg.data.to : msg.data.from;
             const chatId = chatAppInstance.getPrivateChatId(username, partner);
@@ -67,7 +80,7 @@ function initSocket(username, chatAppInstance) {
                 date: new Date().toISOString(),
                 from: 'system',
                 to: chatId,
-                content: `Private chat with ${msg.data.from.charAt(0).toUpperCase() + msg.data.from.slice(1)} started.`
+                content: `Private chat with ${msg.data.from.charAt(0) + msg.data.from.slice(1)} started.`
             });
         }        
         else if (msg.type === "system") {
@@ -91,9 +104,50 @@ function initSocket(username, chatAppInstance) {
                 }
             }
             chatAppInstance.addMessageToChat(chatAppInstance.currentChat, msg.data);
-        }              
+        }
+        else if (msg.type === "match_request") {
+            // L'utente ricevente visualizza la richiesta di partita tramite modal di conferma
+            const sender = msg.data ? msg.data.from : msg.from; // "userA"
+            showConfirmModal(
+              `${sender} ti ha invitato a una partita. Accetti?`,
+              () => { // onConfirm: utente conferma
+                  const response = {
+                      type: "match_response",
+                      to: sender,
+                      accepted: true
+                  };
+                  console.log("⚡ Invio risposta all'invito:", response);
+                  socket.send(JSON.stringify(response));
+              },
+              () => { // onReject: utente rifiuta
+                  const response = {
+                      type: "match_response",
+                      to: sender,
+                      accepted: false
+                  };
+                  console.log("⚡ Invio risposta all'invito:", response);
+                  socket.send(JSON.stringify(response));
+              }
+            );
+        }
+        else if (msg.type === "match_response") {
+            console.log("📩 Risposta ricevuta:", msg);
+            if (msg.data && msg.data.accepted)
+                // Modal informativo: solo un pulsante OK
+                showInfoModal("L'invito è stato accettato! Puoi avviare la partita.", () => {});
+            else
+                showInfoModal("L'invito è stato rifiutato.", () => {});
+        }                                  
     };
     return socket;
 }
 
-export { initSocket };
+function sendMessage(message) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(message));
+    } else {
+        console.error("Socket non è connesso o non pronto.");
+    }
+}
+
+export { initSocket, sendMessage };

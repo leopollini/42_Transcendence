@@ -43,9 +43,9 @@ export default function LiveChat()
                 </div>
                 <div class="friends-tabs">
                     <img id="friendsButton" class="active" src="website/images/friends.png" alt="Friends">
-                    <div id="friendRequestsButtonContainer" style="position: relative; display: inline-block;">
+                    <div id="friendRequestsButtonContainer" class="friend-requests-container">
                         <img id="friendRequestsButton" src="website/images/add-friend.png" alt="Requests">
-                        <span id="friendRequestsBadge" style="position: absolute; top: -8px; right: -8px; background: red; color: white; border-radius: 50%; font-size: 10px; padding: 1px 4px; display: none;"></span>
+                          <span id="friendRequestsBadge" class="friend-badge"></span>
                     </div>                
                     <img id="blockedUsersButton" src="website/images/block-user.png" alt="Blocked">
                 </div>
@@ -53,9 +53,9 @@ export default function LiveChat()
                     <!-- Lista amici -->
                     <div class="friends-list" id="friendsList"></div>
                     <!-- Lista richieste di amicizia, inizialmente nascosta -->
-                    <div class="friend-requests-list" id="friendRequestsList" style="display:none;"></div>
+                    <div id="friendRequestsList" class="friend-requests-list"></div>
                     <!-- Lista utenti bloccati, inizialmente nascosta -->
-                    <div class="blocked-users-list" id="blockedUsersList" style="display:none;"></div>
+                    <div id="blockedUsersList" class="blocked-users-list"></div>
                 </div>
             </div>
             <div class="main-chat">
@@ -65,7 +65,7 @@ export default function LiveChat()
                 </header>
                 <div class="messages-container" id="messages"></div>
                 <div class="input-area">
-                    <input type="text" class="message-input" id="messageInput" placeholder="Type your message...">
+                    <input type="text" class="message-input" id="messageInput" placeholder="Type your message..." autocomplete="off">
                     <button class="send-button" id="sendButton">Send</button>
                 </div>
             </div>

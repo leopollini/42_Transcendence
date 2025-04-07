@@ -17,19 +17,21 @@ module Ports
 
     'add_user' => ['user_manager', 7080],
     'get_user' => ['user_manager', 7080],
-    'drop_users' => ['user_manager', 7080],
-    'drop_guests' => ['user_manager', 7080],
     'update_user' => ['user_manager', 7080],
     'login_user' => ['user_manager', 7080],
     'logout_user' => ['user_manager', 7080],
     
     'chat' => ['chat', 6087],
+    'broadcast' => ['internal_chat_support', 6088],
+    'send_msg' => ['internal_chat_support', 6088],
 
     'save_pong_game' => ['game_data_manager', 8790],
     'get_pong_games' => ['game_data_manager', 8790],
     'save_f4_game' => ['game_data_manager', 8790],
     'get_f4_games' => ['game_data_manager', 8790],
-    'get_all_games' => ['game_data_manager', 8790]
+    'get_all_games' => ['game_data_manager', 8790],
+
+    'match_invitation_request' => ['matchmaking', 6009]
   }
   MAX_MSG_LEN = 100_000
 end
@@ -79,11 +81,16 @@ end
 
 module SimpleServer
   # JSON object (not in string form)
-  def self.method_req(method, msg = '', do_close = true)
+  def self.method_req(method, msg = {}, do_close = true)
     raise "Bad method request (#{method})" if Ports::HASH[method].nil?
     puts "Resolving host: #{Ports::HASH[method][0]}"
-    service = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
-    service.write msg if msg
+    begin
+      service = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
+    rescue => r
+      return {'status' => "connection failed. Maybe service closed? (#{r.to_s})", 'success' => 'false'}.to_s
+    end
+    msg['method'] = method if msg.is_a? Hash
+    service.write msg.to_json if msg
     IO.select [service], [], [], 1
     res = service.read_nonblock Ports::MAX_MSG_LEN
     service.close if do_close

@@ -1,8 +1,8 @@
-import { navigate } from '../main.js';
-import {profile, restore_user} from "../login/user.js";
+import { escapeHTML, free_users} from '../security/security.js';
 import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
-import { readCookie } from '../login/user.js';
+import { showInfoModal } from '../modal.js';
+import { nullify_user } from '../main.js';
 
 export default function Modes()
 {
@@ -56,72 +56,17 @@ export default function Modes()
     `;
 }
 
-export let current_user = JSON.parse(localStorage.getItem('your_profile'));
-
-export function nullify_user()
+window.onpopstate = function ()
 {
-    current_user = null;
-}
-
-window.onpopstate = function () {
     if (location.pathname === "/")
     {
-        navigate("/modes", "Modes");
-        history.pushState(null, null, location.href);
+        showInfoModal("you have quitted the active session", () => {});;
+        sessionStorage.setItem("already in", 0);
+        localStorage.setItem("session opened", 0);
+        nullify_user();
+        free_users();
     }
 };
-
-window.addEventListener('storage', (event) => {
-    if (event.key === "your_profile")
-    {
-        if (!event.newValue)
-            current_user = null;
-        else
-            current_user = JSON.parse(event.newValue);
-    }
-});
-
-window.addEventListener('popstate', (event) => {
-    let storedUser = localStorage.getItem('your_profile');
-    if (storedUser) {
-        let parsedUser = JSON.parse(storedUser);
-        current_user = new profile(
-            parsedUser.email,
-            parsedUser.display_name,
-            parsedUser.realname,
-            parsedUser.bio,
-            parsedUser.image,
-            parsedUser.type
-        );
-        updateProfileUI(current_user);
-    }
-});
-
-export function updateUserProfile(newUserData) {
-    current_user = new profile(
-        newUserData.email,
-        newUserData.display_name,
-        newUserData.realname,
-        newUserData.bio,
-        newUserData.image,
-        newUserData.type
-    );
-    localStorage.setItem("your_profile", JSON.stringify(current_user));
-    fetch("http://localhost:8008", {
-                method: "get_user",
-                body: JSON.stringify({ 
-                    "params" : [{}] 
-                }) 
-            })
-            .then(response => response.json())
-            .then(data =>
-            {
-                console.log(data);
-            })
-            .catch(error => {
-                console.error("Error fetching user data:", error);
-            });
-}
 
 export function updateProfileUI(profile)
 {
@@ -167,8 +112,9 @@ export function change_name(name) {
         const avatarName = document.getElementById('avatarName');
         if (avatarName)
         {
-            avatarName.innerText = name;
-            setUserName(name);
+            const escapedName = escapeHTML(name);
+            avatarName.innerText = escapedName;
+            setUserName(escapedName);
             clearInterval(checknameInterval);
         }
     }, 100);

@@ -1,4 +1,11 @@
+
+
 MAX_GUEST_COUNT = 10
+
+require 'dotenv'
+require 'colorize'
+
+Dotenv.load
 
 class GuestsList
   
@@ -8,17 +15,33 @@ class GuestsList
     @counter = 0
   end
 
-  def add_guest(username)
-    puts "creating new guest #{username}"
+  def add_guest(data, token)
+    puts "creating new guest #{data}".green
+    username = data['username']
+    puts "username: #{username}".yellow
     return DEFAULT_MISSING_PARAM.clone if username.class != "".class
     return {'status' => 'username already in use', 'success' => 'false'} if @guests[@index[username].to_i]
 
     @counter = @counter % MAX_GUEST_COUNT + 1
     @index.delete @guests[@counter]['username'] if @guests[@counter]
     @index[username] = @counter
-    @guests[@counter] = {'username' => username, 'created' => Time.now.to_i, 'deleted' => -1, 'token' => Digest::SHA256.hexdigest(username)}
-    puts "added #{username}! Token #{@guests[@counter]['token']}"
-    {'status' => 'success', 'success' => 'true', 'token' => @guests[@counter]['token']}
+    @guests[@counter] = {
+      'username' => username,
+      'created' => Time.now.to_i,
+      'deleted' => -1,
+      'bio' => "",
+      'image' => data['image'].to_s,
+      'token' => token
+    }
+    @guests[@counter]['bio'] = data['bio'].to_s
+    @guests[@counter]['image'] = data['image'].to_s
+    puts "added #{username}!".green
+    return {
+      'service' => 'user_manager',
+      'status' => 'success',
+      'success' => 'true',
+      'username' => username
+    }
   end
   def del_guest(username)
     return DEFAULT_MISSING_PARAM.clone if username.class != "".class
@@ -26,15 +49,8 @@ class GuestsList
 
     @guests[@index[username]]['deleted'] = Time.now.to_i
     @index.delete username
-    puts "removed #{username}!"
+    puts "removed #{username}!".red
     {'status' => 'success', 'success' => 'true'}
-  end
-  def get_guests(username, logged = false)
-    if logged
-      t = @guests[@index[username].to_i]
-      return t ? [t] : nil?
-    end
-    @guests.count > 0 ? @guests[1..].select { |g| g['username'] == username } : []
   end
   def get_all_guests()
     @guests.count > 0 ? @guests[1..] : []

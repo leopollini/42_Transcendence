@@ -1,5 +1,7 @@
-import { nullify_user, updateProfileUI} from "../pages/modes.js";
-import { navigate } from "../main.js";
+import { navigate, nullify_user } from "../main.js";
+import {updateProfileUI} from "../pages/modes.js";
+import { showInfoModal } from "../modal.js";
+
 export class user {
     constructor(image, name, login_name, email, bio) {
         this.image = image;
@@ -9,8 +11,6 @@ export class user {
         this.bio = bio;
     }
 }
-
-export let profiles = [];
 
 export class profile {
     constructor(email, display_name, realname, bio, image, type)
@@ -76,44 +76,37 @@ export function restore_user()
     .then(data =>
     {
         //console.log("(get_user)\nData login = ", data);
-        /*if (!data || (!data.user && !data.guest)) 
+        if (result)
         {
-            nullify_user();
-            alert("ERROR: no users found...");
-            navigate("/", "home");
-            return;
-        }*/
-        let type = 1;
-        let find_user = data.user?.find(u => u.token === token);
-        if (!find_user)
-        {
-            find_user = data.guest?.find(g => g.token === token);
-            type = 0;
-        }
-        if (find_user) 
-        {
-            let user_type;
-            if (type === 1)
-                user_type = "user"
+            if (result.success === "true" && result.status === "success")
+            {
+                const ref_user = new profile(
+                    "",
+                    result.username,
+                    "",
+                    result.bio,
+                    result.image,
+                    result.type
+                );
+                sessionStorage.setItem('already in', 1);
+                localStorage.setItem('session opened',1);
+                updateProfileUI(ref_user);
+                return ref_user;
+            }
             else
-                user_type =  "guest";
-            let ref_user = new profile(
-                "",
-                find_user.username,
-                "",
-                "",
-                "website/images/guest.jpg" || find_user.image,
-                user_type
-            );
-            localStorage.setItem('session opened', 1);
-            localStorage.setItem('your_profile', JSON.stringify(ref_user));
-            updateProfileUI(ref_user);
+            {
+                showInfoModal("ERROR: An error has occured(\"" + result.status + "\")", () => {});
+                nullify_user();
+                navigate("/", "home");
+                return null;
+            }
         }
-        else 
-        {
-            // nullify_user();
-            // alert("ERROR: finding logged user...");
-            // navigate("/", "home");
-        }
-    });
+        else
+            showInfoModal("no result??", () => {});
+    }
+    catch (error)
+    {
+        console.error("Error with get_user:", error);
+        return null;
+    }
 }

@@ -12,7 +12,7 @@ import { matchData } from '../data/game_global.js';
 import { saveMatchStatsData, resetMatchStatsData } from '../data/game_stats.js';
 import { updateTimer } from '../other/timer.js';
 import { ballColor, paddleColor, ballTrailColor, wallsColor, powerUpActive, background } from '../data/game_global.js';
-import { current_user } from '../../../pages/modes.js';
+import { current_user } from '../../../main.js';
 
 export let gameContainer;
 
@@ -60,8 +60,10 @@ export class PongGame {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         // Set game variables
-        this.p1Name = players[0];
-        this.p2Name = players[1];
+        //this.p1Name = players[0];
+        //this.p2Name = players[1];
+        this.p1Name = current_user.display_name;
+        this.p2Name = sessionStorage.getItem('opponent') || 'IA';
         this.scoreP1 = 0;
         this.scoreP2 = 0;
         this.maxScore = 2;
@@ -256,7 +258,7 @@ export class PongGame {
             this.paddle2.handleInput(event.key, false);
         });
 
-        backToBracketButton.addEventListener('click', (event) => {
+        backToBracketButton.addEventListener('click', () => {
             gameCanvas.style.display = "none";  
             backToBracketButton.hidden = true;
             sessionStorage.setItem("winner", this.winner);
@@ -266,7 +268,7 @@ export class PongGame {
             navigate("/tournament/knockout/bracket", "Return from Match");
         })
 
-        backToRobinButton.addEventListener('click', (event) => {
+        backToRobinButton.addEventListener('click', () => {
             gameCanvas.style.display = "none";  
             backToRobinButton.hidden = true;
             sessionStorage.setItem("winner", this.winner);
@@ -276,7 +278,7 @@ export class PongGame {
             navigate("/tournament/roundrobin/robinranking", "Return from Match");
         })
 
-        backToMenuButton.addEventListener('click', (event) => {
+        backToMenuButton.addEventListener('click', () => {
            
             gameCanvas.style.display = "none";  
             backToMenuButton.hidden = true;

@@ -1,6 +1,5 @@
 import { navigate } from "../../main.js";
 
-
 export default function Bracket() {
     return `
         <img id="backImageButton" src="../../website/images/home.png" alt="Back" class="back-button">
@@ -245,7 +244,7 @@ export function backToBracket(winner) {
 }
 
 // Event listeners
-export const addBracketPageHandlers = () => {
+export const addBracketPageHandlers = async () => {
     const backImageButton = document.getElementById('backImageButton');
 
     knockoutMatchButton?.addEventListener('click', () => {

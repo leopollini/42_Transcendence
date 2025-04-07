@@ -1,6 +1,6 @@
-import { navigate } from "../../main.js";
-import { current_user} from "../modes.js";
-
+import { navigate, current_user } from "../../main.js";
+import { escapeHTML } from "../../security/security.js";
+import { showInfoModal } from "../../modal.js";
 let invitedPlayers = [];
 let tournament;
 let selectedPlayer;

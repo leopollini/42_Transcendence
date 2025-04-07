@@ -44,6 +44,7 @@ def save_pong(obj)
   return DEFAULT_SUCCESS_RES.clone
 end
 
+
 def get_f4(obj)
   puts 'get_f4 called'
   name = obj['realname']

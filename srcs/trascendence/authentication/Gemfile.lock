@@ -49,18 +49,18 @@ PLATFORMS
 
 DEPENDENCIES
   bundler
-  cgi
-  colorize
+  cgi (= 0.4.2)
+  colorize (= 1.1.0)
   did_you_mean
-  dotenv
-  json
+  dotenv (= 3.1.7)
+  json (= 2.10.2)
   oauth2
   openssl
-  pg
-  rack
-  rack-session
+  pg (= 1.5.9)
+  rack (= 3.1.12)
+  rack-session (= 2.1.0)
   securerandom
-  webrick
+  webrick (= 1.9.1)
 
 BUNDLED WITH
    2.6.2

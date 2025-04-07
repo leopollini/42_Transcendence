@@ -1,4 +1,5 @@
 import { redrawGrid } from "./forza4_grid.js";
+import { showInfoModal } from "../../../modal.js"
 
 export function activatePowerup(game, player) {
     if (game.gameEnded) return;
@@ -6,11 +7,11 @@ export function activatePowerup(game, player) {
     //console.log("game board = " + game.board);
 
     if ((game.currentPlayer === 'token1' && player === 'token2') || (game.currentPlayer === 'token2' && player === 'token1')) {
-        alert("Not your turn!");
+        showInfoModal("Not your turn!", () => {});
         return;
     }
     else if (game.moves === 0) {
-        alert("No tokens to remove!");
+        showInfoModal("No tokens to remove!", () => {});
         return;
     }
 
@@ -69,7 +70,7 @@ export function activatePowerup(game, player) {
             game.powerUpActive = false;
             game.f4PowerupInfo.textContent = "";
         } else {
-            alert("Select an opponent token!");
+            showInfoModal("Select an opponent token!", () => {});
         }
     }
 }

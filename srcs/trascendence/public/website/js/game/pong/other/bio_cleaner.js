@@ -14,8 +14,11 @@ export function show_full_bio(bio, showBioBtn)
     popup.style.maxWidth = '80%'; 
     popup.style.maxHeight = '80%'; 
     popup.style.overflowY = 'auto';
-    popup.innerHTML = `<p style="text-indent: 20px;">${formattedBio}</p>`;
-    function closePopup() {
+    const p = document.createElement("p");
+    p.style.textIndent = "20px";
+    p.textContent = formattedBio;
+    popup.replaceChildren(p);
+        function closePopup() {
         popup.remove();
         document.removeEventListener('click', outsideClickListener);
     }

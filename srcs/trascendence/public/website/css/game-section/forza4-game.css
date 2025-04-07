@@ -51,7 +51,6 @@
     color: #fff;
     margin-top: 1vh;
     font-size: 2vw;
-    font-family: 'Liberty', sans-serif;
     text-align: center;
 }
 
@@ -85,7 +84,6 @@
 /* Pulsanti power-up*/
 
 .f4-button-style {
-    font-family: 'Liberty', sans-serif;
     font-size: 2.5vh;
     padding: 0.75em 1.5em;
     color: #0fffcf;

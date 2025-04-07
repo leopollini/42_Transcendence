@@ -1,7 +1,7 @@
 import { matchData } from './game_global.js';
 import { formatTime } from '../other/timer.js';
 
-export function saveMatchStatsData(p1Name, p2Name, scoreP1, scoreP2) {
+export async function saveMatchStatsData(p1Name, p2Name, scoreP1, scoreP2) {
     matchData.player1 = p1Name;
     matchData.player2 = p2Name;
     matchData.scorep1 = scoreP1;
@@ -20,7 +20,6 @@ function saveUserStatsData(matchData) {
     const score2 = matchData.scorep2;
     const matchTime = matchData.seconds;
     const longestRally = matchData.longestRally;
-
 
     fetch("http://localhost:8008", {
         method: "save_pong_game",

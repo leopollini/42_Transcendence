@@ -1,8 +1,6 @@
 import { navigate } from "../../main.js";
 import { userName } from "../user_data.js";
 import { formatTime } from "../../game/pong/other/timer.js";
-import { current_user, change_name, update_image} from "../modes.js";
-
 
 let userData;
 let wins = 0;
@@ -231,10 +229,10 @@ export async function showCharts() {
     //playerName = userName;
     try {
         const response = await fetch("http://localhost:8008", {
-          method: "get_pong_games",
-          body: JSON.stringify({
-            realname: userName,
-          }),
+            method: "get_pong_games",
+            body: JSON.stringify({
+                realname: userName,
+            }),
         });
         const data = await response.json();
         //console.log("Get Pong Game response: ", data);
