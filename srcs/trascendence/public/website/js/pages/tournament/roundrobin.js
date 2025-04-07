@@ -79,7 +79,7 @@ export function setupRoundRobinPlayers() {
 
             nameInputRobin.style.display = 'block';
 
-            playerNamesRobin.innerHTML = '';
+            playerNamesRobin.textContent = '';
 
             for (let i = 1; i <= selectedPlayers; i++) {
                 const input = document.createElement('input');

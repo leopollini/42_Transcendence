@@ -64,10 +64,39 @@ class GuestsList
     guest['bio'] = new_data['bio'] if new_data['bio']
     guest['image'] = new_data['image'] if new_data['image']
   end
-  def login_with_token(token)
-    @guests.each do |entry|
-      return @guest.to_json.merge({'status' => 'success', 'success' => 'true'}) if entry['token'].to_s == token
+  def get_token_name(token)
+    unless @guests.empty?
+      @guests[1..].each do |entry|
+        next if entry.nil?
+        if entry['token'].strip == token.strip
+          return {
+            'status' => 'success',
+            'success' => 'true',
+            'username' => entry['username'],
+            'bio' => entry['bio'],
+            'image' => entry['image'],
+            'type' => 'guest'
+          }
+        end
+      end
+      return {'status' => 'invalid token', 'success' => 'false'}
+    else
+      return {'status' => 'no users found', 'success' => 'false'}
     end
-    return {'status' => 'invalid token', 'success' => 'false'}
+  end
+
+
+  def del_guest_by_token(token)
+    unless @guests.empty?
+      @guests[1..].each_with_index do |entry, index|
+        next if entry.nil?
+        if entry['token'].strip == token.strip
+          @guests.delete_at(index + 1)
+          @index.delete token
+          return {'service' => 'user_manager', 'status' => "guest deleted succesfully", 'success' => 'true'}
+        end
+      end
+      return {'service' => 'user_manager', 'status' => " (guest) does not exist", 'success' => 'false'}
+    end
   end
 end

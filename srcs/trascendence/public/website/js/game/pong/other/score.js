@@ -1,5 +1,5 @@
 import { matchData } from "../data/game_global.js";
-export function checkScore(game, mode) {
+export function checkScore(game) {
     if (game.scoreP1 >= game.maxScore || game.scoreP2 >= game.maxScore) {
         game.gameEnd = true;
         //game.running = false;
@@ -10,15 +10,16 @@ export function checkScore(game, mode) {
         else 
             game.winner = game.p2Name;
         
-        if (mode === "roundrobin")
-            backToRobinButton.style.display = "block";
-        else if (mode === "knockout")
-            backToBracketButton.style.display = "block";
-        else {
+        sessionStorage.setItem('game ended', true);
+        if (window.location.pathname === "/classic" || window.location.pathname === "/VS_AI")
+        {
             backToMenuButton.style.display = "block";
             backToMenuButton.hidden = false;
         }
-          
+        else if (window.location.pathname === "/tournament/roundrobin")
+            backToRobinButton.style.display = "block";
+        else if (window.location.pathname === "/tournament/knockout")
+            backToBracketButton.style.display = "block";
 
         game.ui.render(game, game.scoreP1, game.scoreP2); 
     }

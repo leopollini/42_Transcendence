@@ -80,6 +80,7 @@ export function updateProfileUI(profile)
 }
 
 export const addModesPageHandlers = () => {
+    sessionStorage.removeItem("opponent");
     const classicButton = document.getElementById('classicButton');
     const aiButton = document.getElementById('aiButton');
     const tournamentButton = document.getElementById('tournamentButton');

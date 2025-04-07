@@ -152,10 +152,7 @@ const loadContent = async () => {
                 addModesPageHandlers();
                 break;
             case "/tournament":
-                if (current_user.type === "guest")
-                    showInfoModal("You must be logged to use this feature!", () => {});
-                else
-                    addTournamentPageHandlers();
+                addTournamentPageHandlers();
                 break;
             case "/tournament/knockout":
                 addKnockoutPageHandlers();

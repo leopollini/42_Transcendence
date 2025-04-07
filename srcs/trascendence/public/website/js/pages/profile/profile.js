@@ -98,10 +98,10 @@ function updateLogin(current_user)
 function updateGuest(current_user)
 {
   console.log("hello");
-  let data = JSON.stringify({
-    bio: current_user.bio,
-    image: current_user.image
-  });
+  let data = {
+    bio: current_user.bio
+    //image: current_user.image
+  };
   fetch("http://localhost:8008",
   {
     method: "update_user",

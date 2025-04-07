@@ -1,5 +1,4 @@
-import { navigate } from "../../main.js";
-import { current_user } from "../modes.js";
+import { navigate, current_user} from "../../main.js";
 
 let invitedPlayers = [];
 let selectedPlayer;
@@ -8,6 +7,7 @@ let numPlayersAccepted = 0;
 let totalPlayers = 2;
 
 export default function Forza4LobbyRoom() {
+    sessionStorage.removeItem("opponent");
     return `
         <img id="backImageButton" src="../../website/images/home.png" alt="Back" class="back-button">
         <h1 class="text">
@@ -66,6 +66,7 @@ export function handleForza4Lobby() {
         const div = document.createElement("div");
         div.classList.add("player");
         div.textContent = player;
+
         div.onclick = () => {
             document.querySelectorAll(".player").forEach(el => el.style.background = "");
             div.style.background = "#007bff";

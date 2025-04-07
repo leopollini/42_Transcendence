@@ -52,7 +52,6 @@ function update_guest(curr_guest)
   );
   let data = {"data" : {"username":guest_user.display_name,"image":guest_user.image},"login_as_guest":"true"};
   data = JSON.stringify(data);
-  console.log("data risultante = ", data);
   fetch("http://localhost:8008",
   {
       method: "login_user",

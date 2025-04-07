@@ -60,8 +60,6 @@ export class PongGame {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         // Set game variables
-        //this.p1Name = players[0];
-        //this.p2Name = players[1];
         this.p1Name = current_user.display_name;
         this.p2Name = sessionStorage.getItem('opponent') || 'IA';
         this.scoreP1 = 0;
@@ -143,7 +141,7 @@ export class PongGame {
             this.ball.checkPosition(this);
             if (powerUpActive) 
                 handlePowerups(this);
-            checkScore(this, mode);
+            checkScore(this);
         }
 
         if (background == "space")
@@ -279,7 +277,7 @@ export class PongGame {
         })
 
         backToMenuButton.addEventListener('click', () => {
-           
+            sessionStorage.setItem("game ended", false);
             gameCanvas.style.display = "none";  
             backToMenuButton.hidden = true;
             sessionStorage.setItem("winner", this.winner);

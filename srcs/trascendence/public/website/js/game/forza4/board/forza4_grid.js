@@ -9,7 +9,7 @@ export function createGrid(game) {
 
     const boardElement = document.getElementById('f4board');
     const forza4Game = document.getElementById('forza4Game');
-    boardElement.innerHTML = '';
+    boardElement.textContent = '';
 
     const gap = window.innerWidth * 0.01; // Spece between cells
     const maxWidth = window.innerWidth * 0.6; // Max board width 

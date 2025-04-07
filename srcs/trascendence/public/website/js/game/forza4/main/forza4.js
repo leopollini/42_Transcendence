@@ -1,4 +1,4 @@
-import { navigate} from "../../../main.js";
+import { current_user, navigate} from "../../../main.js";
 import { token1Color, token2Color, powerUpMode} from "../data/forza4_game_global.js";
 import { createGrid, redrawGrid } from "../board/forza4_grid.js";
 import { updateTimer, resetTimer } from "../other/forza4_timer.js";
@@ -37,6 +37,8 @@ export function Forza4() {
 export function startForza4Game(players) {
     backImageButton = document.getElementById('backImageButton');
     matchPlayers = players;
+    if (!sessionStorage.getItem("opponent"))
+        sessionStorage.setItem("opponent", players[1]);
     let f4Game = new Forza4Game();
     //console.log("playerzz:" +players);
    
@@ -71,8 +73,8 @@ class Forza4Game {
         this.gameEnded = false;
 
         //this.f4Players = JSON.parse(sessionStorage.getItem('forza4players'));
-        this.p1 = matchPlayers[0];
-        this.p2 = matchPlayers[1];
+        this.p1 = current_user.display_name;
+        this.p2 = sessionStorage.getItem("opponent");
 
         this.p1Name.textContent = this.p1 + ":";
         this.p2Name.textContent = this.p2 + ":";
@@ -122,7 +124,8 @@ class Forza4Game {
 
 
     addEventListeners() {
-        f4BackToMenuButton.addEventListener('click', (event) => {
+        f4BackToMenuButton.addEventListener('click', () => {
+            sessionStorage.setItem("game ended", false);
             document.getElementById("app").style.background = 
             "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
             resetTimer(this);

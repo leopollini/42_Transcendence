@@ -118,7 +118,7 @@ class ChatApp {
 
     updateMessagesDisplay() {
         const messages = this.chats.get(this.currentChat) || [];
-        this.elements.messagesContainer.innerHTML = messages
+        this.elements.messagesContainer.textContent = messages
             .map((msg) => this.createMessageElement(msg))
             .join('');
         this.scrollToBottom();
@@ -356,7 +356,7 @@ class ChatApp {
 
     updateFriendsList() {
         if (!this.elements.friendsList) return;
-        this.elements.friendsList.innerHTML = '';
+        this.elements.friendsList.textContent = '';
         this.friends.forEach((user) => {
             const friendItem = document.createElement('div');
             friendItem.className = 'friend-item';
@@ -368,7 +368,7 @@ class ChatApp {
 
     updateFriendRequestsUI() {
         if (!this.elements.friendRequestsList) return;
-        this.elements.friendRequestsList.innerHTML = '';
+        this.elements.friendRequestsList.textContent = '';
         this.receivedRequests.forEach((req, index) => {
             const formattedName = req.from.charAt(0) + req.from.slice(1);
             const item = document.createElement('div');
@@ -436,7 +436,7 @@ class ChatApp {
 
     updateBlockedUsersList() {
         if (!this.elements.blockedUsersList) return;
-        this.elements.blockedUsersList.innerHTML = '';
+        this.elements.blockedUsersList.textContent = '';
         this.blockedUsers.forEach((user) => {
             const blockedItem = document.createElement('div');
             blockedItem.className = 'blocked-user-item';
