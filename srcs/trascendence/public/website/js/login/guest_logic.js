@@ -76,7 +76,7 @@ function update_guest(curr_guest)
         if (data.status === "no users found")
           showInfoModal("ERROR: Name already taken, try a different one", () => {});
         else
-          showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});
+          showInfoModal("ERROR in LOGIN_USER: An error has occured(\"" + data.status + "\")", () => {});
         return;
     }
   })

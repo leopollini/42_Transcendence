@@ -69,7 +69,7 @@ function get_data()
         }
         else
         {
-            showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});;
+            showInfoModal("ERROR GET_USER: An error has occured(\"" + data.status + "\")", () => {});;
             sessionStorage.setItem("already in", 0);
             localStorage.setItem("session opened", 0);
             navigate("/", "login");

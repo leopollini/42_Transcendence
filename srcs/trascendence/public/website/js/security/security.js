@@ -74,12 +74,15 @@ export function free_users()
     .then(response => response.json())
     .then(data =>
     {
-        if (data.status === " (guest) does not exist")
-            return;
-        if (data && data.status && data.success)
+        if (data)
         {
-            if (data.status !== "success" && data.success !== "true")
-                showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});
+            if (data.status === " (guest) does not exist")
+                return;
+            if (data.status && data.success)
+            {
+                if (data.status !== "success" && data.success !== "true")
+                    showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
+            }
         }
     })
     .catch(error =>
