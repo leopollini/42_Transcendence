@@ -70,7 +70,6 @@ function continue_error_check(path)
 export function path_error(path)
 {
     let opponent = sessionStorage.getItem("opponent");
-    console.log("opponent = ", opponent);
     if (!opponent && (path === "/classic" || path === "/forza4/game"))
     {
         showInfoModal("the operation you are doing is forbidden", () => {});

@@ -7,15 +7,24 @@ export function pop_false()
     localStorage.setItem('popup_opened', 'false');
 }
 
+function receiveMessage(event)
+{
+    if (event.data.error)
+    {
+        console.log("catched error");
+        log_succ = false;
+        popup.close();
+        localStorage.removeItem("popup opened");
+        return;
+    }
+    if (event.data.access_granted === true)
+        log_succ = true;
+}
+
 function popupHandling(popup)
 {
     localStorage.setItem("popup opened", true);
     let log_succ = false
-    function receiveMessage(event)
-    {
-        if (event.data.access_granted === true)
-            log_succ = true;
-    }
     window.addEventListener("message", receiveMessage);
     let popupMonitor = setInterval(() => {
         if (popup.closed)
@@ -88,6 +97,9 @@ export function performLogin()
     .then(response => response.json())
     .then(data => {
         setpopup(window.open(data.auth_url, 'Login', 'width=800,height=800'));
-        popupHandling(popup, data);
+        popupHandling(popup);
     })
+    .catch(error => {
+        showInfoModal("Error during login: " + error.message, () => {});
+    });
 }
