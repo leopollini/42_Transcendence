@@ -576,7 +576,6 @@ class ChatApp {
 
     set_profile_info()
     {
-        console.log("user = ", current_user);
         const userimage = document.querySelector("#profileAvatar");
         const profileDetails = document.querySelector('.profile-details');
         const lastOnline = profileDetails.querySelector('#lastOnline');

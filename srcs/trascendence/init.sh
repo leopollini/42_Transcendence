@@ -61,5 +61,4 @@ fi
 echo "==============================="
 echo "Script completato. Avvio server..."
 
-bash https.sh
 ruby server.rb

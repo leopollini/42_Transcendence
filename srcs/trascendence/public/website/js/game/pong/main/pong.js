@@ -13,7 +13,7 @@ import { saveMatchStatsData, resetMatchStatsData } from '../data/game_stats.js';
 import { updateTimer } from '../other/timer.js';
 import { ballColor, paddleColor, ballTrailColor, wallsColor, powerUpActive, background } from '../data/game_global.js';
 import { current_user } from '../../../main.js';
-import { showInfoModal } from '../../../modal.js';
+import { remove_all } from '../../../error_main.js';
 
 export let gameContainer;
 
@@ -286,7 +286,7 @@ export class PongGame {
         })
 
         backToMenuButton.addEventListener('click', () => {
-            sessionStorage.setItem("game ended", false);
+            remove_all(1, 1);
             gameCanvas.style.display = "none";  
             backToMenuButton.hidden = true;
             sessionStorage.setItem("winner", this.winner);

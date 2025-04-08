@@ -1,42 +1,51 @@
-import { navigate } from "../main.js";
+import { navigate, popup, setpopup} from "../main.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
-
-export let popupOpened = false;
-
+import { remove_all } from "../error_main.js";
 export function pop_false()
 {
-    popupOpened = false;
     localStorage.setItem('popup_opened', 'false');
 }
 
-function popupHandling(popup, data)
+function receiveMessage(event)
+{
+    if (event.data.error)
+    {
+        console.log("catched error");
+        log_succ = false;
+        popup.close();
+        localStorage.removeItem("popup opened");
+        return;
+    }
+    if (event.data.access_granted === true)
+        log_succ = true;
+}
+
+function popupHandling(popup)
 {
     localStorage.setItem("popup opened", true);
     let log_succ = false
-    function receiveMessage(event) {
-        if (event.data.access_granted === true) {
-            log_succ = true;
-        }
-    }
     window.addEventListener("message", receiveMessage);
     let popupMonitor = setInterval(() => {
-        if (popup.closed) {
+        if (popup.closed)
+        {
             clearInterval(popupMonitor);
             localStorage.setItem("popup opened", false);
             window.removeEventListener("message", receiveMessage);
-            console.log("log_succ = ", log_succ);
             if (log_succ === true)
             {
                 get_data();
-                localStorage.removeItem("popup opened");
+                remove_all(1, 1);
                 navigate("/modes", "Modalità di gioco");
                 showInfoModal("You are logged in successfully.\nTo change user, close this tab first!", () => {});
             }
             else if (log_succ === false)
                 localStorage.removeItem("popup opened");
             else
+            {
+                remove_all(0, 0);
                 showInfoModal("Error: Unexpected popup closure, authentication failed.", () => {});
+            }
         }
     }, 10);
 }
@@ -66,15 +75,12 @@ function get_data()
         
             change_name(new_user.login_name);
             update_image(new_user.image);
-            sessionStorage.setItem("already in", 1);
-            localStorage.setItem("session opened", 1);
             update_user(new_user);   
         }
         else
         {
-            showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});;
-            sessionStorage.setItem("already in", 0);
-            localStorage.setItem("session opened", 0);
+            showInfoModal("ERROR GET_USER: An error has occured(\"" + data.status + "\")", () => {});;
+            remove_all(0, 0, 1);
             navigate("/", "login");
             return ;
         }
@@ -90,7 +96,10 @@ export function performLogin()
     fetch('/auth/login')
     .then(response => response.json())
     .then(data => {
-        const popup = window.open(data.auth_url, 'Login', 'width=800,height=800');
-        popupHandling(popup, data);
+        setpopup(window.open(data.auth_url, 'Login', 'width=800,height=800'));
+        popupHandling(popup);
     })
+    .catch(error => {
+        showInfoModal("Error during login: " + error.message, () => {});
+    });
 }

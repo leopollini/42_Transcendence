@@ -34,25 +34,29 @@ class App
   def call(env)
     request = Rack::Request.new(env)
     response = Rack::Response.new
-
-    case request.path
-    when '/'
-      response.write(File.read(File.join(__dir__, '../public', 'index.html')))
-      response.content_type = 'text/html'
-    when '/auth/login'
-      login(request, response, @client)
-    when '/callback'
-      callback(request, response, @client)
-    else
-      if File.extname(request.path).empty? && @spa_route.include?(request.path)
+    begin
+      case request.path
+      when '/'
         response.write(File.read(File.join(__dir__, '../public', 'index.html')))
         response.content_type = 'text/html'
-      elsif request.path.start_with?('/website') && static_file_path = File.exist?(File.join(__dir__, '../public', request.path))
-        response.write(File.read(static_file_path))
-        response.content_type = determine_content_type(request.path)
+      when '/auth/login'
+        login(request, response, @client)
+      when '/callback'
+        callback(request, response, @client)
       else
-        page_not_found(response)
+        if File.extname(request.path).empty? && @spa_route.include?(request.path)
+          response.write(File.read(File.join(__dir__, '../public', 'index.html')))
+          response.content_type = 'text/html'
+        elsif request.path.start_with?('/website') && static_file_path = File.exist?(File.join(__dir__, '../public', request.path))
+          response.write(File.read(static_file_path))
+          response.content_type = determine_content_type(request.path)
+        else
+          page_not_found(response)
+        end
       end
+    rescue => e
+      puts "Error found: #{e.message}".red
+      puts "Backtrace: #{e.backtrace.join("\n")}".red
     end
 
     response.finish

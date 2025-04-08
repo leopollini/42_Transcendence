@@ -58,8 +58,5 @@ module AuthMethods
     html_content = File.read('./pages_auth/auth_page.html')
     response.content_type = 'text/html'
     response.write(html_content)
-  rescue StandardError => e
-    response.content_type = 'application/json'
-    response.write({ success: false, error: "Error during OAuth callback: #{e.message}" }.to_json)
   end
 end

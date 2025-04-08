@@ -70,7 +70,7 @@ export async function restore_user()
             }
             else
             {
-                showInfoModal("ERROR: An error has occured(\"" + result.status + "\")", () => {});
+                showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => {});
                 nullify_user();
                 navigate("/", "home");
                 return null;

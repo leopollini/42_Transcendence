@@ -3,11 +3,11 @@ import { current_user } from "../../../main.js";
 let gameInstance;
 
 export function initializeGameCanvas(matchPlayers) {
-    console.log("Inizializzazione game canvas");
+    //console.log("Inizializzazione game canvas");
     const path = window.location.pathname;
     let players;
 
-    console.log("PATH =>" +path);
+    //console.log("PATH =>" +path);
     const gameCanvas = document.getElementById('gameCanvas');
     if (!gameCanvas) {
         console.error("Canvas non trovato nel DOM!");

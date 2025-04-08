@@ -42,6 +42,10 @@ down:
 
 re: clean prep_dirs
 	@clear
+	@echo "configurazione server https locale"
+	@chmod +x setup/setup_online_website.sh
+	@sudo ./setup/setup_online_website.sh
+	@echo "configurazione completata"
 	make -C srcs/common_tools/ re
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
@@ -61,13 +65,18 @@ clean:
 	@docker-compose -f docker-compose.yml stop
 	@docker ps -qa | xargs -r docker stop || true
 	@docker ps -qa | xargs -r docker rm || true
-	#@docker images -qa | xargs -r docker rmi -f
-	# @docker volume ls -q | xargs -r docker volume rm
-	# @docker network ls -q | awk '!$(echo bridge|host|none) {print}' | xargs -r docker network rm
 	# Destroy all directories
 	rm -rf /data/wordpress
+
+fclean: clean
+	@docker-compose down -v --remove-orphans
+	@docker system prune -a --volumes -f
+	@docker images -qa | xargs -r docker rmi -f
+	@docker volume ls -q | xargs -r docker volume rm
+	@docker network ls -q | grep -vE 'bridge|host|none' | xargs -r docker network rm
+	@echo "pulizia completata"
 
 clean_imgs:
 	@docker images -qa | xargs -r docker rmi -f
 
-.PHONY: all stop_containers down re clean remove_all
+.PHONY: all stop_containers down re clean remove_all fclean

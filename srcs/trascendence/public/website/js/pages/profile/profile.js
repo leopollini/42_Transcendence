@@ -97,10 +97,9 @@ function updateLogin(current_user)
 
 function updateGuest(current_user)
 {
-  console.log("hello");
   let data = {
-    bio: current_user.bio
-    //image: current_user.image
+    bio: current_user.biom,
+    image: current_user.image
   };
   fetch("http://localhost:8008",
   {
@@ -110,7 +109,7 @@ function updateGuest(current_user)
   .then(response => response.json())
   .then(data =>
   {
-    console.log("(UPDATE_USER)\ndata update user profile for guest  = ", data);
+    //console.log("(UPDATE_USER)\ndata update user profile for guest  = ", data);
   })
   .catch(error =>
   {
