@@ -191,7 +191,9 @@ export const addRobinRankingPageHandlers = () => {
         const players = [];
         players.push(nextMatch.player1);
         players.push(nextMatch.player2);
-        sessionStorage.setItem('matchPlayers', JSON.stringify(players));
+        //sessionStorage.setItem('matchPlayers', JSON.stringify(players));
+        sessionStorage.setItem("player1", players[0]);
+        sessionStorage.setItem("player2", players[1]);
         nextMatch = null;
         navigate("/tournament/roundrobin/robinranking/game", "RoundRobin Pong Game");
     });

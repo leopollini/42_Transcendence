@@ -45,7 +45,7 @@ export function handleClassicPongLobby() {
     const matchPlayers = document.getElementById("pongMatchPlayers");
     const inviteButton = document.getElementById("pongInviteButton");
     numPlayersLabel = document.getElementById("pongNumPlayersLabel");
-    
+    invitedPlayers = [];
     numPlayersAccepted = 0;
     selectedPlayer = null;
     numPlayersLabel.textContent = "0/" + totalPlayers;

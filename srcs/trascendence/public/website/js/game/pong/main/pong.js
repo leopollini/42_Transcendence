@@ -13,6 +13,7 @@ import { saveMatchStatsData, resetMatchStatsData } from '../data/game_stats.js';
 import { updateTimer } from '../other/timer.js';
 import { ballColor, paddleColor, ballTrailColor, wallsColor, powerUpActive, background } from '../data/game_global.js';
 import { current_user } from '../../../main.js';
+import { showInfoModal } from '../../../modal.js';
 
 export let gameContainer;
 
@@ -38,6 +39,7 @@ export function startPongGame(matchPlayers, gameMode) {
     resetMatchStatsData();
     // Set the game mode (classic, ai, knocknout, rondrobin)
     mode = gameMode;
+   
     players = matchPlayers;
 }
 
@@ -60,8 +62,14 @@ export class PongGame {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         // Set game variables
-        this.p1Name = current_user.display_name;
-        this.p2Name = sessionStorage.getItem('opponent') || 'IA';
+        if (mode === "classic" || mode === "ai") {
+            this.p1Name = current_user.display_name;
+            this.p2Name = sessionStorage.getItem('opponent') || 'IA';
+        }
+        else {
+            this.p1Name = sessionStorage.getItem('player1');
+            this.p2Name = sessionStorage.getItem('player2');
+        }
         this.scoreP1 = 0;
         this.scoreP2 = 0;
         this.maxScore = 2;
@@ -107,6 +115,7 @@ export class PongGame {
     }
     
     start() {
+      
         this.running = true;
         this.loop();
         matchData.timer = setInterval(updateTimer.bind(this), 1000);
@@ -289,9 +298,17 @@ export class PongGame {
         })
 
         window.addEventListener('resize', () => this.resize());
-        window.addEventListener("popstate", (event) => {
+        window.addEventListener("popstate", () => {
             //clearInterval(matchData.timer);
-            this.destroy();
+            if (mode === "knockout" || mode === "roundrobin")
+            {
+                this.destroy();
+                showInfoModal("Leaving Tournament...", () => {});   
+                navigate("/modes", "Return to Game Mode");  
+            } 
+            else
+                this.destroy();    
+                  
         });
     } 
 }

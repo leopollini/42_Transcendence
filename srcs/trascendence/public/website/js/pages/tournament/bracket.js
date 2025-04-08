@@ -252,7 +252,9 @@ export const addBracketPageHandlers = async () => {
         matchPlayers.push(bracketPlayers[currentRound][currentMatch * 2]);
         matchPlayers.push(bracketPlayers[currentRound][currentMatch * 2 + 1]);
         console.log("match players => " + matchPlayers);
-        sessionStorage.setItem('matchPlayers', JSON.stringify(matchPlayers)); // Salva i giocatori della partita
+        //sessionStorage.setItem('matchPlayers', JSON.stringify(matchPlayers)); // Salva i giocatori della partita
+        sessionStorage.setItem("player1", matchPlayers[0]);
+        sessionStorage.setItem("player2", matchPlayers[1]);
         navigate("/tournament/knockout/bracket/game", "Bracket Pong Game", matchPlayers);
     });
 
