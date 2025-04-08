@@ -97,14 +97,14 @@ export function addForza4LobbyPageHandlers() {
             selectedPlayer.remove();
             selectedPlayer = null;
             inviteButton.disabled = true;
+            console.log("invited: " + invitedPlayers);
             if (numPlayersAccepted === totalPlayers)
                 toggleStartMatch.disabled = false;
         }
     };
 
     toggleStartMatch?.addEventListener('click', () => {
-        console.log("avversario = ", invitedPlayers[1]);
-        sessionStorage.setItem("opponent", invitedPlayers[1]);
+        sessionStorage.setItem("f4opponent", invitedPlayers[1]);
         navigate( "/forza4/game", "Forza 4 Game", invitedPlayers);
     });
 

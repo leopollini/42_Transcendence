@@ -20,8 +20,9 @@ import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
 import { restore_user } from "./login/user.js";
-import {check_valid_operation, remove_all, path_error} from "./error_main.js";
 import { showInfoModal } from "./modal.js";
+
+import { free_users } from "./security/security.js";
 let buttonTitle;
 let winner;
 let players;
@@ -51,13 +52,7 @@ const routes = {
     "/profile": Profile,
 };
 
-export let popup = null;
 export let current_user = null;
-
-export function setpopup(new_popup)
-{
-    popup = new_popup;
-}
 
 export async function initUser()
 {
@@ -75,25 +70,23 @@ export function nullify_user()
     current_user = null;
 }
 
+window.addEventListener('load', () => {
+    if (sessionStorage.getItem('already in') === null)
+        sessionStorage.setItem('already in', 0);
+    if (localStorage.getItem('session opened') === null)
+        localStorage.setItem('session opened', 0);
+});
+
 //restore logged da sistemare
-export const navigate = async (path, title = "", lobbyPlayers) => {
+export const navigate = (path, title = "", lobbyPlayers) => {
     if (window.location.pathname !== path)
         history.pushState({ path }, title, path);
     else
         history.replaceState({ path }, title, path);
     buttonTitle = title;
+    console.log("lobby playrs" + lobbyPlayers);
     players = lobbyPlayers;
-    history.pushState({ path }, title, path);
-    /*if (window.location.pathname !== path)
-    {
-        console.log("entra");
-    }
-    else
-    {
-        console.log("non puo entra");
-        history.replaceState({ path }, title, path);
-    }*/
-    await loadContent();
+    loadContent();
 };
 
 function createPlayersArray(numPlayers) {
@@ -114,15 +107,16 @@ function restoreBackground() {
 
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
+    await initUser();
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    if (check_valid_operation(path) === 1 || path_error(path) === 1)
-        return;
-    else
-        await initUser();
+    
+    //console.log("path => " + path);
     let playerNames;
     let numPlayers = 4;
+    if (check_valid_operation(path) === 1)
+        return;
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
         || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
         numPlayers = parseInt(buttonTitle.replace(/\D/g, ""), 10);
@@ -131,13 +125,11 @@ const loadContent = async () => {
     //console.log("Players? " +players);
     playerNames = players;  
     //console.log("path => " + path);
-    if (path !== "/classic" && path !== "/forza4/game")
-        remove_all(1, 1);
     if (component)
     {
-        app.innerHTML = component();//sicuro se lo purifichi blocca codici
+        app.innerHTML = component();
         if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
-            //console.log("playerzzzz2: " + players);
+            console.log("playerzzzz2: " + players);
             initializeGameCanvas(players);
             document.getElementById('app').classList.add('no-background');
         }
@@ -152,7 +144,6 @@ const loadContent = async () => {
                 profileHandler();
                 break;
             case "/classic":
-                sessionStorage.setItem("no", true);
                 break;
             case "/classic/lobby":
                 addClassicPongLobbyPageHandlers();
@@ -224,39 +215,30 @@ const loadContent = async () => {
                 break;
             case "/forza4/game":
                 startForza4Game(players);
-                sessionStorage.setItem("no", true);
                 break;
             default:
                 break;
         }
     }
+    else
+        app.innerHTML = "<h1 class='text'>404 - Pagina non trovata</h1>"; // Pagina non trovata
 
     const chatRoutes = ["/modes"]; // aggiungi qui le rotte dove vuoi visualizzare la chat
     if (chatRoutes.includes(path)) {
         initChat();
     } else {
         // If don't needed, empty the chat content
-        document.getElementById("chatApp").innerHTML = "";//sicuro
+        document.getElementById("chatApp").innerHTML = "";
     }
 };
 
     // Handling "Forward" and "Backward" browser buttons
 window.addEventListener("popstate", loadContent);
 
-window.addEventListener("popstate", async(event) =>
-{
-    if (sessionStorage.getItem("no") === "true")
-    {
-        remove_all(1, 1);
-        showInfoModal("you successfully exited the game", () => {});
-        return;
-    }
-});
-
 function initChat() {
     const chatContainer = document.getElementById("chatApp");
     // Insert chat template
-    chatContainer.innerHTML = LiveChat();//sicuro
+    chatContainer.innerHTML = LiveChat();
     // Initialize chat logic by creating the ChatApp instance   
     new ChatApp();
 }
@@ -268,8 +250,6 @@ const channel = new BroadcastChannel("session_sync");
 
 window.addEventListener('beforeunload', () =>
 {
-    if (popup)
-        popup.close();
     if (sessionStorage.getItem('already in') === '1')
     {
         localStorage.setItem('session opened', 0);
@@ -289,5 +269,61 @@ window.addEventListener('storage', (event) =>
 channel.addEventListener("message", (event) =>
 {
     if (event.data === "session_closed")
-        remove_all(0,0, 1);
+    {
+        localStorage.setItem('session opened', 0);
+        free_users();
+    }
 });
+
+function check_valid_operation(path)
+{
+    if (sessionStorage.getItem('already in') === '1' && localStorage.getItem('session opened') === '0')
+        localStorage.setItem('session opened', 1);
+    if (sessionStorage.getItem('already in') === '1' && path === "/")
+    {
+        free_users();
+        nullify_user();
+        localStorage.setItem('session opened', 0);
+        sessionStorage.setItem('already in', 0);
+        return (0);
+    }
+    else if (path !== '/')
+    {
+        if (continue_error_check(path) === 1)
+            return (1);
+    }
+    return (0);
+}
+
+function continue_error_check(path)
+{
+    // if (sessionStorage.getItem('already in') === '1')
+    // {
+    //     if (path === window.location.pathname
+    //     && sessionStorage.getItem('already in') === '1')
+    //     {
+    //         if (sessionStorage.getItem('game ended') === 'true')
+    //         {
+    //             sessionStorage.removeItem("game ended");
+    //             showInfoModal("ERROR:(Invalid operation) going back to menu...", () => {});
+    //             navigate("/modes", "Return to Game Mode");
+    //             return (1);
+    //         }
+    //         return (0);
+    //     }
+    // }
+    // else
+    // {
+    //     if (!sessionStorage.getItem('already in'))
+    //         sessionStorage.setItem('already in', '0');
+    //     if (!localStorage.getItem('session opened'))
+    //         localStorage.setItem('session opened', '0');
+    //     if ((localStorage.getItem('session opened') === '1' && sessionStorage.getItem('already in') === '0') ||
+    //     (sessionStorage.getItem('already in') === '0' && localStorage.getItem('session opened') === '0'))
+    //     {
+    //         showInfoModal("ERROR: accessing unauthorized page...", () => {});
+    //         navigate("/", "home");
+    //         return (1);
+    //     }
+    // }
+}

@@ -70,7 +70,7 @@ export function setupRoundRobinPlayers() {
 
     //console.log("Round Robin setup initialized");
 
-    playerSelection.addEventListener('change', () => {
+    playerSelection.addEventListener('change', (event) => {
         //console.log("Change event triggered");
         const selectedRadio = document.querySelector('input[name="players"]:checked');
         if (selectedRadio) {
@@ -102,7 +102,7 @@ export const addRoundRobinPageHandlers = () => {
     const backImageButton = document.getElementById('backImageButton');
 
     radioButtons.forEach(radioButton => {
-        radioButton.addEventListener('change', () => {
+        radioButton.addEventListener('change', (event) => {
             navigate("/tournament/roundrobin/lobby", "Robin"+radioButton.value);  
         });
     });

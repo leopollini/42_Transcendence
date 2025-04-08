@@ -1,8 +1,8 @@
-import { escapeHTML} from '../security/security.js';
+import { escapeHTML, free_users} from '../security/security.js';
 import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
 import { showInfoModal } from '../modal.js';
-import { remove_all } from '../error_main.js';
+import { nullify_user } from '../main.js';
 
 export default function Modes()
 {
@@ -60,8 +60,11 @@ window.onpopstate = function ()
 {
     if (location.pathname === "/")
     {
-        showInfoModal("you have quitted the active session", () => {});
-        remove_all(0, 0, 1);
+        showInfoModal("you have quitted the active session", () => {});;
+        sessionStorage.setItem("already in", 0);
+        localStorage.setItem("session opened", 0);
+        nullify_user();
+        free_users();
     }
 };
 
@@ -77,6 +80,7 @@ export function updateProfileUI(profile)
 }
 
 export const addModesPageHandlers = () => {
+    sessionStorage.removeItem("opponent");
     const classicButton = document.getElementById('classicButton');
     const aiButton = document.getElementById('aiButton');
     const tournamentButton = document.getElementById('tournamentButton');

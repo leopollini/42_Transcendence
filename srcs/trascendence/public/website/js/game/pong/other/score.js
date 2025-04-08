@@ -10,6 +10,7 @@ export function checkScore(game) {
         else 
             game.winner = game.p2Name;
         
+        sessionStorage.setItem('game ended', true);
         if (window.location.pathname === "/classic" || window.location.pathname === "/VS_AI")
         {
             backToMenuButton.style.display = "block";

@@ -11,9 +11,9 @@ all: prep_dirs #stop_containers
 	@echo "configurazione completata"
 	make -C ./srcs/common_tools/ all
 	@if [ "$(DETATCH)" = "true" ]; then \
-		docker-compose -f ./docker-compose.yml up -d; \
+		docker compose -f ./docker-compose.yml up -d; \
 	else \
-		docker-compose -f ./docker-compose.yml up; \
+		docker compose -f ./docker-compose.yml up; \
 	fi
 
 $(CONTAINERS): prep_dirs
@@ -23,33 +23,29 @@ $(CONTAINERS): prep_dirs
 		echo "cleaned"; \
 	fi
 	@if [ "$(DETATCH)" = "true" ]; then \
-		docker-compose -f ./docker-compose.yml up -d $@; \
+		docker compose -f ./docker-compose.yml up -d $@; \
 	else \
-		docker-compose -f ./docker-compose.yml up $@; \
+		docker compose -f ./docker-compose.yml up $@; \
 	fi
-	# @docker-compose -f ./docker-compose.yml up $@
+	# @docker compose -f ./docker-compose.yml up $@
 
 stop_containers:
 	clear
 	@echo "Stopping existing containers..."
 	@sudo chmod +x /usr/bin/docker-compose
-	@docker-compose -f ./docker-compose.yml stop
+	@docker compose -f ./docker-compose.yml stop
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
 
 down:
-	@docker-compose -f ./docker-compose.yml down
+	@docker compose -f ./docker-compose.yml down
 
 re: clean prep_dirs
 	@clear
-	@echo "configurazione server https locale"
-	@chmod +x setup/setup_online_website.sh
-	@sudo ./setup/setup_online_website.sh
-	@echo "configurazione completata"
 	make -C srcs/common_tools/ re
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
-	@docker-compose -f ./docker-compose.yml up --build
+	@docker compose -f ./docker-compose.yml up --build
 
 prep_dirs:
 	@mkdir -p ./srcs/common_tools/tools
@@ -62,21 +58,16 @@ prep_dirs:
 clean:
 	@clear
 	make -C srcs/common_tools/ clean
-	@docker-compose -f docker-compose.yml stop
+	@docker compose -f docker-compose.yml stop
 	@docker ps -qa | xargs -r docker stop || true
 	@docker ps -qa | xargs -r docker rm || true
+	#@docker images -qa | xargs -r docker rmi -f
+	# @docker volume ls -q | xargs -r docker volume rm
+	# @docker network ls -q | awk '!$(echo bridge|host|none) {print}' | xargs -r docker network rm
 	# Destroy all directories
 	rm -rf /data/wordpress
-
-fclean: clean
-	@docker-compose down -v --remove-orphans
-	@docker system prune -a --volumes -f
-	@docker images -qa | xargs -r docker rmi -f
-	@docker volume ls -q | xargs -r docker volume rm
-	@docker network ls -q | grep -vE 'bridge|host|none' | xargs -r docker network rm
-	@echo "pulizia completata"
 
 clean_imgs:
 	@docker images -qa | xargs -r docker rmi -f
 
-.PHONY: all stop_containers down re clean remove_all fclean
+.PHONY: all stop_containers down re clean remove_all

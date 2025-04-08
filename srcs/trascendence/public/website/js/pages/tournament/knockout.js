@@ -47,7 +47,7 @@ export const addKnockoutPageHandlers = () => {
     const backImageButton = document.getElementById('backImageButton');
     
     radioButtons.forEach(radioButton => {
-        radioButton.addEventListener('change', () => {
+        radioButton.addEventListener('change', (event) => {
             navigate("/tournament/knockout/lobby", "Bracket"+radioButton.value);          
         });
     });

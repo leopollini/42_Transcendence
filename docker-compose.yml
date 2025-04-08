@@ -99,7 +99,6 @@ services:
     privileged: true
     restart: always
     volumes:
-      - ./srcs/trascendence/authentication/ssl_certs:/ssl_certs
       - ./srcs/common_tools/tools:/var/common
       - ./srcs/trascendence:/var/www
     depends_on:
