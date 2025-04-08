@@ -7,6 +7,7 @@ require_relative ((File.file?('/var/common/Ports.rb') ? '/var/common/Ports.rb' :
 
 module Other_logic
 
+
   def page_not_found(response)
     response.status = 200
     html_content = File.read('./pages_auth/no_page.html')
