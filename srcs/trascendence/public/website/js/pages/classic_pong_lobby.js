@@ -10,7 +10,6 @@ let numPlayersAccepted = 0;
 let totalPlayers = 2;
 
 export default function ClassicPongLobbyRoom() {
-    sessionStorage.removeItem("opponent");
     return `
         <img id="backImageButton" src="../../website/images/home.png" alt="Back" class="back-button">
         <h1 class="text">
@@ -101,6 +100,7 @@ export function addClassicPongLobbyPageHandlers() {
     };
 
     toggleStartMatch?.addEventListener('click', () => {
+        console.log("invitedPlayers: ", invitedPlayers);
         sessionStorage.setItem("opponent", invitedPlayers[1]);
         navigate( "/classic", "Pong Classic Game", invitedPlayers);
     });

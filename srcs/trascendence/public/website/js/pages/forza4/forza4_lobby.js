@@ -7,7 +7,6 @@ let numPlayersAccepted = 0;
 let totalPlayers = 2;
 
 export default function Forza4LobbyRoom() {
-    sessionStorage.removeItem("opponent");
     return `
         <img id="backImageButton" src="../../website/images/home.png" alt="Back" class="back-button">
         <h1 class="text">
@@ -103,6 +102,8 @@ export function addForza4LobbyPageHandlers() {
     };
 
     toggleStartMatch?.addEventListener('click', () => {
+        console.log("avversario = ", invitedPlayers[1]);
+        sessionStorage.setItem("opponent", invitedPlayers[1]);
         navigate( "/forza4/game", "Forza 4 Game", invitedPlayers);
     });
 

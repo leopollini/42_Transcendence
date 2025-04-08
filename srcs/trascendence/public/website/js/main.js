@@ -20,9 +20,8 @@ import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
 import {restore_user } from "./login/user.js";
-import {showInfoModal } from "./modal.js";
-import { cant_go_back, check_valid_operation} from "./error_main.js";
-import { free_users } from "./security/security.js";
+import {check_valid_operation, remove_all, path_error} from "./error_main.js";
+import { showInfoModal } from "./modal.js";
 let buttonTitle;
 let winner;
 let players;
@@ -77,14 +76,20 @@ export function nullify_user()
 }
 
 //restore logged da sistemare
-export const navigate = (path, title = "", lobbyPlayers) => {
-    if (window.location.pathname !== path)
-        history.pushState({ path }, title, path);
-    else
-        history.replaceState({ path }, title, path);
+export const navigate = async (path, title = "", lobbyPlayers) => {
     buttonTitle = title;
     players = lobbyPlayers;
-    loadContent();
+    history.pushState({ path }, title, path);
+    /*if (window.location.pathname !== path)
+    {
+        console.log("entra");
+    }
+    else
+    {
+        console.log("non puo entra");
+        history.replaceState({ path }, title, path);
+    }*/
+    await loadContent();
 };
 
 function createPlayersArray(numPlayers) {
@@ -108,7 +113,7 @@ const loadContent = async () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    if (check_valid_operation(path) === 1 || cant_go_back(path) === 1)
+    if (check_valid_operation(path) === 1 || path_error(path) === 1)
         return;
     else
         await initUser();
@@ -122,7 +127,9 @@ const loadContent = async () => {
     //console.log("Players? " +players);
     playerNames = players;  
     //console.log("path => " + path);
-    if (component && sessionStorage.getItem("start") !== 'true')
+    if (path !== "/classic" && path !== "/forza4/game")
+        remove_all(1, 1);
+    if (component)
     {
         app.innerHTML = component();//sicuro se lo purifichi blocca codici
         if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
@@ -141,8 +148,7 @@ const loadContent = async () => {
                 profileHandler();
                 break;
             case "/classic":
-                sessionStorage.setItem("start", "true");
-                sessionStorage.setItem("path game", path);
+                sessionStorage.setItem("no", true);
                 break;
             case "/classic/lobby":
                 addClassicPongLobbyPageHandlers();
@@ -214,27 +220,12 @@ const loadContent = async () => {
                 break;
             case "/forza4/game":
                 startForza4Game(players);
-                sessionStorage.setItem("path game", path);
-                sessionStorage.setItem("start", "true");
+                sessionStorage.setItem("no", true);
                 break;
             default:
                 break;
         }
     }
-    else
-    {
-        sessionStorage.removeItem("start");
-        navigate("/modes", "Return to Game Mode");
-        showInfoModal("the operation you are doing is forbidden", () => {});
-    }
-    /*else
-    {
-        const h1 = document.createElement("h1");
-        h1.className = "text";
-        h1.textContent = "404 - Pagina non trovata";
-        app.replaceChildren(h1); // Sostituisce tutto il contenuto con h1
-    }*/
-    
 
     const chatRoutes = ["/modes"]; // aggiungi qui le rotte dove vuoi visualizzare la chat
     if (chatRoutes.includes(path)) {
@@ -247,6 +238,16 @@ const loadContent = async () => {
 
     // Handling "Forward" and "Backward" browser buttons
 window.addEventListener("popstate", loadContent);
+
+window.addEventListener("popstate", async(event) =>
+{
+    if (sessionStorage.getItem("no") === "true")
+    {
+        remove_all(1, 1);
+        showInfoModal("you successfully exited the game", () => {});
+        return;
+    }
+});
 
 function initChat() {
     const chatContainer = document.getElementById("chatApp");
@@ -284,8 +285,5 @@ window.addEventListener('storage', (event) =>
 channel.addEventListener("message", (event) =>
 {
     if (event.data === "session_closed")
-    {
-        localStorage.setItem('session opened', 0);
-        free_users();
-    }
+        remove_all(0,0, 1);
 });

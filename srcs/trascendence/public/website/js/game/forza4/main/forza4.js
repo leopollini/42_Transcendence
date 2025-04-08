@@ -3,6 +3,7 @@ import { token1Color, token2Color, powerUpMode} from "../data/forza4_game_global
 import { createGrid, redrawGrid } from "../board/forza4_grid.js";
 import { updateTimer, resetTimer } from "../other/forza4_timer.js";
 import { activatePowerup } from "../board/forza4_powerup.js";
+import { remove_all } from "../../../error_main.js";
 
 let backImageButton;
 let matchPlayers = [];
@@ -37,8 +38,6 @@ export function Forza4() {
 export function startForza4Game(players) {
     backImageButton = document.getElementById('backImageButton');
     matchPlayers = players;
-    if (!sessionStorage.getItem("opponent"))
-        sessionStorage.setItem("opponent", players[1]);
     let f4Game = new Forza4Game();
     //console.log("playerzz:" +players);
    
@@ -125,12 +124,11 @@ class Forza4Game {
 
     addEventListeners() {
         f4BackToMenuButton.addEventListener('click', () => {
-            sessionStorage.removeItem("start");
-            sessionStorage.setItem("game ended", false);
+            remove_all(1, 1);
             document.getElementById("app").style.background = 
             "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
             resetTimer(this);
-            navigate("/forza4", "Forza 4 Home");
+            navigate("/modes", "Forza 4 Home");
         });
     
         backImageButton?.addEventListener('click', () => {

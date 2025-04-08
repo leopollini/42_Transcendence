@@ -1,6 +1,6 @@
-import { navigate, current_user, nullify_user} from "../../../main.js";
-import { free_users } from "../../../security/security.js";
+import { navigate, current_user} from "../../../main.js";
 import { showInfoModal } from "../../../modal.js";
+import { remove_all } from "../../../error_main.js";
 
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
@@ -73,10 +73,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
                 navigate("/", "logout");
                 return;
             }
-            free_users();
-            nullify_user();
-            sessionStorage.setItem("already in", 0);
-            localStorage.setItem("session opened", 0);
+            remove_all(0,0, 1);
             navigate("/", "login");
         });
     }

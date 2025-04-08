@@ -1,7 +1,7 @@
 import { navigate, popup, setpopup} from "../main.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
-
+import { remove_all } from "../error_main.js";
 export function pop_false()
 {
     localStorage.setItem('popup_opened', 'false');
@@ -26,14 +26,17 @@ function popupHandling(popup)
             if (log_succ === true)
             {
                 get_data();
-                localStorage.removeItem("popup opened");
+                remove_all(1, 1);
                 navigate("/modes", "Modalità di gioco");
                 showInfoModal("You are logged in successfully.\nTo change user, close this tab first!", () => {});
             }
             else if (log_succ === false)
                 localStorage.removeItem("popup opened");
             else
+            {
+                remove_all(0, 0);
                 showInfoModal("Error: Unexpected popup closure, authentication failed.", () => {});
+            }
         }
     }, 10);
 }
@@ -63,15 +66,12 @@ function get_data()
         
             change_name(new_user.login_name);
             update_image(new_user.image);
-            sessionStorage.setItem("already in", 1);
-            localStorage.setItem("session opened", 1);
             update_user(new_user);   
         }
         else
         {
             showInfoModal("ERROR GET_USER: An error has occured(\"" + data.status + "\")", () => {});;
-            sessionStorage.setItem("already in", 0);
-            localStorage.setItem("session opened", 0);
+            remove_all(0, 0, 1);
             navigate("/", "login");
             return ;
         }
