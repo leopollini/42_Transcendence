@@ -66,7 +66,7 @@ class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
     res.status = status
     res['Content-Security-Policy'] =
     "default-src 'self'; " \
-    "script-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com; " \
+    "script-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://cdn.jsdelivr.net; " \
     "style-src 'self' https://fonts.googleapis.com; " \
     "font-src 'self' https://fonts.gstatic.com; " \
     "img-src 'self' data:; " \
