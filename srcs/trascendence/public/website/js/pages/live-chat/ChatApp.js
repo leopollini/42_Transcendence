@@ -41,7 +41,6 @@ class ChatApp {
             this.username = current_user.display_name;
         else
             this.username = "default";
-
         this.socket = initSocket(this.username, this);
     }
 
@@ -117,8 +116,8 @@ class ChatApp {
     }
 
     updateMessagesDisplay() {
-        const messages = this.chats.get(this.currentChat) || [];
-        this.elements.messagesContainer.textContent = messages
+        let messages = this.chats.get(this.currentChat) || [];
+        this.elements.messagesContainer.innerHTML = messages
             .map((msg) => this.createMessageElement(msg))
             .join('');
         this.scrollToBottom();
@@ -134,7 +133,6 @@ class ChatApp {
             const hours = time.getHours().toString().padStart(2, '0');
             const minutes = time.getMinutes().toString().padStart(2, '0');
             const formattedTime = `${hours}:${minutes}`;
-
             return `<div class="message ${className}">
                         <div class="sender" style="color: ${senderColor};">
                             ${msg.from.charAt(0) + msg.from.slice(1)}
