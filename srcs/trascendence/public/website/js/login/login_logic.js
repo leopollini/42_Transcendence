@@ -7,6 +7,8 @@ export function pop_false()
     localStorage.setItem('popup_opened', 'false');
 }
 
+let log_succ = false;
+
 function receiveMessage(event)
 {
     if (event.data.error)
@@ -24,7 +26,7 @@ function receiveMessage(event)
 function popupHandling(popup)
 {
     localStorage.setItem("popup opened", true);
-    let log_succ = false
+    log_succ = false
     window.addEventListener("message", receiveMessage);
     let popupMonitor = setInterval(() => {
         if (popup.closed)
