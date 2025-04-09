@@ -60,17 +60,17 @@ server = WEBrick::HTTPServer.new(
 class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     puts "####", req.request_method, res, "####"
-    # return request_sorter req if req.method == "OPTIONS"
+    #return request_sorter req if req.method == "OPTIONS"
     status, headers, body = APP.call(req.meta_vars)
     res.status = status
-    #res['Content-Security-Policy'] =
-    #"default-src 'self'; " \
-    #"script-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com; " \
-    #"style-src 'self' https://fonts.googleapis.com; " \
-    #"font-src 'self' https://fonts.gstatic.com; " \
-    #"img-src 'self' data:; " \
-    #"connect-src 'self' http://localhost:8008 ws://localhost:6087; " \
-    #"object-src 'none'"
+    res['Content-Security-Policy'] =
+    "default-src 'self'; " \
+    "script-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com; " \
+    "style-src 'self' https://fonts.googleapis.com; " \
+    "font-src 'self' https://fonts.gstatic.com; " \
+    "img-src 'self' data:; " \
+    "connect-src 'self' http://localhost:8008 ws://localhost:6087; " \
+    "object-src 'none'"
   
       headers.each { |k, v| res[k] = v }
     log_error_details(req, status, body, LOGGER)
