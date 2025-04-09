@@ -330,8 +330,10 @@ class ChatApp {
         }
     }
 
+    //Non crederai mai a cosa mi è successo! <script>alert('XSS');</script>
+    //escapare in ruby. (errore in send_message)
     sendMessage() {
-        const text = escapeHTML(this.elements.messageInput.value);
+        const text = this.elements.messageInput.value;
         if (!text) return;
 
         const messagePayload = {
@@ -347,7 +349,6 @@ class ChatApp {
             messagePayload.chat = 'general';
             messagePayload.to = 'general';
         }
-
         this.socket.send(JSON.stringify({ type: "send_message", ...messagePayload }));
         this.elements.messageInput.value = '';
     }
