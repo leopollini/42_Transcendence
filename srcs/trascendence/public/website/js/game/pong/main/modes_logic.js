@@ -1,6 +1,6 @@
-import { navigate, current_user, nullify_user} from "../../../main.js";
-import { free_users } from "../../../security/security.js";
+import { navigate, current_user} from "../../../main.js";
 import { showInfoModal } from "../../../modal.js";
+import { remove_all } from "../../../error_main.js";
 
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
@@ -15,18 +15,19 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     });
 
     tournamentButton?.addEventListener('click', () => {
-        /*if (current_user.type === "guest")
+        if (current_user.type === "guest")
         {
-            showInfoModal("You must be logged to use this feature!", () => {}); showInfoModal("Select an opponent token!", () => {});
+            showInfoModal("You must be logged to use this feature!", () => {});
             return;
-        }*/
-        navigate("/tournament", "Modalità Torneo");
+        }
+        else
+            navigate("/tournament", "Modalità Torneo");
     });
 
     forza4Button?.addEventListener('click', () => {
         navigate("/forza4/findopponent", "Forza 4 Find Opponent");
     })
-    avatarImage.addEventListener("click", (event) => {
+    avatarImage.addEventListener("click", () => {
         menuContainer.classList.toggle("visible");
     });
 
@@ -58,7 +59,8 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
                 showInfoModal("You must be logged to use this feature!", () => {});
                 return;
             }
-            navigate("/userstats", "Game User Statistics");
+            else
+                navigate("/userstats", "Game User Statistics");
         });
     }
     else 
@@ -66,16 +68,12 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
     if (logout)
     {
         logout.addEventListener("click", () => {
-            localStorage.setItem("popup opened", false);
             if (!current_user)
             {
                 navigate("/", "logout");
                 return;
             }
-            free_users();
-            nullify_user();
-            sessionStorage.setItem("already in", 0);
-            localStorage.setItem("session opened", 0);
+            remove_all(0,0, 1);
             navigate("/", "login");
         });
     }

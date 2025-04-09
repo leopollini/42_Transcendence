@@ -56,6 +56,11 @@ export async function validateUploadedImage(file)
 
 export function escapeHTML(str)
 {
+    if (!str)
+    {
+        console.error("no data");
+        return ;
+    }
     str = str.trim();
     const div = document.createElement('div');
     if (str) 
@@ -74,12 +79,20 @@ export function free_users()
     .then(response => response.json())
     .then(data =>
     {
-        if (data && data.status && data.success)
+        if (data)
         {
-            if (data.status !== "success" && data.success !== "true")
-                showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});
+            if (data.status === " (guest) does not exist")
+                return;
+            if (data.status && data.success)
+            {
+                if (data.status !== "success" && data.success !== "true")
+                    showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
+            }
             else
-                console.log("deleting current user");
+            {
+                sessionStorage.setItem('already in', 0);
+                localStorage.setItem('session opened', 0);
+            }
         }
     })
     .catch(error =>

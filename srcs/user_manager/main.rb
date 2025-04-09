@@ -41,7 +41,9 @@ class TokenManager
   end
 
   def self.read_token_login
-    `cat #{TOKEN_LOGIN_FILE}`
+    if File.exist?(TOKEN_LOGIN_FILE)
+      `cat #{TOKEN_LOGIN_FILE}`
+    end
   end
 
   def self.save_token_guest(token)
@@ -49,7 +51,9 @@ class TokenManager
   end
 
   def self.read_token_guest
-    `cat #{TOKEN_GUEST_FILE}`
+    if File.exist?(TOKEN_GUEST_FILE)
+      `cat #{TOKEN_GUEST_FILE}`
+    end
   end
 
   def self.delete_token
@@ -106,17 +110,17 @@ def login_user(client, obj)
     return GUEST.add_guest(data, token)
   end
 
-  puts "looking in databaase for #{data['realname']}"
-  if usr = (LOGIN.select ['realname'], [data['realname']])[0]
-    # LOGIN.valueManipulation 'realname', data['realname'], 'loged_in = true'
-    return usr.merge({'status' => 'success', 'success' => 'true', 'token' => (LOGIN.select_specific(['token'], 'realname', data['realname']))['token']})
-  end
-  puts "#{data['realname']} not found in database"
-  return {'service' => 'user_manager', 'status' => 'bad request', 'success' => 'false'} if r
+  r = nil
+  if (usr = LOGIN.select ['realname'], ['realname = ?'], [data['realname']])[0]
+    LOGIN.valueManipulation 'realname', data['realname'], ['?'] => [data['realname']]
+    return usr.merge({'status' => 'success', 'success' => 'true'})
+  end rescue r
+  return {'status' => 'user_manager: bad request', 'success' => 'false'} unless r.nil?
   return add_user(client, obj) if obj['do_create']
   
   {'service' => 'user_manager', 'status' => 'user not found', 'success' => 'false'}
 end
+
 
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE

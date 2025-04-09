@@ -13,6 +13,7 @@ import { saveMatchStatsData, resetMatchStatsData } from '../data/game_stats.js';
 import { updateTimer } from '../other/timer.js';
 import { ballColor, paddleColor, ballTrailColor, wallsColor, powerUpActive, background } from '../data/game_global.js';
 import { current_user } from '../../../main.js';
+import { remove_all } from '../../../error_main.js';
 
 export let gameContainer;
 
@@ -60,8 +61,6 @@ export class PongGame {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         // Set game variables
-        //this.p1Name = players[0];
-        //this.p2Name = players[1];
         this.p1Name = current_user.display_name;
         this.p2Name = sessionStorage.getItem('opponent') || 'IA';
         this.scoreP1 = 0;
@@ -143,7 +142,7 @@ export class PongGame {
             this.ball.checkPosition(this);
             if (powerUpActive) 
                 handlePowerups(this);
-            checkScore(this, mode);
+            checkScore(this);
         }
 
         if (background == "space")
@@ -279,7 +278,7 @@ export class PongGame {
         })
 
         backToMenuButton.addEventListener('click', () => {
-           
+            remove_all(1, 1);
             gameCanvas.style.display = "none";  
             backToMenuButton.hidden = true;
             sessionStorage.setItem("winner", this.winner);
@@ -291,7 +290,7 @@ export class PongGame {
         })
 
         window.addEventListener('resize', () => this.resize());
-        window.addEventListener("popstate", (event) => {
+        window.addEventListener("popstate", () => {
             //clearInterval(matchData.timer);
             this.destroy();
         });

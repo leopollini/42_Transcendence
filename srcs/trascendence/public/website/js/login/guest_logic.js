@@ -3,6 +3,7 @@ import { user, profile} from "./user.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { escapeHTML } from "../security/security.js";
 import { showInputModal, showInfoModal } from "../modal.js"
+import { remove_all } from "../error_main.js";
 
 function hasNoSpaces(str)
 {
@@ -52,7 +53,6 @@ function update_guest(curr_guest)
   );
   let data = {"data" : {"username":guest_user.display_name,"image":guest_user.image},"login_as_guest":"true"};
   data = JSON.stringify(data);
-  console.log("data risultante = ", data);
   fetch("http://localhost:8008",
   {
       method: "login_user",
@@ -64,21 +64,19 @@ function update_guest(curr_guest)
     //console.log("(LOGIN_USER)\ndatas = ", data);
     if (data.status === "success" && data.success === "true")
     {
-        sessionStorage.setItem("already in", 1);
-        localStorage.setItem("session opened", 1);
+        remove_all(1, 1);
         update_user(guest_user);
         navigate("/modes", "Modalità di gioco");
     }
     else
     {
-        sessionStorage.setItem("already in", 0);
-        localStorage.setItem("session opened", 0);
-        guest_user = null;
-        if (data.status === "no users found")
-          showInfoModal("ERROR: Name already taken, try a different one", () => {});
-        else
-          showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});
-        return;
+      guest_user = null;
+      remove_all(0, 0, 1);
+      if (data.status === "no users found")
+        showInfoModal("ERROR: Name already taken, try a different one", () => {});
+      else
+        showInfoModal("ERROR in LOGIN_USER: An error has occured(\"" + data.status + "\")", () => {});
+      return;
     }
   })
   .catch(error =>

@@ -36,45 +36,20 @@ export class Friend {
     }
 }
 
-export function saveCookie(name, element, days) {
-    let data = new Date();
-    data.setTime(data.getTime() + (days * 24 * 60 * 60 * 1000));
-    let expire_date = "expires=" + data.toUTCString();
-    document.cookie = name + "=" + encodeURIComponent(JSON.stringify(element)) + ";" + expire_date + ";path=/";
-}
-
-export function readCookie(name)
+export async function restore_user()
 {
-    let nameCookie = name + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let cookieArray = decodedCookie.split(';');
-
-    for (let i = 0; i < cookieArray.length; i++) {
-        let cookie = cookieArray[i].trim();
-        if (cookie.startsWith(nameCookie)) {
-            return cookie.substring(nameCookie.length);
-        }
-    }
-    return null;
-}
-
-export function eraseCookie(name)
-{
-    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-}
-
-export function restore_user()
-{
-    let token = readCookie("user_token").replace(/"/g, '');
-    let data = JSON.stringify({ "params" : [{}]});
-    fetch("http://localhost:8008",
+    if (window.location.pathname === '/' || (sessionStorage.getItem('already in') !== '1' && localStorage.getItem('session opened', 0) !== '1'))
+        return null;
+    try
     {
-        method: "get_user",
-        body: data
-    })
-    .then(response => response.json())
-    .then(data =>
-    {
+        let data = JSON.stringify({ "params" : [{'token' : 'token'}]});
+        const response = await fetch("http://localhost:8008",
+        {
+            method: "get_user",
+            body: data
+        })
+
+        const result = await response.json();
         //console.log("(get_user)\nData login = ", data);
         if (result)
         {
@@ -95,7 +70,7 @@ export function restore_user()
             }
             else
             {
-                showInfoModal("ERROR: An error has occured(\"" + result.status + "\")", () => {});
+                showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => {});
                 nullify_user();
                 navigate("/", "home");
                 return null;

@@ -41,7 +41,6 @@ class ChatApp {
             this.username = current_user.display_name;
         else
             this.username = "default";
-
         this.socket = initSocket(this.username, this);
     }
 
@@ -117,7 +116,7 @@ class ChatApp {
     }
 
     updateMessagesDisplay() {
-        const messages = this.chats.get(this.currentChat) || [];
+        let messages = this.chats.get(this.currentChat) || [];
         this.elements.messagesContainer.innerHTML = messages
             .map((msg) => this.createMessageElement(msg))
             .join('');
@@ -134,7 +133,6 @@ class ChatApp {
             const hours = time.getHours().toString().padStart(2, '0');
             const minutes = time.getMinutes().toString().padStart(2, '0');
             const formattedTime = `${hours}:${minutes}`;
-
             return `<div class="message ${className}">
                         <div class="sender" style="color: ${senderColor};">
                             ${msg.from.charAt(0) + msg.from.slice(1)}
@@ -332,8 +330,10 @@ class ChatApp {
         }
     }
 
+    //Non crederai mai a cosa mi è successo! <script>alert('XSS');</script>
+    //escapare in ruby. (errore in send_message)
     sendMessage() {
-        const text = escapeHTML(this.elements.messageInput.value);
+        const text = this.elements.messageInput.value;
         if (!text) return;
 
         const messagePayload = {
@@ -349,14 +349,13 @@ class ChatApp {
             messagePayload.chat = 'general';
             messagePayload.to = 'general';
         }
-
         this.socket.send(JSON.stringify({ type: "send_message", ...messagePayload }));
         this.elements.messageInput.value = '';
     }
 
     updateFriendsList() {
         if (!this.elements.friendsList) return;
-        this.elements.friendsList.innerHTML = '';
+        this.elements.friendsList.textContent = '';
         this.friends.forEach((user) => {
             const friendItem = document.createElement('div');
             friendItem.className = 'friend-item';
@@ -368,7 +367,7 @@ class ChatApp {
 
     updateFriendRequestsUI() {
         if (!this.elements.friendRequestsList) return;
-        this.elements.friendRequestsList.innerHTML = '';
+        this.elements.friendRequestsList.textContent = '';
         this.receivedRequests.forEach((req, index) => {
             const formattedName = req.from.charAt(0) + req.from.slice(1);
             const item = document.createElement('div');
@@ -436,7 +435,7 @@ class ChatApp {
 
     updateBlockedUsersList() {
         if (!this.elements.blockedUsersList) return;
-        this.elements.blockedUsersList.innerHTML = '';
+        this.elements.blockedUsersList.textContent = '';
         this.blockedUsers.forEach((user) => {
             const blockedItem = document.createElement('div');
             blockedItem.className = 'blocked-user-item';
@@ -576,7 +575,6 @@ class ChatApp {
 
     set_profile_info()
     {
-        console.log("user = ", current_user);
         const userimage = document.querySelector("#profileAvatar");
         const profileDetails = document.querySelector('.profile-details');
         const lastOnline = profileDetails.querySelector('#lastOnline');

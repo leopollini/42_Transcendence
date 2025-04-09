@@ -1,5 +1,4 @@
-import { navigate } from "../../main.js";
-import { current_user } from "../modes.js";
+import { navigate, current_user} from "../../main.js";
 
 let invitedPlayers = [];
 let selectedPlayer;
@@ -66,6 +65,7 @@ export function handleForza4Lobby() {
         const div = document.createElement("div");
         div.classList.add("player");
         div.textContent = player;
+
         div.onclick = () => {
             document.querySelectorAll(".player").forEach(el => el.style.background = "");
             div.style.background = "#007bff";
@@ -96,13 +96,14 @@ export function addForza4LobbyPageHandlers() {
             selectedPlayer.remove();
             selectedPlayer = null;
             inviteButton.disabled = true;
-            console.log("invited: " + invitedPlayers);
             if (numPlayersAccepted === totalPlayers)
                 toggleStartMatch.disabled = false;
         }
     };
 
     toggleStartMatch?.addEventListener('click', () => {
+        console.log("avversario = ", invitedPlayers[1]);
+        sessionStorage.setItem("opponent", invitedPlayers[1]);
         navigate( "/forza4/game", "Forza 4 Game", invitedPlayers);
     });
 

@@ -11,26 +11,13 @@ RUN apt-get update -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /ssl_certs && \
-    openssl req -new -x509 -days 365 -nodes -out /ssl_certs/server.crt -keyout /ssl_certs/server.key -subj "/C=IT/ST=F/L=MyCity/O=MyOrg/OU=MyDept/CN=localhost"
+RUN update-ca-certificates && gem install bundler && bundle install
 
 COPY /ssl_certs/server.crt /usr/local/share/ca-certificates/
-
-RUN update-ca-certificates
-
-RUN gem install bundler
-
-WORKDIR /var/www
-
-COPY srcs/trascendence/authentication/Gemfile /var/www/authentication/Gemfile
-COPY srcs/trascendence/authentication/Gemfile.lock /var/www/authentication/Gemfile.lock
+COPY srcs/trascendence/ /var/www/
 
 WORKDIR /var/www/authentication
 
-RUN bundle install
-
-COPY srcs/trascendence/ /var/www/
-
-EXPOSE 8433
+EXPOSE 443
 
 CMD ["bundle", "exec", "ruby", "server.rb"]

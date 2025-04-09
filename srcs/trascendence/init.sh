@@ -4,6 +4,8 @@ set -e
 
 gem cleanup
 
+cd authentication/
+
 echo "==============================="
 echo "Controllo installazione di Ruby..."
 if ruby --version; then
@@ -38,7 +40,6 @@ else
     echo "❌ Errore durante la pulizia delle gemme."
 fi
 
-cd authentication/
 echo "==============================="
 echo "Aggiornamento delle gemme con Bundler..."
 if bundle update; then
@@ -60,5 +61,4 @@ fi
 echo "==============================="
 echo "Script completato. Avvio server..."
 
-bash https.sh
 ruby server.rb
