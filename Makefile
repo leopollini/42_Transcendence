@@ -11,9 +11,9 @@ all: prep_dirs #stop_containers
 	@echo "configurazione completata"
 	make -C ./srcs/common_tools/ all
 	@if [ "$(DETATCH)" = "true" ]; then \
-		docker compose -f ./docker-compose.yml up -d; \
+		docker-compose -f ./docker-compose.yml up -d; \
 	else \
-		docker compose -f ./docker-compose.yml up; \
+		docker-compose -f ./docker-compose.yml up; \
 	fi
 
 $(CONTAINERS): prep_dirs
@@ -23,29 +23,29 @@ $(CONTAINERS): prep_dirs
 		echo "cleaned"; \
 	fi
 	@if [ "$(DETATCH)" = "true" ]; then \
-		docker compose -f ./docker-compose.yml up -d $@; \
+		docker-compose -f ./docker-compose.yml up -d $@; \
 	else \
-		docker compose -f ./docker-compose.yml up $@; \
+		docker-compose -f ./docker-compose.yml up $@; \
 	fi
-	# @docker compose -f ./docker-compose.yml up $@
+	# @docker-compose -f ./docker-compose.yml up $@
 
 stop_containers:
 	clear
 	@echo "Stopping existing containers..."
 	@sudo chmod +x /usr/bin/docker-compose
-	@docker compose -f ./docker-compose.yml stop
+	@docker-compose -f ./docker-compose.yml stop
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
 
 down:
-	@docker compose -f ./docker-compose.yml down
+	@docker-compose -f ./docker-compose.yml down
 
 re: clean prep_dirs
 	@clear
 	make -C srcs/common_tools/ re
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
-	@docker compose -f ./docker-compose.yml up --build
+	@docker-compose -f ./docker-compose.yml up --build
 
 prep_dirs:
 	@mkdir -p ./srcs/common_tools/tools
@@ -58,7 +58,7 @@ prep_dirs:
 clean:
 	@clear
 	make -C srcs/common_tools/ clean
-	@docker compose -f docker-compose.yml stop
+	@docker-compose -f docker-compose.yml stop
 	@docker ps -qa | xargs -r docker stop || true
 	@docker ps -qa | xargs -r docker rm || true
 	#@docker images -qa | xargs -r docker rmi -f
