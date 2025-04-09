@@ -72,7 +72,7 @@ class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
     "connect-src 'self' http://localhost:8008 ws://localhost:6087; " \
     "object-src 'none'"
   
-      headers.each { |k, v| res[k] = v }
+    headers.each { |k, v| res[k] = v }
     log_error_details(req, status, body, LOGGER)
   
     if body.nil?
