@@ -151,5 +151,5 @@ function saveProfile(infoContainer) {
 
 function updateDisplayNames(infoContainer) {
   let myName = infoContainer.querySelector("#myName");
-  myName.textContent = `the actual name : (${current_user.display_name})`;
+  myName.textContent = `the actual name : ${current_user.display_name}`;
 }

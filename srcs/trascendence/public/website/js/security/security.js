@@ -65,46 +65,50 @@ export function renderHtmlAsText(input)
 
 export function free_users()
 {
-    let data = JSON.stringify({});
-    fetch("http://localhost:8008",
+    try
     {
-        method: "logout_user",
-        body: data
-    })
-    .then(response => response.json())
-    .then(data =>
-    {
-        if (data)
+        let data = JSON.stringify({});
+        fetch("http://localhost:8008",
         {
-            if (data.status === " (guest) does not exist")
-                return;
-            if (data.status && data.success)
-            {
-                if (data.status !== "success" && data.success !== "true")
-                    showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
-            }
-        if (data)
+            method: "logout_user",
+            body: data
+        })
+        .then(response => response.json())
+        .then(data =>
         {
-            if (data.status === " (guest) does not exist")
-                return;
-            if (data.status && data.success)
+            if (data)
             {
-                if (data.status !== "success" && data.success !== "true")
-                    showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
+                if (data.status === " (guest) does not exist")
+                    return;
+                if (data.status && data.success)
+                {
+                    if (data.status !== "success" && data.success !== "true")
+                        showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
+                }
             }
-            else
+            if (data)
             {
-                sessionStorage.setItem('already in', 0);
-                localStorage.setItem('session opened', 0);
+                if (data.status === " (guest) does not exist")
+                    return;
+                if (data.status && data.success)
+                {
+                    if (data.status !== "success" && data.success !== "true")
+                        showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
+                }
+                else
+                {
+                    sessionStorage.setItem('already in', 0);
+                    localStorage.setItem('session opened', 0);
+                }
             }
-            {
-                sessionStorage.setItem('already in', 0);
-                localStorage.setItem('session opened', 0);
-            }
-        }
-    })
-    .catch(error =>
+        })
+        .catch(error =>
+        {
+            console.log("Error with fetch logout_user:", error);
+        });
+    }
+    catch (error)
     {
-        console.error("Error with logout_user:", error);
-    });
+        console.error("Error in logout_user:", error);
+    }
 }

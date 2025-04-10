@@ -13,6 +13,7 @@ export function guest_login()
 {
     showInputModal("Inserisci il tuo nickname", (name) => {
       name = name.trim();
+      if (name )
       if (hasNoSpaces(name) === false)
       {
         showInfoModal("Name cannot have spaces", guest_login);
