@@ -10,6 +10,8 @@ export function pop_false()
     localStorage.setItem('popup_opened', 'false');
 }
 
+let log_succ = false;
+
 function popupHandling(popup, data)
 {
     localStorage.setItem("popup opened", true);

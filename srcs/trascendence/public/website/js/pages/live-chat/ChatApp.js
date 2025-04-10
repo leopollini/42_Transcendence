@@ -2,7 +2,6 @@ import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
 import { current_user } from '../../main.js';
-import { escapeHTML } from '../../security/security.js';
 
 class ChatApp {
     constructor() {
@@ -16,8 +15,6 @@ class ChatApp {
         this.username = null;
         this.blockedUsers = new Set();
         this.disabledChats = {};
-        this.userColors = new Map(); // Map to store assigned colors for users
-        this.assignedColors = new Set();
         this.initialize();
     }
 
@@ -41,7 +38,6 @@ class ChatApp {
             this.username = current_user.display_name;
         else
             this.username = "default";
-
         this.socket = initSocket(this.username, this);
     }
 
@@ -117,67 +113,36 @@ class ChatApp {
     }
 
     updateMessagesDisplay() {
-        const messages = this.chats.get(this.currentChat) || [];
-        this.elements.messagesContainer.textContent = messages
+        let messages = this.chats.get(this.currentChat) || [];
+        this.elements.messagesContainer.innerHTML = messages
             .map((msg) => this.createMessageElement(msg))
             .join('');
         this.scrollToBottom();
     }
 
     createMessageElement(msg) {
+        const time = new Date();
+        const hours = time.getHours().toString().padStart(2, '0');
+        const minutes = time.getMinutes().toString().padStart(2, '0');
+        const formattedTime = `${hours}:${minutes}`;
+    
         if (msg.from === 'system') {
-            return `<div class="message system"><div class="text">${msg.content}</div></div>`;
+            return `<div class="message system">
+                        <div class="text">${msg.content}</div>
+                    </div>`;
         } else {
             const className = msg.from === this.username ? 'self' : 'other';
-            const senderColor = this.getUserColor(msg.from);
-            const time = new Date();
-            const hours = time.getHours().toString().padStart(2, '0');
-            const minutes = time.getMinutes().toString().padStart(2, '0');
-            const formattedTime = `${hours}:${minutes}`;
-
             return `<div class="message ${className}">
-                        <div class="sender" style="color: ${senderColor};">
-                            ${msg.from.charAt(0) + msg.from.slice(1)}
+                        <div class="sender">
+                            ${msg.from.charAt(0).toUpperCase() + msg.from.slice(1)}
                         </div>
-                        <div class="text">${msg.content}</div>
+                        <div class="text">
+                            ${msg.content}
+                        </div>
                         <div class="time">${formattedTime}</div>
                     </div>`;
         }
-    }
-
-    getUserColor(username) {
-        if (this.userColors.has(username)) {
-            return this.userColors.get(username);
-        }
-
-        let color;
-        do {
-            color = this.generateRandomColor();
-        } while (this.assignedColors.has(color));
-
-        this.userColors.set(username, color);
-        this.assignedColors.add(color);
-        return color;
-    }
-
-    generateRandomColor() {
-        let color;
-        do {
-            const hue = Math.floor(Math.random() * 360);
-            color = `hsl(${hue}, 70%, 50%)`;
-        } while (this.isForbiddenColor(color));
-        return color;
-    }
-
-    isForbiddenColor(color) {
-        const forbiddenColors = ['rgb(255, 255, 255)', 'rgb(72, 31, 31)'];
-        const div = document.createElement('div');
-        div.style.color = color;
-        document.body.appendChild(div);
-        const computedColor = window.getComputedStyle(div).color;
-        document.body.removeChild(div);
-        return forbiddenColors.includes(computedColor);
-    }
+    }    
 
     blockUser(user) {
         this.blockedUsers.add(user);
@@ -332,10 +297,12 @@ class ChatApp {
         }
     }
 
+    //Non crederai mai a cosa mi è successo! <script>alert('XSS');</script>
+    //escapare in ruby. (errore in send_message)
     sendMessage() {
-        const text = escapeHTML(this.elements.messageInput.value);
+        let text = this.elements.messageInput.value;
         if (!text) return;
-
+        text = encodeURIComponent(text);
         const messagePayload = {
             content: text,
             date: new Date().toISOString()
@@ -349,13 +316,13 @@ class ChatApp {
             messagePayload.chat = 'general';
             messagePayload.to = 'general';
         }
-
         this.socket.send(JSON.stringify({ type: "send_message", ...messagePayload }));
         this.elements.messageInput.value = '';
     }
 
     updateFriendsList() {
         if (!this.elements.friendsList) return;
+        this.elements.friendsList.textContent = '';
         this.elements.friendsList.textContent = '';
         this.friends.forEach((user) => {
             const friendItem = document.createElement('div');
@@ -368,6 +335,7 @@ class ChatApp {
 
     updateFriendRequestsUI() {
         if (!this.elements.friendRequestsList) return;
+        this.elements.friendRequestsList.textContent = '';
         this.elements.friendRequestsList.textContent = '';
         this.receivedRequests.forEach((req, index) => {
             const formattedName = req.from.charAt(0) + req.from.slice(1);
@@ -437,6 +405,7 @@ class ChatApp {
     updateBlockedUsersList() {
         if (!this.elements.blockedUsersList) return;
         this.elements.blockedUsersList.textContent = '';
+        this.elements.blockedUsersList.textContent = '';
         this.blockedUsers.forEach((user) => {
             const blockedItem = document.createElement('div');
             blockedItem.className = 'blocked-user-item';
@@ -469,15 +438,17 @@ class ChatApp {
         const profileItem = menu.querySelector('[data-action="profile"]');
         const blockItem = menu.querySelector('[data-action="block"]');
     
+        //controllar login
         // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
-        if (user === this.username && current_user.type === "login"){
+        if (user === this.username && (current_user.type === "guest" || current_user.type === "login")) {
             chatItem.style.display = 'none';
             addFriendItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
             profileItem.style.display = 'block';
             blockItem.style.display = 'none';
             return;
-        }        
+        }
+              
 
         if (this.blockedUsers.has(user)) {
             chatItem.style.display = 'none';

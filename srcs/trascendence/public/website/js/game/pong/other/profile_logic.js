@@ -1,9 +1,9 @@
-import { escapeHTML, validateUploadedImage} from "../../../security/security.js";
+import { validateUploadedImage} from "../../../security/security.js";
 import { showInfoModal } from "../../../modal.js";
 export function savebio(me, yourDataSection)
 {
     const bioInput = yourDataSection.querySelector('#bioInput');
-    const newBio = escapeHTML(bioInput.value);
+    const newBio = bioInput.value;
 
     let polbio = yourDataSection.querySelector('#bioSection');
     polbio.style.width = "50%";
@@ -20,7 +20,7 @@ export function savebio(me, yourDataSection)
 export function savename(me, yourDataSection)
 {
     const changeName = yourDataSection.querySelector('#displayNameInput');
-    const newname = escapeHTML(changeName.value);
+    const newname = changeName.value;
 
     let polname = yourDataSection.querySelector('#changeDisplayName');
     polname.style.width = "50%";

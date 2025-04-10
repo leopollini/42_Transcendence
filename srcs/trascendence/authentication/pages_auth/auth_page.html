@@ -1,57 +1,44 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
     <title>Access Granted</title>
-    <style>
-        body {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          margin: 0;
-          background-color: #f4f4f4;
-        }
-        
-        .container {
-          text-align: center;
-        }
-        
-        #timer {
-          font-size: 30px;
-          font-weight: bold;
-          color: #333;
-        }
-      </style>
+    <link rel="stylesheet" href="auth_page.css">
   </head>
   <body>
     <div class="container">
       <h1>Access Granted</h1>
-      <p>The page will close in <span id="timer">3</span> seconds.<br> Or you
-        can close it.</p>
-        <script>
-          let countdown = 3;
-          const timerElement = document.getElementById('timer');
-          function closePopup() {
-              if (window.opener)
-                  window.opener.postMessage({ access_granted: true }, "*");
-        
-              setTimeout(() => {
-                  window.close();
-              }, 100);
+      <p>
+        The page will close in <span id="timer">3</span> seconds.<br>
+        Or you can close it.
+      </p>
+      <script>
+        let countdown = 3;
+        const timerElement = document.getElementById('timer');
+
+        function closePopup() {
+          if (window.opener)
+            window.opener.postMessage({ access_granted: true }, "*");
+
+          setTimeout(() => {
+            window.close();
+          }, 100);
+        }
+
+        const timerInterval = setInterval(function() {
+          countdown--;
+          timerElement.textContent = countdown;
+
+          if (countdown === 0) {
+            clearInterval(timerInterval);
+            closePopup();
           }
-        
-          const timerInterval = setInterval(function() {
-              countdown--;
-              timerElement.textContent = countdown;
-              
-              if (countdown === 0) {
-                  clearInterval(timerInterval);
-                  closePopup();
-              }
-          }, 1000);
-        
-          window.addEventListener("beforeunload", closePopup);
-        </script>
-        
+        }, 1000);
+
+        window.addEventListener("beforeunload", () => {
+          closePopup();
+        });
+      </script>
     </div>
   </body>
 </html>

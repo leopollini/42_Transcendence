@@ -1,4 +1,3 @@
-import { escapeHTML, free_users} from '../security/security.js';
 import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
 import { showInfoModal } from '../modal.js';
@@ -60,11 +59,10 @@ window.onpopstate = function ()
 {
     if (location.pathname === "/")
     {
-        showInfoModal("you have quitted the active session", () => {});;
-        sessionStorage.setItem("already in", 0);
-        localStorage.setItem("session opened", 0);
-        nullify_user();
-        free_users();
+        showInfoModal("you have quitted the active session", () => {});
+        remove_all(0, 0, 1);
+        showInfoModal("you have quitted the active session", () => {});
+        remove_all(0, 0, 1);
     }
 };
 
@@ -113,9 +111,8 @@ export function change_name(name) {
         const avatarName = document.getElementById('avatarName');
         if (avatarName)
         {
-            const escapedName = escapeHTML(name);
-            avatarName.innerText = escapedName;
-            setUserName(escapedName);
+            avatarName.textContent = name;
+            setUserName(name);
             clearInterval(checknameInterval);
         }
     }, 100);

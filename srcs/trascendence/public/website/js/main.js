@@ -235,6 +235,16 @@ const loadContent = async () => {
     // Handling "Forward" and "Backward" browser buttons
 window.addEventListener("popstate", loadContent);
 
+window.addEventListener("popstate", () =>
+{
+    if (sessionStorage.getItem("no") === "true")
+    {
+        remove_all(1, 1);
+        showInfoModal("you successfully exited the game", () => {});
+        return;
+    }
+});
+
 function initChat() {
     const chatContainer = document.getElementById("chatApp");
     // Insert chat template

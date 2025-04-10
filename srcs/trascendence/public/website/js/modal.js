@@ -5,7 +5,7 @@ export function showConfirmModal(message, onConfirm, onReject) {
     const confirmAccept = document.getElementById("confirmAccept");
     const confirmReject = document.getElementById("confirmReject");
   
-    confirmMessage.innerText = message;
+    confirmMessage.textContent = message;
     confirmModal.classList.add("active");
   
     // Rimuovo eventuali listener precedenti
@@ -29,7 +29,7 @@ export function showInfoModal(message, onOk) {
     const infoMessage = document.getElementById("infoMessage");
     const infoOk = document.getElementById("infoOk");
   
-    infoMessage.innerText = message;
+    infoMessage.textContent = message;
     infoModal.classList.add("active");
   
     // Rimuovo eventuali listener precedenti
@@ -48,7 +48,7 @@ export function showInputModal(title, onConfirm) {
     const nicknameInput = document.getElementById("nicknameInput");
     const inputConfirm = document.getElementById("inputConfirm");
   
-    inputModalTitle.innerText = title || "Inserisci il tuo nickname";
+    inputModalTitle.textContent = title || "Inserisci il tuo nickname";
     nicknameInput.value = "";
     inputModal.classList.add("active");
   

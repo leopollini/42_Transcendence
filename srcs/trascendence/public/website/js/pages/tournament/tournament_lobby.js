@@ -1,6 +1,4 @@
 import { navigate, current_user } from "../../main.js";
-import { escapeHTML } from "../../security/security.js";
-import { showInfoModal } from "../../modal.js";
 let invitedPlayers = [];
 let tournament;
 let selectedPlayer;
@@ -264,7 +262,7 @@ export function addLobbyPageHandlers() {
 //     });
 
 //     toggleInviteUser?.addEventListener('click', () => {
-//         const playerSearchResult = document.getElementById("playerSearchResult").innerText;
+//         const playerSearchResult = document.getElementById("playerSearchResult").textContent;
         
 //         if (playerSearchResult.startsWith("User Found: ")) {
 //             const playerName = playerSearchResult.replace("User Found: ", "");
