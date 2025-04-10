@@ -76,7 +76,7 @@ class ChatService < WEBrick::Websocket::Servlet
 
       when "unblock_user"
         ChatStore.clients[@username].send_sys "You have unblocked #{target}"
-        ChatStore.clients[@username].unblock_usr target
+        ChatStore.clients[@username].unblock_user target
 
       when 'match_request'
         ChatStore.clients[data['to']].send_me({'from' => @username}, "match_request")
@@ -115,10 +115,14 @@ def internal_call(client, server)
   when 'broadcast'
     puts "Broadcast called from non client"
     ChatStore.sys_broadcast bobj['content'] if bobj['content'] rescue r
+    client.puts
   when 'send_msg'
     puts "Sending message to #{bobj['to']}: #{bobj['content']}"
     r = "missing params" unless (['content', 'to'] - bobj.keys).empty?
     ChatStore.clients[bobj['to']].send_me({'date' => Time.now.iso8601, 'from' => 'sys', 'content' => bobj['content']}, bobj['type'] ? bobj['type'] : 'message') rescue r
+    client.puts
+  when 'get_online'
+    client.puts ChatStore.get_online.to_json
   else
     puts "Unknown method called (#{bobj['method']})"
   end

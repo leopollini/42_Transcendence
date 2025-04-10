@@ -66,11 +66,11 @@ class Client
     @friends.delete who
   end
 
-  def block_usr(who)
+  def block_user(who)
     @blocked << who
   end
 
-  def unblock_usr(who)
+  def unblock_user(who)
     @blocked.delete who
   end
 
@@ -160,7 +160,7 @@ class ChatStore
     ChatStore.remove_friend(target, user)
     @@clients[user].send_sys "You have blocked #{target}"
     @@clients[target].send_sys "You have been blocked by #{user}"
-    @@clients[user].block_user target
+    @@clients[user].block_usr target
 
     remove_friend target, user
   end
@@ -174,7 +174,6 @@ class ChatStore
 
   def self.start_private_chat(user)
     @@clients[target].send_me({"from" => @username}, 'private_chat_started')
-    @@clients[target].
   end
 
   def self.clients
@@ -183,5 +182,9 @@ class ChatStore
 
   def self.close_client(username)
     @@clients[username].close_sock
+  end
+
+  def self.get_online
+    @@clients.keys
   end
 end
