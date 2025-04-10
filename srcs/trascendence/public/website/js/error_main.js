@@ -20,7 +20,7 @@ function reset_value()
         session = 0;
     }
     if (already === '0' && session === '0')
-        remove_all(0, 0, 1);
+        remove_all(0, 0);
     if (already === '1' && session === '0')
         localStorage.setItem('session opened', 1);
 }
