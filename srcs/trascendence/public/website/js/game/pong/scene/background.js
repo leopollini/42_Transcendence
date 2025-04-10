@@ -1,5 +1,5 @@
 import { Star } from "../elements/star.js";
-import { background } from "../data/game_global.js";
+import { pongGameData } from "../main/pong.js";
 export function createStarsBackground(game, count) {
     for (let i = 0; i < count; i++) {
         const star = new Star(game, game.canvas, game.ctx);
@@ -10,7 +10,7 @@ export function createStarsBackground(game, count) {
 export function renderBackground(game) {
     // Walls
 
-    if (background == "pingpong") {
+    if (pongGameData.background == "pingpong") {
         // Background
         game.ctx.fillStyle = "#1d8819";
         game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
@@ -19,7 +19,7 @@ export function renderBackground(game) {
         game.ctx.fillRect(game.canvas.width / 2, game.wallThickness, game.wallThickness, game.canvas.height - game.wallThickness);
     }
 
-    if (background == "classic") {
+    if (pongGameData.background == "classic") {
         game.ctx.fillStyle = game.wallsColor;
         // Draw vertical dashed line
         for (let y = game.wallThickness; y < game.canvas.height - game.wallThickness; y += 50) {
