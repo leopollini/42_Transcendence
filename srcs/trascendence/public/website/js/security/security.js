@@ -83,7 +83,20 @@ export function free_users()
                 if (data.status !== "success" && data.success !== "true")
                     showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
             }
+        if (data)
+        {
+            if (data.status === " (guest) does not exist")
+                return;
+            if (data.status && data.success)
+            {
+                if (data.status !== "success" && data.success !== "true")
+                    showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
+            }
             else
+            {
+                sessionStorage.setItem('already in', 0);
+                localStorage.setItem('session opened', 0);
+            }
             {
                 sessionStorage.setItem('already in', 0);
                 localStorage.setItem('session opened', 0);

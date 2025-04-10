@@ -2,6 +2,7 @@ import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
 import { showInfoModal } from '../modal.js';
 import { remove_all } from '../error_main.js';
+import { remove_all } from '../error_main.js';
 
 export default function Modes()
 {
@@ -59,6 +60,8 @@ window.onpopstate = function ()
 {
     if (location.pathname === "/")
     {
+        showInfoModal("you have quitted the active session", () => {});
+        remove_all(0, 0, 1);
         showInfoModal("you have quitted the active session", () => {});
         remove_all(0, 0, 1);
     }
