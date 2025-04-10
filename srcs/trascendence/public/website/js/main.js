@@ -239,7 +239,7 @@ const loadContent = async () => {
     // Handling "Forward" and "Backward" browser buttons
 window.addEventListener("popstate", loadContent);
 
-window.addEventListener("popstate", async(event) =>
+window.addEventListener("popstate", () =>
 {
     if (sessionStorage.getItem("no") === "true")
     {
