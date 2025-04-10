@@ -1,4 +1,5 @@
 import { showConfirmModal, showInfoModal } from "../../modal.js";
+import { renderHtmlAsText } from "../../security/security.js";
 
 let socket;
 
@@ -12,8 +13,9 @@ function initSocket(username, chatAppInstance) {
     };
 
     socket.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-
+        let msg = JSON.parse(event.data);
+        msg.data.content = decodeURIComponent(msg.data.content);
+        msg.data.content = renderHtmlAsText(msg.data.content);
         if (msg.type === "state") {
             const { friends, friendRequests, blockedUsers } = msg.data;
             chatAppInstance.friends = new Set(friends);

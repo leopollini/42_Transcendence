@@ -56,10 +56,7 @@ export function profileHandler()
   document.querySelector("#profileImage").src = me.image;
   document.getElementById("imageUploadInput").style.display = "none";
   if (current_user.type === "guest")
-  {
     document.getElementById("changeDisplayName").style.display = "none";
-    document.getElementById("myName").style.display = "none";
-  }
   // Seleziono l'intera scheda e, all'interno, la sezione delle informazioni
   const card = document.querySelector(".profile-card");
   const infoContainer = card.querySelector("#yourData");
@@ -154,5 +151,5 @@ function saveProfile(infoContainer) {
 
 function updateDisplayNames(infoContainer) {
   let myName = infoContainer.querySelector("#myName");
-  myName.innerText = `the actual name ${current_user.display_name}`;
+  myName.textContent = `the actual name : (${current_user.display_name})`;
 }

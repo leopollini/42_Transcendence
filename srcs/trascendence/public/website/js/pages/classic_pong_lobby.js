@@ -1,7 +1,5 @@
 import { navigate } from "../main.js";
 import { current_user } from "../main.js";
-import { escapeHTML } from "../security/security.js";
-import { showInfoModal } from "../modal.js";
 
 let invitedPlayers = [];
 let selectedPlayer;

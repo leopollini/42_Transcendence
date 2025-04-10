@@ -1,7 +1,6 @@
 import { navigate, update_user } from "../main.js";
 import { user, profile} from "./user.js";
 import { update_image, change_name} from "../pages/modes.js";
-import { escapeHTML } from "../security/security.js";
 import { showInputModal, showInfoModal } from "../modal.js"
 import { remove_all } from "../error_main.js";
 
@@ -13,7 +12,7 @@ function hasNoSpaces(str)
 export function guest_login()
 {
     showInputModal("Inserisci il tuo nickname", (name) => {
-      name = escapeHTML(name);
+      name = name.trim();
       if (hasNoSpaces(name) === false)
       {
         showInfoModal("Name cannot have spaces", guest_login);

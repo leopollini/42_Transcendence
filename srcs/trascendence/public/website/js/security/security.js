@@ -54,17 +54,12 @@ export async function validateUploadedImage(file)
     });
 }
 
-export function escapeHTML(str)
+export function renderHtmlAsText(input)
 {
-    if (!str)
-    {
-        console.error("no data");
-        return ;
-    }
-    str = str.trim();
     const div = document.createElement('div');
-    if (str) 
-        div.textContent = str;
+
+    div.textContent = input;
+    
     return div.innerHTML;
 }
 

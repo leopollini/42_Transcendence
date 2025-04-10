@@ -2,7 +2,6 @@ import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
 import { current_user } from '../../main.js';
-import { escapeHTML } from '../../security/security.js';
 
 class ChatApp {
     constructor() {
@@ -116,7 +115,7 @@ class ChatApp {
     }
 
     updateMessagesDisplay() {
-        let messages = this.chats.get(this.currentChat) || [];
+        let messages = this.chats.get(this.currentChat) || []
         this.elements.messagesContainer.innerHTML = messages
             .map((msg) => this.createMessageElement(msg))
             .join('');
@@ -330,12 +329,10 @@ class ChatApp {
         }
     }
 
-    //Non crederai mai a cosa mi è successo! <script>alert('XSS');</script>
-    //escapare in ruby. (errore in send_message)
     sendMessage() {
-        const text = this.elements.messageInput.value;
+        let text = this.elements.messageInput.value;
         if (!text) return;
-
+        text = encodeURIComponent(text);
         const messagePayload = {
             content: text,
             date: new Date().toISOString()

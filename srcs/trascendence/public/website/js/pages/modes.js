@@ -1,4 +1,3 @@
-import { escapeHTML} from '../security/security.js';
 import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
 import { showInfoModal } from '../modal.js';
@@ -109,9 +108,8 @@ export function change_name(name) {
         const avatarName = document.getElementById('avatarName');
         if (avatarName)
         {
-            const escapedName = escapeHTML(name);
-            avatarName.innerText = escapedName;
-            setUserName(escapedName);
+            avatarName.textContent = name;
+            setUserName(name);
             clearInterval(checknameInterval);
         }
     }, 100);
