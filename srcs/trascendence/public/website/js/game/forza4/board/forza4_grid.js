@@ -1,7 +1,6 @@
-import { boardBackground } from "../data/forza4_game_global.js";
+import { forza4GameData } from "../main/forza4.js";
 import { highlightColumn } from "./forza4_grid_visual.js";
 import { checkWin } from "./forza4_check_win.js";
-import { token1Color, token2Color } from "../data/forza4_game_global.js";
 import { savef4StatsData } from "../data/forza4_game_stats.js";
 
 export function createGrid(game) {
@@ -33,19 +32,19 @@ export function createGrid(game) {
     boardElement.style.margin = 'auto';
 
     // Set background (based on customization settings)
-    if (boardBackground === 'bg1') 
+    if (forza4GameData.boardBackground === 'bg1') 
     {
         document.getElementById("app").style.background = 
             "linear-gradient(35deg, #134946, #000000), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
         forza4Game.style.backgroundColor = '#134946';
     }  
-    else if (boardBackground === 'bg2') 
+    else if (forza4GameData.boardBackground === 'bg2') 
     {
         document.getElementById("app").style.background = 
             "linear-gradient(35deg, #240046, #5a189a, #00f5d4), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
         forza4Game.style.backgroundColor = '#240046';
     }
-    else if (boardBackground === 'bg3')
+    else if (forza4GameData.boardBackground === 'bg3')
     {
         document.getElementById("app").style.background = 
             "linear-gradient(35deg, #8b4513, #c29d60, #d08a4d), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
@@ -131,7 +130,7 @@ function checkGrid(event,game) {
 function updateGrid(game, row, col) {
     const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
     if (!cell) return;
-    cell.style.backgroundColor = game.currentPlayer === 'token1' ? token1Color : token2Color;
+    cell.style.backgroundColor = game.currentPlayer === 'token1' ? forza4GameData.token1Color : forza4GameData.token2Color;
     game.moves++;
     //cell.classList.add(currentPlayer);
 }
@@ -146,9 +145,9 @@ export function redrawGrid(game, rows, cols) {
     for (let i = 0; i < game.rows; i++) {
         for (let j = 0; j < game.cols; j++) {
             if (game.board[i][j] === 'token1') {
-                cells[i * game.cols + j].style.backgroundColor = token1Color;
+                cells[i * game.cols + j].style.backgroundColor = forza4GameData.token1Color;
             } else if (game.board[i][j] === 'token2') {
-                cells[i * game.cols + j].style.backgroundColor = token2Color;
+                cells[i * game.cols + j].style.backgroundColor = forza4GameData.token2Color;
             }
         }
     }

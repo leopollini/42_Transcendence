@@ -1,9 +1,10 @@
 import { current_user, navigate } from "../../../main.js";
-import { token1Color, token2Color, powerUpMode } from "../data/forza4_game_global.js";
+import { forza4CustomData } from "../data/forza4_game_global.js";
 import { createGrid, redrawGrid } from "../board/forza4_grid.js";
 import { updateTimer, resetTimer } from "../other/forza4_timer.js";
 import { activatePowerup } from "../board/forza4_powerup.js";
 
+export let forza4GameData;
 let backImageButton;
 let matchPlayers = [];
 
@@ -39,7 +40,10 @@ export function startForza4Game(players) {
     console.log(players);
     backImageButton = document.getElementById('backImageButton');
     matchPlayers = players;
-    
+    if (sessionStorage.getItem("forza4Data") !== null)
+        forza4GameData = JSON.parse(sessionStorage.getItem("forza4Data"));
+      else
+        forza4GameData = forza4CustomData;
     return new Forza4Game();
 }
 
@@ -56,8 +60,8 @@ class Forza4Game {
         this.moves = 0;
         this.elapsedTime = 0;
 
-        this.p1Color.style.backgroundColor = token1Color;
-        this.p2Color.style.backgroundColor = token2Color;
+        this.p1Color.style.backgroundColor = forza4GameData.token1Color;
+        this.p2Color.style.backgroundColor = forza4GameData.token2Color;
         this.rows = 6;
         this.cols = 7;
         this.currentPlayer = 'token1';
@@ -139,7 +143,7 @@ class Forza4Game {
     }
 
     checkPowerups() {
-        if (!powerUpMode) {
+        if (!forza4GameData.powerUpMode) {
             document.getElementById('p1PowerupButton').style.display = "none";
             document.getElementById('p2PowerupButton').style.display = "none";
         } else {
@@ -158,7 +162,7 @@ class Forza4Game {
         window.addEventListener("popstate", this.handlePopState);
         window.addEventListener('resize', this.handleResize);
 
-        if (powerUpMode) {
+        if (forza4GameData.powerUpMode) {
             document.getElementById('p1PowerupButton').addEventListener('click', this.handleP1Powerup);
             document.getElementById('p2PowerupButton').addEventListener('click', this.handleP2Powerup);
         }
@@ -184,7 +188,7 @@ class Forza4Game {
         window.removeEventListener('resize', this.handleResize);
 
         // Clean up powerup buttons if in powerup mode
-        if (powerUpMode) {
+        if (forza4GameData.powerUpMode) {
             const p1PowerupButton = document.getElementById('p1PowerupButton');
             const p2PowerupButton = document.getElementById('p2PowerupButton');
             
