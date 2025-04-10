@@ -14,6 +14,14 @@ export let f4matchData = {
 };
 
 
+export let forza4CustomData = {
+    token1Color: "#ff0000",
+    token2Color: "#0000ff",
+    boardBackground: "bg1",
+    powerUpMode: false
+}
+
+
 export function setToken1Color(color) {
     token1Color = color;
 }
