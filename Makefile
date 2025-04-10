@@ -3,24 +3,31 @@ CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager histo
 # ========================================= #
 SHELL:=/bin/bash
 
+RED=\033[0;31m
+GREEN=\033[0;32m
+YELLOW=\033[0;33m
+BLUE=\033[0;34m
+NC=\033[0m
+
 all: prep_dirs #stop_containers
 	@clear
-	@echo "configurazione server https locale"
+	@echo -e "$(YELLOW)configurazione server https locale$(NC)"
 	@chmod +x setup/setup_online_website.sh
 	@sudo ./setup/setup_online_website.sh
-	@echo "configurazione completata"
+	@echo -e "$(GREEN)configurazione completata$(NC)"
 	make -C ./srcs/common_tools/ all
-	@if [ "$(DETATCH)" = "true" ]; then \
-		docker-compose -f ./docker-compose.yml up -d; \
+	@echo -e "$(YELLOW)Avvio container Docker...$(NC)"; \
+	if [ "$${DETATCH}" = "true" ]; then \
+		sudo docker-compose -f ./docker-compose.yml up -d; \
 	else \
-		docker-compose -f ./docker-compose.yml up; \
+		sudo docker-compose -f ./docker-compose.yml up; \
 	fi
 
 $(CONTAINERS): prep_dirs
 	@if [ "$(docker ps -a | grep $@ | wc -l)" = "1" ]; then \
 		docker stop $@ \
 		docker rm $@; \
-		echo "cleaned"; \
+		echo -e "$(GREEN)cleaned$(NC)"; \
 	fi
 	@if [ "$(DETATCH)" = "true" ]; then \
 		docker-compose -f ./docker-compose.yml up -d $@; \
@@ -31,7 +38,7 @@ $(CONTAINERS): prep_dirs
 
 stop_containers:
 	clear
-	@echo "Stopping existing containers..."
+	@echo -e "${YELLOW}Stopping existing containers...${NC}"
 	@sudo chmod +x /usr/bin/docker-compose
 	@docker-compose -f ./docker-compose.yml stop
 	@docker ps -qa | xargs -r docker stop
@@ -42,16 +49,17 @@ down:
 
 re: clean prep_dirs
 	@clear
-	@echo "configurazione server https locale"
+	@echo -e "${YELLOW}configurazione server https locale${NC}"
 	@chmod +x setup/setup_online_website.sh
 	@sudo ./setup/setup_online_website.sh
-	@echo "configurazione completata"
+	@echo -e "${GREEN}configurazione completata${NC}"
 	make -C srcs/common_tools/ re
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
 	@docker-compose -f ./docker-compose.yml up --build
 
 prep_dirs:
+	@echo -e "${YELLOW}Creating directories...${NC}"
 	@mkdir -p ./srcs/common_tools/tools
 	@mkdir -p ./srcs/receiver
 	# @mkdir -p ./srcs/request_manager
@@ -62,19 +70,33 @@ prep_dirs:
 clean:
 	@clear
 	make -C srcs/common_tools/ clean
-	@docker-compose -f docker-compose.yml stop
-	@docker ps -qa | xargs -r docker stop || true
-	@docker ps -qa | xargs -r docker rm || true
+	@if [ "$$(docker ps -a -q | wc -l)" -gt 0 ]; then \
+		echo -e "Container Docker trovati, procedo con la pulizia..."; \
+		if [ "$$(docker ps -q | wc -l)" -gt 0 ]; then \
+			docker-compose -f docker-compose.yml stop; \
+		else \
+			echo -e "${RED}Nessun container attivo da fermare.${NC}"; \
+		fi; \
+		docker ps -qa | xargs -r docker stop || true; \
+		docker ps -qa | xargs -r docker rm || true; \
+	else \
+		echo -e "${RED}Nessun container Docker trovato, skippo la parte Docker.${NC}"; \
+	fi
 	# Destroy all directories
 	rm -rf /data/wordpress
+	@echo -e "${GREEN}pulizia base completata	${NC}"
 
 fclean: clean
-	@docker-compose down -v --remove-orphans
-	@docker system prune -a --volumes -f
-	@docker images -qa | xargs -r docker rmi -f
-	@docker volume ls -q | xargs -r docker volume rm
-	@docker network ls -q | grep -vE 'bridge|host|none' | xargs -r docker network rm
-	@echo "pulizia completata"
+	@if [ "$$(docker ps -a -q | wc -l)" -gt 0 ] || [ "$$(docker images -q | wc -l)" -gt 0 ] || [ "$$(docker volume ls -q | wc -l)" -gt 0 ]; then \
+		echo -e "Risorse Docker trovate, avvio la pulizia profonda..."; \
+		docker-compose down -v --remove-orphans; \
+		docker system prune -a --volumes -f; \
+		docker images -qa | xargs -r docker rmi -f || true; \
+		docker volume ls -q | xargs -r docker volume rm || true; \
+	else \
+		echo -e "${RED}Nessuna risorsa Docker trovata, skippo la pulizia.${NC}"; \
+	fi
+	@echo -e "${GREEN}pulizia completata${NC}"
 
 clean_imgs:
 	@docker images -qa | xargs -r docker rmi -f
