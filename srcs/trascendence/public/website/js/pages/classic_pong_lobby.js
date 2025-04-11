@@ -85,6 +85,8 @@ export function addClassicPongLobbyPageHandlers() {
             newPlayer.style.background = "";
             newPlayer.style.color = "white";
             newPlayer.onclick = null;
+            const playerName = newPlayer.textContent.trim();
+            sessionStorage.setItem("opponent", playerName);
             matchPlayers.appendChild(newPlayer);
             numPlayersAccepted++;
             numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
@@ -98,8 +100,6 @@ export function addClassicPongLobbyPageHandlers() {
     };
 
     toggleStartMatch?.addEventListener('click', () => {
-        console.log("invitedPlayers: ", invitedPlayers);
-        sessionStorage.setItem("opponent", invitedPlayers[1]);
         navigate( "/classic", "Pong Classic Game", invitedPlayers);
     });
 

@@ -109,7 +109,6 @@ const loadContent = async () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    console.log("Percorso attuale:", path);
     let let_me_in = await checkAuthentication(path);
     if (let_me_in === 1)
     {
@@ -130,7 +129,6 @@ const loadContent = async () => {
         return;
     else
         await initUser();
-    console.log("init check");
     let playerNames;
     let numPlayers = 4
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 

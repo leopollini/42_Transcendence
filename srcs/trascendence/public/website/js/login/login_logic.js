@@ -62,7 +62,6 @@ export async function performLogin() {
 
 export const checkAuthentication = async (path) =>
 {
-  console.log("callback check");
   if (path === "/callback")
   {
     try
