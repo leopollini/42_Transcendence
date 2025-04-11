@@ -69,14 +69,14 @@ class ChatService < WEBrick::Websocket::Servlet
         ChatStore.remove_friend target, @username
 
       when "private_chat_started"
-        ChatStore.clients[target].send_me({"from" => @username}, 'private_chat_started')
+        ChatStore.start_private_chat(@username)
 
       when "block_user"
         ChatStore.block target, @username
 
       when "unblock_user"
         ChatStore.clients[@username].send_sys "You have unblocked #{target}"
-        ChatStore.clients[@username].unblock_usr target
+        ChatStore.clients[@username].unblock_user target
 
       when 'match_request'
         ChatStore.clients[data['to']].send_me({'from' => @username}, "match_request")
@@ -86,6 +86,9 @@ class ChatService < WEBrick::Websocket::Servlet
 
       when 'get_online_users'
         ChatStore.clients[@username].send_me({'users' => ChatStore.clients.filter{|c| c.alive?}}, 'online_users_list')
+
+      when 'get_state'
+        ChatStore.get_client_state(@username)
 
       else
         puts "Unknown message type: #{data["type"]}"
@@ -112,10 +115,14 @@ def internal_call(client, server)
   when 'broadcast'
     puts "Broadcast called from non client"
     ChatStore.sys_broadcast bobj['content'] if bobj['content'] rescue r
+    client.puts
   when 'send_msg'
     puts "Sending message to #{bobj['to']}: #{bobj['content']}"
     r = "missing params" unless (['content', 'to'] - bobj.keys).empty?
     ChatStore.clients[bobj['to']].send_me({'date' => Time.now.iso8601, 'from' => 'sys', 'content' => bobj['content']}, bobj['type'] ? bobj['type'] : 'message') rescue r
+    client.puts
+  when 'get_online'
+    client.puts ChatStore.get_online.to_json
   else
     puts "Unknown method called (#{bobj['method']})"
   end

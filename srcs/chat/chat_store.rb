@@ -11,7 +11,9 @@ class Client
     @unread = []
     @socket_open = true
     @friends = []
+    @waiting_friends = []
     @blocked = []
+    @open_chats = []
     @socket = sock
     send_me({"content" => "Welcome #{@username}!"}, "system")
   end
@@ -64,12 +66,16 @@ class Client
     @friends.delete who
   end
 
-  def block_usr(who)
+  def block_user(who)
     @blocked << who
   end
 
-  def unblock_usr(who)
+  def unblock_user(who)
     @blocked.delete who
+  end
+
+  def get_waiting_friends
+    @waiting_friends
   end
 end
 
@@ -122,7 +128,8 @@ class ChatStore
       return @@clients[from].send_sys "You and #{to} are already #{@@clients[to].friends.size == 1 ? "best " : ""}friends!" if @@clients[to].friends.include? from
 
       # puts "Sending friend request to #{to} (#{@@clients[to]} : #{@@clients.keys})"
-
+      @@clients[from].get_waiting_friends << to
+      @@clients[to].get_waiting_friends << from
       @@clients[to].send_me({"from" => from}, 'friend_request')
       @@clients[from].send_sys "Friend request sent to #{to}"
     end
@@ -133,6 +140,8 @@ class ChatStore
       @@clients[accepter].send_sys("You have #{accepted ? "accepted" : "denied"} #{requester}'s friend request!")
       @@clients[requester].send_me({"accepted" => accepted, 'from' => accepter}, 'friend_response')
       if accepted
+        @@clients[requester].get_waiting_friends.delete accepter
+        @@clients[accepter].get_waiting_friends.delete requester
         @@clients[requester].add_friend accepter
         @@clients[accepter].add_friend requester
       end
@@ -141,18 +150,30 @@ class ChatStore
   end
 
   def self.remove_friend(target, user)
-    ChatStore.clients[target].send_me({"from" => user}, 'friend_removed')
-    ChatStore.clients[user].send_me({"from" => target}, 'friend_removed')
-    ChatStore.clients[user].rm_friend target
-    ChatStore.clients[target].rm_friend user
+    @@clients[target].send_me({"from" => user}, 'friend_removed')
+    @@clients[user].send_me({"from" => target}, 'friend_removed')
+    @@clients[user].rm_friend target
+    @@clients[target].rm_friend user
   end
 
   def self.block(target, user)
-    ChatStore.clients[user].send_sys "You have blocked #{target}"
-    ChatStore.clients[target].send_sys "You have been blocked by #{user}"
-    ChatStore.clients[user].block_user target
+    ChatStore.remove_friend(target, user)
+    @@clients[user].send_sys "You have blocked #{target}"
+    @@clients[target].send_sys "You have been blocked by #{user}"
+    @@clients[user].block_usr target
 
     remove_friend target, user
+  end
+
+  def self.get_client_state(user)
+    client = ChatStore.clients[user]
+    info = {"friends" => client.friends, "friend_requests" => client.get_waiting_friends, "blocked_users" => client.blocked}
+    puts "sending state info: #{info}"
+    client.send_me(info, "state")
+  end
+
+  def self.start_private_chat(user)
+    @@clients[target].send_me({"from" => @username}, 'private_chat_started')
   end
 
   def self.clients
@@ -161,5 +182,9 @@ class ChatStore
 
   def self.close_client(username)
     @@clients[username].close_sock
+  end
+
+  def self.get_online
+    @@clients.keys
   end
 end
