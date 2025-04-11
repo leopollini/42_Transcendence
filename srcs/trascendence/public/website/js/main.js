@@ -22,6 +22,7 @@ import ChatApp from "./pages/live-chat/ChatApp.js";
 import {restore_user } from "./login/user.js";
 import {check_valid_operation, remove_all, path_error} from "./error_main.js";
 import { showInfoModal } from "./modal.js";
+import {checkAuthentication} from "./login/login_logic.js";
 let buttonTitle;
 let winner;
 let players;
@@ -48,16 +49,10 @@ const routes = {
     "/tournament/roundrobin/lobby": LobbyRoom,
     "/tournament/knockout/bracket": Bracket,
     "/tournament/knockout/bracket/game": PongGame,
-    "/profile": Profile,
+    "/profile": Profile
 };
 
-export let popup = null;
 export let current_user = null;
-
-export function setpopup(new_popup)
-{
-    popup = new_popup;
-}
 
 export async function initUser()
 {
@@ -80,15 +75,6 @@ export const navigate = async (path, title = "", lobbyPlayers) => {
     buttonTitle = title;
     players = lobbyPlayers;
     history.pushState({ path }, title, path);
-    /*if (window.location.pathname !== path)
-    {
-        console.log("entra");
-    }
-    else
-    {
-        console.log("non puo entra");
-        history.replaceState({ path }, title, path);
-    }*/
     await loadContent();
 };
 
@@ -108,17 +94,45 @@ function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
 
+export default function No_Page()
+{
+    return `
+      <div class="error-container">
+        <h1>404 - Page not found</h1>
+        <p>Sorry, the page you're looking for doesn't exist.</p>
+      </div>
+    `;
+}
+
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
+    console.log("Percorso attuale:", path);
+    let let_me_in = await checkAuthentication(path);
+    if (let_me_in === 1)
+    {
+        navigate("/", "Home");
+        return;
+    }
+    else if (let_me_in === -1)
+    {
+        navigate("/modes", "Return to Game Mode");
+        return;
+    }
+    if (!component)
+    {
+        app.innerHTML = No_Page();
+        return;
+    }
     if (check_valid_operation(path) === 1 || path_error(path) === 1)
         return;
     else
         await initUser();
+    console.log("init check");
     let playerNames;
-    let numPlayers = 4;
+    let numPlayers = 4
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
         || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
         numPlayers = parseInt(buttonTitle.replace(/\D/g, ""), 10);
@@ -237,7 +251,10 @@ const loadContent = async () => {
 };
 
     // Handling "Forward" and "Backward" browser buttons
-window.addEventListener("popstate", loadContent);
+window.addEventListener("popstate", () => {
+    loadContent();
+});
+    
 
 window.addEventListener("popstate", () =>
 {
@@ -264,23 +281,12 @@ const channel = new BroadcastChannel("session_sync");
 
 window.addEventListener('beforeunload', () =>
 {
-    if (popup)
-        popup.close();
     if (sessionStorage.getItem('already in') === '1')
     {
         localStorage.setItem('session opened', 0);
         channel.postMessage("session_closed");
     }
 });
-
-window.addEventListener('storage', (event) =>
-{
-    if (event.key === 'popup opened')
-    {
-        if (event.newValue === 'true')
-            localStorage.setItem('popup opened', true);
-    }
-})
 
 channel.addEventListener("message", (event) =>
 {

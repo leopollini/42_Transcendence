@@ -1,5 +1,5 @@
 import { free_users } from "./security/security.js";
-import { nullify_user, navigate, popup } from "./main.js";
+import { nullify_user, navigate } from "./main.js";
 import { showInfoModal } from "./modal.js";
 
 
@@ -7,8 +7,6 @@ function reset_value()
 {
     let session = localStorage.getItem('session opened');
     let already = sessionStorage.getItem('already in');
-    if (!popup)
-        localStorage.setItem('popup opened', 'false');
     if (!already)
     {
         sessionStorage.setItem('already in', '0');

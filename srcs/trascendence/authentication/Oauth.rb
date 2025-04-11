@@ -27,8 +27,17 @@ class OAuthClient
       state: 'state_value'
     )
   end
-
+  
+  def config
+    {
+      id: @client_id,
+      secret: @client_secret,
+      redirect_uri: @redirect_uri
+    }
+  end
+  
   def get_token(code)
     @client.auth_code.get_token(code, redirect_uri: @redirect_uri)
   end
+
 end
