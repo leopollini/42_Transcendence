@@ -5,16 +5,16 @@ import { remove_all } from "../error_main.js";
 
 async function get_data()
 {
-  const data = JSON.stringify({ "params": { token: 'token' } });
-
+  
   try
   {
+    const data = JSON.stringify({ "params": { token: 'tokens' } });
     const response = await fetch("http://localhost:8008", {
         method: "get_user",
         body: data
     })
     const result = await response.json();
-    //console.log("(GET_USER)\ndata login = ", data);
+    console.log("(GET_USER)\ndata login = ", data);
     if (result.success === "true" || result.success === true && result.status === "success")
     {
       const user = result.user[0];
@@ -70,23 +70,23 @@ export const checkAuthentication = async (path) =>
       const data = await response.json();
       
       console.log("data: ", data);
-      if (data.success === "true")
+      if (data.success === true)
       {
-        showInfoModal(message, () => {});
+        showInfoModal(data.message, () => {});
         await get_data()
         navigate("/modes", "Modalità di gioco");
         return (0);
       }
       else
       {
-        showInfoModal("Autenticazione fallita: ", (data.error || "Unknown Error"));
+        showInfoModal("Autenticazione fallita: " + (data.error || "Unknown Error"), () => {});
         return (1);
       }
 
     }
     catch (error)
     {
-      showInfoModal("Errore durante la gestione del callback: ", error.message);
+      showInfoModal("Errore durante la gestione del callback: " + error.message, () => {});
       return (1);
     }
   }

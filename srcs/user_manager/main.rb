@@ -70,6 +70,7 @@ def add_user(_client, obj = nil)
   
   return GUEST.add_guest(data['username']) if obj['login_as_guest']
   
+  puts "data['realname']: #{data['realname']}".yellow
   return DEFAULT_MISSING_PARAM.clone unless data['realname'].is_a?(String) && !data['realname'].empty?
   
   existing_user = LOGIN.select(['realname'], ['realname = ?'], [data['realname']]).first
@@ -95,13 +96,6 @@ def add_user(_client, obj = nil)
   values['token'] = Digest::SHA256.hexdigest(values['realname'])
   
   LOGIN.addValues(values.values, values.keys, ['?'] * values.keys.size)
-  
-  puts "verifica aggiunta utente".green
-  if LOGIN.select(['id'], ['realname = ?'], [values['realname']]).first
-    puts "Utente aggiunto correttamente: #{values['realname']}".green
-  else
-    puts "Errore aggiungendo utente: #{values['realname']}".red
-  end
 
   puts "Success! User token: #{values['token']}".green
   { 'status' => 'success', 'success' => 'true', 'token' => values['token'] }
