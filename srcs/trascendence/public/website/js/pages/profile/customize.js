@@ -10,67 +10,96 @@ const starCount = 30;
 
 export default function Customize() {
   return `
-        <h1 class="customize-title">Customize</h1>
-        <div id="customize-container" class="customize-wrapper">
-            <div class="customize-content">
-                <div id="game-customize" class="customize-section">
-                    <h2 class="section-title">Game Elements</h2>
-                    <div id="game-elements-color" class="color-picker-section">
-                        <div class="color-picker">
-                            <label for="paddleColorPicker">Paddle:</label>
-                            <input type="color" id="paddleColorPicker" value="#ffffff">
-                        </div>
-                        <div class="color-picker">
-                            <label for="ballColorPicker">Ball:</label>
-                            <input type="color" id="ballColorPicker" value="#ffffff">
-                        </div>
-                        <div class="color-picker">
-                            <label for="ballTrailColorPicker">Ball Trail:</label>
-                            <input type="color" id="ballTrailColorPicker" value="#014C4A">
-                        </div>
-                        <div class="color-picker">
-                            <label for="wallsColorPicker">Walls:</label>
-                            <input type="color" id="wallsColorPicker" value="#014C4A">
-                        </div>
+    <h1 class="customize-title">Customize</h1>
+    <div id="customize-container" class="customize-wrapper">
+        <div class="customize-content">
+            <div id="game-customize" class="customize-section">
+                <h2 class="section-title">Game Elements</h2>
+                <div id="game-elements-color" class="color-picker-section">
+                    <div class="color-picker">
+                        <label for="paddleColorPicker">Paddle:</label>
+                        <input type="color" id="paddleColorPicker" value="#ffffff">
+                    </div>
+                    <div class="color-picker">
+                        <label for="ballColorPicker">Ball:</label>
+                        <input type="color" id="ballColorPicker" value="#ffffff">
+                    </div>
+                    <div class="color-picker">
+                        <label for="ballTrailColorPicker">Ball Trail:</label>
+                        <input type="color" id="ballTrailColorPicker" value="#014C4A">
+                    </div>
+                    <div class="color-picker">
+                        <label for="wallsColorPicker">Walls:</label>
+                        <input type="color" id="wallsColorPicker" value="#014C4A">
                     </div>
                 </div>
-                <div id="preview" class="preview-section">
-                    <h2 class="section-title">Preview</h2>
-                    <canvas id="previewCanvas" class="preview-canvas"></canvas>
-                </div>
+            </div>
+            <div id="preview" class="preview-section">
+                <h2 class="section-title">Preview</h2>
+                <canvas id="previewCanvas" class="preview-canvas"></canvas>
             </div>
         </div>
-        <div id="backgrounds" class="backgrounds-section">
-            <h2 class="section-title">Backgrounds</h2>
-            <div id="backgrounds-container" class="backgrounds-grid">
-                <div class="background-item">
-                    <label class="background-label">
-                        <input type="radio" id="backgroundCheckbox1" name="background" class="background-checkbox" />
-                        <span class="background-text">Space</span>
-                    </label>
-                </div>
-                <div class="background-item">
-                    <label class="background-label">
-                        <input type="radio" id="backgroundCheckbox2" name="background" class="background-checkbox" />
-                        <span class="background-text">Classic</span>
-                    </label>
-                </div>
-                <div class="background-item">
-                    <label class="background-label">
-                        <input type="radio" id="backgroundCheckbox3" name="background" class="background-checkbox" />
-                        <span class="background-text">Ping Pong</span>
-                    </label>
-                </div>
+    </div>
+    <div id="backgrounds" class="backgrounds-section">
+        <h2 class="section-title">Backgrounds</h2>
+        <div id="backgrounds-container" class="backgrounds-grid">
+            <div class="background-item">
+                <label class="background-label">
+                    <input type="radio" id="backgroundCheckbox1" name="background" class="background-checkbox" />
+                    <span class="background-text">Space</span>
+                </label>
+            </div>
+            <div class="background-item">
+                <label class="background-label">
+                    <input type="radio" id="backgroundCheckbox2" name="background" class="background-checkbox" />
+                    <span class="background-text">Classic</span>
+                </label>
+            </div>
+            <div class="background-item">
+                <label class="background-label">
+                    <input type="radio" id="backgroundCheckbox3" name="background" class="background-checkbox" />
+                    <span class="background-text">Ping Pong</span>
+                </label>
             </div>
         </div>
-        <div id="powerup-checkbox-container" class="powerup-container">
-            <label class="powerup-label">
-                <input type="checkbox" id="powerup-checkbox" class="powerup-checkbox" />
-                <span class="powerup-text">Power-ups</span>
-            </label>
-        </div>
-        <button id="applyCustomization" class="customization-button">Apply</button>
-    `;
+    </div>
+    <div id="powerup-checkbox-container" class="powerup-container">
+        <label class="powerup-label">
+            <input type="checkbox" id="powerup-checkbox" class="powerup-checkbox" />
+            <span class="powerup-text">Power-ups</span>
+        </label>
+    </div>
+    <button id="applyCustomization" class="customization-button">Apply</button>
+`;
+}
+
+
+function setupCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const container = previewCanvas.parentElement;
+  const maxWidth = container.clientWidth;
+  const maxHeight = window.innerHeight * 0.4; 
+  
+ 
+  let canvasWidth = maxWidth;
+  let canvasHeight = canvasWidth / 2;
+  
+  // Control canvas size
+  if (canvasHeight > maxHeight) {
+    canvasHeight = maxHeight;
+    canvasWidth = canvasHeight * 2;
+  }
+  
+  // Update canvas size
+  previewCanvas.width = Math.floor(canvasWidth * dpr);
+  previewCanvas.height = Math.floor(canvasHeight * dpr);
+  previewCanvas.style.width = `${canvasWidth}px`;
+  previewCanvas.style.height = `${canvasHeight}px`;
+
+  ctx = previewCanvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.imageSmoothingEnabled = false;
+  drawPreview();
 }
 
 function initializeStarsPreviewBackground(width, height) {
@@ -78,16 +107,16 @@ function initializeStarsPreviewBackground(width, height) {
   for (let i = 0; i < starCount; i++) {
     const starX = Math.random() * width;
     const starY = Math.random() * height;
-    const starRadius = Math.random() * 0.5; // variazione di dimensione
+    const starRadius = Math.random() * 0.8; //Star size range
     stars.push({ x: starX, y: starY, radius: starRadius });
   }
 }
 
 function drawPreview() {
-  // Recupera le dimensioni attuali del canvas
-  const width = previewCanvas.width;
-  const height = previewCanvas.height;
-  ctx.clearRect(0, 0, width, height);
+  // Clear canvas
+  const width = previewCanvas.width / (window.devicePixelRatio || 1);
+  const height = previewCanvas.height / (window.devicePixelRatio || 1);
+  ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
 
   // Black bg
   ctx.fillStyle = "black";
@@ -95,7 +124,7 @@ function drawPreview() {
 
   if (pongData.background === "space") {
     // Initialize stars preview bg
-    if (stars.length === 0 || stars[0].x > width || stars[0].y > height) {
+    if (stars.length === 0) {
       initializeStarsPreviewBackground(width, height);
     }
     // Draw stars
@@ -200,7 +229,15 @@ export function addCustomizeGame() {
     pongData = JSON.parse(sessionStorage.getItem("pongData"));
   else
     pongData = pongCustomData;
-  console.log("backroundd = " + pongData.background);
+  
+  previewCanvas = document.getElementById("previewCanvas");
+  setupCanvas();
+  const resizeObserver = new ResizeObserver(() => {
+    setupCanvas();
+  });
+  resizeObserver.observe(previewCanvas.parentElement);
+
+
   ballColorPicker.value = pongData.ballColor;
   paddleColorPicker.value = pongData.paddleColor;
   ballTrailColorPicker.value = pongData.ballTrailColor;
@@ -218,8 +255,8 @@ export function addCustomizeGame() {
 
   previewCanvas = document.getElementById("previewCanvas");
   ctx = previewCanvas.getContext("2d");
-  previewCanvas.width = 200; // Dimensioni ridotte per anteprima
-  previewCanvas.height = 100;
+  // previewCanvas.width = 200; // Dimensioni ridotte per anteprima
+  // previewCanvas.height = 100;
 
   // Update preview on color picker change
   ballColorPicker.addEventListener("input", drawPreview);
@@ -239,7 +276,7 @@ export function addCustomizeGame() {
     powerupCheckbox.checked = true;
 
 
-  drawPreview();
+  //drawPreview();
 
   backgroundCheckbox1.addEventListener("change", () => {
     if (backgroundCheckbox1.checked) {
@@ -280,4 +317,22 @@ export function addCustomizeGame() {
     // }
     navigate("/modes", "Return to Game Mode");
   });
+
+  // Aggiungi questo listener per ridimensionare quando la finestra cambia dimensione
+  window.addEventListener('resize', () => {
+    setupCanvas();
+  });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
