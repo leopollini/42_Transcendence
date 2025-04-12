@@ -105,6 +105,7 @@ class Forza4Game {
     }
 
     handleBackButton() {
+        remove_all(1, 1);
         this.destroy();
         document.getElementById("app").style.background = 
             "linear-gradient(35deg, #491f1f, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";

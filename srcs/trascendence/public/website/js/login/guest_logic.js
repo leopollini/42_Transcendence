@@ -8,24 +8,32 @@ function hasNoSpaces(str)
   return !/\s/.test(str);
 }
 
+function alphanum(str) {
+  return /^[a-zA-Z0-9]+$/.test(str);
+}
+
 export function guest_login()
 {
     showInputModal("Inserisci il tuo nickname", (name) => {
       name = name.trim();
-      if (name )
+      if (alphanum(name) === false)
+      {
+        showInfoModal("Invalid name format(please try again)...", () => {});
+        return;
+      }
       if (hasNoSpaces(name) === false)
       {
-        showInfoModal("Name cannot have spaces", guest_login);
+        showInfoModal("Name cannot have spaces", () => {});
         return;
       }
       if (name.length < 4)
       {
-        showInfoModal("Name too short.", guest_login);
+        showInfoModal("Name too short.", () => {});
         return;
       }
       
       if (name.length >= 15) {
-        showInfoModal("Name too long.", guest_login);
+        showInfoModal("Name too long.", () => {});
         return;
       }
       

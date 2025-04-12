@@ -90,6 +90,8 @@ export function addForza4LobbyPageHandlers() {
             newPlayer.style.background = "";
             newPlayer.style.color = "white";
             newPlayer.onclick = null;
+            const playerName = newPlayer.textContent.trim();
+            sessionStorage.setItem("opponent", playerName);
             matchPlayers.appendChild(newPlayer);
             numPlayersAccepted++;
             numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
@@ -104,7 +106,6 @@ export function addForza4LobbyPageHandlers() {
     };
 
     toggleStartMatch?.addEventListener('click', () => {
-        sessionStorage.setItem("f4opponent", invitedPlayers[1]);
         navigate( "/forza4/game", "Forza 4 Game", invitedPlayers);
     });
 
