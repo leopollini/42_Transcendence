@@ -96,6 +96,13 @@ def add_user(_client, obj = nil)
   
   LOGIN.addValues(values.values, values.keys, ['?'] * values.keys.size)
   
+  puts "verifica aggiunta utente".green
+  if LOGIN.select(['id'], ['realname = ?'], [values['realname']]).first
+    puts "Utente aggiunto correttamente: #{values['realname']}".green
+  else
+    puts "Errore aggiungendo utente: #{values['realname']}".red
+  end
+
   puts "Success! User token: #{values['token']}".green
   { 'status' => 'success', 'success' => 'true', 'token' => values['token'] }
 end
