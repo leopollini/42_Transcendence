@@ -3,6 +3,7 @@ import { forza4CustomData } from "../data/forza4_game_global.js";
 import { createGrid, redrawGrid } from "../board/forza4_grid.js";
 import { updateTimer, resetTimer } from "../other/forza4_timer.js";
 import { activatePowerup } from "../board/forza4_powerup.js";
+import { remove_all } from "../../../error_main.js";
 
 export let forza4GameData;
 let backImageButton;
@@ -72,7 +73,7 @@ class Forza4Game {
         this.gameEnded = false;
 
         this.p1 = current_user.display_name;
-        this.p2 = sessionStorage.getItem("f4opponent");
+        this.p2 = sessionStorage.getItem("opponent");
 
         this.p1Name.textContent = this.p1 + ":";
         this.p2Name.textContent = this.p2 + ":";
