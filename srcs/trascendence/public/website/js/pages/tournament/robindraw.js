@@ -7,7 +7,47 @@ let firstMatch = true;
 let nextMatch = null;
 let lastMatch = null;  
 let playRobinMatchButton;
-let robinBackToMenuButton
+let robinBackToMenuButton;
+
+// Save and Load Tournament State
+function saveTournamentState() {
+    const state = {
+        playerList,
+        playerNames,
+        matchesListRobin,
+        firstMatch,
+        nextMatch,
+        lastMatch
+    };
+    sessionStorage.setItem('robinTournamentState', JSON.stringify(state));
+}
+
+function loadTournamentState() {
+    const savedState = sessionStorage.getItem('robinTournamentState');
+    if (savedState) {
+        const state = JSON.parse(savedState);
+        playerList = state.playerList;
+        playerNames = state.playerNames;
+        matchesListRobin = state.matchesListRobin;
+        firstMatch = state.firstMatch;
+        nextMatch = state.nextMatch;
+        lastMatch = state.lastMatch;
+        return true;
+    }
+    return false;
+}
+
+function resetTournamentState() {
+    sessionStorage.setItem("game ended", false);
+    sessionStorage.removeItem('robinTournamentState');
+    playerList = null;
+    playerNames = [];
+    matchesListRobin = [];
+    firstMatch = true;
+    nextMatch = null;
+    lastMatch = null;
+    if (robinBackToMenuButton) robinBackToMenuButton.style.display = "none";
+}
 
 export default function RobinRanking() {
     return `
@@ -30,7 +70,6 @@ export default function RobinRanking() {
     `;
 }
 
-// Fisher-Yates shuffle
 function shuffleMatchesArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -60,19 +99,16 @@ function findNextMatch(rankingRobinCtx) {
     let tiebreaker;
     attempts = 0;
 
-
-    //console.log("find the next match");
     if (matchesListRobin.length === 0) {
-        if (playerList[0].points == playerList[1].points)
-        {
+        sessionStorage.removeItem('robinTournamentState');
+        if (playerList[0].points == playerList[1].points) {
             let playersWithSameScore = findPlayersWithSameScore();
             populateMatchesList(playersWithSameScore);
-            //console.log("matchesListRobin: " + matchesListRobin);
             nextMatch = matchesListRobin.shift();
             tiebreaker = true;
+            saveTournamentState();
         }
-        else if (!nextMatch) //No more matches (Tournament finished)
-        {
+        else if (!nextMatch) {
             rankingRobinCtx.font = '30px Liberty';
             rankingRobinCtx.textAlign = 'left';
             rankingRobinCtx.fillStyle = 'white';
@@ -85,19 +121,15 @@ function findNextMatch(rankingRobinCtx) {
         }
     }
     
-    if (playerNames.length > 4)
-    {
-        // Search until you find a match to play
+    if (playerNames.length > 4) {
         while (matchesListRobin.length > 0 && attempts < matchesListRobin.length) {
-            nextMatch = matchesListRobin.shift();  // Estrai il primo match
+            nextMatch = matchesListRobin.shift();
 
-                // Check if the players already played the match or no
                 if (!lastMatch || (nextMatch.player1 !== lastMatch.player1 && nextMatch.player1 !== lastMatch.player2 && 
                                 nextMatch.player2 !== lastMatch.player1 && nextMatch.player2 !== lastMatch.player2)) {
-                    break;  // Break if match found
+                    break;
                 }
 
-                // If match was not valid try again
                 matchesListRobin.push(nextMatch);
                 nextMatch = null;
                 attempts++;     
@@ -108,7 +140,6 @@ function findNextMatch(rankingRobinCtx) {
         nextMatch = matchesListRobin.shift(); 
 
     if (nextMatch) {
-        // Draw the next match to play
         rankingRobinCtx.font = '30px Liberty';
         rankingRobinCtx.textAlign = 'left';
         rankingRobinCtx.fillStyle = 'white';
@@ -117,15 +148,17 @@ function findNextMatch(rankingRobinCtx) {
         else 
             rankingRobinCtx.fillText("Next Match (t): " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
         
-        // Update last match played
         lastMatch = nextMatch;
+        saveTournamentState();
     }
 }
 
 export function assignPointsToPlayer(winner) {
     for (let i = 0; i < playerNames.length; i++) {
-        if (playerList[i].name === winner)
+        if (playerList[i].name === winner) {
             playerList[i].points += 3;
+            saveTournamentState();
+        }
     }
 }
 
@@ -134,15 +167,13 @@ function populateMatchesList(playerList) {
     for (let i = 0; i < playerList.length; i++) {
         for (let j = i + 1; j < playerList.length; j++) {
             matchesListRobin.push({player1: playerList[i].name, player2: playerList[j].name});
-            console.log(playerList[i].name + " vs " + playerList[j].name);
         }
     }
     shuffleMatchesArray(matchesListRobin);
+    saveTournamentState();
 }
 
-
 export function robinDraw(players) {
-    
     const rankingRobinCanvas = document.getElementById("rankingRobinCanvas");
     const rankingRobinCtx = rankingRobinCanvas.getContext("2d");
     playRobinMatchButton = document.getElementById("playRobinMatchButton");
@@ -151,33 +182,32 @@ export function robinDraw(players) {
     playRobinMatchButton.style.display = "block";
     rankingRobinCanvas.style.display = "block";
 
-
-    if (!playerList)
-        playerList = initializePlayers(players);
+    // Check if there's a saved state
+    const hasLoadedState = loadTournamentState();
+    
+    if (!hasLoadedState) {
+        // Initialize if you don't have a saved state
+        if (!playerList)
+            playerList = initializePlayers(players);
+    }
 
     playerList.sort((a, b) => b.points - a.points);
     
-
-    // Ranking (Player name and points)
     for (var i = 0; i < playerList.length; i++) {
         rankingRobinCtx.font = '30px Liberty';
         rankingRobinCtx.fillStyle = 'white';
-
-        // Player name
         rankingRobinCtx.textAlign = 'left';
         rankingRobinCtx.fillText(i + 1 + ". " + playerList[i].name, 50, 100 + i * 40);
-        // Player points
         rankingRobinCtx.textAlign = 'right';
         rankingRobinCtx.fillText(playerList[i].points + " points", 750, 100 + i * 40);
     }
 
-    if (firstMatch) {
+    if (firstMatch && !hasLoadedState) {
         firstMatch = false;
         playerNames = players;
         populateMatchesList(playerList);
     }
 
-    // Check next match to play
     findNextMatch(rankingRobinCtx);
 }
 
@@ -186,26 +216,34 @@ export const addRobinRankingPageHandlers = () => {
     const robinBackToMenuButton = document.getElementById('robinBackToMenuButton');
     const backImageButton = document.getElementById('backImageButton');
 
-
     playRobinMatchButton?.addEventListener('click', () => {
         const players = [];
         players.push(nextMatch.player1);
         players.push(nextMatch.player2);
-        //sessionStorage.setItem('matchPlayers', JSON.stringify(players));
         sessionStorage.setItem("player1", players[0]);
         sessionStorage.setItem("player2", players[1]);
         nextMatch = null;
+        saveTournamentState();
         navigate("/tournament/roundrobin/robinranking/game", "RoundRobin Pong Game");
     });
 
     robinBackToMenuButton?.addEventListener('click', () => {
         sessionStorage.setItem("game ended", false);
+        sessionStorage.removeItem('robinTournamentState');
         playerList = [];
+        playerNames = [];
+        matchesListRobin = [];
+        firstMatch = true;
+        nextMatch = null;
+        lastMatch = null;
         robinBackToMenuButton.style.display = "none";
+        resetTournamentState();
         navigate("/modes", "Return to Game Mode");
     });
 
     backImageButton?.addEventListener('click', () => {
+        sessionStorage.removeItem('robinTournamentState');
+        resetTournamentState();
         navigate("/modes", "Return to Game Mode");
     });
 };

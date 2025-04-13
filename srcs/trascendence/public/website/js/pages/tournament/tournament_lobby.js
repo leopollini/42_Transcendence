@@ -65,7 +65,7 @@ export function handleLobby(type, totPlayers) {
         numPlayersAccepted++;
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
-    const players = ["Alice", "Bob", "Charlie", "David"];
+    const players = ["Alice", "Bob", "Charlie", "David", "Adam", "Josh", "Bastien", "Naruto", "Lara", "Kakashi", "Antony", "Jeremy", "Holly", "Benji", "Travis", "Joshua"];
     players.forEach(player => {
         const div = document.createElement("div");
         div.classList.add("player");
