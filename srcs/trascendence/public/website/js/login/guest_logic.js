@@ -74,6 +74,7 @@ function update_guest(curr_guest)
     {
         remove_all(1, 1);
         update_user(guest_user);
+        sessionStorage.setItem("user_name", guest_user.display_name);
         navigate("/modes", "Modalità di gioco");
     }
     else

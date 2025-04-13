@@ -287,12 +287,11 @@ window.addEventListener('beforeunload', () =>
 {
     if (sessionStorage.getItem('already in') === '1')
     {
-        if (!isRefresh && window.location.pathname !== "/")
-            channel.postMessage("session_closed");
-        /*else if (current_user.type === "login")
+        if (current_user.type === "login")
             sessionStorage.setItem("user_name", current_user.realname);
         else
-            sessionStorage.setItem("user_name", current_user.display_name);*/
-        return
+            sessionStorage.setItem("user_name", current_user.display_name);
+        if (!isRefresh && window.location.pathname !== "/")
+            remove_all(0, 0 , 1);
     }
 });

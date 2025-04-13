@@ -67,7 +67,7 @@ export function free_users()
 {
     try
     {
-        let data = JSON.stringify({});
+        let data = JSON.stringify({"username" : sessionStorage.getItem("user_name")});
         fetch("http://localhost:8008",
         {
             method: "logout_user",

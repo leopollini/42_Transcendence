@@ -8,16 +8,20 @@ async function get_data()
   
   try
   {
-    const data = JSON.stringify({ "params": { token: 'tokens' } });
+    const data = JSON.stringify({});
     const response = await fetch("http://localhost:8008", {
         method: "get_user",
         body: data
     })
     const result = await response.json();
-    console.log("(GET_USER)\ndata login = ", data);
-    if (result.success === "true" || result.success === true && result.status === "success")
+    //console.log("(GET_USER)\ndata login = ", data);
+    let name = result.guest.find(guest => guest.display_name === sessionStorage.getItem("user_name"));
+    if (!name)
+        name = result.login.find(login => login.realname === sessionStorage.getItem("user_name"));
+    if (name)
     {
-      const user = result.user[0];
+      //console.log("name: ", name);
+      const user = name;
       let new_user =
       {
         email: user.email,
@@ -70,7 +74,7 @@ export const checkAuthentication = async (path) =>
       const response = await fetch('/api/callback?' + new URLSearchParams(window.location.search));
       const data = await response.json();
       
-      console.log("data: ", data);
+      //console.log("data: ", data);
       if (data.success === true)
       {
         showInfoModal(data.message, () => {});

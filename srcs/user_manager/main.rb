@@ -32,35 +32,6 @@ LOGIN = BetterPG::SimplePG.new 'users',
 GUEST = GuestsList.new
 # REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image]
 
-class TokenManager
-  TOKEN_GUEST_FILE = '/var/token.txt'
-  TOKEN_LOGIN_FILE = '/var/token_login.txt'
-
-  def self.save_token_login(token)
-    `echo -n "#{token}" > #{TOKEN_LOGIN_FILE}`
-  end
-
-  def self.read_token_login
-    if File.exist?(TOKEN_LOGIN_FILE)
-      `cat #{TOKEN_LOGIN_FILE}`
-    end
-  end
-
-  def self.save_token_guest(token)
-    `echo "#{token}" > #{TOKEN_GUEST_FILE}`
-  end
-
-  def self.read_token_guest
-    if File.exist?(TOKEN_GUEST_FILE)
-      `cat #{TOKEN_GUEST_FILE}`
-    end
-  end
-
-  def self.delete_token
-    `rm #{TOKEN_GUEST_FILE}`
-  end
-end
-
 def add_user(_client, obj = nil)
   puts 'add_user called'.green if DEBUG_MODE
   
@@ -106,9 +77,7 @@ def login_user(client, obj)
   data = obj['data']
 
   if obj['login_as_guest'] == 'true' && data.has_key?('image') && data.has_key?('username')
-    token = Digest::SHA256.hexdigest(SecureRandom.alphanumeric(8))
-    TokenManager.save_token_guest("#{token}")
-    return GUEST.add_guest(data, token)
+    return GUEST.add_guest(data)
   end
 
   r = nil
@@ -117,21 +86,21 @@ def login_user(client, obj)
     return usr.merge({'status' => 'success', 'success' => 'true'})
   end rescue r
   return {'status' => 'user_manager: bad request', 'success' => 'false'} unless r.nil?
-  return add_user(client, obj) if obj['do_create']
-  
+
   {'service' => 'user_manager', 'status' => 'user not found', 'success' => 'false'}
 end
 
 
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
-  token = TokenManager.read_token_guest
-  status = GUEST.del_guest_by_token(token)
-  if status && status['success'] == 'true'
-    TokenManager.delete_token
-    return status
-  else
-    return status
+  username = obj["username"]
+  if username
+    status = GUEST.del_guest(username)
+    if status && status['success'] == 'true'
+      return status
+    else
+      return status
+    end
   end
 end
 
@@ -155,39 +124,8 @@ def get_user(_client, obj = nil)
     res['status'] = 'no users found' if users.empty? && res['guest'].empty?
     return res
   end
-  
-  if params.class.to_s == 'Array'
-    puts 'looking for users with ' + params.to_s if DEBUG_MODE
-    params.each do |p|
-      cols = []
-      keys = []
-      p.reject{ |key, _val| key == 'username' || key == 'logged_in' }.each do |key, val|
-        return DEFAULT_ERROR_RES.clone if key.nil? || key.empty?
-
-        cols.append key.to_s
-        keys.append val.to_s
-      end
-      if p  && p['token'] == "token"
-        token = TokenManager.read_token_guest
-        status = GUEST.get_token_name(token)
-        #senno login
-        puts "get_user #{status}".green
-        return status
-      end
-      if !cols.empty?
-        users = LOGIN.select(cols, ['?'] * cols.size, keys)
-        lst = lst + users
-      end
-    end
-    res = DEFAULT_SUCCESS_RES.clone
-    res['status'] = 'no users found' if lst.empty? && lst_guest.empty?
-    res['user'] = lst
-    res['guest'] = lst_guest
-
-    # In case no filter is given returns whole databases
-  end
-  res
 end
+
 
 def update_user(_client, obj = nil)
   puts "\n\n\n\nhahahahhahahahahahah\n\n\n\n".yellow

@@ -37,8 +37,8 @@ export function Forza4() {
 }
 
 export function startForza4Game(players) {
-    console.log("start forza 4 game");
-    console.log(players);
+    //console.log("start forza 4 game");
+    //console.log(players);
     backImageButton = document.getElementById('backImageButton');
     matchPlayers = players;
     if (sessionStorage.getItem("forza4Data") !== null)
@@ -128,7 +128,7 @@ class Forza4Game {
     }
 
     handlePopState() {
-        console.log("popstate");
+        //console.log("popstate");
         matchPlayers = [];
         this.destroy();
         document.getElementById("app").style.background = 

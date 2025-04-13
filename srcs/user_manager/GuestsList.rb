@@ -15,7 +15,7 @@ class GuestsList
     @counter = 0
   end
 
-  def add_guest(data, token)
+  def add_guest(data)
     puts "creating new guest #{data}".green
     username = data['username']
     puts "username: #{username}".yellow
@@ -31,7 +31,6 @@ class GuestsList
       'deleted' => -1,
       'bio' => "",
       'image' => data['image'].to_s,
-      'token' => token
     }
     @guests[@counter]['bio'] = data['bio'].to_s
     @guests[@counter]['image'] = data['image'].to_s
@@ -64,11 +63,11 @@ class GuestsList
     guest['bio'] = new_data['bio'] if new_data['bio']
     guest['image'] = new_data['image'] if new_data['image']
   end
-  def get_token_name(token)
+  def get_token_name(name)
     unless @guests.empty?
       @guests[1..].each do |entry|
         next if entry.nil?
-        if entry['token'].strip == token.strip
+        if entry['username'].strip == name.strip
           return {
             'status' => 'success',
             'success' => 'true',
@@ -86,13 +85,13 @@ class GuestsList
   end
 
 
-  def del_guest_by_token(token)
+  def del_guest(name)
     unless @guests.empty?
       @guests[1..].each_with_index do |entry, index|
         next if entry.nil?
-        if entry['token'].strip == token.strip
+        if entry['username'].strip == name.strip
           @guests.delete_at(index + 1)
-          @index.delete token
+          @index.delete name
           return {'service' => 'user_manager', 'status' => "guest deleted succesfully", 'success' => 'true'}
         end
       end

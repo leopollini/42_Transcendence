@@ -1,5 +1,5 @@
 import { free_users } from "./security/security.js";
-import { nullify_user, navigate } from "./main.js";
+import { nullify_user, navigate, current_user} from "./main.js";
 import { showInfoModal } from "./modal.js";
 
 
@@ -25,6 +25,13 @@ export function remove_all(session, already, all)
 {
     if (all === 1)
     {
+        if (current_user)
+        {
+            if (current_user.type === "login")
+                sessionStorage.setItem("user_name", current_user.realname);
+            else
+                sessionStorage.setItem("user_name", current_user.display_name);
+        }   
         free_users();
         nullify_user();
     }
