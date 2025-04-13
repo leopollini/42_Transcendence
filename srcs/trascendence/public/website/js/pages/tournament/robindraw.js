@@ -10,7 +10,7 @@ let playRobinMatchButton;
 let robinBackToMenuButton;
 
 // Save and Load Tournament State
-function saveTournamentState() {
+function saveRobinTournamentState() {
     const state = {
         playerList,
         playerNames,
@@ -22,7 +22,7 @@ function saveTournamentState() {
     sessionStorage.setItem('robinTournamentState', JSON.stringify(state));
 }
 
-function loadTournamentState() {
+function loadRobinTournamentState() {
     const savedState = sessionStorage.getItem('robinTournamentState');
     if (savedState) {
         const state = JSON.parse(savedState);
@@ -37,7 +37,7 @@ function loadTournamentState() {
     return false;
 }
 
-function resetTournamentState() {
+export function resetRobinTournamentState() {
     sessionStorage.setItem("game ended", false);
     sessionStorage.removeItem('robinTournamentState');
     playerList = null;
@@ -100,13 +100,13 @@ function findNextMatch(rankingRobinCtx) {
     attempts = 0;
 
     if (matchesListRobin.length === 0) {
-        sessionStorage.removeItem('robinTournamentState');
+        resetRobinTournamentState();
         if (playerList[0].points == playerList[1].points) {
             let playersWithSameScore = findPlayersWithSameScore();
             populateMatchesList(playersWithSameScore);
             nextMatch = matchesListRobin.shift();
             tiebreaker = true;
-            saveTournamentState();
+            saveRobinTournamentState();
         }
         else if (!nextMatch) {
             rankingRobinCtx.font = '30px Liberty';
@@ -149,7 +149,7 @@ function findNextMatch(rankingRobinCtx) {
             rankingRobinCtx.fillText("Next Match (t): " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
         
         lastMatch = nextMatch;
-        saveTournamentState();
+        saveRobinTournamentState();
     }
 }
 
@@ -157,7 +157,7 @@ export function assignPointsToPlayer(winner) {
     for (let i = 0; i < playerNames.length; i++) {
         if (playerList[i].name === winner) {
             playerList[i].points += 3;
-            saveTournamentState();
+            saveRobinTournamentState();
         }
     }
 }
@@ -170,7 +170,7 @@ function populateMatchesList(playerList) {
         }
     }
     shuffleMatchesArray(matchesListRobin);
-    saveTournamentState();
+    saveRobinTournamentState();
 }
 
 export function robinDraw(players) {
@@ -183,7 +183,7 @@ export function robinDraw(players) {
     rankingRobinCanvas.style.display = "block";
 
     // Check if there's a saved state
-    const hasLoadedState = loadTournamentState();
+    const hasLoadedState = loadRobinTournamentState();
     
     if (!hasLoadedState) {
         // Initialize if you don't have a saved state
@@ -223,27 +223,21 @@ export const addRobinRankingPageHandlers = () => {
         sessionStorage.setItem("player1", players[0]);
         sessionStorage.setItem("player2", players[1]);
         nextMatch = null;
-        saveTournamentState();
+        saveRobinTournamentState();
         navigate("/tournament/roundrobin/robinranking/game", "RoundRobin Pong Game");
     });
 
     robinBackToMenuButton?.addEventListener('click', () => {
         sessionStorage.setItem("game ended", false);
         sessionStorage.removeItem('robinTournamentState');
-        playerList = [];
-        playerNames = [];
-        matchesListRobin = [];
-        firstMatch = true;
-        nextMatch = null;
-        lastMatch = null;
         robinBackToMenuButton.style.display = "none";
-        resetTournamentState();
+        resetRobinTournamentState();
         navigate("/modes", "Return to Game Mode");
     });
 
     backImageButton?.addEventListener('click', () => {
         sessionStorage.removeItem('robinTournamentState');
-        resetTournamentState();
+        resetRobinTournamentState();
         navigate("/modes", "Return to Game Mode");
     });
 };

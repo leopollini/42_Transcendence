@@ -1,4 +1,5 @@
 import { navigate, current_user } from "../../main.js";
+import { resetRobinTournamentState } from "./robindraw.js";
 let invitedPlayers = [];
 let tournament;
 let selectedPlayer;
@@ -105,10 +106,14 @@ export function addLobbyPageHandlers() {
 
     toggleStartTournament?.addEventListener('click', () => {
         console.log("tournament =>" + tournament);
+        
         if (tournament === "Bracket")
             navigate("/tournament/knockout/bracket", "Starting knockout tournament", invitedPlayers);
         else
+        {
+            resetRobinTournamentState();
             navigate("/tournament/roundrobin/robinranking", "Starting roundrobin tournament", invitedPlayers);
+        }
     });
 
     backImageButton?.addEventListener('click', () => {

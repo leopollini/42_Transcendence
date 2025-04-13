@@ -129,9 +129,6 @@ function loadBracketState() {
 
 // Main function
 export function drawBracket(players) {
-  
-
-    console.log("lenngthhhh = ", players.length);
     if (!initialPlayersCount)
         initialPlayersCount = players.length;
     bracketCanvas = document.getElementById('bracketCanvas');
