@@ -26,51 +26,11 @@ PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
                                ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'token TEXT']
+                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT']
 
 
 GUEST = GuestsList.new
 # REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image]
-
-def add_user(_client, obj = nil)
-  puts 'add_user called'.green if DEBUG_MODE
-  
-  return DEFAULT_ERROR_RES.clone unless obj && obj.is_a?(Hash)
-  
-  data = obj
-  
-  return GUEST.add_guest(data['username']) if obj['login_as_guest']
-  
-  puts "data['realname']: #{data['realname']}".yellow
-  return DEFAULT_MISSING_PARAM.clone unless data['realname'].is_a?(String) && !data['realname'].empty?
-  
-  existing_user = LOGIN.select(['realname'], ['realname = ?'], [data['realname']]).first
-  if existing_user
-    puts "User already present (#{data['realname']})".yellow
-    return { 'status' => 'user_manager: user with same login_name already in database', 'success' => 'false' }
-  end
-  
-  begin
-    max = LOGIN.exec('SELECT MAX(id) AS max FROM users', []).first || { 'max' => 0 }
-  rescue StandardError
-    max = { 'max' => 0 }
-  end
-  
-  fields = LOGIN.getColumns
-  values = {}
-  
-  fields.each do |f|
-    values[f] = data[f].to_s.strip if data[f].is_a?(String)
-  end
-  
-  values['id'] = max['max'].to_i + 1
-  values['token'] = Digest::SHA256.hexdigest(values['realname'])
-  
-  LOGIN.addValues(values.values, values.keys, ['?'] * values.keys.size)
-
-  puts "Success! User token: #{values['token']}".green
-  { 'status' => 'success', 'success' => 'true', 'token' => values['token'] }
-end
 
 def login_user(client, obj)
   puts "login_user called".green
@@ -82,14 +42,24 @@ def login_user(client, obj)
 
   r = nil
   if (usr = LOGIN.select ['realname'], ['realname = ?'], [data['realname']])[0]
-    LOGIN.valueManipulation 'realname', data['realname'], ['?'] => [data['realname']]
+    cols = []
+    keys = []
+    data.each do |key, val|
+      cols.append key.to_s
+      keys.append val.to_s
+    end
+    LOGIN.update cols, keys, ['id = ?'], [usr['id']]
+
+    LOGIN.update ['entered'], ['1'], ['id = ?'], [usr['id']]
+    usr['entered'] = 1
+
     return usr.merge({'status' => 'success', 'success' => 'true'})
   end rescue r
   return {'status' => 'user_manager: bad request', 'success' => 'false'} unless r.nil?
 
+
   {'service' => 'user_manager', 'status' => 'user not found', 'success' => 'false'}
 end
-
 
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
@@ -163,12 +133,9 @@ def user_manager(client, _server)
 
   msg = client.read_nonblock Ports::MAX_MSG_LEN
   bobj = JSON.parse msg
-  puts "\n\n\n method = #{bobj['method']}".yellow
   # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
   begin
     res = case bobj['method'].to_s
-    when 'add_user'
-      add_user client, bobj
     when 'get_user'
       get_user client, bobj
     when 'update_user'

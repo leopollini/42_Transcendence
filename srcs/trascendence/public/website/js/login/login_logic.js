@@ -5,7 +5,6 @@ import { remove_all } from "../error_main.js";
 
 async function get_data()
 {
-  
   try
   {
     const data = JSON.stringify({});
@@ -14,13 +13,13 @@ async function get_data()
         body: data
     })
     const result = await response.json();
-    //console.log("(GET_USER)\ndata login = ", data);
-    let name = result.guest.find(guest => guest.display_name === sessionStorage.getItem("user_name"));
-    if (!name)
-        name = result.login.find(login => login.realname === sessionStorage.getItem("user_name"));
+    console.log("(GET_USER)\ndata login = ", result);
+    let name;
+    if (result.user && Array.isArray(result.user))
+      name = result.user.find(user => user.entered === 1);
+    console.log("name: ", name);
     if (name)
     {
-      //console.log("name: ", name);
       const user = name;
       let new_user =
       {

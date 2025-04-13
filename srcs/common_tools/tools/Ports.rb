@@ -15,7 +15,6 @@ module Ports
     'show_users' => ['request_manager', 9000],
     'tokenizer' => ['tokenizer', 7890],
 
-    'add_user' => ['user_manager', 7080],
     'get_user' => ['user_manager', 7080],
     'update_user' => ['user_manager', 7080],
     'login_user' => ['user_manager', 7080],
