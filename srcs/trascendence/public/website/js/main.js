@@ -276,8 +276,6 @@ function initChat() {
 // Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
 
-const channel = new BroadcastChannel("session_sync");
-
 let isRefresh = false;
 
 window.addEventListener('keydown', function (e) {
@@ -287,18 +285,14 @@ window.addEventListener('keydown', function (e) {
 
 window.addEventListener('beforeunload', () =>
 {
-    if ( window.location.pathname !== "/" && sessionStorage.getItem("already in") === "1"
-    && !isRefresh)
-        remove_all(0, 0, 1);
     if (sessionStorage.getItem('already in') === '1')
     {
-        localStorage.setItem('session opened', 0);
-        channel.postMessage("session_closed");
+        if (!isRefresh && window.location.pathname !== "/")
+            channel.postMessage("session_closed");
+        /*else if (current_user.type === "login")
+            sessionStorage.setItem("user_name", current_user.realname);
+        else
+            sessionStorage.setItem("user_name", current_user.display_name);*/
+        return
     }
-});
-
-channel.addEventListener("message", (event) =>
-{
-    if (event.data === "session_closed")
-        remove_all(0,0, 1);
 });

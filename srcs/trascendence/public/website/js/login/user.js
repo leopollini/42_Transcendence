@@ -43,6 +43,9 @@ export async function restore_user()
         if (window.location.pathname === '/' || (sessionStorage.getItem('already in') !== '1' && localStorage.getItem('session opened', 0) !== '1'))
             return null;
         let data = JSON.stringify({ "params" : [{'token' : 'token'}]});
+        /*
+        let data = JSON.stringify({ "params" : [{'username' : sessionStorage.getItem('user_name')}] });
+        */
         const response = await fetch("http://localhost:8008",
         {
             method: "get_user",
