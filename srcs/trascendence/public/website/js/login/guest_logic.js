@@ -72,10 +72,10 @@ function update_guest(curr_guest)
     //console.log("(LOGIN_USER)\ndatas = ", data);
     if (data.status === "success" && data.success === "true")
     {
-        remove_all(1, 1);
-        update_user(guest_user);
-        sessionStorage.setItem("user_name", guest_user.display_name);
-        navigate("/modes", "Modalità di gioco");
+      remove_all(1, 1);
+      sessionStorage.setItem("user_name", guest_user.display_name);
+      update_user(guest_user);
+      navigate("/modes", "Modalità di gioco");
     }
     else
     {

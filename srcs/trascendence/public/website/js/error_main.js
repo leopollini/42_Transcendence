@@ -23,9 +23,10 @@ function reset_value()
 
 export function remove_all(session, already, all)
 {
+    let user_name = sessionStorage.getItem("user_name");
     if (all === 1)
     {
-        if (current_user)
+        if (current_user && (current_user.display_name || current_user.realname))
         {
             if (current_user.type === "login")
                 sessionStorage.setItem("user_name", current_user.realname);
@@ -39,6 +40,8 @@ export function remove_all(session, already, all)
     sessionStorage.clear();
     localStorage.setItem('session opened', session);
     sessionStorage.setItem('already in', already);
+    if (user_name && already === 1)
+        sessionStorage.setItem('user_name', user_name);
 }
 export function check_valid_operation(path)
 {

@@ -32,6 +32,7 @@ async function get_data()
         type: "login"
       };
       remove_all(1, 1);
+      sessionStorage.setItem("user_name", new_user.realname);
       change_name(new_user.login_name);
       update_image(new_user.image);
       update_user(new_user);

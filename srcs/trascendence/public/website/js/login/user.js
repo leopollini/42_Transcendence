@@ -1,4 +1,4 @@
-import { navigate, nullify_user } from "../main.js";
+import { current_user, navigate, nullify_user } from "../main.js";
 import {updateProfileUI} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../error_main.js";
@@ -52,7 +52,7 @@ export async function restore_user()
         })
 
         const result = await response.json();
-        //console.log("(get_user)\nData login = ", result);
+        console.log("(get_user)\nData login = ", result);
         if (result)
         {
             let name;

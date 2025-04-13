@@ -163,6 +163,7 @@ def user_manager(client, _server)
 
   msg = client.read_nonblock Ports::MAX_MSG_LEN
   bobj = JSON.parse msg
+  puts "\n\n\n method = #{bobj['method']}".yellow
   # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
   begin
     res = case bobj['method'].to_s
