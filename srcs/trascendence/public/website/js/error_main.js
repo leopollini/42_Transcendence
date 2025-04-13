@@ -17,8 +17,6 @@ function reset_value()
         localStorage.setItem('session opened', '0');
         session = 0;
     }
-    if (already === '0' && session === '0')
-        remove_all(0, 0);
     if (already === '1' && session === '0')
         localStorage.setItem('session opened', 1);
 }
@@ -55,10 +53,10 @@ function continue_error_check(path)
 {
     let session = localStorage.getItem('session opened');
     let already = sessionStorage.getItem('already in');
-    if ((session === '1' && already === '0') ||
-    (already === '0' && session === '0'))
+    if ((session === '1' && already === '0')
+    || (already === '0' && session === '0'))
     {
-        remove_all(1, 0);
+        remove_all(0, 0);
         showInfoModal("ERROR: accessing unauthorized page...", () => {});
         navigate("/", "home");
         return (1);

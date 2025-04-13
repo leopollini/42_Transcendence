@@ -27,6 +27,7 @@ async function get_data()
         bio: user.bio,
         type: "login"
       };
+      remove_all(1, 1);
       change_name(new_user.login_name);
       update_image(new_user.image);
       update_user(new_user);

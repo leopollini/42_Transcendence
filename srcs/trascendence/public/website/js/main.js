@@ -56,7 +56,8 @@ export let current_user = null;
 
 export async function initUser()
 {
-    current_user = await restore_user();
+    if (window.location.pathname !== "/")
+        current_user = await restore_user();
 }
 
 
@@ -139,7 +140,7 @@ const loadContent = async () => {
     //console.log("Players? " +players);
     playerNames = players;  
     //console.log("path => " + path);
-    if (path !== "/classic" && path !== "/forza4/game")
+    if (path !== "/" && path !== "/classic" && path !== "/forza4/game")
         remove_all(1, 1);
     if (component)
     {
@@ -277,8 +278,18 @@ document.addEventListener("DOMContentLoaded", loadContent);
 
 const channel = new BroadcastChannel("session_sync");
 
+let isRefresh = false;
+
+window.addEventListener('keydown', function (e) {
+    if ((e.key === 'F5') || (e.ctrlKey && e.key === 'r'))
+        isRefresh = true;
+});
+
 window.addEventListener('beforeunload', () =>
 {
+    if ( window.location.pathname !== "/" && sessionStorage.getItem("already in") === "1"
+    && !isRefresh)
+        remove_all(0, 0, 1);
     if (sessionStorage.getItem('already in') === '1')
     {
         localStorage.setItem('session opened', 0);

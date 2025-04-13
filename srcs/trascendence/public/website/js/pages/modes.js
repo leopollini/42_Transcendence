@@ -61,8 +61,6 @@ window.onpopstate = function ()
     {
         showInfoModal("you have quitted the active session", () => {});
         remove_all(0, 0, 1);
-        showInfoModal("you have quitted the active session", () => {});
-        remove_all(0, 0, 1);
     }
 };
 

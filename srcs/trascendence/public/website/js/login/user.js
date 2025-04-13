@@ -50,7 +50,7 @@ export async function restore_user()
         })
 
         const result = await response.json();
-        //console.log("(get_user)\nData login = ", data);
+        //console.log("(get_user)\nData login = ", result);
         if (result)
         {
             if (result.success === "true" && result.status === "success")
@@ -71,7 +71,6 @@ export async function restore_user()
             else
             {
                 showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => {});
-                nullify_user();
                 navigate("/", "home");
                 return null;
             }
