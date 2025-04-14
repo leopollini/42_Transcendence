@@ -37,7 +37,7 @@ class ChatApp {
         if (current_user && current_user.display_name)
             this.username = current_user.display_name;
         else
-            this.username = "default";
+            this.username = "USERNAME NOT DEFINED :(:(";
         this.socket = initSocket(this.username, this);
     }
 

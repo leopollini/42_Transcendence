@@ -33,31 +33,20 @@ GUEST = GuestsList.new
 # REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image]
 
 class TokenManager
-  TOKEN_GUEST_FILE = '/var/token.txt'
-  TOKEN_LOGIN_FILE = '/var/token_login.txt'
 
   def self.save_token_login(token)
-    `echo -n "#{token}" > #{TOKEN_LOGIN_FILE}`
   end
 
   def self.read_token_login
-    if File.exist?(TOKEN_LOGIN_FILE)
-      `cat #{TOKEN_LOGIN_FILE}`
-    end
   end
 
   def self.save_token_guest(token)
-    `echo "#{token}" > #{TOKEN_GUEST_FILE}`
   end
 
   def self.read_token_guest
-    if File.exist?(TOKEN_GUEST_FILE)
-      `cat #{TOKEN_GUEST_FILE}`
-    end
   end
 
   def self.delete_token
-    `rm #{TOKEN_GUEST_FILE}`
   end
 end
 
@@ -66,13 +55,13 @@ def add_user(_client, obj = nil)
   
   return DEFAULT_ERROR_RES.clone unless obj && obj.is_a?(Hash)
   
-  data = obj
+  data = obj['data']
   
   return GUEST.add_guest(data['username']) if obj['login_as_guest']
   
-  return DEFAULT_MISSING_PARAM.clone unless data['realname'].is_a?(String) && !data['realname'].empty?
+  return DEFAULT_MISSING_PARAM.clone if data['realname'].nil? || data['realname'].empty?
   
-  existing_user = LOGIN.select(['realname'], ['realname = ?'], [data['realname']]).first
+  existing_user = LOGIN.select(['realname'], [data['realname']]).first
   if existing_user
     puts "User already present (#{data['realname']})".yellow
     return { 'status' => 'user_manager: user with same login_name already in database', 'success' => 'false' }
@@ -94,10 +83,10 @@ def add_user(_client, obj = nil)
   values['id'] = max['max'].to_i + 1
   values['token'] = Digest::SHA256.hexdigest(values['realname'])
   
-  LOGIN.addValues(values.values, values.keys, ['?'] * values.keys.size)
+  LOGIN.addValues(values.values, values.keys)
   
   puts "Success! User token: #{values['token']}".green
-  { 'status' => 'success', 'success' => 'true', 'token' => values['token'] }
+  { 'status' => 'success', 'success' => 'true', 'token' => values['token'] }.merge data
 end
 
 def login_user(client, obj)
@@ -111,11 +100,11 @@ def login_user(client, obj)
   end
 
   r = nil
-  if (usr = LOGIN.select ['realname'], ['realname = ?'], [data['realname']])[0]
-    LOGIN.valueManipulation 'realname', data['realname'], ['?'] => [data['realname']]
-    return usr.merge({'status' => 'success', 'success' => 'true'})
+  if (usr = LOGIN.select ['realname'], [data['realname']])[0]
+    LOGIN.valueManipulation 'realname', data['realname'], nil #COMPLETE PLEASE
+    return usr[0].merge({'status' => 'success', 'success' => 'true'})
   end rescue r
-  return {'status' => 'user_manager: bad request', 'success' => 'false'} unless r.nil?
+  return {'status' => "user_manager: bad request #{r.to_s}", 'success' => 'false'} if r
   return add_user(client, obj) if obj['do_create']
   
   {'service' => 'user_manager', 'status' => 'user not found', 'success' => 'false'}
@@ -125,13 +114,14 @@ end
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
   token = TokenManager.read_token_guest
-  status = GUEST.del_guest_by_token(token)
-  if status && status['success'] == 'true'
-    TokenManager.delete_token
-    return status
-  else
-    return status
-  end
+  {"status"=>"lol", "success"=>"true"}
+  # status = GUEST.del_guest_by_token(token)
+  # if status && status['success'] == 'true'
+  #   TokenManager.delete_token
+  #   return status
+  # else
+  #   return status
+  # end
 end
 
 def get_user(_client, obj = nil)
@@ -169,12 +159,11 @@ def get_user(_client, obj = nil)
       if p  && p['token'] == "token"
         token = TokenManager.read_token_guest
         status = GUEST.get_token_name(token)
-        #senno login
         puts "get_user #{status}".green
         return status
       end
       if !cols.empty?
-        users = LOGIN.select(cols, ['?'] * cols.size, keys)
+        users = LOGIN.select(cols, keys)
         lst = lst + users
       end
     end
@@ -189,8 +178,7 @@ def get_user(_client, obj = nil)
 end
 
 def update_user(_client, obj = nil)
-  puts "\n\n\n\nhahahahhahahahahahah\n\n\n\n".yellow
-  puts 'update_user called' if DEBUG_MODE
+  puts 'update_user called'.green if DEBUG_MODE
 
   r = nil
   res = DEFAULT_ERROR_RES.clone
@@ -199,7 +187,7 @@ def update_user(_client, obj = nil)
   return { 'service' => 'user_manager', 'status' => 'Invalid login name change request', 'success' => 'false' } if params.include? 'display_name'
 
   usr = begin
-    (LOGIN.select ['display_name'], ['?'], [lname])[0]
+    (LOGIN.select ['display_name'], [lname])[0]
   rescue StandardError
     r
   end
@@ -221,9 +209,10 @@ def user_manager(client, _server)
   res = DEFAULT_ERROR_RES.clone
   t = select [client], [], [], 20 # waits for client, a few seconds
   return if t.nil? || t[0].empty? || client.closed?
-
+  
   msg = client.read_nonblock Ports::MAX_MSG_LEN
   bobj = JSON.parse msg
+  puts "Content:".yellow, bobj
   # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
   begin
     res = case bobj['method'].to_s
@@ -237,7 +226,6 @@ def user_manager(client, _server)
       login_user client, bobj
     when 'logout_user'
       logout_user client, bobj
-      exit
     else
       {'service' => 'user_manager', 'status' => "unknown method: #{bobj['method'].to_s}", 'success' => 'false'}
     end

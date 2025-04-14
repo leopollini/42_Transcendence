@@ -18,9 +18,9 @@ all: prep_dirs #stop_containers
 	make -C ./srcs/common_tools/ all
 	@echo -e "$(YELLOW)Avvio container Docker...$(NC)"; \
 	if [ "$${DETATCH}" = "true" ]; then \
-		sudo docker-compose -f ./docker-compose.yml up -d; \
+		docker-compose -f ./docker-compose.yml up -d; \
 	else \
-		sudo docker-compose -f ./docker-compose.yml up; \
+		docker-compose -f ./docker-compose.yml up; \
 	fi
 
 $(CONTAINERS): prep_dirs

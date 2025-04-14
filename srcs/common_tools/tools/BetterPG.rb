@@ -101,7 +101,8 @@ module BetterPG
     end
 
     def select_specific(cols, key, val)
-      t = (better_return exec("SELECT #{cols.join ' '} FROM #{@name} WHERE #{key} = '#{val}'"))
+      cols = @columns if cols.size == 0
+      t = (better_return exec("SELECT #{(@columns - ['token'])} FROM #{@name} WHERE #{key} = '#{val}'"))
       better_return t
     end
 

@@ -54,7 +54,8 @@ function popupHandling(popup)
 
 function get_data()
 {
-    let data = JSON.stringify({"params" :{'token' : 'token'}});
+    // let data = JSON.stringify({"params" :{'token' : 'token'}});
+    let data = JSON.stringify({});
     fetch("http://localhost:8008", {
         method: "get_user",
         body: data

@@ -40,7 +40,8 @@ class GuestsList
       'service' => 'user_manager',
       'status' => 'success',
       'success' => 'true',
-      'username' => username
+      'username' => username,
+      'token' => token
     }
   end
   def del_guest(username)
@@ -66,9 +67,10 @@ class GuestsList
   end
   def get_token_name(token)
     unless @guests.empty?
+      return {'statuts' => 'bad token', 'success' => 'false'} if token.nil?
       @guests[1..].each do |entry|
         next if entry.nil?
-        if entry['token'].strip == token.strip
+        if entry['token'].to_s.strip == token.to_s.strip
           return {
             'status' => 'success',
             'success' => 'true',
@@ -90,7 +92,7 @@ class GuestsList
     unless @guests.empty?
       @guests[1..].each_with_index do |entry, index|
         next if entry.nil?
-        if entry['token'].strip == token.strip
+        if entry['token'].to_s.strip == token.to_s.strip
           @guests.delete_at(index + 1)
           @index.delete token
           return {'service' => 'user_manager', 'status' => "guest deleted succesfully", 'success' => 'true'}

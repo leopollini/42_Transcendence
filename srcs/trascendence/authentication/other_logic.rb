@@ -42,6 +42,6 @@ module Other_logic
       },
       do_create: true
     }
-    #SimpleServer.method_req("login_user", payload)
+    SimpleServer.method_req("login_user", payload)
   end
 end
