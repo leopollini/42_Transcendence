@@ -29,11 +29,11 @@ class ChatService < WEBrick::Websocket::Servlet
     begin
       data = JSON.parse text
         puts "####", text
-      puts "request: #{data['type']}"
+      puts "request: #{data['type'].to_s}"
 
       target = data["to"].to_s
 
-      case data["type"]
+      case data["type"].to_s
       when "join"
         @username = data["username"].to_s
         ChatStore.joined @username, sock
@@ -43,17 +43,17 @@ class ChatService < WEBrick::Websocket::Servlet
         message = {
           "date"    => Time.now.iso8601,
           "from"    => @username,
-          "content" => data["content"]
+          "content" => data["content"].to_s
         }
-        if data["chat"] == "general"
+        if data["chat"].to_s == "general"
           message['to'] = 'general'
           ChatStore.broadcast message, 'message'
 
-        elsif data["chat"] == "private"
+        elsif data["chat"].to_s == "private"
           unless ChatStore.clients[@username].friends.include? target
             return ChatStore.clients[@username].send_sys "The message could not be delivered" 
           end
-          message["to"] = target
+          message["to"].to_s = target
           ChatStore.clients[target].send_me message, 'private_message'
           ChatStore.clients[@username].send_me message, 'private_message'
         end
@@ -63,7 +63,7 @@ class ChatService < WEBrick::Websocket::Servlet
 
       when "friend_response"
         #in this case target is whoever was @username who sent the request
-        ChatStore.friend_res target, @username, data['accepted']
+        ChatStore.friend_res target, @username, data['accepted'].to_s
 
       when "remove_friend"
         ChatStore.remove_friend target, @username
@@ -79,10 +79,10 @@ class ChatService < WEBrick::Websocket::Servlet
         ChatStore.clients[@username].unblock_user target
 
       when 'match_request'
-        ChatStore.clients[data['to']].send_me({'from' => @username}, "match_request")
+        ChatStore.clients[data['to'].to_s].send_me({'from' => @username}, "match_request")
 
       when 'match_response'
-        ChatStore.clients[data['to']].send_me({'accepted' => data['accepted']}, "match_response")
+        ChatStore.clients[data['to'].to_s].send_me({'accepted' => data['accepted'].to_s}, "match_response")
 
       when 'get_online_users'
         ChatStore.clients[@username].send_me({'users' => ChatStore.clients.filter{|c| c.alive?}}, 'online_users_list')

@@ -90,7 +90,6 @@ clean:
 		echo -e "${RED}Nessun container Docker trovato, skippo la parte Docker.${NC}"; \
 	fi
 	# Destroy all directories
-	rm -rf /data/wordpress
 	@echo -e "${GREEN}pulizia base completata	${NC}"
 
 fclean: clean

@@ -28,7 +28,6 @@ LOGIN = BetterPG::SimplePG.new 'users',
                                ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
                                 'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT']
 
-
 GUEST = GuestsList.new
 # REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image]
 
@@ -56,12 +55,9 @@ def logout_user(client, obj)
   username = obj["username"]
   if username
     status = GUEST.del_guest(username)
-    if status && status['success'] == 'true'
-      return status
-    else
-      return status
-    end
+    return status
   end
+  {"status"=>"success", "success"=>"true"}
 end
 
 def get_user(_client, obj = nil)

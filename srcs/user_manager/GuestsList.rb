@@ -49,7 +49,7 @@ class GuestsList
   
   def del_guest(username)
     index = @index[username]
-    return { 'status' => 'user not found', 'success' => 'false' } unless index
+    return { 'status' => 'user not found', 'success' => 'false' } if index.nil?
   
     @guests[index] = nil
     @index.delete(username)
