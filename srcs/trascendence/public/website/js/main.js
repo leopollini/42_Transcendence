@@ -1,5 +1,5 @@
 import Login, { addLoginPageHandlers } from "./pages/profile/login.js";
-import Modes, {addModesPageHandlers} from "./pages/modes.js";
+import Modes, { addModesPageHandlers } from "./pages/modes.js";
 import Tournament, { addTournamentPageHandlers } from "./pages/tournament/tournament.js";
 import PongGame from "./pages/pong_game.js";
 import ClassicPongLobbyRoom, { handleClassicPongLobby, addClassicPongLobbyPageHandlers } from "./pages/classic_pong_lobby.js";
@@ -15,14 +15,14 @@ import Settings, { addSettingsPageHandlers } from "./pages/profile/settings.js";
 import { userName } from "./pages/user_data.js";
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
-import { GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers} from "./pages/game_statistics.js";
+import { GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers } from "./pages/game_statistics.js";
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import {restore_user } from "./login/user.js";
-import {check_valid_operation, remove_all, path_error} from "./error_main.js";
+import { restore_user, user } from "./login/user.js";
+import { check_valid_operation, remove_all, path_error } from "./error_main.js";
 import { showInfoModal } from "./modal.js";
-import {checkAuthentication} from "./login/login_logic.js";
+import { checkAuthentication } from "./login/login_logic.js";
 let buttonTitle;
 let winner;
 let players;
@@ -53,21 +53,19 @@ const routes = {
 };
 
 export let current_user = null;
+export let user_name = null;
 
-export async function initUser()
-{
+export async function initUser() {
     if (window.location.pathname !== "/")
         current_user = await restore_user();
 }
 
 
-export function update_user(user)
-{
-    current_user = user;
+export function update_name(name) {
+    user_name = name;
 }
 
-export function nullify_user()
-{
+export function nullify_user() {
     current_user = null;
 }
 
@@ -81,12 +79,11 @@ export const navigate = async (path, title = "", lobbyPlayers) => {
 
 function createPlayersArray(numPlayers) {
     let players = [];
-    for (let i = 1; i <= numPlayers; i++)
-    {
+    for (let i = 1; i <= numPlayers; i++) {
         if (i === 1)
             players.push(userName);
         else
-        players.push(`Player ${i}`);
+            players.push(`Player ${i}`);
     }
     return players;
 }
@@ -95,8 +92,7 @@ function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
 
-export default function No_Page()
-{
+export default function No_Page() {
     return `
       <div class="error-container">
         <h1>404 - Page not found</h1>
@@ -107,22 +103,24 @@ export default function No_Page()
 
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
+
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
     let let_me_in = await checkAuthentication(path);
-    if (let_me_in === 1)
-    {
+    if (path !== '/' && !user_name) {
+        update_name(sessionStorage.getItem("user_name"));
+        sessionStorage.removeItem("user_name");
+    }
+    if (let_me_in === 1) {
         navigate("/", "Home");
         return;
     }
-    else if (let_me_in === -1)
-    {
+    else if (let_me_in === -1) {
         navigate("/modes", "Return to Game Mode");
         return;
     }
-    if (!component)
-    {
+    if (!component) {
         app.innerHTML = No_Page();
         return;
     }
@@ -132,18 +130,17 @@ const loadContent = async () => {
         await initUser();
     let playerNames;
     let numPlayers = 4
-    if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
+    if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8"
         || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
         numPlayers = parseInt(buttonTitle.replace(/\D/g, ""), 10);
     if (!players)
         players = createPlayersArray(numPlayers);
     //console.log("Players? " +players);
-    playerNames = players;  
+    playerNames = players;
     //console.log("path => " + path);
     if (path !== "/" && path !== "/classic" && path !== "/forza4/game")
         remove_all(1, 1);
-    if (component)
-    {
+    if (component) {
         app.innerHTML = component();//sicuro se lo purifichi blocca codici
         if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
             //console.log("playerzzzz2: " + players);
@@ -152,8 +149,7 @@ const loadContent = async () => {
         }
         else
             restoreBackground();
-        switch (path)
-        {
+        switch (path) {
             case "/":
                 addLoginPageHandlers();
                 break;
@@ -196,7 +192,7 @@ const loadContent = async () => {
                     backToBracket(winner);
                 }
                 else
-                    drawBracket(players);          
+                    drawBracket(players);
                 break;
             case "/tournament/roundrobin":
                 addRoundRobinPageHandlers();
@@ -228,7 +224,7 @@ const loadContent = async () => {
                 gameUserStatisticsPageHandlers();
                 break;
             case "/forza4/findopponent":
-                handleForza4Lobby(); 
+                handleForza4Lobby();
                 addForza4LobbyPageHandlers();
                 break;
             case "/forza4/game":
@@ -249,18 +245,16 @@ const loadContent = async () => {
     }
 };
 
-    // Handling "Forward" and "Backward" browser buttons
+// Handling "Forward" and "Backward" browser buttons
 window.addEventListener("popstate", () => {
     loadContent();
 });
-    
 
-window.addEventListener("popstate", () =>
-{
-    if (sessionStorage.getItem("no") === "true")
-    {
+
+window.addEventListener("popstate", () => {
+    if (sessionStorage.getItem("no") === "true") {
         remove_all(1, 1);
-        showInfoModal("you successfully exited the game", () => {});
+        showInfoModal("you successfully exited the game", () => { });
         return;
     }
 });
@@ -273,6 +267,12 @@ function initChat() {
     new ChatApp();
 }
 
+window.addEventListener('storage', (event) =>
+{
+    if (event.key === "already in" || event.key === "session opened") {
+        console.log("value changed to = ", event.newValue);
+    }
+});
 // Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
 
@@ -283,11 +283,11 @@ window.addEventListener('keydown', function (e) {
         isRefresh = true;
 });
 
-window.addEventListener('beforeunload', () =>
-{
-    if (sessionStorage.getItem('already in') === '1')
-    {
-        if (!isRefresh && window.location.pathname !== "/")
-            remove_all(0, 0 , 1);
+window.addEventListener('beforeunload', () => {
+    if (sessionStorage.getItem('already in') === '1') {
+        sessionStorage.setItem("user_name", user_name);
+        if (!isRefresh && window.location.pathname !== "/") {
+            remove_all(0, 0, 1);
+        }
     }
 });

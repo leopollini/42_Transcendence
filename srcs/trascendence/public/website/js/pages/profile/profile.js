@@ -88,7 +88,7 @@ function updateLogin(current_user)
   })
   .catch(error =>
   {
-    console.error("Error with update_user:", error);
+    showInfoModal("Error with update_user:", error);
   });
 }
 
@@ -110,7 +110,7 @@ function updateGuest(current_user)
   })
   .catch(error =>
   {
-    console.error("Error with update_user:", error);
+    showInfoModal("Error with update_user:", error);
   });
 }
 

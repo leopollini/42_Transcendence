@@ -1,3 +1,4 @@
+import { user_name } from "../main.js";
 import { showInfoModal } from "../modal.js";
 
 export async function validateUploadedImage(file)
@@ -67,7 +68,7 @@ export function free_users()
 {
     try
     {
-        let data = JSON.stringify({"username" : sessionStorage.getItem("user_name")});
+        let data = JSON.stringify({"username" : user_name});
         fetch("http://localhost:8008",
         {
             method: "logout_user",
@@ -86,26 +87,20 @@ export function free_users()
                         showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
                 }
             }
-            if (data)
-            {
-                if (data.status === " (guest) does not exist")
-                    return;
-                if (data.status && data.success)
-                {
-                    if (data.status !== "success" && data.success !== "true")
-                        showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
-                }
-                else
-                    return;
-            }
         })
         .catch(error =>
         {
-            console.log("Error with fetch logout_user:", error);
+            remove_all(0, 0, 1);
+            if (window.location.pathname !== '/')
+                navigate("/", "home");
+            showInfoModal("Error with fetch logout_user:", error);
         });
     }
     catch (error)
     {
-        console.error("Error in logout_user:", error);
+        remove_all(0, 0, 1);
+        if (window.location.pathname !== '/')
+            navigate("/", "home");
+        showInfoModal("Error in logout_user:", error);
     }
 }

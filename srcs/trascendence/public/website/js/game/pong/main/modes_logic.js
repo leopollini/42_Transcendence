@@ -50,7 +50,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         });
     }
     else
-        console.error("profile icon not found!");
+        showInfoModal("profile icon not found!", () => {});
     if (history)
     {
         history.addEventListener("click", () => {
@@ -64,7 +64,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         });
     }
     else 
-        console.error("history icon not found!");
+        showInfoModal("history icon not found!", () => {});
     if (logout)
     {
         logout.addEventListener("click", () => {
@@ -78,5 +78,5 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         });
     }
     else 
-        console.error("logout icon not found!");
+        showInfoModal("logout icon not found!", () => {});
 }

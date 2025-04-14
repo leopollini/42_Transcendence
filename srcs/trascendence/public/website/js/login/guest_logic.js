@@ -1,4 +1,4 @@
-import { navigate, update_user } from "../main.js";
+import { navigate, update_name} from "../main.js";
 import { user, profile} from "./user.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInputModal, showInfoModal } from "../modal.js"
@@ -73,8 +73,7 @@ function update_guest(curr_guest)
     if (data.status === "success" && data.success === "true")
     {
       remove_all(1, 1);
-      sessionStorage.setItem("user_name", guest_user.display_name);
-      update_user(guest_user);
+      update_name(guest_user.display_name);
       navigate("/modes", "Modalità di gioco");
     }
     else
@@ -85,11 +84,16 @@ function update_guest(curr_guest)
         showInfoModal("ERROR: Name already taken, try a different one", () => {});
       else
         showInfoModal("ERROR in LOGIN_USER: An error has occured(\"" + data.status + "\")", () => {});
+      if (window.location.pathname !== '/')
+        navigate("/", "home");
       return;
     }
   })
   .catch(error =>
   {
-    console.error("Error with login_user:", error);
+    remove_all(0, 0, 1);
+    if (window.location.pathname !== '/')
+      navigate("/", "home");
+    showInfoModal("Error with login_user:", error);
   })
 }

@@ -1,4 +1,4 @@
-import { current_user, navigate, nullify_user } from "../main.js";
+import { current_user, navigate, nullify_user, user_name } from "../main.js";
 import {updateProfileUI} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../error_main.js";
@@ -52,11 +52,11 @@ export async function restore_user()
         })
 
         const result = await response.json();
-        console.log("(get_user)\nData login = ", result);
+        // console.log("(get_user)\nData login = ", result);
         if (result)
         {
             let name;
-            let username = sessionStorage.getItem("user_name");
+            let username = user_name;
             if (Array.isArray(result.guest))
             {
                 name = result.guest.filter(guest => guest !== null)
@@ -81,17 +81,26 @@ export async function restore_user()
             else
             {
                 remove_all(0, 0, 1);
+                if (window.location.pathname !== '/')
+                    navigate("/", "home");
                 showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => {});
-                navigate("/", "home");
                 return null;
             }
         }
         else
+        {
+            remove_all(0, 0, 1);
+            if (window.location.pathname !== '/')
+                navigate("/", "home");
             showInfoModal("no result??", () => {});
+        }
     }
     catch (error)
     {
-        console.error("Error with get_user:", error);
+        remove_all(0, 0, 1);
+        if (window.location.pathname !== '/')
+            navigate("/", "home");
+        showInfoModal("Error with get_user:", error);
         return null;
     }
 }

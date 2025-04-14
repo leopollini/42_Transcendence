@@ -1,4 +1,4 @@
-import { navigate} from "../main.js";
+import { navigate, update_name} from "../main.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../error_main.js";
@@ -17,7 +17,6 @@ async function get_data()
     let name;
     if (result.user && Array.isArray(result.user))
       name = result.user.find(user => user.entered === 1);
-    console.log("name: ", name);
     if (name)
     {
       const user = name;
@@ -31,22 +30,25 @@ async function get_data()
         type: "login"
       };
       remove_all(1, 1);
-      sessionStorage.setItem("user_name", new_user.realname);
+      update_name(new_user.realname);
       change_name(new_user.login_name);
       update_image(new_user.image);
-      update_user(new_user);
       return ;
     }
     else
     {
-      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => {});;
+      if (window.location.pathname !== '/')
+        navigate("/", "home");
       remove_all(0, 0, 1);
-      navigate("/", "login");
+      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => {});;
       return;
     }
   }
   catch (error)
   {
+    if (window.location.pathname !== '/')
+      navigate("/", "home");
+    remove_all(0, 0, 1);
     showInfoModal("Error during Login in get_user: " + error.message, () => {});
     return;
   }
