@@ -40,18 +40,14 @@ export const addLoginPageHandlers = () => {
 function handle_access(loginButton, guestButton)
 {
     loginButton.addEventListener("click", () => {
-        if (localStorage.getItem('popup opened') === 'true')
-            showInfoModal("popup already open finish authentication before continuing", () => {});
-        else if (sessionStorage.getItem('already in') === '0'
+        if (sessionStorage.getItem('already in') === '0'
         && localStorage.getItem('session opened') === '1')
             showInfoModal("You've already logged in!", () => {});
         else
             performLogin();
     });
     guestButton.addEventListener("click", () => {
-        if (localStorage.getItem('popup opened') === 'true')
-            showInfoModal("Authenticating in progress....\nPlease wait.", () => {});
-        else if (sessionStorage.getItem('already in') === '0'
+        if (sessionStorage.getItem('already in') === '0'
         && localStorage.getItem('session opened') === '1')
             showInfoModal("You've already logged in!", () => {});
         else

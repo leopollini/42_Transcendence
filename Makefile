@@ -9,8 +9,15 @@ YELLOW=\033[0;33m
 BLUE=\033[0;34m
 NC=\033[0m
 
+RED=\033[0;31m
+GREEN=\033[0;32m
+YELLOW=\033[1;33m
+NC=\033[0m
+
 all: prep_dirs #stop_containers
 	@clear
+	@echo -e "$(RED)Rimozione del volume per evitare conflitti...$(NC)";
+	@sudo docker volume rm ct;
 	@echo -e "$(YELLOW)configurazione server https locale$(NC)"
 	@chmod +x setup/setup_online_website.sh
 	@sudo ./setup/setup_online_website.sh

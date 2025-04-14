@@ -26,77 +26,18 @@ PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
                                ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'token TEXT']
+                                'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT']
 
 
 GUEST = GuestsList.new
 # REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image]
-
-class TokenManager
-
-  def self.save_token_login(token)
-  end
-
-  def self.read_token_login
-  end
-
-  def self.save_token_guest(token)
-  end
-
-  def self.read_token_guest
-  end
-
-  def self.delete_token
-  end
-end
-
-def add_user(_client, obj = nil)
-  puts 'add_user called'.green if DEBUG_MODE
-  
-  return DEFAULT_ERROR_RES.clone unless obj && obj.is_a?(Hash)
-  
-  data = obj['data']
-  
-  return GUEST.add_guest(data['username']) if obj['login_as_guest']
-  
-  return DEFAULT_MISSING_PARAM.clone if data['realname'].nil? || data['realname'].empty?
-  
-  existing_user = LOGIN.select(['realname'], [data['realname']]).first
-  if existing_user
-    puts "User already present (#{data['realname']})".yellow
-    return { 'status' => 'user_manager: user with same login_name already in database', 'success' => 'false' }
-  end
-  
-  begin
-    max = LOGIN.exec('SELECT MAX(id) AS max FROM users', []).first || { 'max' => 0 }
-  rescue StandardError
-    max = { 'max' => 0 }
-  end
-  
-  fields = LOGIN.getColumns
-  values = {}
-  
-  fields.each do |f|
-    values[f] = data[f].to_s.strip if data[f].is_a?(String)
-  end
-  
-  values['id'] = max['max'].to_i + 1
-  values['token'] = Digest::SHA256.hexdigest(values['realname'])
-  
-  LOGIN.addValues(values.values, values.keys)
-  
-  puts "Success! User token: #{values['token']}".green
-  { 'status' => 'success', 'success' => 'true', 'token' => values['token'] }.merge data
-end
 
 def login_user(client, obj)
   puts "login_user called".green
   data = obj['data']
 
   if obj['login_as_guest'] == 'true' && data.has_key?('image') && data.has_key?('username')
-    token = Digest::SHA256.hexdigest(SecureRandom.alphanumeric(8))
-    TokenManager.save_token_guest("#{token}")
-    return GUEST.add_guest(data, token)
+    return GUEST.add_guest(data)
   end
 
   r = nil
@@ -105,23 +46,22 @@ def login_user(client, obj)
     return usr[0].merge({'status' => 'success', 'success' => 'true'})
   end rescue r
   return {'status' => "user_manager: bad request #{r.to_s}", 'success' => 'false'} if r
-  return add_user(client, obj) if obj['do_create']
+  \\return add_user(client, obj) if obj['do_create']
   
   {'service' => 'user_manager', 'status' => 'user not found', 'success' => 'false'}
 end
 
-
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
-  token = TokenManager.read_token_guest
-  {"status"=>"lol", "success"=>"true"}
-  # status = GUEST.del_guest_by_token(token)
-  # if status && status['success'] == 'true'
-  #   TokenManager.delete_token
-  #   return status
-  # else
-  #   return status
-  # end
+  username = obj["username"]
+  if username
+    status = GUEST.del_guest(username)
+    if status && status['success'] == 'true'
+      return status
+    else
+      return status
+    end
+  end
 end
 
 def get_user(_client, obj = nil)
@@ -216,8 +156,6 @@ def user_manager(client, _server)
   # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
   begin
     res = case bobj['method'].to_s
-    when 'add_user'
-      add_user client, bobj
     when 'get_user'
       get_user client, bobj
     when 'update_user'

@@ -1,6 +1,7 @@
-import { navigate, nullify_user } from "../main.js";
+import { current_user, navigate, nullify_user } from "../main.js";
 import {updateProfileUI} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
+import { remove_all } from "../error_main.js";
 
 export class user {
     constructor(image, name, login_name, email, bio) {
@@ -42,7 +43,7 @@ export async function restore_user()
     {
         if (window.location.pathname === '/' || (sessionStorage.getItem('already in') !== '1' && localStorage.getItem('session opened', 0) !== '1'))
             return null;
-        // let data = JSON.stringify({ "params" : [{'token' : 'token'}]});
+
         let data = JSON.stringify({});
         const response = await fetch("http://localhost:8008",
         {
@@ -51,28 +52,36 @@ export async function restore_user()
         })
 
         const result = await response.json();
-        //console.log("(get_user)\nData login = ", data);
+        console.log("(get_user)\nData login = ", result);
         if (result)
         {
-            if (result.success === "true" && result.status === "success")
+            let name;
+            let username = sessionStorage.getItem("user_name");
+            if (Array.isArray(result.guest))
+            {
+                name = result.guest.filter(guest => guest !== null)
+                .find(guest => guest.username === username);
+            }
+            if (!name && Array.isArray(result.user))
+                name = result.user.find(user => user.realname === username);
+            if (name)
             {
                 const ref_user = new profile(
-                    "",
-                    result.username,
-                    "",
-                    result.bio,
-                    result.image,
-                    result.type
+                    name.email,
+                    name.username,
+                    name.realname,
+                    name.bio,
+                    name.image,
+                    name.type
                 );
-                sessionStorage.setItem('already in', 1);
-                localStorage.setItem('session opened',1);
+                remove_all(1, 1);
                 updateProfileUI(ref_user);
                 return ref_user;
             }
             else
             {
+                remove_all(0, 0, 1);
                 showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => {});
-                nullify_user();
                 navigate("/", "home");
                 return null;
             }
