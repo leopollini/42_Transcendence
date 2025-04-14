@@ -1,6 +1,7 @@
 import { free_users } from "./security/security.js";
 import { nullify_user, navigate, current_user, update_name} from "./main.js";
 import { showInfoModal } from "./modal.js";
+import Bracket from "./pages/tournament/bracket.js";
 
 
 function reset_value()

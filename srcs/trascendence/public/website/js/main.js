@@ -8,7 +8,7 @@ import Customize, { addCustomizeGame } from "./pages/profile/customize.js";
 import Roundrobin, { addRoundRobinPageHandlers } from "./pages/tournament/roundrobin.js";
 import RobinRanking, { addRobinRankingPageHandlers, robinDraw, assignPointsToPlayer } from "./pages/tournament/robindraw.js";
 import LobbyRoom, { addLobbyPageHandlers, handleLobby } from "./pages/tournament/tournament_lobby.js";
-import Bracket, { addBracketPageHandlers, drawBracket, backToBracket, resetBracketState } from "./pages/tournament/bracket.js";
+import Bracket, { addBracketPageHandlers, drawBracket, backToBracket, resetBracketState, get_bracket } from "./pages/tournament/bracket.js";
 import { initializeGameCanvas } from "./game/pong/main/handling_Canvas.js";
 import Profile, { profileHandler } from "./pages/profile/profile.js";
 import Settings, { addSettingsPageHandlers } from "./pages/profile/settings.js";
@@ -54,10 +54,13 @@ const routes = {
 
 export let current_user = null;
 export let user_name = null;
-
+export let customize = null;
+export let roundrobin = null
 export async function initUser() {
-    if (window.location.pathname !== "/")
+    if (window.location.pathname !== "/") {
         current_user = await restore_user();
+        current_user.type = "login";
+    }
 }
 
 
@@ -103,7 +106,6 @@ export default function No_Page() {
 
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
-
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
@@ -157,7 +159,7 @@ const loadContent = async () => {
                 profileHandler();
                 break;
             case "/classic":
-                sessionStorage.setItem("no", true);
+                sessionStorage.setItem("in_game", true);
                 break;
             case "/classic/lobby":
                 addClassicPongLobbyPageHandlers();
@@ -229,7 +231,7 @@ const loadContent = async () => {
                 break;
             case "/forza4/game":
                 startForza4Game(players);
-                sessionStorage.setItem("no", true);
+                sessionStorage.setItem("in_game", true);
                 break;
             default:
                 break;
@@ -252,7 +254,7 @@ window.addEventListener("popstate", () => {
 
 
 window.addEventListener("popstate", () => {
-    if (sessionStorage.getItem("no") === "true") {
+    if (sessionStorage.getItem("in_game") === "true") {
         remove_all(1, 1);
         showInfoModal("you successfully exited the game", () => { });
         return;
@@ -267,19 +269,13 @@ function initChat() {
     new ChatApp();
 }
 
-window.addEventListener('storage', (event) =>
-{
-    if (event.key === "already in" || event.key === "session opened") {
-        console.log("value changed to = ", event.newValue);
-    }
-});
 // Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
 
 let isRefresh = false;
 
 window.addEventListener('keydown', function (e) {
-    if ((e.key === 'F5') || (e.ctrlKey && e.key === 'r'))
+    if (window.location.pathname !== '/' && ((e.key === 'F5') || (e.ctrlKey && e.key === 'r')))
         isRefresh = true;
 });
 
