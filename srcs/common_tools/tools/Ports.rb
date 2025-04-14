@@ -19,7 +19,8 @@ module Ports
     'get_user' => ['user_manager', 7080, 1],
     'update_user' => ['user_manager', 7080, 1],
     'login_user' => ['user_manager', 7080, 0],
-    'logout_user' => ['user_manager', 7080, 1],
+    'logout_user' => ['user_manager', 7080, 2], # CALLED BY CHAT AT LOGOUT
+    'get_user_by_token' => ['user_manager', 7080, 1]
     
     'chat' => ['chat', 6087, 1],
     'broadcast' => ['internal_chat_support', 6088, 1],

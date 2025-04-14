@@ -87,7 +87,7 @@ module BetterPG
       end
     end
 
-    def better_return(obj = [])
+    def better_return(obj = [], hide_token = true)
       r = nil
       reslst = []
       return [] if obj.nil?
@@ -97,13 +97,16 @@ module BetterPG
       rescue StandardError
         r
       end
+      reslst.slice! ['token'] if hide_token
       reslst
     end
 
-    def select_specific(cols, key, val)
+    def select_specific(key, val, cols hide_token = true)
       cols = @columns if cols.size == 0
-      t = (better_return exec("SELECT #{(@columns - ['token'])} FROM #{@name} WHERE #{key} = '#{val}'"))
-      better_return t
+      t = (better_return exec("SELECT #{@columns} FROM #{@name} WHERE #{key} = '#{val}'"))
+      sel = better_return t, hide_token
+      return nil if sel.empty?
+      sel[0]
     end
 
     # perform select for data fetching
@@ -112,7 +115,7 @@ module BetterPG
 
       req = []
       begin
-        req = ['SELECT ' + (@columns - ['token']).join(', ') + ' FROM', @name]
+        req = ['SELECT ' + @columns.join(', ') + ' FROM', @name]
         t = []
         keys.each_with_index do |k, i|
           t.append cols[i] + "='" + k.to_s + "'" if i < cols.count && cols[i] && k && !k.to_s.empty?
@@ -147,10 +150,11 @@ module BetterPG
       end
     end
 
-    def addValues(vals = [], format = [])
+    def addValues(content)
+      content.slice! @columns
       format = @columns[0, vals.size] if format == []
-      exec 'INSERT INTO', @name, (format.size != 0 ? '(' + format.join(', ') + ')' : ''), 'VALUES',
-           "('" + vals.join("', '") + "')"
+      exec 'INSERT INTO', @name, (content.keys.size != 0 ? '(' + content.keys.join(', ') + ')' : ''), 'VALUES',
+           "('" + content.values.join("', '") + "')"
       puts 'Added ' + vals.to_s + ' as ' + format.to_s + ' to ' + @name
     end
 
@@ -158,6 +162,7 @@ module BetterPG
     def updateValue(key = '', val = '', set = {})
       req = ['UPDATE', @name, 'SET']
       t = []
+      set.slice! @columns
       set.each do |k, v|
         t << "#{k} = '#{v}'" if k && v
       end

@@ -38,7 +38,7 @@ def save_pong(obj)
   # obj['duration'] = Time.now.to_i - obj['begin_time'].to_i
   obj['duration'] = obj['begin_time']
   obj = obj.slice(*(obj.keys & GAMES_PONG.getColumns))
-  GAMES_PONG.addValues obj.values, obj.keys
+  GAMES_PONG.addValues obj
 
   puts 'game saved!'
   return DEFAULT_SUCCESS_RES.clone
@@ -58,7 +58,7 @@ def save_f4(obj)
   # obj['duration'] = Time.now.to_i - obj['begin_time'].to_i
   obj['duration'] = obj['begin_time']
   obj = obj.slice(*(obj.keys & GAMES_F4.getColumns))
-  GAMES_F4.addValues obj.values, obj.keys
+  GAMES_F4.addValues obj
 
   puts 'game saved!'
   return DEFAULT_SUCCESS_RES.clone

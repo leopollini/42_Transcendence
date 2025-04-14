@@ -12,6 +12,7 @@ class GuestsList
   def initialize()
     @guests = Array.new(MAX_GUEST_COUNT + 1)
     @index = {}
+    @counter_index = 0
   end
 
   def add_guest(data)
@@ -19,31 +20,29 @@ class GuestsList
     return DEFAULT_MISSING_PARAM.clone unless username.is_a?(String)
     return { 'status' => 'username already in use', 'success' => 'false' } if @index.key?(username)
   
-    index = @guests.find_index.with_index { |g, i| i > 0 && g.nil? }
+    i = @counter_index
+    @counter_index = (@counter_index + 1) % MAX_GUEST_COUNT
   
-    if index.nil?
-      oldest = @guests[1..].each_with_index.min_by { |g, i| g['created'] || Time.now.to_i }
-      index = oldest ? i + 1 : 1
-    end
+    @index.delete(@guests[i]['username']) if @guests[i]
   
-    @index.delete(@guests[index]['username']) if @guests[index]
-  
-    @guests[index] = {
+    @guests[i] = {
       'username' => username,
       'created' => Time.now.to_i,
       'deleted' => -1,
       'bio' => data['bio'].to_s,
       'image' => data['image'].to_s,
-      # 'token' => token
+      'token' = data['token']
     }
   
-    @index[username] = index
+    @index[username] = i
   
+  # TOKEN MANAGEMENT
     {
       'service' => 'user_manager',
       'status' => 'success',
       'success' => 'true',
-      'username' => username
+      'username' => username,
+      'token' = data['token']
     }
   end
   
@@ -55,15 +54,16 @@ class GuestsList
     @index.delete(username)
   
     {
-      'service' => 'user_manager',
-      'status' => 'guest deleted successfully',
+      'status' => 'success',
       'success' => 'true'
     }
   end
   
-  
   def get_all_guests()
-    @guests[1..].compact
+    t = @guests.clone
+    t.each do |guest|
+      guest.slice (guest.keys - ['token'])
+    end
   end
   
   def update_guest(username, new_data)
@@ -113,5 +113,9 @@ class GuestsList
       end
       return {'service' => 'user_manager', 'status' => " (guest) does not exist", 'success' => 'false'}
     end
+  end
+
+  def exists?(username)
+    @guest[@index[username]]['deleted'] == -1
   end
 end
