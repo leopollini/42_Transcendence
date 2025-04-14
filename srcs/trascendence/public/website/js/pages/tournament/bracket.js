@@ -70,7 +70,7 @@ function drawRectangle(x, y, width, height, player1, player2, color, ctx) {
     ctx.textAlign = 'center';
 
     const vsOffset = 1;
-    const playerOffset = 15;
+    const playerOffset = 5;
 
     ctx.font = '14px Liberty';
     ctx.textBaseline = 'bottom';

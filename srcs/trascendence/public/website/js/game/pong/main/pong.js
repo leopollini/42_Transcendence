@@ -301,6 +301,7 @@ export class PongGame {
 
     backToMenuButton.addEventListener("click", () => {
       sessionStorage.setItem("game ended", false);
+      sessionStorage.setItem("in_game", false);
       gameCanvas.style.display = "none";
       backToMenuButton.hidden = true;
       sessionStorage.setItem("winner", this.winner);

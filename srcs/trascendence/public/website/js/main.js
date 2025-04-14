@@ -141,6 +141,7 @@ const loadContent = async () => {
     //console.log("path => " + path);
     if (path !== "/classic" && path !== "/forza4/game")
         remove_all(1, 1);
+        
     if (component)
     {
         app.innerHTML = component();//sicuro se lo purifichi blocca codici
@@ -160,7 +161,7 @@ const loadContent = async () => {
                 profileHandler();
                 break;
             case "/classic":
-                sessionStorage.setItem("no", true);
+                sessionStorage.setItem("in_game", true);
                 break;
             case "/classic/lobby":
                 addClassicPongLobbyPageHandlers();
@@ -232,7 +233,7 @@ const loadContent = async () => {
                 break;
             case "/forza4/game":
                 startForza4Game(players);
-                sessionStorage.setItem("no", true);
+                sessionStorage.setItem("in_game", true);
                 break;
             default:
                 break;
@@ -256,9 +257,10 @@ window.addEventListener("popstate", () => {
 
 window.addEventListener("popstate", () =>
 {
-    if (sessionStorage.getItem("no") === "true")
+    if (sessionStorage.getItem("in_game") === "true")
     {
         remove_all(1, 1);
+        sessionStorage.setItem("in_game", false);
         showInfoModal("you successfully exited the game", () => {});
         return;
     }

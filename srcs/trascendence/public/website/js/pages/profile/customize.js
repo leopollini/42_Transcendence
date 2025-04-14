@@ -1,13 +1,16 @@
 import { navigate } from "../../main.js";
 import { pongCustomData } from "../../game/pong/data/game_global.js";
 
-
 let pongData;
 let previewCanvas;
 let ctx;
 let stars = [];
 const starCount = 30;
 
+let ballColorPicker;
+let paddleColorPicker;
+let ballTrailColorPicker;
+let wallsColorPicker;
 export default function Customize() {
   return `
     <h1 class="customize-title">Customize</h1>
@@ -212,10 +215,10 @@ function drawPreview() {
 
 export function addCustomizeGame() {
   const applyCustomization = document.getElementById("applyCustomization");
-  let ballColorPicker = document.getElementById("ballColorPicker");
-  let paddleColorPicker = document.getElementById("paddleColorPicker");
-  let ballTrailColorPicker = document.getElementById("ballTrailColorPicker");
-  let wallsColorPicker = document.getElementById("wallsColorPicker");
+  ballColorPicker = document.getElementById("ballColorPicker");
+  paddleColorPicker = document.getElementById("paddleColorPicker");
+  ballTrailColorPicker = document.getElementById("ballTrailColorPicker");
+  wallsColorPicker = document.getElementById("wallsColorPicker");
 
   let powerupCheckbox = document.getElementById("powerup-checkbox");
   let powerupSelected;
