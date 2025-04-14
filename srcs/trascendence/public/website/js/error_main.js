@@ -38,7 +38,7 @@ export function remove_all(session, already, all)
         nullify_user();
     }
     localStorage.clear();
-    sessionStorage.clear();
+    //sessionStorage.clear();
     localStorage.setItem('session opened', session);
     sessionStorage.setItem('already in', already);
     if (user_name && already === 1)
