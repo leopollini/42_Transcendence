@@ -21,8 +21,6 @@ export class profile {
         this.realname = realname
         this.bio = bio;
         this.image = image;
-        this.num_friends = 0;
-        this.myfriend = friend_list;
         this.type = type
     }
 }

@@ -33,9 +33,12 @@ module Other_logic
     request.session[:authenticated] = true
     request.session[:token] = token.token
 
-    get_user_data_from_oauth_provider(token.token)
+    realname = get_user_data_from_oauth_provider(token.token)
     response.content_type = 'application/json'
-    response.write({ success: true , message: "authenticated"}.to_json)
+    response.write({
+      success: true ,
+      message: "authenticated",
+      realname : realname}.to_json)
     response.finish
   end
 
@@ -45,7 +48,7 @@ module Other_logic
     request["Authorization"] = "Bearer #{token}"
 
     response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
-      http.request(request)
+    http.request(request)
     end
     if response.code.to_i == 200
       user_data = JSON.parse(response.body)
@@ -63,9 +66,9 @@ module Other_logic
         email: email,
         image: image,
         display_name: display_name
-      },
-      do_create: true
+      }
     }
     SimpleServer.method_req("login_user", payload)
+    return realname
   end
 end
