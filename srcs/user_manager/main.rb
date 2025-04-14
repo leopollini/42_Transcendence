@@ -46,7 +46,7 @@ def login_user(client, obj)
     return usr[0].merge({'status' => 'success', 'success' => 'true'})
   end rescue r
   return {'status' => "user_manager: bad request #{r.to_s}", 'success' => 'false'} if r
-  \\return add_user(client, obj) if obj['do_create']
+  # return add_user(client, obj) if obj['do_create']
   
   {'service' => 'user_manager', 'status' => 'user not found', 'success' => 'false'}
 end

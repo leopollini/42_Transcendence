@@ -33,7 +33,8 @@ class GuestsList
       'created' => Time.now.to_i,
       'deleted' => -1,
       'bio' => data['bio'].to_s,
-      'image' => data['image'].to_s
+      'image' => data['image'].to_s,
+      # 'token' => token
     }
   
     @index[username] = index
@@ -42,8 +43,7 @@ class GuestsList
       'service' => 'user_manager',
       'status' => 'success',
       'success' => 'true',
-      'username' => username,
-      'token' => token
+      'username' => username
     }
   end
   
