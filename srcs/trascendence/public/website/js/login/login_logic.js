@@ -37,18 +37,18 @@ async function get_data()
     }
     else
     {
+      remove_all(0, 0, 1);
       if (window.location.pathname !== '/')
         navigate("/", "home");
-      remove_all(0, 0, 1);
       showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => {});;
       return;
     }
   }
   catch (error)
   {
+    remove_all(0, 0, 1);
     if (window.location.pathname !== '/')
       navigate("/", "home");
-    remove_all(0, 0, 1);
     showInfoModal("Error during Login in get_user: " + error.message, () => {});
     return;
   }

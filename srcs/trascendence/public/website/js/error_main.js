@@ -1,5 +1,5 @@
 import { free_users } from "./security/security.js";
-import { nullify_user, navigate, current_user, update_name} from "./main.js";
+import { nullify_user, navigate, current_user, update_name, user_name} from "./main.js";
 import { showInfoModal } from "./modal.js";
 import Bracket from "./pages/tournament/bracket.js";
 
@@ -32,7 +32,7 @@ export function remove_all(session, already, all)
                 update_name(current_user.realname);
             else
                 update_name(current_user.display_name);
-        }   
+        }
         free_users();
         nullify_user();
     }

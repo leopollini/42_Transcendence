@@ -38,7 +38,7 @@ module Other_logic
     response.write({
       success: true ,
       message: "authenticated",
-      realname : realname}.to_json)
+      realname: realname}.to_json)
     response.finish
   end
 

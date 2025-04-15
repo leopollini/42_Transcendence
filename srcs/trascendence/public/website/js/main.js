@@ -57,10 +57,8 @@ export let user_name = null;
 export let customize = null;
 export let roundrobin = null
 export async function initUser() {
-    if (window.location.pathname !== "/") {
+    if (window.location.pathname !== "/")
         current_user = await restore_user();
-        current_user.type = "login";
-    }
 }
 
 
@@ -110,7 +108,8 @@ const loadContent = async () => {
     const app = document.getElementById("app");
     const component = routes[path];
     let let_me_in = await checkAuthentication(path);
-    if (path !== '/' && !user_name) {
+    if (path !== '/' && sessionStorage.getItem("user_name")) {
+        console.log("new user name triggered");
         update_name(sessionStorage.getItem("user_name"));
         sessionStorage.removeItem("user_name");
     }
@@ -272,17 +271,29 @@ function initChat() {
 // Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
 
-let isRefresh = false;
+const navEntries = performance.getEntriesByType('navigation');
 
-window.addEventListener('keydown', function (e) {
-    if (window.location.pathname !== '/' && ((e.key === 'F5') || (e.ctrlKey && e.key === 'r')))
-        isRefresh = true;
-});
+if (navEntries.length > 0) {
+    const navType = navEntries[0].type;
 
-window.addEventListener('beforeunload', () => {
-    if (sessionStorage.getItem('already in') === '1') {
+    if (navType === 'reload') {
+
+        sessionStorage.setItem("refresh", "1");
+        console.log('La pagina è stata ricaricata!');
+    }
+    else
+        sessionStorage.setItem("refresh", "0");
+}
+
+window.addEventListener('beforeunload', (event) =>
+{
+    if (user_name)
         sessionStorage.setItem("user_name", user_name);
-        if (!isRefresh && window.location.pathname !== "/") {
+    if (sessionStorage.getItem('refresh') === '1')
+        sessionStorage.removeItem('refresh');
+    else {
+        console.log("L'utente sta chiudendo la finestra o la tab");
+        if (sessionStorage.getItem('already in') === '1') {
             remove_all(0, 0, 1);
         }
     }
