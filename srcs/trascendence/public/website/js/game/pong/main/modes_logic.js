@@ -14,14 +14,19 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         navigate("/VS_AI", "Modalità AI");
     });
 
+    // !test per torneo da togliere poi
     tournamentButton?.addEventListener('click', () => {
+        current_user.type = "login";
         if (current_user.type === "guest")
         {
             showInfoModal("You must be logged to use this feature!", () => {});
             return;
         }
         else
+        {
+            current_user.type = "guest";
             navigate("/tournament", "Modalità Torneo");
+        }
     });
 
     forza4Button?.addEventListener('click', () => {
