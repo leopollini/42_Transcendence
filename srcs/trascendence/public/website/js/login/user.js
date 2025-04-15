@@ -1,4 +1,4 @@
-import { current_user, navigate, nullify_user, user_name } from "../main.js";
+import { current_user, navigate, user_name } from "../main.js";
 import {updateProfileUI} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../error_main.js";
@@ -102,3 +102,53 @@ export async function restore_user()
         return null;
     }
 }
+
+/*export async function restore_user()
+{
+    try
+    {
+        if (window.location.pathname === '/' || (sessionStorage.getItem('already in') !== '1' && localStorage.getItem('session opened', 0) !== '1'))
+            return null;
+
+        let data = JSON.stringify({"params": {"display_name": user_name}});
+        const response = await fetch("http://localhost:8008",
+        {
+            method: "get_user",
+            body: data
+        })
+
+        const result = await response.json();
+        // console.log("(get_user)\nData login = ", result);
+        if (result)
+        {
+                const ref_user = new profile(
+                    result.email,
+                    result.username,
+                    result.realname,
+                    result.bio,
+                    result.image,
+                    result.type
+                );
+                remove_all(1, 1);
+                updateProfileUI(ref_user);
+                return ref_user;
+        }
+        else
+        {
+            remove_all(0, 0, 1);
+            if (window.location.pathname !== '/')
+                navigate("/", "home");
+            showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => {});
+            return null;
+        }
+    }
+    catch (error)
+    {
+        remove_all(0, 0, 1);
+        if (window.location.pathname !== '/')
+            navigate("/", "home");
+        showInfoModal("Error with get_user:", error);
+        return null;
+    }
+}
+*/

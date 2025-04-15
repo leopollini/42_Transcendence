@@ -74,9 +74,9 @@ export function profileHandler()
   });
 }
 
-function updateLogin(current_user)
+/*function updateLogin(current_user)
 {
-  let data = "{ display_name :" + JSON.stringify(current_user.display_name) + ", bio :" + JSON.stringify(current_user.bio) + ", image : " + current_user.image + " }";
+  let data = JSON.stringify({"params": {"display_name": current_user.display_name, "bio": current_user.bio, "image": current_user.image}, "token": token};
   fetch("http://localhost:8008",
   {
     method: "update_user",
@@ -85,34 +85,46 @@ function updateLogin(current_user)
   .then(response => response.json())
   .then(data =>{
     //console.log("(UPDATE_USER)\ndata update user profile = ", data);
+    if (data)
+    {
+      if (data.success !== "true")
+      {
+        remove_all(1, 1);
+        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + result.status + "\")", () => {});
+      }
+    }
   })
   .catch(error =>
   {
     showInfoModal("Error with update_user:", error);
   });
-}
+}*/
 
-function updateGuest(current_user)
+/*function updateGuest(current_user)
 {
-  let data = {
-    bio: current_user.biom,
-    image: current_user.image
-  };
+  let data = JSON.stringify({"params": {"bio": current_user.bio, "image": current_user.image}, "token": token};
   fetch("http://localhost:8008",
   {
     method: "update_user",
     body: data
   })
   .then(response => response.json())
-  .then(data =>
-  {
-    console.log("(UPDATE_USER)\ndata update user profile for guest  = ", data);
+  .then(data =>{
+    //console.log("(UPDATE_USER)\ndata update user profile = ", data);
+    if (data)
+    {
+      if (data.success !== "true")
+      {
+        remove_all(1, 1);
+        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + result.status + "\")", () => {});
+      }
+    }
   })
   .catch(error =>
   {
     showInfoModal("Error with update_user:", error);
   });
-}
+}*/
 
 function saveProfile(infoContainer) {
   let saving;
@@ -138,13 +150,13 @@ function saveProfile(infoContainer) {
     saving += savename(me, infoContainer);
     current_user.display_name = me.display_name;
   }
-  else
+  /*else
   {
     if (current_user.type === "guest")
       updateGuest(current_user);
     else
       updateLogin(current_user);
-  }
+  }*/
   showInfoModal(saving, () => {});
   history.back();
 }

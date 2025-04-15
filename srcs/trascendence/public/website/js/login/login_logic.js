@@ -1,7 +1,53 @@
-import { navigate, update_name} from "../main.js";
+import { navigate} from "../main.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../error_main.js";
+
+/*async function get_data()
+{
+  try
+  {
+    const data = JSON.stringify({"params": {"display_name": user_name}, "token": token});
+    const response = await fetch("http://localhost:8008", {
+        method: "get_user",
+        body: data
+    })
+    const result = await response.json();
+    console.log("(GET_USER)\ndata login = ", result);
+      let new_user =
+      {
+        email: result.email,
+        login_name: result.display_name,
+        realname: result.realname,
+        image: result.image,
+        bio: result.bio,
+        type: "login"
+      };
+      remove_all(1, 1);
+      update_name(new_user.realname);
+      change_name(new_user.login_name);
+      update_image(new_user.image);
+      return ;
+    }
+    else
+    {
+      remove_all(0, 0, 1);
+      if (window.location.pathname !== '/')
+        navigate("/", "home");
+      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => {});;
+      return;
+    }
+  }
+  catch (error)
+  {
+    remove_all(0, 0, 1);
+    if (window.location.pathname !== '/')
+      navigate("/", "home");
+    showInfoModal("Error during Login in get_user: " + error.message, () => {});
+    return;
+  }
+}
+*/
 
 async function get_data()
 {
@@ -30,7 +76,7 @@ async function get_data()
         type: "login"
       };
       remove_all(1, 1);
-      update_name(new_user.realname);
+      save_global("name", new_user.realname);
       change_name(new_user.login_name);
       update_image(new_user.image);
       return ;

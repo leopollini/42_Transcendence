@@ -1,4 +1,4 @@
-import { navigate, update_name} from "../main.js";
+import { navigate, save_global} from "../main.js";
 import { user, profile} from "./user.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInputModal, showInfoModal } from "../modal.js"
@@ -73,7 +73,8 @@ function update_guest(curr_guest)
     if (data.status === "success" && data.success === "true")
     {
       remove_all(1, 1);
-      update_name(guest_user.display_name);
+      //token = data.token;
+      save_global("name", guest_user.display_name);
       navigate("/modes", "Modalità di gioco");
     }
     else
