@@ -1,9 +1,7 @@
 import { free_users } from "./security/security.js";
 import { nullify_user, navigate, current_user, update_name, user_name} from "./main.js";
 import { showInfoModal } from "./modal.js";
-import Bracket from "./pages/tournament/bracket.js";
-
-
+import { checkAuthentication } from "./login/login_logic.js";
 function reset_value()
 {
     let session = localStorage.getItem('session opened');
@@ -41,7 +39,8 @@ export function remove_all(session, already, all)
     localStorage.setItem('session opened', session);
     sessionStorage.setItem('already in', already);
 }
-export function check_valid_operation(path)
+
+export async function check_valid_operation(path, component)
 {
     reset_value();
     if (sessionStorage.getItem('already in') === '1' && path === "/")
@@ -53,6 +52,38 @@ export function check_valid_operation(path)
     {
         if (continue_error_check(path) === 1)
             return (1);
+    }
+    if (cont_check(path, component) === 1)
+        return (1);
+    return (0);
+}
+
+async function  cont_check(path, component)
+{
+    let opponent = sessionStorage.getItem("opponent");
+    if (!opponent && (path === "/classic" || path === "/forza4/game"))
+    {
+        showInfoModal("the operation you are doing is forbidden", () => {});
+        navigate("/modes", "return to modes");
+        return(1);
+    }
+    if (path !== '/' && sessionStorage.getItem("user_name")) {
+        update_name(sessionStorage.getItem("user_name"));
+        sessionStorage.removeItem("user_name");
+        return (0);
+    }
+    if (!component) {
+        app.innerHTML = No_Page();
+        return (1);
+    }
+    let let_me_in = await checkAuthentication(path);
+    if (let_me_in === 1) {
+        navigate("/", "Home");
+        return (1);
+    }
+    else if (let_me_in === -1) {
+        navigate("/modes", "Return to Game Mode");
+        return (1);
     }
     return (0);
 }
@@ -71,14 +102,11 @@ function continue_error_check(path)
     }
 }
 
-export function path_error(path)
-{
-    let opponent = sessionStorage.getItem("opponent");
-    if (!opponent && (path === "/classic" || path === "/forza4/game"))
-    {
-        showInfoModal("the operation you are doing is forbidden", () => {});
-        navigate("/modes", "return to modes");
-        return(1);
-    }
-    return (0);
+export default function No_Page() {
+    return `
+      <div class="error-container">
+        <h1>404 - Page not found</h1>
+        <p>Sorry, the page you're looking for doesn't exist.</p>
+      </div>
+    `;
 }

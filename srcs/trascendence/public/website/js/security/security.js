@@ -1,6 +1,6 @@
 import { user_name } from "../main.js";
 import { showInfoModal } from "../modal.js";
-
+import { remove_all } from "../error_main.js";
 export async function validateUploadedImage(file)
 {
     return new Promise((resolve, reject) =>

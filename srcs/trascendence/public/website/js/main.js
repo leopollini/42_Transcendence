@@ -20,9 +20,8 @@ import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
 import { restore_user, user } from "./login/user.js";
-import { check_valid_operation, remove_all, path_error } from "./error_main.js";
+import { check_valid_operation, remove_all} from "./error_main.js";
 import { showInfoModal } from "./modal.js";
-import { checkAuthentication } from "./login/login_logic.js";
 let buttonTitle;
 let winner;
 let players;
@@ -54,8 +53,8 @@ const routes = {
 
 export let current_user = null;
 export let user_name = null;
-export let customize = null;
-export let roundrobin = null
+export let path = null;
+
 export async function initUser() {
     if (window.location.pathname !== "/")
         current_user = await restore_user();
@@ -93,39 +92,12 @@ function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
 
-export default function No_Page() {
-    return `
-      <div class="error-container">
-        <h1>404 - Page not found</h1>
-        <p>Sorry, the page you're looking for doesn't exist.</p>
-      </div>
-    `;
-}
-
 // Caricamento dinamico del contenuto
 const loadContent = async () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    let let_me_in = await checkAuthentication(path);
-    if (path !== '/' && sessionStorage.getItem("user_name")) {
-        console.log("new user name triggered");
-        update_name(sessionStorage.getItem("user_name"));
-        sessionStorage.removeItem("user_name");
-    }
-    if (let_me_in === 1) {
-        navigate("/", "Home");
-        return;
-    }
-    else if (let_me_in === -1) {
-        navigate("/modes", "Return to Game Mode");
-        return;
-    }
-    if (!component) {
-        app.innerHTML = No_Page();
-        return;
-    }
-    if (check_valid_operation(path) === 1 || path_error(path) === 1)
+    if (check_valid_operation(path, component) === 1)
         return;
     else
         await initUser();
@@ -271,30 +243,21 @@ function initChat() {
 // Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
 
-const navEntries = performance.getEntriesByType('navigation');
+export let refresh = true;
 
-if (navEntries.length > 0) {
-    const navType = navEntries[0].type;
-
-    if (navType === 'reload') {
-
-        sessionStorage.setItem("refresh", "1");
-        console.log('La pagina è stata ricaricata!');
-    }
-    else
-        sessionStorage.setItem("refresh", "0");
-}
-
-window.addEventListener('beforeunload', (event) =>
-{
+window.addEventListener('beforeunload', () => {
     if (user_name)
         sessionStorage.setItem("user_name", user_name);
-    if (sessionStorage.getItem('refresh') === '1')
-        sessionStorage.removeItem('refresh');
-    else {
-        console.log("L'utente sta chiudendo la finestra o la tab");
+    const navEntries = performance.getEntriesByType("navigation");
+    if (navEntries.length > 0 && navEntries[0].type === "reload")
+        console.log("Reload detected");
+    else
+        refresh = false;
+    if (refresh === false)
+    {
         if (sessionStorage.getItem('already in') === '1') {
             remove_all(0, 0, 1);
+            return (0);
         }
     }
-});
+});  
