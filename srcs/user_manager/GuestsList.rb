@@ -10,6 +10,10 @@ Dotenv.load
 class GuestsList
   
   def initialize()
+    reset
+  end
+  
+  def reset()
     @guests = Array.new(MAX_GUEST_COUNT + 1)
     @index = Hash.new
     @counter_index = 0

@@ -25,7 +25,7 @@ SERVICE_NAME = 'user_manager'
 PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
-                               ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
+                               ['display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
                                 'created NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT', 'token TEXT']
 
 GUEST = GuestsList.new
@@ -129,7 +129,7 @@ def user_manager(client, _server)
       get_user_by_token client, bobj
     when 'drop_users'
       LOGIN.dropTable
-      GUEST.new
+      GUEST.reset
     else
       {'service' => 'user_manager', 'status' => "unknown method: #{bobj['method'].to_s}", 'success' => 'false'}
     end

@@ -196,6 +196,7 @@ module BetterPG
       raise RiskOfFullDeletion if @name.include?('*') && !iamsure
 
       exec 'DROP TABLE', @name
+      createTable @original_cols
     end
 
     def zeroTable
