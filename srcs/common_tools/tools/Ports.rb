@@ -20,6 +20,7 @@ module Ports
     'update_user' => ['user_manager', 7080, 1],
     'login_user' => ['user_manager', 7080, 0],
     'logout_user' => ['user_manager', 7080, 2],         # CALLED BY CHAT AT LOGOUT
+    'drop_users' => ['user_manager', 7080, 2],         # CALLED BY CHAT AT LOGOUT
     'get_user_by_token' => ['user_manager', 7080, 1],
     
     'chat' => ['chat', 6087, 1],

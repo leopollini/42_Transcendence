@@ -26,15 +26,16 @@ PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
                                ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-                                'created NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT']
+                                'created NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT', 'token TEXT']
 
 GUEST = GuestsList.new
 MANDATORY_DATA = %w[email display_name realname bio image]
 GET_USER_SECURE_INFO = %w[display_name, created, image]
-NON_UPDATABLE_PARAMS = %w[realname, token, created, level, entered]
+UPDATABLE_PARAMS = %w[display_name, email, image, bio]
 
 def user_creat(data)
-  return DEFAULT_MISSING_PARAM.clone if (MANDATORY_DATA - data).empty?
+  puts "Cteating new user as:".green, data
+  return DEFAULT_MISSING_PARAM.clone if (MANDATORY_DATA - data.keys).empty?
   LOGIN.addValues data
   return DEFAULT_SUCCESS_RES.merge({'token' => 'loltoken'})
 end
@@ -46,20 +47,21 @@ def login_user(client, obj)
 
   return GUEST.add_guest(data) if data['login_as_guest'].to_s == 'true'
 
-  usr = (LOGIN.select_specific 'realname', data['realname'].to_s, false)
-  if usr.empty?
-    return user_creat(data) if data['do_create'].to_s == 'true' 
+  usr = LOGIN.select_specific 'realname', data['realname'].to_s, [], false
+  if usr.nil?
+    return user_creat(data) if obj['do_create'].to_s == 'true'
     return {'status' => 'user not found', 'success' => 'false', 'service' => 'user_manager'}
   end
-  usr = usr[0]
-  (update_user usr).merge({'token' => 'loltoken'})
+  puts "user already in database, updating with new info".yellow
+  (update_user(client, {"new_params" => data})).merge({'token' => 'loltoken'})
 end
 
 def update_user(_client, obj = nil)
   puts 'update_user called'.green if DEBUG_MODE
+  puts "Diomerds " + obj.to_s.grey
 
-  new_params = obj['new_params'].slice(obj['new_params'] - NON_UPDATABLE_PARAMS)
-  return DEFAULT_MISSING_PARAM.clone if new_params.nil? || obj['display_name'].to_s == ""
+  new_params = obj['new_params'].slice(UPDATABLE_PARAMS)
+  return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['display_name'].to_s == ""
   LOGIN.valueManipulation 'display_name', obj['display_name'].to_s, new_params
   return DEFAULT_SUCCESS_RES.clone
 end
@@ -84,9 +86,9 @@ def get_user(_client, obj = nil)
   params = obj['params']
   if params.nil? || params.empty?
     users = LOGIN.select
-    users.each {| u | u.slice!(GET_USER_SECURE_INFO)}
+    users.each {| u | u = u.slice(GET_USER_SECURE_INFO)}
     guests = GUEST.get_all_guests
-    guests.each {| u | u.slice!(GET_USER_SECURE_INFO)}
+    guests.each {| u | u = u.slice(GET_USER_SECURE_INFO)}
     return {'status' => (users.empty? && guests.empty? ? 'no user found' : 'returning whole database'), 'success' => 'true', 
               'guest' => guests, 'user' => users}
   end
@@ -125,6 +127,9 @@ def user_manager(client, _server)
       logout_user client, bobj
     when 'get_user_by_token'
       get_user_by_token client, bobj
+    when 'drop_users'
+      LOGIN.dropTable
+      GUEST.new
     else
       {'service' => 'user_manager', 'status' => "unknown method: #{bobj['method'].to_s}", 'success' => 'false'}
     end

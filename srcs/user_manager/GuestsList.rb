@@ -11,7 +11,7 @@ class GuestsList
   
   def initialize()
     @guests = Array.new(MAX_GUEST_COUNT + 1)
-    @index = {}
+    @index = Hash.new
     @counter_index = 0
   end
 
@@ -60,9 +60,13 @@ class GuestsList
   end
   
   def get_all_guests()
-    t = @guests.clone
-    t.each do |guest|
-      guest.slice!(guest.keys - ['token'])
+    t = @guests.clone    #watch out! Could be deleting original object
+    t[1..].each do |g|
+      if g.nil?
+        t.delete g 
+      else
+        g.slice!(g.keys - ['token'])
+      end
     end
     t
   end
@@ -122,6 +126,6 @@ class GuestsList
   end
 
   def exists?(username)
-    @guest[@index[username]]['deleted'] == -1
+    @guest[@index[username]]['deleted'] == -1 if @index[username]
   end
 end
