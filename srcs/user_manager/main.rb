@@ -42,7 +42,7 @@ end
 def login_user(client, obj)
   puts "login_user called".green
   data = obj['data']
-  data['token'] = Digest::SHA256.hexdigest(Time.now)
+  data['token'] = Digest::SHA256.hexdigest(Time.now.to_s)
 
   return GUEST.add_guest(data) if data['login_as_guest'].to_s == 'true'
 
