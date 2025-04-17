@@ -15,9 +15,9 @@ export function checkScore(game) {
             backToMenuButton.style.display = "block";
             backToMenuButton.hidden = false;
         }
-        else if (window.location.pathname === "/tournament/roundrobin")
+        else if (window.location.pathname === "/tournament/roundrobin/robinranking/game")
             backToRobinButton.style.display = "block";
-        else if (window.location.pathname === "/tournament/knockout")
+        else if (window.location.pathname === "/tournament/knockout/bracket/game")
             backToBracketButton.style.display = "block";
 
         game.ui.render(game, game.scoreP1, game.scoreP2); 

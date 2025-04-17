@@ -79,7 +79,7 @@ export function free_users()
         {
             if (data)
             {
-                if (data.status === " (guest) does not exist")
+                if (data.status === " (guest) does not exist" || data.status === "user not found")
                     return;
                 if (data.status && data.success)
                 {

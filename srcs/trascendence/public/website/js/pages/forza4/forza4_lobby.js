@@ -1,4 +1,4 @@
-import { navigate, current_user} from "../../main.js";
+import { navigate, current_user, save_global} from "../../main.js";
 
 let invitedPlayers = [];
 let selectedPlayer;
@@ -90,7 +90,7 @@ export function addForza4LobbyPageHandlers() {
             newPlayer.style.color = "white";
             newPlayer.onclick = null;
             const playerName = newPlayer.textContent.trim();
-            sessionStorage.setItem("opponent", playerName);
+            save_global("opponent", playerName);
             matchPlayers.appendChild(newPlayer);
             numPlayersAccepted++;
             numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;

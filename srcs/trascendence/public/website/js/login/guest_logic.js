@@ -59,8 +59,7 @@ function update_guest(curr_guest)
       curr_guest.image,
       "guest"
   );
-  let data = {"data" : {"username":guest_user.display_name,"image":guest_user.image},"login_as_guest":"true"};
-  data = JSON.stringify(data);
+  const data = JSON.stringify({data : {username: guest_user.display_name,image: guest_user.image},login_as_guest: "true"});
   fetch("http://localhost:8008",
   {
       method: "login_user",
@@ -95,6 +94,6 @@ function update_guest(curr_guest)
     remove_all(0, 0, 1);
     if (window.location.pathname !== '/')
       navigate("/", "home");
-    showInfoModal("Error with login_user:", error);
+    showInfoModal("Error with login_user: (" + error + ")", () => {});
   })
 }

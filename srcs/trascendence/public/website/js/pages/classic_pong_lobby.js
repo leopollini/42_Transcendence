@@ -1,4 +1,4 @@
-import { navigate } from "../main.js";
+import { navigate, save_global} from "../main.js";
 import { current_user } from "../main.js";
 
 let invitedPlayers = [];
@@ -86,7 +86,7 @@ export function addClassicPongLobbyPageHandlers() {
             newPlayer.style.color = "white";
             newPlayer.onclick = null;
             const playerName = newPlayer.textContent.trim();
-            sessionStorage.setItem("opponent", playerName);
+            save_global("opponent",playerName);
             matchPlayers.appendChild(newPlayer);
             numPlayersAccepted++;
             numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;

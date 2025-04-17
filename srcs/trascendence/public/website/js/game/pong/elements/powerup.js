@@ -23,14 +23,17 @@ export class Powerup {
         const types = ["shrinker", "teleport", "invisible"];
         types.forEach(type => {
             this.sprites[type] = new Image();
-            this.sprites[type].src = `website/images/${type}_spritesheet.png`; // Sprites path
-
-            // Handling errors
+            this.sprites[type].src = `website/images/${type}_spritesheet.png`;
+    
             this.sprites[type].onerror = () => {
-                console.error(`Errore nel caricamento dell'immagine: ${type}.png`);
+                this.sprites[type] = null;
+            };
+    
+            this.sprites[type].onload = () => {
             };
         });
     }
+    
     getType() { 
         const typeNum = Math.floor(Math.random() * 3) + 1;
     
@@ -70,10 +73,11 @@ export class Powerup {
     // }
     
     render() {
-        this.sprite = this.sprites[this.type];
-        this.updateAnimation();  
+        if (this.sprites[this.type])
+            this.sprite = this.sprites[this.type];
+        if (this.sprite && this.sprite.complete && this.ctx) {  // If sprite loaded
+            this.updateAnimation();  
         
-        if (this.sprite.complete) {  // If sprite loaded
             this.ctx.drawImage(
                 this.sprite, 
                 this.frameIndex * this.frameWidth, 0, // Select correct frame
@@ -82,7 +86,8 @@ export class Powerup {
                 this.width, this.height             
             );
         } else {
-            console.warn(`Sprite non ancora caricata: website/images/${this.type}_spritesheet.png`);
+            this.ctx.clearRect(this.x, this.y, this.width, this.height);  
+            //console.warn(`Sprite non ancora caricata: website/images/${this.type}_spritesheet.png`);
         }
     }
 

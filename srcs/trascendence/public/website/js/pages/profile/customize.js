@@ -1,4 +1,4 @@
-import { navigate } from "../../main.js";
+import { navigate, save_global } from "../../main.js";
 import { pongCustomData } from "../../game/pong/data/game_global.js";
 
 let pongData;
@@ -314,7 +314,8 @@ export function addCustomizeGame() {
     pongData.paddleColor = paddleColorPicker.value;
     pongData.ballTrailColor = ballTrailColorPicker.value;
     pongData.wallsColor = wallsColorPicker.value;
-    sessionStorage.setItem("pongData", JSON.stringify(pongData));
+    save_global("pong", pongData);
+    //sessionStorage.setItem("pongData", JSON.stringify(pongData));
     // if (powerupSelected) {
     //     setPowerupPlayer(powerupSelected.value, 1);
     // }

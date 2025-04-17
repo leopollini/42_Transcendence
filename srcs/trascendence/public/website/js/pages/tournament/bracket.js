@@ -1,5 +1,5 @@
-import { navigate } from "../../main.js";
-
+import { Bracket_state, in_game, navigate, save_global, players, match_ended, winner} from "../../main.js";
+import { showInfoModal } from "../../modal.js";
 let boxColor = 'black';
 let matchBoxPos = [];
 let matchesPerRound = 8;
@@ -44,13 +44,6 @@ export default function Bracket() {
             <button class="button-style" id="knockoutMatchButton">Play Match</button>
         </div>
     `;
-}
-
-export let Bracket_state = null;
-
-export function get_bracket()
-{
-    return Bracket_state;
 }
 
 // Shuffle players
@@ -99,22 +92,9 @@ function initializeBracket() {
     }
 }
 
-// Save and Load Tournament State
-/*function saveBracketState() {
 
-    sessionStorage.setItem('bracketState', JSON.stringify({
-        bracketPlayers,
-        currentRound,
-        currentMatch,
-        matchesThisRound,
-        rounds,
-        firstDraw,
-        matchBoxPos,
-        initialPlayersCount
-    }));
-}*/
-
-function loadBracketState() {
+function loadBracketState()
+{
     //const savedState = sessionStorage.getItem('bracketState');
     const savedState = Bracket_state;
     if (savedState) {
@@ -137,35 +117,26 @@ function loadBracketState() {
     return null;
 }
 
-function save_barcket()
+function give_data()
 {
-    if (sessionStorage.getItem("bracketState"))
+    let Bracket_data =
     {
-        Bracket_state = sessionStorage.getItem("bracketState");
-        sessionStorage.removeItem("bracketState");
-        console.log("1 bracket", Bracket_state);
+        bracketPlayers,
+        currentRound,
+        currentMatch,
+        matchesThisRound,
+        rounds,
+        firstDraw,
+        matchBoxPos,
+        initialPlayersCount
     }
-    else
-    {
-        Bracket_state =
-        {
-            bracketPlayers,
-            currentRound,
-            currentMatch,
-            matchesThisRound,
-            rounds,
-            firstDraw,
-            matchBoxPos,
-            initialPlayersCount
-        }
-        console.log("2  bracket", Bracket_state);
-    }
+    return Bracket_data;
 }
 
 // Main function
-export function drawBracket(players) {
+export function drawBracket(match_players) {
     if (!initialPlayersCount)
-        initialPlayersCount = players.length;
+        initialPlayersCount = match_players.length;
     bracketCanvas = document.getElementById('bracketCanvas');
     bracketCtx = bracketCanvas.getContext('2d');
 
@@ -199,9 +170,8 @@ export function drawBracket(players) {
         document.getElementById('knockoutMatchButton').style.display = 'block';
         matchesThisRound = matchesPerRound;
         initializeBracket();
-        bracketPlayers[0] = shuffleArray(players.slice()); // Create array players copy
+        bracketPlayers[0] = shuffleArray(match_players.slice()); // Create array match_players copy
     }
-
     matchBoxPos[0] = [];
 
     // Draw first round
@@ -231,7 +201,7 @@ export function drawBracket(players) {
 
             boxColor = (i === currentMatch && currentRound === round) ? 'rgb(2, 191, 185)' : 'white';
             
-            // Show players if found
+            // Show match_players if found
             const player1 = round < bracketPlayers.length ? bracketPlayers[round][i * 2] : undefined;
             const player2 = round < bracketPlayers.length ? bracketPlayers[round][i * 2 + 1] : undefined;
             
@@ -255,8 +225,7 @@ export function drawBracket(players) {
         xOffset += roundGap;
     }
 
-    save_barcket();
-    //saveBracketState();
+    save_global("bracket", give_data())
 }
 
 export function resetBracketState() {
@@ -265,21 +234,36 @@ export function resetBracketState() {
     firstDraw = true;
     matchBoxPos = [];
     initialPlayersCount = 0;
-    sessionStorage.removeItem('bracketState');
+    save_global("bracket", null);
 }
 
-export function backToBracket(winner) {
-    if (winner === null) {
+function you_win(match_winner)
+{
+    drawBracket(bracketPlayers[0], initialPlayersCount);
+    const button = document.getElementById('knockoutMatchButton');
+    if (button) {
+        button.hidden = true;
+        button.style.display = 'none';
+    }
+    save_global("end", 1)
+    bracketCtx.font = '30px Liberty';
+    bracketCtx.fillStyle = 'white';
+    bracketCtx.textAlign = 'center';
+    bracketCtx.textBaseline = 'top';
+    bracketCtx.fillText(`${match_winner} Wins the Tournament!`, bracketCanvas.width / 2, bracketCanvas.height - 110);
+}
+
+export function backToBracket(match_winner) {
+    if (match_winner === null) {
         drawBracket(bracketPlayers[0], initialPlayersCount);
         return;
     }
-
     if (currentRound < rounds - 1) {
         if (!bracketPlayers[currentRound + 1]) {
             bracketPlayers[currentRound + 1] = [];
         }
         
-        bracketPlayers[currentRound + 1][currentMatch] = winner;
+        bracketPlayers[currentRound + 1][currentMatch] = match_winner;
         currentMatch++;
         
         if (currentMatch >= matchesThisRound) {
@@ -288,58 +272,51 @@ export function backToBracket(winner) {
             matchesThisRound = Math.floor(matchesThisRound / 2);
         }
         drawBracket(bracketPlayers[0], initialPlayersCount);
-    } else {
-        drawBracket(bracketPlayers[0], initialPlayersCount);
-        const button = document.getElementById('knockoutMatchButton');
-        if (button) {
-            button.hidden = true;
-            button.style.display = 'none';
-        }
-        
-        bracketCtx.font = '30px Liberty';
-        bracketCtx.fillStyle = 'white';
-        bracketCtx.textAlign = 'center';
-        bracketCtx.textBaseline = 'top';
-        bracketCtx.fillText(`${winner} Wins the Tournament!`, bracketCanvas.width / 2, bracketCanvas.height - 110);
-        
-        sessionStorage.removeItem('bracketState');
-    }
-    save_barcket();
-    //saveBracketState();
+    } else
+        you_win(match_winner);
+    save_global("bracket", give_data());
 }
 
 export const addBracketPageHandlers = async () => {
     const backImageButton = document.getElementById('backImageButton');
     const knockoutMatchButton = document.getElementById('knockoutMatchButton');
-
     // Check if there is saved state
     const savedState = loadBracketState();
-    if (savedState) {
-        drawBracket(savedState.players, savedState.initialCount);
+    if (in_game !== 1 && window.location.pathname)
+    {
+        navigate("/tournament/knockout/lobby", "return to modes");
+        showInfoModal("the operation you are doing is forbidden", () => { });
+        return (1);   
     }
-
+    if (match_ended === 1)
+    {
+        you_win(winner);
+        return;
+    }
+    if (savedState)
+        drawBracket(savedState.players, savedState.initialCount);
+    else
+        drawBracket(players);
     knockoutMatchButton?.addEventListener('click', () => {
         const matchPlayers = [
             bracketPlayers[currentRound][currentMatch * 2],
             bracketPlayers[currentRound][currentMatch * 2 + 1]
         ];
-        
-        sessionStorage.setItem("player1", matchPlayers[0]);
-        sessionStorage.setItem("player2", matchPlayers[1]);
+        save_global("p1", matchPlayers[0]);
+        save_global("p2", matchPlayers[1]);
         navigate("/tournament/knockout/bracket/game", "Bracket Pong Game", matchPlayers);
     });
 
     backImageButton?.addEventListener('click', () => {
-        sessionStorage.removeItem('bracketState');
+        if (match_ended === 1)
+            showInfoModal("You finised the tournament yay");
+        save_global("bracket", null);
+        save_global("p1", null);
+        save_global("p2", null);
+        save_global("bracket", null);
+        save_global("players", null);
         navigate("/modes", "Return to Game Mode");
         resetBracketState();
         bracketPlayers = [];
-    });
-
-    // Save state before unload
-    //window.addEventListener('beforeunload', saveBracketState);
-    window.addEventListener("beforeunload", () =>
-    {
-        sessionStorage.setItem("bracketState", Bracket_state);
     });
 };

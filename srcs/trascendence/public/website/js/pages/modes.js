@@ -55,15 +55,6 @@ export default function Modes()
     `;
 }
 
-window.onpopstate = function ()
-{
-    if (location.pathname === "/")
-    {
-        showInfoModal("you have quitted the active session", () => {});
-        remove_all(0, 0, 1);
-    }
-};
-
 export function updateProfileUI(profile)
 {
     if (profile !== undefined && profile !== null)
