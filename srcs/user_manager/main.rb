@@ -30,7 +30,7 @@ LOGIN = BetterPG::SimplePG.new 'users',
 
 GUEST = GuestsList.new
 MANDATORY_DATA = %w[email display_name realname bio image]
-GET_USER_NOT_SECURE_DISPLAY_INFO = %w[display_name, created, image]
+GET_USER_SECURE_INFO = %w[display_name, created, image]
 NON_UPDATABLE_PARAMS = %w[realname, token, created, level, entered]
 
 def user_creat(data)
@@ -83,16 +83,18 @@ def get_user(_client, obj = nil)
   puts 'get_user called'.green if DEBUG_MODE
   params = obj['params']
   if params.nil? || params.empty?
-    users = LOGIN.select.slice(GET_USER_NOT_SECURE_DISPLAY_INFO)
+    users = LOGIN.select
+    users.each {| u | u.slice!(GET_USER_SECURE_INFO)}
     guests = GUEST.get_all_guests
+    guests.each {| u | u.slice!(GET_USER_SECURE_INFO)}
     return {'status' => (users.empty? && guests.empty? ? 'no user found' : 'returning whole database'), 'success' => 'true', 
               'guest' => guests, 'user' => users}
   end
   if name = params['display_name']
     user = LOGIN.select(['display_name'], [name])
     if user.empty?
-      guests = GUEST.get_all_guests
-      return DEFAULT_SUCCESS_RES.merge({'guest' => guests[name]}) if guests[name]
+      guest = GUEST.get_by_name(name)
+      return DEFAULT_SUCCESS_RES.merge({'guest' => guest}) if guest
       return {'status' => 'no user found', 'success' => 'false'} 
     end
     return DEFAULT_SUCCESS_RES.merge({'user' => user})

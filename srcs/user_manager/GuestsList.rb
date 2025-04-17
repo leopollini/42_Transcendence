@@ -62,13 +62,18 @@ class GuestsList
   def get_all_guests()
     t = @guests.clone
     t.each do |guest|
-      guest.slice (guest.keys - ['token'])
+      guest.slice!(guest.keys - ['token'])
     end
+    t
+  end
+
+  def get_by_name(name)
+    @guests[@index[name].to_i]
   end
   
   def update_guest(username, new_data)
     index = @index[username]
-    return { 'status' => "user #{username} not found", 'success' => 'false' } unless index
+    return { 'status' => "user #{username} not found", 'success' => 'false' } if index.nil?
   
     guest = @guests[index]
     return { 'status' => "cannot change this info", 'success' => 'false' } if new_data['username'] || new_data['created'] || new_data['deleted']
@@ -78,6 +83,7 @@ class GuestsList
     guest['image'] = new_data['image'] if new_data['image']
     { 'status' => 'success', 'success' => 'true' }
   end
+
   def get_token_name(token)
     unless @guests.empty?
       return {'statuts' => 'bad token', 'success' => 'false'} if token.nil?
