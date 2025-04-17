@@ -101,7 +101,7 @@ module BetterPG
       reslst
     end
 
-    def select_specific(key, val, cols hide_token = true)
+    def select_specific(key, val, cols, hide_token = true)
       cols = @columns if cols.size == 0
       t = (better_return exec("SELECT #{@columns} FROM #{@name} WHERE #{key} = '#{val}'"))
       sel = better_return t, hide_token

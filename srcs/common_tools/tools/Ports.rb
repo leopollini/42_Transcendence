@@ -9,18 +9,18 @@ module Ports
     #  1 -> user wfqew
     #  2 -> API key
     
-    # '' => ['receiver', 8008],
     # 'GET' => ['auth', 443],
     # 'POST' => ['request_manager', 9000],
     # 'HEAD' => ['request_manager', 9000],
     # 'show_users' => ['request_manager', 9000],
     # 'tokenizer' => ['tokenizer', 7890],
-
+    
+    '' => ['receiver', 8008],
     'get_user' => ['user_manager', 7080, 1],
     'update_user' => ['user_manager', 7080, 1],
     'login_user' => ['user_manager', 7080, 0],
-    'logout_user' => ['user_manager', 7080, 2], # CALLED BY CHAT AT LOGOUT
-    'get_user_by_token' => ['user_manager', 7080, 1]
+    'logout_user' => ['user_manager', 7080, 2],         # CALLED BY CHAT AT LOGOUT
+    'get_user_by_token' => ['user_manager', 7080, 1],
     
     'chat' => ['chat', 6087, 1],
     'broadcast' => ['internal_chat_support', 6088, 1],

@@ -3,7 +3,6 @@
 # require 'timeout'
 require 'json'
 require 'digest'
-require 'securerandom'
 require 'colorize'
 
 # load ((File.file? '/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')
@@ -13,8 +12,6 @@ require 'colorize'
 # load ((File.file? '/var/common/BetterPG.rb') ? '/var/common/BetterPG.rb' : '../common_tools/tools/BetterPG.rb')
 
 Dir['/var/common/*.rb'].each { |file| require file }
-
-require_relative 'GuestsList'
 
 DEFAULT_ERROR_RES = { 'service' => 'matchmaking', 'status' => 'failed', 'success' => 'false' }
 DEFAULT_SUCCESS_RES = { 'status' => 'success', 'success' => 'true' }
@@ -35,7 +32,7 @@ def matchmake(client, server)
   puts "Content:".yellow, bobj
   
   puts "am matchmakimg lol"
-  client.puts {"status"=>"WIP", "success" => "false"}.to_json
+  client.puts({"status"=>"WIP", "success" => "false"}.to_json)
 end
 
 puts 'matchmaking active at port ' + PORT.to_s + "\n"

@@ -1,4 +1,4 @@
-CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager history_manager chat game_data_manager
+CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager history_manager chat game_data_manager matchmaking
 
 # ========================================= #
 SHELL:=/bin/bash
@@ -17,7 +17,7 @@ NC=\033[0m
 all: prep_dirs #stop_containers
 	@clear
 	@echo -e "$(RED)Rimozione del volume per evitare conflitti...$(NC)";
-	@sudo docker volume rm ct;
+	#@sudo docker volume rm ct;
 	@echo -e "$(YELLOW)configurazione server https locale$(NC)"
 	@chmod +x setup/setup_online_website.sh
 	@sudo ./setup/setup_online_website.sh

@@ -31,7 +31,7 @@ class GuestsList
       'deleted' => -1,
       'bio' => data['bio'].to_s,
       'image' => data['image'].to_s,
-      'token' = data['token']
+      'token' => data['token']
     }
   
     @index[username] = i
@@ -42,7 +42,7 @@ class GuestsList
       'status' => 'success',
       'success' => 'true',
       'username' => username,
-      'token' = data['token']
+      'token' => data['token']
     }
   end
   

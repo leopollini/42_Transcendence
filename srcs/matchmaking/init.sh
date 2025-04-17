@@ -2,7 +2,7 @@
 
 /var/common/setup_tools.sh
 
-GEMS=("pg" "digest")
+GEMS=("pg" "digest" "colorize")
 
 for gm in "${GEMS[@]}"
 do
