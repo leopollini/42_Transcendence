@@ -221,12 +221,12 @@ export function addCustomizeGame() {
   wallsColorPicker = document.getElementById("wallsColorPicker");
 
   let powerupCheckbox = document.getElementById("powerup-checkbox");
-  let powerupSelected;
+  //let powerupSelected;
   let backgroundCheckbox1 = document.getElementById("backgroundCheckbox1");
   let backgroundCheckbox2 = document.getElementById("backgroundCheckbox2");
   let backgroundCheckbox3 = document.getElementById("backgroundCheckbox3");
 
-  let backgroundSelected = document.getElementById("background-selected");
+  //let backgroundSelected = document.getElementById("background-selected");
 
   if (sessionStorage.getItem("pongData") !== null)
     pongData = JSON.parse(sessionStorage.getItem("pongData"));

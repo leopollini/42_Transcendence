@@ -57,7 +57,9 @@ export function handleClassicPongLobby() {
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
     
-    const players = ["Alice", "Bob", "Charlie", "David"];
+    const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
+    "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
+    "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
     players.forEach(player => {
         const div = document.createElement("div");
         div.classList.add("player");

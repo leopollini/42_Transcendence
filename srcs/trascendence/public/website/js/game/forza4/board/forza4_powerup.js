@@ -69,6 +69,8 @@ export function activatePowerup(game, player) {
             game.printPlayerTurnMessage();
             game.powerUpActive = false;
             game.f4PowerupInfo.textContent = "";
+            if (game.moves === 1)
+                game.moves--;
         } else {
             showInfoModal("Select an opponent token!", () => {});
         }

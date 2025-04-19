@@ -40,7 +40,7 @@ GEM
       hashie
       version_gem (~> 1.1, >= 1.1.1)
     uri (1.0.3)
-    version_gem (1.1.6)
+    version_gem (1.1.7)
     webrick (1.9.1)
 
 PLATFORMS

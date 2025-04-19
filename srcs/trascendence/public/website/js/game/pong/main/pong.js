@@ -35,7 +35,7 @@ export function startPongGame(gameMode) {
     backToRobinButton.hidden = true;
   if (backToMenuButton)
     backToMenuButton.hidden = true;
-  if (pong_save !== null)
+  if (pong_save !== null && (gameMode === "ai" || gameMode === "classic"))
     pongGameData = pong_save;
   else
     pongGameData = pongCustomData;
