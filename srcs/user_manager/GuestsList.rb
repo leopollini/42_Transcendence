@@ -10,8 +10,13 @@ Dotenv.load
 class GuestsList
   
   def initialize()
+    reset
+  end
+  
+  def reset()
     @guests = Array.new(MAX_GUEST_COUNT + 1)
-    @index = {}
+    @index = Hash.new
+    @counter_index = 0
   end
 
   def add_guest(data)
@@ -19,31 +24,29 @@ class GuestsList
     return DEFAULT_MISSING_PARAM.clone unless username.is_a?(String)
     return { 'status' => 'username already in use', 'success' => 'false' } if @index.key?(username)
   
-    index = @guests.find_index.with_index { |g, i| i > 0 && g.nil? }
+    i = @counter_index
+    @counter_index = (@counter_index + 1) % MAX_GUEST_COUNT
   
-    if index.nil?
-      oldest = @guests[1..].each_with_index.min_by { |g, i| g['created'] || Time.now.to_i }
-      index = oldest ? i + 1 : 1
-    end
+    @index.delete(@guests[i]['username']) if @guests[i]
   
-    @index.delete(@guests[index]['username']) if @guests[index]
-  
-    @guests[index] = {
+    @guests[i] = {
       'username' => username,
       'created' => Time.now.to_i,
       'deleted' => -1,
       'bio' => data['bio'].to_s,
       'image' => data['image'].to_s,
-      # 'token' => token
+      'token' => data['token']
     }
   
-    @index[username] = index
+    @index[username] = i
   
+  # TOKEN MANAGEMENT
     {
       'service' => 'user_manager',
       'status' => 'success',
       'success' => 'true',
-      'username' => username
+      'username' => username,
+      'token' => data['token']
     }
   end
   
@@ -55,20 +58,30 @@ class GuestsList
     @index.delete(username)
   
     {
-      'service' => 'user_manager',
-      'status' => 'guest deleted successfully',
+      'status' => 'success',
       'success' => 'true'
     }
   end
   
-  
   def get_all_guests()
-    @guests[1..].compact
+    t = @guests.clone    #watch out! Could be deleting original object
+    t[1..].each do |g|
+      if g.nil?
+        t.delete g 
+      else
+        g.slice!(g.keys - ['token'])
+      end
+    end
+    t
+  end
+
+  def get_by_name(name)
+    @guests[@index[name].to_i]
   end
   
   def update_guest(username, new_data)
     index = @index[username]
-    return { 'status' => "user #{username} not found", 'success' => 'false' } unless index
+    return { 'status' => "user #{username} not found", 'success' => 'false' } if index.nil?
   
     guest = @guests[index]
     return { 'status' => "cannot change this info", 'success' => 'false' } if new_data['username'] || new_data['created'] || new_data['deleted']
@@ -78,6 +91,7 @@ class GuestsList
     guest['image'] = new_data['image'] if new_data['image']
     { 'status' => 'success', 'success' => 'true' }
   end
+
   def get_token_name(token)
     unless @guests.empty?
       return {'statuts' => 'bad token', 'success' => 'false'} if token.nil?
@@ -113,5 +127,9 @@ class GuestsList
       end
       return {'service' => 'user_manager', 'status' => " (guest) does not exist", 'success' => 'false'}
     end
+  end
+
+  def exists?(username)
+    @guest[@index[username]]['deleted'] == -1 if @index[username]
   end
 end

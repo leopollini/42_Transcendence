@@ -15,10 +15,13 @@ class Receiver < WEBrick::HTTPServlet::AbstractServlet
     begin
       res.status = 200
 
+      # return res.body = {"status" => "receiver: empty request", 'success' => 'true'}.to_json if res.body.to_s == ""
+      # return res.body = "{}" if res.body.to_s == ""
       begin
         json_body = JSON.parse req.body.to_s
       rescue => r
         res.body = {"status" => "receiver: not a valid json string (#{r.class})", 'success' => 'false'}.to_json
+        puts "bad request body: '#{req.body}'"
         return
       end
 
@@ -32,6 +35,7 @@ class Receiver < WEBrick::HTTPServlet::AbstractServlet
       res.body = SimpleServer.method_req method, json_body
     rescue => r
       res.body = {"status" => "Server Error: #{r.to_s}", "success" => "false"}.to_json
+      puts "server error:", req.body
     # raise r
     end
   end
