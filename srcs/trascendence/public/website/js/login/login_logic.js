@@ -1,4 +1,4 @@
-import { navigate} from "../main.js";
+import { navigate, save_global} from "../main.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../error_main.js";
@@ -75,6 +75,7 @@ async function get_data()
         bio: user.bio,
         type: "login"
       };
+      save_global("acess", true);
       remove_all(1, 1);
       save_global("name", new_user.realname);
       change_name(new_user.login_name);

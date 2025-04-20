@@ -51,20 +51,9 @@ const routes = {
     "/profile": Profile
 };
 
-export let Bracket_state = null;
-export let current_user = null;
-export let user_name = null;
-export let opponent = null;
-export let pong_save = null;
-export let forza4_save = null;
-export let Player1 = null;
-export let Player2 = null;
-export let in_game = null;
-export let winner = null;
-export let players = null;
-export let match_ended = null;
-export let robinranking = null;
-export let numPlayers = null;
+export let Bracket_state, current_user, user_name, opponent, pong_save, forza4_save = null;
+export let Player1, Player2, in_game, winner, players, match_ended, robinranking, numPlayers = null;
+export let acess = false;
 
 export async function initUser() {
     if (window.location.pathname !== "/")
@@ -111,6 +100,8 @@ export function save_global(type, data) {
         robinranking = parsed_data;
     if (type === "numP")
         numPlayers = parsed_data;
+    if (type === "acess")
+        acess = parsed_data;
 }
 
 export function nullify_user() {
@@ -271,7 +262,7 @@ window.onpopstate = function () {
 
 };
 // Handling "Forward" and "Backward" browser buttons
-window.addEventListener("popstate", () => {
+window.addEventListener("popstate", async() => {
     const path = window.location.pathname;
     if (prev_path === "/modes" && path === "/") {
         showInfoModal("you have quitted the active session", () => { });
@@ -286,7 +277,7 @@ window.addEventListener("popstate", () => {
         reset_all();
         resetBracketState();
         showInfoModal("you successfully exited the game", () => { });
-        loadContent();
+        await loadContent();
         return;
     }
     if ((path === "/tournament/knockout/bracket" || path === "/tournament/roundrobin/robinranking/game"
@@ -310,7 +301,7 @@ window.addEventListener("popstate", () => {
         showInfoModal("You finised the tournament yay");
         return;
     }
-    loadContent();
+    await loadContent();
 });
 
 function initChat() {
@@ -330,6 +321,39 @@ window.addEventListener('keydown', function (e) {
         sessionStorage.setItem("refresh", true);
     else
         sessionStorage.setItem("refresh", false);
+});
+
+window.addEventListener('storage', function(e)
+{
+    console.log("e = ", e);
+    const path = window.location.pathname;
+    const key = e.key === "session opened" || e.key === "already in";
+    console.log("key = ", key);
+    console.log("path = ", path);
+    console.log("value = ", e.value);
+    if (path === "/")
+    {
+        if(key === true)
+        {
+            if (e.value !== "0")
+            {
+                showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
+                remove_all(0, 0, 1);
+            }
+        }
+    }
+    else
+    {
+        if(key === true)
+        {
+            if (e.value !== "1")
+            {
+                navigate("/", "home");
+                showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
+                remove_all(0, 0, 1);
+            }
+        }
+    }
 });
 
 function to_string(name, value, isjson) {
@@ -366,6 +390,8 @@ function save_at_exit() {
         to_string("robinranked", robinranking, true);
     if (numPlayers)
         to_string("numP", numPlayers, true);
+    if (acess === true || acess === "true")
+        to_string("acess", acess, false);
 }
 
 window.addEventListener('beforeunload', () => {

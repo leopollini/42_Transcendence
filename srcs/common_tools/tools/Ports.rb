@@ -3,34 +3,35 @@
 module Ports
   HASH = {
     # sample:
-    # "method" => ["service_to_call", port_to_service]
-    # "GET" => ["localhost", 9001],
-    # "HEAD" => ["localhost", 9090],
-    # "log" => ["localhost", 8001],
-
-    '' => ['receiver', 8008],
-    'GET' => ['auth', 443],
-    'POST' => ['request_manager', 9000],
-    'HEAD' => ['request_manager', 9000],
-    'show_users' => ['request_manager', 9000],
-    'tokenizer' => ['tokenizer', 7890],
-
-    'get_user' => ['user_manager', 7080],
-    'update_user' => ['user_manager', 7080],
-    'login_user' => ['user_manager', 7080],
-    'logout_user' => ['user_manager', 7080],
+    # "method" => ["service_to_call", port_to_service, securiy_level]
+    # SECURITY LEVELS:
+    #  0 -> none
+    #  1 -> user wfqew
+    #  2 -> API key
     
-    'chat' => ['chat', 6087],
-    'broadcast' => ['internal_chat_support', 6088],
-    'send_msg' => ['internal_chat_support', 6088],
+    # '' => ['receiver', 8008],
+    # 'GET' => ['auth', 443],
+    # 'POST' => ['request_manager', 9000],
+    # 'HEAD' => ['request_manager', 9000],
+    # 'show_users' => ['request_manager', 9000],
+    # 'tokenizer' => ['tokenizer', 7890],
 
-    'save_pong_game' => ['game_data_manager', 8790],
-    'get_pong_games' => ['game_data_manager', 8790],
-    'save_f4_game' => ['game_data_manager', 8790],
-    'get_f4_games' => ['game_data_manager', 8790],
-    'get_all_games' => ['game_data_manager', 8790],
+    'get_user' => ['user_manager', 7080, 1],
+    'update_user' => ['user_manager', 7080, 1],
+    'login_user' => ['user_manager', 7080, 0],
+    'logout_user' => ['user_manager', 7080, 1],
+    
+    'chat' => ['chat', 6087, 1],
+    'broadcast' => ['internal_chat_support', 6088, 1],
+    'send_msg' => ['internal_chat_support', 6088, 1],
 
-    'match_invitation_request' => ['matchmaking', 6009]
+    'save_pong_game' => ['game_data_manager', 8790, 1],
+    'get_pong_games' => ['game_data_manager', 8790, 1],
+    'save_f4_game' => ['game_data_manager', 8790, 1],
+    'get_f4_games' => ['game_data_manager', 8790, 1],
+    'get_all_games' => ['game_data_manager', 8790, 1],
+
+    'match_invitation_request' => ['matchmaking', 6009, 1]
   }
   MAX_MSG_LEN = 100_000
 end

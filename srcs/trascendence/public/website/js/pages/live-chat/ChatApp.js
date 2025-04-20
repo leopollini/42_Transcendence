@@ -134,7 +134,7 @@ class ChatApp {
             const className = msg.from === this.username ? 'self' : 'other';
             return `<div class="message ${className}">
                         <div class="sender">
-                            ${msg.from.charAt(0).toUpperCase() + msg.from.slice(1)}
+                            ${msg.from.charAt(0) + msg.from.slice(1)}
                         </div>
                         <div class="text">
                             ${msg.content}
@@ -440,7 +440,7 @@ class ChatApp {
     
         //controllar login
         // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
-        if (user === this.username && (current_user.type === "guest" || current_user.type === "login")) {
+        if (user === this.username) {
             chatItem.style.display = 'none';
             addFriendItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
@@ -448,8 +448,7 @@ class ChatApp {
             blockItem.style.display = 'none';
             return;
         }
-              
-
+        
         if (this.blockedUsers.has(user)) {
             chatItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';

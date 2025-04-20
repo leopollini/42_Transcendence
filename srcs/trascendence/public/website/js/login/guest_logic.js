@@ -71,6 +71,7 @@ function update_guest(curr_guest)
     //console.log("(LOGIN_USER)\ndatas = ", data);
     if (data.status === "success" && data.success === "true")
     {
+      save_global("acess", true);
       remove_all(1, 1);
       //token = data.token;
       save_global("name", guest_user.display_name);

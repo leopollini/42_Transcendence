@@ -28,7 +28,6 @@ LOGIN = BetterPG::SimplePG.new 'users',
                                ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
                                 'created NUMERIC', 'num_friends NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT']
 
-
 GUEST = GuestsList.new
 # REQUIRED_FOR_ADDUSER = %w[email display_name realname bio image]
 
@@ -41,23 +40,13 @@ def login_user(client, obj)
   end
 
   r = nil
-  if (usr = LOGIN.select ['realname'], ['realname = ?'], [data['realname']])[0]
-    cols = []
-    keys = []
-    data.each do |key, val|
-      cols.append key.to_s
-      keys.append val.to_s
-    end
-    LOGIN.update cols, keys, ['id = ?'], [usr['id']]
-
-    LOGIN.update ['entered'], ['1'], ['id = ?'], [usr['id']]
-    usr['entered'] = 1
-
-    return usr.merge({'status' => 'success', 'success' => 'true'})
+  if (usr = LOGIN.select ['realname'], [data['realname']])[0]
+    LOGIN.valueManipulation 'realname', data['realname'], nil #COMPLETE PLEASE
+    return usr[0].merge({'status' => 'success', 'success' => 'true'})
   end rescue r
-  return {'status' => 'user_manager: bad request', 'success' => 'false'} unless r.nil?
-
-
+  return {'status' => "user_manager: bad request #{r.to_s}", 'success' => 'false'} if r
+  # return add_user(client, obj) if obj['do_create']
+  
   {'service' => 'user_manager', 'status' => 'user not found', 'success' => 'false'}
 end
 
@@ -66,12 +55,9 @@ def logout_user(client, obj)
   username = obj["username"]
   if username
     status = GUEST.del_guest(username)
-    if status && status['success'] == 'true'
-      return status
-    else
-      return status
-    end
+    return status
   end
+  {"status"=>"success", "success"=>"true"}
 end
 
 def get_user(_client, obj = nil)
@@ -94,12 +80,41 @@ def get_user(_client, obj = nil)
     res['status'] = 'no users found' if users.empty? && res['guest'].empty?
     return res
   end
+  
+  if params.class.to_s == 'Array'
+    puts 'looking for users with ' + params.to_s if DEBUG_MODE
+    params.each do |p|
+      cols = []
+      keys = []
+      p.reject{ |key, _val| key == 'username' || key == 'logged_in' }.each do |key, val|
+        return DEFAULT_ERROR_RES.clone if key.nil? || key.empty?
+
+        cols.append key.to_s
+        keys.append val.to_s
+      end
+      if p  && p['token'] == "token"
+        token = TokenManager.read_token_guest
+        status = GUEST.get_token_name(token)
+        puts "get_user #{status}".green
+        return status
+      end
+      if !cols.empty?
+        users = LOGIN.select(cols, keys)
+        lst = lst + users
+      end
+    end
+    res = DEFAULT_SUCCESS_RES.clone
+    res['status'] = 'no users found' if lst.empty? && lst_guest.empty?
+    res['user'] = lst
+    res['guest'] = lst_guest
+
+    # In case no filter is given returns whole databases
+  end
+  res
 end
 
-
 def update_user(_client, obj = nil)
-  puts "\n\n\n\nhahahahhahahahahahah\n\n\n\n".yellow
-  puts 'update_user called' if DEBUG_MODE
+  puts 'update_user called'.green if DEBUG_MODE
 
   r = nil
   res = DEFAULT_ERROR_RES.clone
@@ -108,7 +123,7 @@ def update_user(_client, obj = nil)
   return { 'service' => 'user_manager', 'status' => 'Invalid login name change request', 'success' => 'false' } if params.include? 'display_name'
 
   usr = begin
-    (LOGIN.select ['display_name'], ['?'], [lname])[0]
+    (LOGIN.select ['display_name'], [lname])[0]
   rescue StandardError
     r
   end
@@ -130,9 +145,10 @@ def user_manager(client, _server)
   res = DEFAULT_ERROR_RES.clone
   t = select [client], [], [], 20 # waits for client, a few seconds
   return if t.nil? || t[0].empty? || client.closed?
-
+  
   msg = client.read_nonblock Ports::MAX_MSG_LEN
   bobj = JSON.parse msg
+  puts "Content:".yellow, bobj
   # client.puts "HTTP/1.1 200 OK\r\n\r\n" if bobj['header'] # parsed an http request
   begin
     res = case bobj['method'].to_s

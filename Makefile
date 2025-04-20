@@ -25,9 +25,9 @@ all: prep_dirs #stop_containers
 	make -C ./srcs/common_tools/ all
 	@echo -e "$(YELLOW)Avvio container Docker...$(NC)"; \
 	if [ "$${DETATCH}" = "true" ]; then \
-		sudo docker-compose -f ./docker-compose.yml up -d; \
+		docker-compose -f ./docker-compose.yml up -d; \
 	else \
-		sudo docker-compose -f ./docker-compose.yml up; \
+		docker-compose -f ./docker-compose.yml up; \
 	fi
 
 $(CONTAINERS): prep_dirs
@@ -90,7 +90,6 @@ clean:
 		echo -e "${RED}Nessun container Docker trovato, skippo la parte Docker.${NC}"; \
 	fi
 	# Destroy all directories
-	rm -rf /data/wordpress
 	@echo -e "${GREEN}pulizia base completata	${NC}"
 
 fclean: clean

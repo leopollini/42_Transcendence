@@ -20,14 +20,14 @@ function reset_value(path) {
     }
     if (already === '1' && session === '0')
         localStorage.setItem('session opened', 1);
-    if ((already !== '1' && already !== '0') || (session !== '1' && session !== '0')) {
+    /* if ((already !== '1' && already !== '0') || (session !== '1' && session !== '0')) {
         if (path !== '/') {
             navigate("/", "home");
             remove_all(0, 0, 1);
         }
         remove_all(0, 0);
         showInfoModal("Error: Operation uniavable,quitting session...");
-    }
+    } */
 }
 
 export function remove_all(session, already, all) {
@@ -38,6 +38,7 @@ export function remove_all(session, already, all) {
             else
                 save_global("name", current_user.display_name);
         }
+        save_global("acess", false);
         free_users();
         nullify_user();
     }
@@ -127,6 +128,10 @@ function refresh_reset(path) {
         if (sessionStorage.getItem("numP")) {
             save_global("numP", sessionStorage.getItem("numP"));
             sessionStorage.removeItem("numP");
+        }
+        if (sessionStorage.getItem("acess")) {
+            save_global("acess", sessionStorage.getItem("acess"));
+            sessionStorage.removeItem("acess");
         }
     }
 }

@@ -33,7 +33,8 @@ class GuestsList
       'created' => Time.now.to_i,
       'deleted' => -1,
       'bio' => data['bio'].to_s,
-      'image' => data['image'].to_s
+      'image' => data['image'].to_s,
+      # 'token' => token
     }
   
     @index[username] = index
@@ -48,7 +49,7 @@ class GuestsList
   
   def del_guest(username)
     index = @index[username]
-    return { 'status' => 'user not found', 'success' => 'false' } unless index
+    return { 'status' => 'user not found', 'success' => 'false' } if index.nil?
   
     @guests[index] = nil
     @index.delete(username)
@@ -75,8 +76,42 @@ class GuestsList
   
     guest['bio'] = new_data['bio'] if new_data['bio']
     guest['image'] = new_data['image'] if new_data['image']
-  
     { 'status' => 'success', 'success' => 'true' }
   end
+  def get_token_name(token)
+    unless @guests.empty?
+      return {'statuts' => 'bad token', 'success' => 'false'} if token.nil?
+      @guests[1..].each do |entry|
+        next if entry.nil?
+        if entry['token'].to_s.strip == token.to_s.strip
+          return {
+            'status' => 'success',
+            'success' => 'true',
+            'username' => entry['username'],
+            'bio' => entry['bio'],
+            'image' => entry['image'],
+            'type' => 'guest'
+          }
+        end
+      end
+      return {'status' => 'invalid token', 'success' => 'false'}
+    else
+      return {'status' => 'no users found', 'success' => 'false'}
+    end
+  end
 
+
+  def del_guest_by_token(token)
+    unless @guests.empty?
+      @guests[1..].each_with_index do |entry, index|
+        next if entry.nil?
+        if entry['token'].to_s.strip == token.to_s.strip
+          @guests.delete_at(index + 1)
+          @index.delete token
+          return {'service' => 'user_manager', 'status' => "guest deleted succesfully", 'success' => 'true'}
+        end
+      end
+      return {'service' => 'user_manager', 'status' => " (guest) does not exist", 'success' => 'false'}
+    end
+  end
 end
