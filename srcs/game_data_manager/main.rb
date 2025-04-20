@@ -20,12 +20,13 @@ PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 GAMES_PONG = BetterPG::SimplePG.new 'pong_games_history', ['player1 TEXT', 'player2 TEXT', 'score1 INT', 'score2 INT', 'winner TEXT', 'begin_time INT', 'duration INT', 'longest_rally INT']
 GAMES_F4 = BetterPG::SimplePG.new 'forza4_games_history', ['player1 TEXT', 'player2 TEXT', 'winner TEXT', 'moves INT', 'begin_time INT', 'duration INT']
-LOGIN = BetterPG::SimplePG.new 'users', ['realname TEXT', 'wins INT', 'loss INT']
 
 def get_pong(obj)
   puts 'get_pong called'
-  name = obj['realname']
+  name = obj['display_name']
+  return {'status' => 'player name not specified', 'success' => 'false'} if name.nil? || name.empty?
   games = GAMES_PONG.select(['player1', 'player2'], [name, name], [], 'OR')
+  return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'games'=>(games.filter {|g| g['winner'] == name}).size } if obj['count_victories'] == 'true'
   return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'games'=>games }
 end
 
@@ -47,7 +48,7 @@ end
 
 def get_f4(obj)
   puts 'get_f4 called'
-  name = obj['realname']
+  name = obj['display_name']
   games = GAMES_F4.select(['player1', 'player2'], [name, name], [], 'OR')
   return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'games'=>games }
 end
