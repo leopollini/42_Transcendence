@@ -68,48 +68,6 @@ export function free_users()
 {
     try
     {
-        let data = JSON.stringify({"username" : user_name});
-        fetch("http://localhost:8008",
-        {
-            method: "logout_user",
-            body: data
-        })
-        .then(response => response.json())
-        .then(data =>
-        {
-            if (data)
-            {
-                if (data.status === " (guest) does not exist" || data.status === "user not found")
-                    return;
-                if (data.status && data.success)
-                {
-                    if (data.status !== "success" && data.success !== "true")
-                        showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
-                }
-            }
-        })
-        .catch(error =>
-        {
-            remove_all(0, 0, 1);
-            if (window.location.pathname !== '/')
-                navigate("/", "home");
-            showInfoModal("Error with fetch logout_user:", error);
-        });
-    }
-    catch (error)
-    {
-        remove_all(0, 0, 1);
-        if (window.location.pathname !== '/')
-            navigate("/", "home");
-        showInfoModal("Error in logout_user:", error);
-    }
-}
-
-
-/*export function free_users()
-{
-    try
-    {
         let data = JSON.stringify({"diplay_name" : user_name});
         fetch("http://localhost:8008",
         {
@@ -119,6 +77,7 @@ export function free_users()
         .then(response => response.json())
         .then(data =>
         {
+            console.log("data of logout = ", data);
             if (data)
             {
                 if (data.status === " (guest) does not exist")
@@ -132,7 +91,7 @@ export function free_users()
         })
         .catch(error =>
         {
-            remove_all(0, 0, 1);
+            remove_all(0, 0);
             if (window.location.pathname !== '/')
                 navigate("/", "home");
             showInfoModal("Error with fetch logout_user:", error);
@@ -140,10 +99,9 @@ export function free_users()
     }
     catch (error)
     {
-        remove_all(0, 0, 1);
+        remove_all(0, 0);
         if (window.location.pathname !== '/')
             navigate("/", "home");
         showInfoModal("Error in logout_user:", error);
     }
 }
-*/

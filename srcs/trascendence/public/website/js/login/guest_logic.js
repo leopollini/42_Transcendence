@@ -59,7 +59,7 @@ function update_guest(curr_guest)
       curr_guest.image,
       "guest"
   );
-  const data = JSON.stringify({data : {username: guest_user.display_name,image: guest_user.image},login_as_guest: "true"});
+  const data = JSON.stringify({data : {username: guest_user.display_name,image: guest_user.image, login_as_guest: "true"}});
   fetch("http://localhost:8008",
   {
       method: "login_user",
@@ -68,19 +68,18 @@ function update_guest(curr_guest)
   .then(response => response.json())
   .then(data =>
   {
-    //console.log("(LOGIN_USER)\ndatas = ", data);
-    if (data.status === "success" && data.success === "true")
+    if (data.status === "success")
     {
-      save_global("acess", true);
       remove_all(1, 1);
-      //token = data.token;
+      save_global("acess", true);
+      save_global("token", data.token);
       save_global("name", guest_user.display_name);
       navigate("/modes", "Modalità di gioco");
     }
     else
     {
-      guest_user = null;
       remove_all(0, 0, 1);
+      guest_user = null;
       if (data.status === "no users found")
         showInfoModal("ERROR: Name already taken, try a different one", () => {});
       else

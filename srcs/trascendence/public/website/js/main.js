@@ -1,34 +1,45 @@
 import Login, { addLoginPageHandlers } from "./pages/profile/login.js";
+import Callback from "./login/login_logic.js";
 import Modes, { addModesPageHandlers } from "./pages/modes.js";
-import Tournament, { addTournamentPageHandlers } from "./pages/tournament/tournament.js";
-import PongGame from "./pages/pong_game.js";
-import ClassicPongLobbyRoom, { handleClassicPongLobby, addClassicPongLobbyPageHandlers } from "./pages/classic_pong_lobby.js";
-import Knockout, { addKnockoutPageHandlers } from "./pages/tournament/knockout.js";
-import Customize, { addCustomizeGame } from "./pages/profile/customize.js";
-import Roundrobin, { addRoundRobinPageHandlers } from "./pages/tournament/roundrobin.js";
-import RobinRanking, { addRobinRankingPageHandlers, robinDraw, assignPointsToPlayer, reset_all } from "./pages/tournament/robindraw.js";
-import LobbyRoom, { addLobbyPageHandlers, handleLobby } from "./pages/tournament/tournament_lobby.js";
-import Bracket, { addBracketPageHandlers, backToBracket, resetBracketState } from "./pages/tournament/bracket.js";
-import { initializeGameCanvas } from "./game/pong/main/handling_Canvas.js";
 import Profile, { profileHandler } from "./pages/profile/profile.js";
 import Settings, { addSettingsPageHandlers } from "./pages/profile/settings.js";
-import { userName } from "./pages/user_data.js";
+import Customize, { addCustomizeGame } from "./pages/profile/customize.js";
+
+import PongGame from "./pages/pong_game.js";
+import ClassicPongLobbyRoom, { handleClassicPongLobby, addClassicPongLobbyPageHandlers } from "./pages/classic_pong_lobby.js";
+
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
-import { GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers } from "./pages/game_statistics.js";
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
+
+import Tournament, { addTournamentPageHandlers } from "./pages/tournament/tournament.js";
+import Knockout, { addKnockoutPageHandlers } from "./pages/tournament/knockout.js";
+import Roundrobin, { addRoundRobinPageHandlers } from "./pages/tournament/roundrobin.js";
+import LobbyRoom, { addLobbyPageHandlers, handleLobby } from "./pages/tournament/tournament_lobby.js";
+import Bracket, { addBracketPageHandlers, backToBracket, resetBracketState } from "./pages/tournament/bracket.js";
+import RobinRanking, {
+  addRobinRankingPageHandlers,
+  robinDraw,
+  assignPointsToPlayer,
+  reset_all
+} from "./pages/tournament/robindraw.js";
+
+import { initializeGameCanvas } from "./game/pong/main/handling_Canvas.js";
+import { userName } from "./pages/user_data.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
+import { GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers } from "./pages/game_statistics.js";
 import { check_valid_operation, remove_all } from "./error_main.js";
 import { showInfoModal } from "./modal.js";
 import { restore_user } from "./login/user.js";
-let buttonTitle;
 
+let buttonTitle;
 let prev_path = null;
 
 // Mappa delle rotte
 const routes = {
-    "/": Login,
+    "/":Login,
+    "/callback": Callback,
     "/modes": Modes,
     "/classic": PongGame,
     "/classic/lobby": ClassicPongLobbyRoom,
@@ -51,9 +62,15 @@ const routes = {
     "/profile": Profile
 };
 
-export let Bracket_state, current_user, user_name, opponent, pong_save, forza4_save = null;
+export let Bracket_state, current_user, user_name, opponent, pong_save, forza4_save, token = null;
 export let Player1, Player2, in_game, winner, players, match_ended, robinranking, numPlayers = null;
 export let acess = false;
+
+export function reset_all_let()
+{
+    Bracket_state, current_user, user_name, opponent, pong_save, forza4_save, token = null;
+    Player1, Player2, in_game, winner, players, match_ended, robinranking, numPlayers = null;
+}
 
 export async function initUser() {
     if (window.location.pathname !== "/")
@@ -86,6 +103,8 @@ export function save_global(type, data) {
         Player1 = parsed_data;
     if (type === "p2")
         Player2 = parsed_data;
+    if (type === "token")
+        token = parsed_data;
     if (type === "bracket")
         Bracket_state = parsed_data
     if (type === "game")
@@ -151,6 +170,7 @@ const loadContent = async () => {
         return;
     else
         await initUser();
+    setInterval(check_change, 100);
     let playerNames;
     if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8"
         || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
@@ -159,7 +179,7 @@ const loadContent = async () => {
         players = createPlayersArray(numPlayers);
     playerNames = players;
     if (component) {
-        app.innerHTML = component();//sicuro se lo purifichi blocca codici
+        app.innerHTML = component();
         if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
             //console.log("playerzzzz2: " + players);
             in_game = 1;
@@ -323,30 +343,24 @@ window.addEventListener('keydown', function (e) {
         sessionStorage.setItem("refresh", false);
 });
 
-window.addEventListener('storage', function(e)
+const check_change = () =>
 {
-    console.log("e = ", e);
-    const path = window.location.pathname;
-    const key = e.key === "session opened" || e.key === "already in";
-    console.log("key = ", key);
-    console.log("path = ", path);
-    console.log("value = ", e.value);
+    let path = window.location.pathname;
+    const session = localStorage.getItem("session opened");
+    const already = sessionStorage.getItem("already in");
     if (path === "/")
     {
-        if(key === true)
+        if (session !== "0" || already !== "0")
         {
-            if (e.value !== "0")
-            {
-                showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
-                remove_all(0, 0, 1);
-            }
+            showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
+            remove_all(0, 0, 1);
         }
     }
     else
     {
-        if(key === true)
+        if(acess === true || acess === "true")
         {
-            if (e.value !== "1")
+            if (session !== '1' || already !== '1')
             {
                 navigate("/", "home");
                 showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
@@ -354,7 +368,7 @@ window.addEventListener('storage', function(e)
             }
         }
     }
-});
+};
 
 function to_string(name, value, isjson) {
     if (typeof value === "object" && value !== null && isjson)
@@ -392,6 +406,8 @@ function save_at_exit() {
         to_string("numP", numPlayers, true);
     if (acess === true || acess === "true")
         to_string("acess", acess, false);
+    if (token)
+        to_string("token", token, false);
 }
 
 window.addEventListener('beforeunload', () => {

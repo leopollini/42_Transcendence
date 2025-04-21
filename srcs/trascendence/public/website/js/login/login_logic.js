@@ -1,19 +1,68 @@
-import { navigate, save_global} from "../main.js";
-import { update_image, change_name} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../error_main.js";
+import { navigate, save_global, token} from "../main.js";
+import { update_image, change_name} from "../pages/modes.js"
 
-/*async function get_data()
-{
-  try
-  {
-    const data = JSON.stringify({"params": {"display_name": user_name}, "token": token});
+export default function Callback() {
+  return `
+    `;
+}
+
+export async function addCallbackPageHandlers() {
+  let let_me_in = await checkAuthentication(window.location.pathname);
+  if (let_me_in === 1) {
+    await navigate("/", "Home");
+    return (1);
+  }
+  else if (let_me_in === -1) {
+    await navigate("/modes", "Return to Game Mode");
+    return (1);
+  }
+}
+
+async function checkAuthentication() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    if (!code) {
+      showInfoModal("Missing OAuth parameters.", () => { });
+      navigate("/", "Return to home");
+      remove_all(0, 0, 1);
+      return;
+    }
+    const response = await fetch('/api/callback?' + params.toString());
+    const data = await response.json();
+
+    console.log("data: ", data);
+    if (data.success) {
+      save_global("name", data.realname);
+      showInfoModal(data.message, () => { });
+      await get_data();
+      navigate("/modes", "Modalità di gioco");
+    } else {
+      showInfoModal("Autenticazione fallita: " + (data.error || "Unknown Error"), () => {
+      });
+      navigate("/", "Return to home");
+      remove_all(0, 0, 1);
+    }
+  } catch (error) {
+    showInfoModal("Errore durante la gestione del callback: " + error.message, () => { });
+    remove_all(0, 0, 1);
+    navigate("/", "Return to home");
+  }
+}
+
+async function get_data() {
+  try {
+    const data = JSON.stringify({ "params": { "display_name": user_name }, "token": token });
     const response = await fetch("http://localhost:8008", {
-        method: "get_user",
-        body: data
+      method: "get_user",
+      body: data
     })
     const result = await response.json();
     console.log("(GET_USER)\ndata login = ", result);
+    save_global("token", data.token);
+    if (result && result.status === "true") {
       let new_user =
       {
         email: result.email,
@@ -24,124 +73,38 @@ import { remove_all } from "../error_main.js";
         type: "login"
       };
       remove_all(1, 1);
-      update_name(new_user.realname);
       change_name(new_user.login_name);
       update_image(new_user.image);
-      return ;
+      return;
     }
-    else
-    {
+    else {
       remove_all(0, 0, 1);
       if (window.location.pathname !== '/')
         navigate("/", "home");
-      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => {});;
+      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => { });;
       return;
     }
   }
-  catch (error)
-  {
+  catch (error) {
     remove_all(0, 0, 1);
     if (window.location.pathname !== '/')
       navigate("/", "home");
-    showInfoModal("Error during Login in get_user: " + error.message, () => {});
-    return;
-  }
-}
-*/
-
-async function get_data()
-{
-  try
-  {
-    const data = JSON.stringify({});
-    const response = await fetch("http://localhost:8008", {
-        method: "get_user",
-        body: data
-    })
-    const result = await response.json();
-    console.log("(GET_USER)\ndata login = ", result);
-    let name;
-    if (result.user && Array.isArray(result.user))
-      name = result.user.find(user => user.entered === 1);
-    if (name)
-    {
-      const user = name;
-      let new_user =
-      {
-        email: user.email,
-        login_name: user.display_name,
-        realname: user.realname,
-        image: user.image,
-        bio: user.bio,
-        type: "login"
-      };
-      save_global("acess", true);
-      remove_all(1, 1);
-      save_global("name", new_user.realname);
-      change_name(new_user.login_name);
-      update_image(new_user.image);
-      return ;
-    }
-    else
-    {
-      remove_all(0, 0, 1);
-      if (window.location.pathname !== '/')
-        navigate("/", "home");
-      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => {});;
-      return;
-    }
-  }
-  catch (error)
-  {
-    remove_all(0, 0, 1);
-    if (window.location.pathname !== '/')
-      navigate("/", "home");
-    showInfoModal("Error during Login in get_user: " + error.message, () => {});
+    showInfoModal("Error during Login in get_user: " + error.message, () => { });
     return;
   }
 }
 
 export async function performLogin() {
-    try
-    {
-      const response = await fetch('/auth/login');
-      const data = await response.json();
+  try {
+    const response = await fetch('/auth/login');
+    const data = await response.json();
+    console.log("data = ", data);
+    if (data.auth_url) {
       window.location.href = data.auth_url;
-    }
-    catch (error)
-    {
-      showInfoModal("Error during login: " + error.message, () => {});
-    }
-}
+    } else
+      throw new Error("No auth_url received");
 
-export const checkAuthentication = async (path) =>
-{
-  if (path === "/callback")
-  {
-    try
-    {
-      const response = await fetch('/api/callback?' + new URLSearchParams(window.location.search));
-      const data = await response.json();
-      
-      //console.log("data: ", data);
-      if (data.success === true)
-      {
-        showInfoModal(data.message, () => {});
-        await get_data()
-        navigate("/modes", "Modalità di gioco");
-        return (0);
-      }
-      else
-      {
-        showInfoModal("Autenticazione fallita: " + (data.error || "Unknown Error"), () => {});
-        return (1);
-      }
-
-    }
-    catch (error)
-    {
-      showInfoModal("Errore durante la gestione del callback: " + error.message, () => {});
-      return (1);
-    }
+  } catch (error) {
+    showInfoModal("Error during login: " + error.message, () => { });
   }
-};
+}

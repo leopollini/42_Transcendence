@@ -1,5 +1,5 @@
-import { current_user, navigate, user_name } from "../main.js";
-import {updateProfileUI} from "../pages/modes.js";
+import { navigate, user_name, token } from "../main.js";
+import { updateProfileUI } from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../error_main.js";
 
@@ -14,8 +14,7 @@ export class user {
 }
 
 export class profile {
-    constructor(email, display_name, realname, bio, image, type)
-    {
+    constructor(email, display_name, realname, bio, image, type) {
         this.email = email;
         this.display_name = display_name;
         this.realname = realname
@@ -28,73 +27,58 @@ export class profile {
 export let friend_list = [];
 
 export class Friend {
-    constructor(name, status)
-    {
+    constructor(name, status) {
         this.name = name;
         this.status = status;
     }
 }
 
-export async function restore_user()
+function set_user(user, type)
 {
-    try
-    {
-        if (window.location.pathname === '/' || (sessionStorage.getItem('already in') !== '1' && localStorage.getItem('session opened', 0) !== '1'))
+    let new_user = new profile(
+        user.email,
+        user.username,
+        user.realname,
+        user.bio,
+        user.image,
+        type
+    );
+    return new_user;
+}
+
+export async function restore_user() {
+    try {
+        if (window.location.pathname === '/')
             return null;
-
-        let data = JSON.stringify({});
+        let data = JSON.stringify({ "params": { "display_name": user_name, "token": token } });
         const response = await fetch("http://localhost:8008",
-        {
-            method: "get_user",
-            body: data
-        })
+            {
+                method: "get_user",
+                body: data
+            })
 
-        const result = await response.json();
-        // console.log("(get_user)\nData login = ", result);
-        if (result)
-        {
-            let name;
-            let username = user_name;
-            if (Array.isArray(result.guest))
-            {
-                name = result.guest.filter(guest => guest !== null)
-                .find(guest => guest.username === username);
-            }
-            if (!name && Array.isArray(result.user))
-                name = result.user.find(user => user.realname === username);
-            if (name)
-            {
-                const ref_user = new profile(
-                    name.email,
-                    name.username,
-                    name.realname,
-                    name.bio,
-                    name.image,
-                    name.type
-                );
-                remove_all(1, 1);
-                updateProfileUI(ref_user);
-                return ref_user;
-            }
+        let result = await response.json();
+        //console.log("(get_user)\nData login = ", result);
+        if (result) {
+            let ref_user;
+            if (result.guest)
+                ref_user = set_user(result.guest, "guest");
             else
-            {
-                remove_all(0, 0, 1);
-                if (window.location.pathname !== '/')
-                    navigate("/", "home");
-                showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => {});
-                return null;
-            }
+                ref_user = set_user(result.user, "login");
+            remove_all(1, 1);
+            updateProfileUI(ref_user);
+            return ref_user;
         }
-        else
-        {
+        else {
             remove_all(0, 0, 1);
             if (window.location.pathname !== '/')
                 navigate("/", "home");
-            showInfoModal("no result??", () => {});
+            showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => { });
+            return null;
         }
     }
-    catch (error)
-    {
+    catch (error) {
+        console.log("Eroor in get_user = ", error);
         remove_all(0, 0, 1);
         if (window.location.pathname !== '/')
             navigate("/", "home");
@@ -102,53 +86,3 @@ export async function restore_user()
         return null;
     }
 }
-
-/*export async function restore_user()
-{
-    try
-    {
-        if (window.location.pathname === '/' || (sessionStorage.getItem('already in') !== '1' && localStorage.getItem('session opened', 0) !== '1'))
-            return null;
-
-        let data = JSON.stringify({"params": {"display_name": user_name}});
-        const response = await fetch("http://localhost:8008",
-        {
-            method: "get_user",
-            body: data
-        })
-
-        const result = await response.json();
-        // console.log("(get_user)\nData login = ", result);
-        if (result)
-        {
-                const ref_user = new profile(
-                    result.email,
-                    result.username,
-                    result.realname,
-                    result.bio,
-                    result.image,
-                    result.type
-                );
-                remove_all(1, 1);
-                updateProfileUI(ref_user);
-                return ref_user;
-        }
-        else
-        {
-            remove_all(0, 0, 1);
-            if (window.location.pathname !== '/')
-                navigate("/", "home");
-            showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => {});
-            return null;
-        }
-    }
-    catch (error)
-    {
-        remove_all(0, 0, 1);
-        if (window.location.pathname !== '/')
-            navigate("/", "home");
-        showInfoModal("Error with get_user:", error);
-        return null;
-    }
-}
-*/

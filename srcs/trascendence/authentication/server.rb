@@ -60,7 +60,6 @@ server = WEBrick::HTTPServer.new(
 class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     puts "####", req.request_method, res, "####"
-    #return request_sorter req if req.method == "OPTIONS"
     status, headers, body = APP.call(req.meta_vars)
     res.status = status
     res['Content-Security-Policy'] =
@@ -83,10 +82,6 @@ class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
       else
         body.each { |chunk| res.body << chunk }
       end
-    end
-  
-    if status >= 400
-      LOGGER.error("#{status} Error: #{req.path}".red)
     end
   end
 end

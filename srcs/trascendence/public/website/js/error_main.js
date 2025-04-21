@@ -1,9 +1,9 @@
 import { free_users } from "./security/security.js";
 import { resetMatchStatsData } from "./game/pong/data/game_stats.js";
-import {nullify_user, navigate, current_user,opponent, save_global,in_game} from "./main.js";
+import {nullify_user, navigate, reset_all_let, current_user,opponent, save_global,in_game, user_name} from "./main.js";
 import { showInfoModal } from "./modal.js";
-import { checkAuthentication } from "./login/login_logic.js";
 import { resetBracketState } from "./pages/tournament/bracket.js";
+import { addCallbackPageHandlers } from "./login/login_logic.js";
 
 function reset_value(path) {
     let session = localStorage.getItem('session opened');
@@ -38,8 +38,10 @@ export function remove_all(session, already, all) {
             else
                 save_global("name", current_user.display_name);
         }
+        reset_all_let();
         save_global("acess", false);
-        free_users();
+        if (current_user && user_name)
+            free_users();
         nullify_user();
     }
     localStorage.clear();
@@ -51,6 +53,11 @@ export function remove_all(session, already, all) {
 export async function check_valid_operation(path, component) {
     reset_value(path);
     refresh_reset(path);
+    if (path === "/callback")
+    {   
+        await addCallbackPageHandlers();
+        return (1);
+    }
     if (path === "/tournament/knockout/lobby" || path === "/tournament/roundrobin/lobby") {
         save_global("bracket", null);
         save_global("players", null);
@@ -68,7 +75,7 @@ export async function check_valid_operation(path, component) {
     if (await cont_check(path, component) === 1)
         return (1);
     if (path !== "/" && path !== "/classic" && path !== "/forza4/game"
-        && path !== "/tournament/knockout/bracket/game" && path !== "/tournament/roundrobin/robinranking/game") {
+    && path !== "/tournament/knockout/bracket/game" && path !== "/tournament/roundrobin/robinranking/game") {
         save_global("opponent", null);
         remove_all(1, 1);
     }
@@ -108,6 +115,10 @@ function refresh_reset(path) {
         if (sessionStorage.getItem("game")) {
             save_global("game", sessionStorage.getItem("game"));
             sessionStorage.removeItem("game");
+        }
+        if (sessionStorage.getItem("token")) {
+            save_global("token", sessionStorage.getItem("token"));
+            sessionStorage.removeItem("token");
         }
         if (sessionStorage.getItem("winner")) {
             save_global("winner", sessionStorage.getItem("winner"));
@@ -151,15 +162,6 @@ async function cont_check(path, component) {
         app.innerHTML = No_Page();
         return (1);
     }
-    let let_me_in = await checkAuthentication(path);
-    if (let_me_in === 1) {
-        await navigate("/", "Home");
-        return (1);
-    }
-    else if (let_me_in === -1) {
-        await navigate("/modes", "Return to Game Mode");
-        return (1);
-    }
     return (0);
 }
 
@@ -167,7 +169,7 @@ function continue_error_check(path) {
     let session = localStorage.getItem('session opened');
     let already = sessionStorage.getItem('already in');
     if ((session === '1' && already === '0')
-        || (already === '0' && session === '0')) {
+    || (already === '0' && session === '0')) {
         remove_all(0, 0, 1);
         showInfoModal("ERROR: accessing unauthorized page...", () => { });
         navigate("/", "home");
