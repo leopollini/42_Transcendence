@@ -166,6 +166,14 @@ const loadContent = async () => {
     const app = document.getElementById("app");
     const component = routes[path];
     set_prev_path();
+    if (!component) {
+        app.innerHTML = `
+            <div class="error-container">
+                <h1>404 - Page not found</h1>
+                <p>Sorry, the page you're looking for doesn't exist.</p>
+            </div>`
+        return;
+    }
     if (await check_valid_operation(path, component) === 1)
         return;
     else

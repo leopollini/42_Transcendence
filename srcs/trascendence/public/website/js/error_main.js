@@ -50,7 +50,7 @@ export function remove_all(session, already, all) {
     sessionStorage.setItem('already in', already);
 }
 
-export async function check_valid_operation(path, component) {
+export async function check_valid_operation(path) {
     reset_value(path);
     refresh_reset(path);
     if (path === "/callback")
@@ -72,7 +72,7 @@ export async function check_valid_operation(path, component) {
         if (continue_error_check(path) === 1)
             return (1);
     }
-    if (await cont_check(path, component) === 1)
+    if (await cont_check(path) === 1)
         return (1);
     if (path !== "/" && path !== "/classic" && path !== "/forza4/game"
     && path !== "/tournament/knockout/bracket/game" && path !== "/tournament/roundrobin/robinranking/game") {
@@ -147,7 +147,7 @@ function refresh_reset(path) {
     }
 }
 
-async function cont_check(path, component) {
+async function cont_check(path) {
     if (!opponent && (path === "/classic" || path === "/forza4/game")) {
         navigate("/modes", "return to modes");
         showInfoModal("the operation you are doing is forbidden", () => { });
@@ -157,10 +157,6 @@ async function cont_check(path, component) {
         resetBracketState();
         resetMatchStatsData();
         save_global("game", null);
-    }
-    if (!component) {
-        app.innerHTML = No_Page();
-        return (1);
     }
     return (0);
 }
@@ -175,13 +171,4 @@ function continue_error_check(path) {
         navigate("/", "home");
         return (1);
     }
-}
-
-export default function No_Page() {
-    return `
-      <div class="error-container">
-        <h1>404 - Page not found</h1>
-        <p>Sorry, the page you're looking for doesn't exist.</p>
-      </div>
-    `;
 }
