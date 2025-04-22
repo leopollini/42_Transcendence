@@ -53,7 +53,7 @@ class ChatService < WEBrick::Websocket::Servlet
           unless ChatStore.clients[@username].friends.include? target
             return ChatStore.clients[@username].send_sys "The message could not be delivered" 
           end
-          message["to"].to_s = target
+          message["to"] = target.to_s
           ChatStore.clients[target].send_me message, 'private_message'
           ChatStore.clients[@username].send_me message, 'private_message'
         end
@@ -69,7 +69,7 @@ class ChatService < WEBrick::Websocket::Servlet
         ChatStore.remove_friend target, @username
 
       when "private_chat_started"
-        ChatStore.start_private_chat(@username)
+        ChatStore.start_private_chat target, @username
 
       when "block_user"
         ChatStore.block target, @username
@@ -122,7 +122,7 @@ def internal_call(client, server)
     ChatStore.clients[bobj['to']].send_me({'date' => Time.now.iso8601, 'from' => 'sys', 'content' => bobj['content']}, bobj['type'] ? bobj['type'] : 'message') rescue r
     client.puts
   when 'get_online'
-    client.puts ChatStore.get_online.to_json
+    client.puts ChatStore.get_online(bobj['include_guests']).to_json
   else
     puts "Unknown method called (#{bobj['method']})"
   end

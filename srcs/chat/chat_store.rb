@@ -172,8 +172,8 @@ class ChatStore
     client.send_me(info, "state")
   end
 
-  def self.start_private_chat(user)
-    @@clients[target].send_me({"from" => @username}, 'private_chat_started')
+  def self.start_private_chat(target, user)
+    @@clients[target].send_me({"from" => user}, 'private_chat_started')
   end
 
   def self.clients
@@ -184,7 +184,18 @@ class ChatStore
     @@clients[username].close_sock
   end
 
-  def self.get_online
-    @@clients.keys
+  def self.get_online(include_guests)
+    users = @@clients.keys
+    puts "all connected users: " + users.to_s
+    if include_guests.to_s != 'true'
+      login_users = []
+      (JSON.parse SimpleServer::method_req("get_user", {'avoid_guests' => 'true'}))['user'].each do |u|
+        login_users << u['display_name']
+      end
+      puts "all login users: " + login_users.to_s
+      users = users & login_users
+      puts "connected login users: " + users.to_s
+    end
+    {"status" => (users.empty? ? "no online users" : "success"), "success" => "true", "online_users" => users}
   end
 end

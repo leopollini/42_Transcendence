@@ -89,9 +89,9 @@ def get_user(_client, obj = nil)
   puts 'get_user called'.green if DEBUG_MODE
   params = obj['params']
   if params.nil? || params.empty?
-    users = LOGIN.select
+    users =  (obj['avoid_logins'] == 'true' ? [] : LOGIN.select )
     users.each {| u | u = u.slice(GET_USER_SECURE_INFO)}
-    guests = GUEST.get_all_guests
+    guests = (obj['avoid_guests'] == 'true' ? [] : GUEST.get_all_guests)
     guests.each {| u | u = u.slice(GET_USER_SECURE_INFO)}
     return {'status' => (users.empty? && guests.empty? ? 'no user found' : 'returning whole database'), 'success' => 'true', 
               'guest' => guests, 'user' => users}

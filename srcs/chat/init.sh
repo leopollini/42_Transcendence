@@ -2,7 +2,7 @@
 
 /var/common/setup_tools.sh
 
-GEMS=('webrick-websocket')
+GEMS=('webrick-websocket' 'colorize', 'json')
 
 for gm in $GEMS
 do
