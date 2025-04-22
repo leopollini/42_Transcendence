@@ -26,7 +26,7 @@ def get_pong(obj)
   name = obj['display_name']
   return {'status' => 'player name not specified', 'success' => 'false'} if name.nil? || name.empty?
   games = GAMES_PONG.select(['player1', 'player2'], [name, name], [], 'OR')
-  return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'games'=>(games.filter {|g| g['winner'] == name}).size } if obj['count_victories'] == 'true'
+  return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'games'=> -games.size * 6 + (games.filter {|g| g['winner'] == name}).size * 17  } if obj['get_rank'] == 'true'
   return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'games'=>games }
 end
 

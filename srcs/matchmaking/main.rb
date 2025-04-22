@@ -29,7 +29,7 @@ def make_match(players, mode)
   victories = {}
   players.each_with_index do |p, i|
     return {'status' => 'duplicate username', 'success' => 'false'} if players[(i + 1)..].include? p
-    t = JSON.parse SimpleServer.method_req('get_pong_games', {'display_name' => p, 'count_victories' => 'true'})
+    t = JSON.parse SimpleServer.method_req('get_pong_games', {'display_name' => p, 'get_rank' => 'true'})
     return DEFAULT_ERROR_RES.clone if t['success'].to_s != 'true'
     wins = t['games']
     puts wins
