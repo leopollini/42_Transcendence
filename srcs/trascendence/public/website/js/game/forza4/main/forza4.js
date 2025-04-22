@@ -28,7 +28,7 @@ export function Forza4() {
                 <div id="f4board"></div>
             </div>
             <div id="f4message"></div>
-            <button id="f4BackToMenuButton" class="button-style">Back to Menu</button>
+            <button id="f4BackToMenuButton" class="f4-button-style hidden-button">Back to Menu</button>
         </div>
         <div class="avatar-container">
             <img id="backImageButton" src="../website/images/home.png" alt="Back" class="back-button">
@@ -100,8 +100,9 @@ class Forza4Game {
 
     handleBackToMenu() {
         this.destroy();
+        // old bg color-> #b97070
         document.getElementById("app").style.background = 
-            "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
+            "linear-gradient(35deg, #491f1f, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
         resetTimer(this);
         navigate("/modes", "Game Modes");
     }
