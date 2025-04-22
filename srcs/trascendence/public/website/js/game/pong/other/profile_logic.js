@@ -75,6 +75,7 @@ export async function saveimage(me, yourDataSection) {
             }
             catch (error)
             {
+                console.log("error = ", error);
             }
         }
         else

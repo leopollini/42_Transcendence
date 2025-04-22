@@ -1,4 +1,4 @@
-import { navigate } from "../../../main.js";
+import { navigate, opponent, Player1, Player2, save_global } from "../../../main.js";
 import { Ball } from "../elements/ball.js";
 import { Paddle } from "../elements/paddle.js";
 import { ParticlePool } from "../elements/particle_pool.js";
@@ -12,12 +12,9 @@ import { matchData } from "../data/game_global.js";
 import { saveMatchStatsData, resetMatchStatsData } from "../data/game_stats.js";
 import { pongCustomData } from "../data/game_global.js";
 import { updateTimer } from "../other/timer.js";
-import { current_user } from "../../../main.js";
-import { showInfoModal } from "../../../modal.js";
+import { current_user, pong_save } from "../../../main.js";
 
 export let gameContainer;
-
-export let players;
 export let game;
 export let mode;
 export let pongGameData;
@@ -26,26 +23,26 @@ export let backToBracketButton;
 export let backToRobinButton;
 export let backToMenuButton;
 
-export function startPongGame(matchPlayers, gameMode) {
+export function startPongGame(gameMode) {
   backToBracketButton = document.getElementById("backToBracketButton");
   backToRobinButton = document.getElementById("backToRobinButton");
   backToMenuButton = document.getElementById("backToMenuButton");
 
   // Hide the buttons when the game starts
-  backToBracketButton.hidden = true;
-  backToRobinButton.hidden = true;
-  backToMenuButton.hidden = true;
-  if (sessionStorage.getItem("pongData") !== null)
-    pongGameData = JSON.parse(sessionStorage.getItem("pongData"));
+  if (backToBracketButton)
+    backToBracketButton.hidden = true;
+  if (backToRobinButton)
+    backToRobinButton.hidden = true;
+  if (backToMenuButton)
+    backToMenuButton.hidden = true;
+  if (pong_save !== null && pong_save !== undefined && (gameMode === "ai" || gameMode === "classic"))
+    pongGameData = pong_save;
   else
     pongGameData = pongCustomData;
-  
-  
+
   resetMatchStatsData();
   // Set the game mode (classic, ai, knocknout, rondrobin)
   mode = gameMode;
-
-  players = matchPlayers;
 }
 
 // Main class
@@ -54,12 +51,12 @@ export class PongGame {
     // Create Canvas and Context
     this.canvas = document.getElementById("gameCanvas");
     if (!this.canvas) {
-      console.error("Canvas not found.");
+      //console.error("Canvas not found.");
       return;
     }
     this.ctx = this.canvas.getContext("2d");
     if (!this.ctx) {
-      console.error("Canvas context not found.");
+      //console.error("Canvas context not found.");
       return;
     }
 
@@ -69,10 +66,11 @@ export class PongGame {
     // Set game variables
     if (mode === "classic" || mode === "ai") {
       this.p1Name = current_user.display_name;
-      this.p2Name = sessionStorage.getItem("opponent") || "IA";
+      //this.p2Name = sessionStorage.getItem("opponent") || "IA";
+      this.p2Name = opponent || "IA";
     } else {
-      this.p1Name = sessionStorage.getItem("player1");
-      this.p2Name = sessionStorage.getItem("player2");
+      this.p1Name = Player1;
+      this.p2Name = Player2;
     }
     this.scoreP1 = 0;
     this.scoreP2 = 0;
@@ -153,9 +151,9 @@ export class PongGame {
       requestAnimationFrame(() => this.loop());
     }
   }
-  
+
   update() {
-    if (!this.gamePaused && !this.gameEnd) {
+    if (!this.gamePaused && !this.gameEnd && this.ball && this.paddle1) {
       this.ball.update(
         this,
         this.paddle1,
@@ -184,7 +182,8 @@ export class PongGame {
     }
   }
   render() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    if (this.ctx)
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     renderBackground(this);
     this.ball.render();
     this.screenShake.update();
@@ -192,8 +191,11 @@ export class PongGame {
     this.paddle1.render(this.ctx);
     this.paddle2.render(this.ctx);
 
-    if (this.powerup[0]) this.powerup[0].render();
-
+    if (mode === "classic" || mode === 'ai')
+    {
+      if (this.powerup && this.powerup[0])
+        this.powerup[0].render();
+    }
     if (pongGameData.background == "space") {
       for (let i = 0; i < this.starsNumber; i++) {
         this.stars[i].render();
@@ -282,7 +284,7 @@ export class PongGame {
     backToBracketButton.addEventListener("click", () => {
       gameCanvas.style.display = "none";
       backToBracketButton.hidden = true;
-      sessionStorage.setItem("winner", this.winner);
+      save_global("winner", this.winner);
       saveMatchStatsData(this.p1Name, this.p2Name, this.scoreP1, this.scoreP2);
       //resetMatchStatsData();
       this.destroy();
@@ -292,7 +294,7 @@ export class PongGame {
     backToRobinButton.addEventListener("click", () => {
       gameCanvas.style.display = "none";
       backToRobinButton.hidden = true;
-      sessionStorage.setItem("winner", this.winner);
+      save_global("winner", this.winner);
       saveMatchStatsData(this.p1Name, this.p2Name, this.scoreP1, this.scoreP2);
       //resetMatchStatsData();
       this.destroy();
@@ -300,11 +302,9 @@ export class PongGame {
     });
 
     backToMenuButton.addEventListener("click", () => {
-      sessionStorage.setItem("game ended", false);
-      sessionStorage.setItem("in_game", false);
       gameCanvas.style.display = "none";
       backToMenuButton.hidden = true;
-      sessionStorage.setItem("winner", this.winner);
+      save_global("winner", this.winner);
       if (mode === "classic")
         saveMatchStatsData(
           this.p1Name,
@@ -318,13 +318,10 @@ export class PongGame {
     });
 
     window.addEventListener("resize", () => this.resize());
-    window.addEventListener("popstate", () => {
-      //clearInterval(matchData.timer);
-      if (mode === "knockout" || mode === "roundrobin") {
-        this.destroy();
-        showInfoModal("Leaving Tournament...", () => {});
-        navigate("/modes", "Return to Game Mode");
-      } else this.destroy();
-    });
   }
 }
+
+window.addEventListener("beforeunload", () =>
+{
+
+});

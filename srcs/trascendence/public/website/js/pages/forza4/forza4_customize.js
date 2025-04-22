@@ -1,4 +1,4 @@
-import { navigate } from "../../main.js";
+import { navigate, save_global, forza4_save} from "../../main.js";
 import { forza4CustomData } from "../../game/forza4/data/forza4_game_global.js";
 import { setToken1Color, setToken2Color, setBoardBackground, setPowerUpState } from "../../game/forza4/data/forza4_game_global.js";
 
@@ -52,6 +52,7 @@ export function Forza4Customize() {
 
 export function forza4Config() {
 
+
     const token1ColorPicker = document.getElementById('token1ColorPicker');
     const token2ColorPicker = document.getElementById('token2ColorPicker');
     const forza4ApplyCustom = document.getElementById('forza4ApplyCustom');
@@ -61,11 +62,10 @@ export function forza4Config() {
     const f4BackgroundSelected = document.getElementById('f4BackgroundSelected');
     const f4powerupCheckbox = document.getElementById('powerup-checkbox');
 
-    if (sessionStorage.getItem("forza4Data") !== null)
-      forza4Data = JSON.parse(sessionStorage.getItem("forza4Data"));
+    if (forza4_save !== null && forza4_save !== undefined)
+      forza4Data = forza4_save;
     else
       forza4Data = forza4CustomData;
-
     token1ColorPicker.value = forza4Data.token1Color;
     token2ColorPicker.value = forza4Data.token2Color;
     f4powerupCheckbox.checked = forza4Data.powerUpMode;
@@ -86,7 +86,7 @@ export function forza4Config() {
         // setToken2Color(token2ColorPicker.value);
         forza4Data.token1Color = token1ColorPicker.value;
         forza4Data.token2Color = token2ColorPicker.value;
-        sessionStorage.setItem("forza4Data", JSON.stringify(forza4Data));
+        save_global("forza4", JSON.stringify(forza4Data));
         //window.history.pushState({}, path, window.location.origin + path);
         navigate("/modes", "Back to Game Modes");
     });

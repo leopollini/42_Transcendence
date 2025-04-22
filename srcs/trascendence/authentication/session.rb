@@ -15,7 +15,7 @@ class App
   include Other_logic
   
   def initialize(client, logger)
-    @client = client
+    @client = OAuthClient.new
     @logger = logger
     @spa_route = JSON.parse(ENV['SPA_ROUTES'] || '[]')
     @app = Rack::Builder.new do
@@ -61,6 +61,9 @@ class App
     rescue => e
       puts "Error found: #{e.message}".red
       puts "Backtrace: #{e.backtrace.join("\n")}".red
+      response.content_type = 'application/json'
+      response.write({ success: false, error: "Error in server" }.to_json)
+      response.finish
     end
 
     response.finish
@@ -77,10 +80,4 @@ class App
     end
   end
 
-  def login(request, response, client)
-    request.session.clear
-    auth_url = client.auth_url
-    response.content_type = 'application/json'
-    response.write({ auth_url: auth_url }.to_json)
-  end
 end

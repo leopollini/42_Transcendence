@@ -1,4 +1,4 @@
-import { navigate, current_user} from "../../main.js";
+import { navigate, current_user, save_global} from "../../main.js";
 
 let invitedPlayers = [];
 let selectedPlayer;
@@ -41,7 +41,6 @@ export default function Forza4LobbyRoom() {
 
 
 export function handleForza4Lobby() {
-    invitedPlayers = [];
     const onlinePlayers = document.getElementById("f4OnlinePlayers");
     const matchPlayers = document.getElementById("f4MatchPlayers");
     const inviteButton = document.getElementById("f4InviteButton");
@@ -61,7 +60,9 @@ export function handleForza4Lobby() {
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
     
-    const players = ["Alice", "Bob", "Charlie", "David"];
+    const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
+    "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
+    "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
     players.forEach(player => {
         const div = document.createElement("div");
         div.classList.add("player");
@@ -91,7 +92,7 @@ export function addForza4LobbyPageHandlers() {
             newPlayer.style.color = "white";
             newPlayer.onclick = null;
             const playerName = newPlayer.textContent.trim();
-            sessionStorage.setItem("opponent", playerName);
+            save_global("opponent", playerName);
             matchPlayers.appendChild(newPlayer);
             numPlayersAccepted++;
             numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
@@ -99,7 +100,6 @@ export function addForza4LobbyPageHandlers() {
             selectedPlayer.remove();
             selectedPlayer = null;
             inviteButton.disabled = true;
-            console.log("invited: " + invitedPlayers);
             if (numPlayersAccepted === totalPlayers)
                 toggleStartMatch.disabled = false;
         }

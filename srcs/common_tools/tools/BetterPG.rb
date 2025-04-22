@@ -87,31 +87,37 @@ module BetterPG
       end
     end
 
-    def better_return(obj = [])
+    def better_return(obj = [], hide_token = true)
       r = nil
       reslst = []
       return [] if obj.nil?
       
       obj.each do |lol|
+        # lol.slice! ['token'] if hide_token
         reslst.append lol
       rescue StandardError
-        r
+        puts r.to_s.red
       end
+      # puts reslst.to_s.grey + " was ".grey
+      # obj.each {|o| puts o.to_s.grey}
       reslst
     end
 
-    def select_specific(cols, key, val)
-      t = (better_return exec("SELECT #{cols.join ' '} FROM #{@name} WHERE #{key} = '#{val}'"))
-      better_return t
+    def select_specific(key, val, cols, hide_token = true)
+      cols = @columns if cols.size == 0
+      t = (better_return exec("SELECT #{@columns.join(', ')} FROM #{@name} WHERE #{key} = '#{val}'"))
+      sel = better_return t, hide_token
+      return nil if sel.empty?
+      sel[0]
     end
 
     # perform select for data fetching
     def select(cols = [], keys = [], fullkeys = [], logic = 'AND')
       raise 'Bad logic operator' unless %w[AND OR].include? logic
-
+      raise "invalid select request: requesting a column which exists not" unless (cols - @columns).empty?
       req = []
       begin
-        req = ['SELECT ' + (@columns - ['token']).join(', ') + ' FROM', @name]
+        req = ['SELECT ' + @columns.join(', ') + ' FROM', @name]
         t = []
         keys.each_with_index do |k, i|
           t.append cols[i] + "='" + k.to_s + "'" if i < cols.count && cols[i] && k && !k.to_s.empty?
@@ -146,22 +152,25 @@ module BetterPG
       end
     end
 
-    def addValues(vals = [], format = [])
-      format = @columns[0, vals.size] if format == []
-      exec 'INSERT INTO', @name, (format.size != 0 ? '(' + format.join(', ') + ')' : ''), 'VALUES',
-           "('" + vals.join("', '") + "')"
-      puts 'Added ' + vals.to_s + ' as ' + format.to_s + ' to ' + @name
+    def addValues(content)
+      return if content.nil? || content.empty?
+      raise "invalid addValues request: requesting a column which exists not" unless (content.keys - @columns).empty?
+      exec 'INSERT INTO', @name, (content.keys.size != 0 ? '(' + content.keys.join(', ') + ')' : ''), 'VALUES',
+           "('" + content.values.join("', '") + "')"
+      puts 'Added ' + content.values.to_s + ' as ' + content.keys.to_s + ' to ' + @name
     end
 
     # send a query like this: 'UPDATE table SET set_key1 = set_val1, set_key2 = set_val2, ... WHERE key = val'. KEY VAL PAIR MUST BE UNIVOQUE
     def updateValue(key = '', val = '', set = {})
+      return [] if set.nil? || set.empty?
       req = ['UPDATE', @name, 'SET']
       t = []
+      raise "invalid updateValue request: changing a column which exists not" unless (set.keys - @columns).empty?
       set.each do |k, v|
         t << "#{k} = '#{v}'" if k && v
       end
       req << t.join(',')
-      req.append ['WHERE', key, '=', "'#{val}'"]
+      req.append ['WHERE', key.to_s, '=', "'#{val.to_s}'"]
       exec req
     end
 
@@ -187,6 +196,7 @@ module BetterPG
       raise RiskOfFullDeletion if @name.include?('*') && !iamsure
 
       exec 'DROP TABLE', @name
+      createTable @original_cols
     end
 
     def zeroTable
@@ -196,7 +206,6 @@ module BetterPG
     def exec(*strs)
       puts strs.join(' ')
       return @pg.exec(strs.join(' ')) if strs.size != 0
-
       [{}]
     end
   end

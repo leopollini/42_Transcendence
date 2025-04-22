@@ -1,6 +1,7 @@
-import { navigate, nullify_user } from "../main.js";
-import {updateProfileUI} from "../pages/modes.js";
+import { navigate, user_name, token } from "../main.js";
+import { updateProfileUI } from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
+import { remove_all } from "../error_main.js";
 
 export class user {
     constructor(image, name, login_name, email, bio) {
@@ -13,15 +14,12 @@ export class user {
 }
 
 export class profile {
-    constructor(email, display_name, realname, bio, image, type)
-    {
+    constructor(email, display_name, realname, bio, image, type) {
         this.email = email;
         this.display_name = display_name;
         this.realname = realname
         this.bio = bio;
         this.image = image;
-        this.num_friends = 0;
-        this.myfriend = friend_list;
         this.type = type
     }
 }
@@ -29,59 +27,62 @@ export class profile {
 export let friend_list = [];
 
 export class Friend {
-    constructor(name, status)
-    {
+    constructor(name, status) {
         this.name = name;
         this.status = status;
     }
 }
 
-export async function restore_user()
+function set_user(user, type)
 {
-    try
-    {
-        if (window.location.pathname === '/' || (sessionStorage.getItem('already in') !== '1' && localStorage.getItem('session opened', 0) !== '1'))
-            return null;
-        let data = JSON.stringify({ "params" : [{'token' : 'token'}]});
-        const response = await fetch("http://localhost:8008",
-        {
-            method: "get_user",
-            body: data
-        })
+    let new_user = new profile(
+        user.email,
+        user.username,
+        user.realname,
+        user.bio,
+        user.image,
+        type
+    );
+    return new_user;
+}
 
-        const result = await response.json();
-        //console.log("(get_user)\nData login = ", data);
-        if (result)
-        {
-            if (result.success === "true" && result.status === "success")
+export async function restore_user() {
+    try {
+        if (window.location.pathname === '/')
+            return null;
+        let data = JSON.stringify({ "params": { "display_name": user_name, "token": token } });
+        const response = await fetch("http://localhost:8008",
             {
-                const ref_user = new profile(
-                    "",
-                    result.username,
-                    "",
-                    result.bio,
-                    result.image,
-                    result.type
-                );
-                sessionStorage.setItem('already in', 1);
-                localStorage.setItem('session opened',1);
-                updateProfileUI(ref_user);
-                return ref_user;
-            }
+                method: "get_user",
+                body: data
+            })
+
+        let result = await response.json();
+        //console.log("(get_user)\nData login = ", result);
+        if (result) {
+            let ref_user;
+            if (result.guest)
+                ref_user = set_user(result.guest, "guest");
             else
-            {
-                showInfoModal("ERROR: An error has occured(\"" + result.status + "\")", () => {});
-                nullify_user();
-                navigate("/", "home");
-                return null;
-            }
+                ref_user = set_user(result.user, "login");
+            remove_all(1, 1);
+            updateProfileUI(ref_user);
+            return ref_user;
         }
-        else
-            showInfoModal("no result??", () => {});
+        else {
+            remove_all(0, 0, 1);
+            if (window.location.pathname !== '/')
+                navigate("/", "home");
+            showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => { });
+            return null;
+        }
     }
-    catch (error)
-    {
-        console.error("Error with get_user:", error);
+    catch (error) {
+        console.log("Eroor in get_user = ", error);
+        remove_all(0, 0, 1);
+        if (window.location.pathname !== '/')
+            navigate("/", "home");
+        showInfoModal("Error with get_user:", error);
         return null;
     }
 }

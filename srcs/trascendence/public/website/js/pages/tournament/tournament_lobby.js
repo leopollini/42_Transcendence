@@ -1,5 +1,5 @@
-import { navigate, current_user } from "../../main.js";
-import { resetRobinTournamentState } from "./robindraw.js";
+import { navigate, current_user, save_global, numPlayers } from "../../main.js";
+import { resetBracketState } from "./bracket.js";
 let invitedPlayers = [];
 let tournament;
 let selectedPlayer;
@@ -44,7 +44,7 @@ export default function LobbyRoom() {
 }
 
 
-export function handleLobby(type, totPlayers) {
+export function handleLobby(type) {
     const onlinePlayers = document.getElementById("onlinePlayers");
     const tournamentPlayers = document.getElementById("tournamentPlayers");
     const inviteButton = document.getElementById("inviteButton");
@@ -53,7 +53,7 @@ export function handleLobby(type, totPlayers) {
     invitedPlayers = [];
     numPlayersAccepted = 0;
     selectedPlayer = null;
-    totalPlayers = Number(totPlayers);
+    totalPlayers = Number(numPlayers);
     tournament = type;
     numPlayersLabel.textContent = "0/" + totalPlayers;
 
@@ -66,7 +66,9 @@ export function handleLobby(type, totPlayers) {
         numPlayersAccepted++;
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
-    const players = ["Alice", "Bob", "Charlie", "David", "Adam", "Josh", "Bastien", "Naruto", "Lara", "Kakashi", "Antony", "Jeremy", "Holly", "Benji", "Travis", "Joshua"];
+    const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
+    "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
+    "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
     players.forEach(player => {
         const div = document.createElement("div");
         div.classList.add("player");
@@ -80,11 +82,13 @@ export function handleLobby(type, totPlayers) {
         };
         onlinePlayers.appendChild(div);
     });
-
-    
 }
 
 export function addLobbyPageHandlers() {
+    save_global("end", null);
+    save_global("game", null);
+    save_global("players", null);
+    save_global("robinranked", null);
     const toggleStartTournament = document.getElementById("toggleStartTournament");
     inviteButton.onclick = () => {
         if (selectedPlayer && numPlayersAccepted < totalPlayers) {
@@ -105,15 +109,12 @@ export function addLobbyPageHandlers() {
     };
 
     toggleStartTournament?.addEventListener('click', () => {
-        console.log("tournament =>" + tournament);
-        
+        //console.log("tournament =>" + tournament);
+        save_global("game", 1);
         if (tournament === "Bracket")
             navigate("/tournament/knockout/bracket", "Starting knockout tournament", invitedPlayers);
         else
-        {
-            resetRobinTournamentState();
             navigate("/tournament/roundrobin/robinranking", "Starting roundrobin tournament", invitedPlayers);
-        }
     });
 
     backImageButton?.addEventListener('click', () => {

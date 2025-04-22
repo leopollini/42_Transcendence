@@ -1,4 +1,4 @@
-import { navigate } from "../../main.js";
+import { navigate, save_global } from "../../main.js";
 
 export default function Knockout() {
     return `
@@ -46,8 +46,9 @@ export const addKnockoutPageHandlers = () => {
     const radioButtons = document.querySelectorAll("input[name='players']");
     const backImageButton = document.getElementById('backImageButton');
     
+    save_global("numP", null);
     radioButtons.forEach(radioButton => {
-        radioButton.addEventListener('change', (event) => {
+        radioButton.addEventListener('change', () => {
             navigate("/tournament/knockout/lobby", "Bracket"+radioButton.value);          
         });
     });

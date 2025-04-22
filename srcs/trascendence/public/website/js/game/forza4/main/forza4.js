@@ -1,4 +1,4 @@
-import { current_user, navigate } from "../../../main.js";
+import { current_user, forza4_save, navigate, opponent, players } from "../../../main.js";
 import { forza4CustomData } from "../data/forza4_game_global.js";
 import { createGrid, redrawGrid } from "../board/forza4_grid.js";
 import { updateTimer, resetTimer } from "../other/forza4_timer.js";
@@ -36,14 +36,15 @@ export function Forza4() {
     `;
 }
 
-export function startForza4Game(players) {
-    console.log("start forza 4 game");
-    console.log(players);
+export function startForza4Game() {
+    //console.log("start forza 4 game");
+    //console.log(players);
     backImageButton = document.getElementById('backImageButton');
     matchPlayers = players;
-    if (sessionStorage.getItem("forza4Data") !== null)
-        forza4GameData = JSON.parse(sessionStorage.getItem("forza4Data"));
-      else
+    console.log("forza4 save: ", forza4_save);
+    if (forza4_save !== null && forza4_save !== undefined)
+        forza4GameData = forza4_save;
+    else
         forza4GameData = forza4CustomData;
     return new Forza4Game();
 }
@@ -73,7 +74,8 @@ class Forza4Game {
         this.gameEnded = false;
 
         this.p1 = current_user.display_name;
-        this.p2 = sessionStorage.getItem("opponent");
+        this.p2 = opponent;
+        //this.p2 = sessionStorage.getItem("opponent");
 
         this.p1Name.textContent = this.p1 + ":";
         this.p2Name.textContent = this.p2 + ":";
@@ -98,7 +100,6 @@ class Forza4Game {
 
     handleBackToMenu() {
         this.destroy();
-        sessionStorage.setItem("game ended", false);
         document.getElementById("app").style.background = 
             "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
         resetTimer(this);
@@ -128,7 +129,7 @@ class Forza4Game {
     }
 
     handlePopState() {
-        console.log("popstate");
+        //console.log("popstate");
         matchPlayers = [];
         this.destroy();
         document.getElementById("app").style.background = 

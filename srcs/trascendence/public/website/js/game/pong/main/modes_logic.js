@@ -1,6 +1,6 @@
-import { navigate, current_user, nullify_user} from "../../../main.js";
-import { free_users } from "../../../security/security.js";
+import { navigate, current_user} from "../../../main.js";
 import { showInfoModal } from "../../../modal.js";
+import { remove_all } from "../../../error_main.js";
 
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
@@ -14,20 +14,25 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         navigate("/VS_AI", "Modalità AI");
     });
 
+    // !test per torneo da togliere poi
     tournamentButton?.addEventListener('click', () => {
-        // if (current_user.type === "guest")
-        // {
-        //     showInfoModal("You must be logged to use this feature!", () => {});
-        //     return;
-        // }
-        // else
+        current_user.type = "login";
+        if (current_user.type === "guest")
+        {
+            showInfoModal("You must be logged to use this feature!", () => {});
+            return;
+        }
+        else
+        {
+            current_user.type = "guest";
             navigate("/tournament", "Modalità Torneo");
+        }
     });
 
     forza4Button?.addEventListener('click', () => {
         navigate("/forza4/findopponent", "Forza 4 Find Opponent");
     })
-    avatarImage.addEventListener("click", (event) => {
+    avatarImage.addEventListener("click", () => {
         menuContainer.classList.toggle("visible");
     });
 
@@ -50,37 +55,33 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         });
     }
     else
-        console.error("profile icon not found!");
+        showInfoModal("profile icon not found!", () => {});
     if (history)
     {
         history.addEventListener("click", () => {
-        // if (current_user.type == "guest")
-        //     {
-        //         showInfoModal("You must be logged to use this feature!", () => {});
-        //         return;
-        //     }
-        //     else
+        if (current_user.type == "guest")
+            {
+                showInfoModal("You must be logged to use this feature!", () => {});
+                return;
+            }
+            else
                 navigate("/userstats", "Game User Statistics");
         });
     }
     else 
-        console.error("history icon not found!");
+        showInfoModal("history icon not found!", () => {});
     if (logout)
     {
         logout.addEventListener("click", () => {
-            localStorage.setItem("popup opened", false);
             if (!current_user)
             {
                 navigate("/", "logout");
                 return;
             }
-            free_users();
-            nullify_user();
-            sessionStorage.setItem("already in", 0);
-            localStorage.setItem("session opened", 0);
+            remove_all(0,0, 1);
             navigate("/", "login");
         });
     }
     else 
-        console.error("logout icon not found!");
+        showInfoModal("logout icon not found!", () => {});
 }

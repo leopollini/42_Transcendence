@@ -1,4 +1,4 @@
-import { navigate } from "../main.js";
+import { navigate, save_global} from "../main.js";
 import { current_user } from "../main.js";
 
 let invitedPlayers = [];
@@ -8,7 +8,6 @@ let numPlayersAccepted = 0;
 let totalPlayers = 2;
 
 export default function ClassicPongLobbyRoom() {
-    sessionStorage.removeItem("opponent");
     return `
         <img id="backImageButton" src="../../website/images/home.png" alt="Back" class="back-button">
         <h1 class="text">
@@ -43,7 +42,7 @@ export function handleClassicPongLobby() {
     const matchPlayers = document.getElementById("pongMatchPlayers");
     const inviteButton = document.getElementById("pongInviteButton");
     numPlayersLabel = document.getElementById("pongNumPlayersLabel");
-    invitedPlayers = [];
+    
     numPlayersAccepted = 0;
     selectedPlayer = null;
     numPlayersLabel.textContent = "0/" + totalPlayers;
@@ -58,7 +57,9 @@ export function handleClassicPongLobby() {
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
     
-    const players = ["Alice", "Bob", "Charlie", "David"];
+    const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
+    "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
+    "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
     players.forEach(player => {
         const div = document.createElement("div");
         div.classList.add("player");
@@ -87,7 +88,7 @@ export function addClassicPongLobbyPageHandlers() {
             newPlayer.style.color = "white";
             newPlayer.onclick = null;
             const playerName = newPlayer.textContent.trim();
-            sessionStorage.setItem("opponent", playerName);
+            save_global("opponent",playerName);
             matchPlayers.appendChild(newPlayer);
             numPlayersAccepted++;
             numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
@@ -95,7 +96,6 @@ export function addClassicPongLobbyPageHandlers() {
             selectedPlayer.remove();
             selectedPlayer = null;
             inviteButton.disabled = true;
-            console.log("invited: " + invitedPlayers);
             if (numPlayersAccepted === totalPlayers)
                 toggleStartMatch.disabled = false;
         }

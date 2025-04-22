@@ -1,69 +1,73 @@
-CONTAINERS	= tokenizer receiver postgres request_manager auth user_manager history_manager chat game_data_manager
+CONTAINERS = tokenizer receiver postgres request_manager auth user_manager history_manager chat game_data_manager matchmaking
 
 # ========================================= #
-SHELL:=/bin/bash
+SHELL := /bin/bash
 
-RED=\033[0;31m
-GREEN=\033[0;32m
-YELLOW=\033[0;33m
-BLUE=\033[0;34m
-NC=\033[0m
+RED = \033[0;31m
+GREEN = \033[0;32m
+YELLOW = \033[0;33m
+BLUE = \033[0;34m
+NC = \033[0m
 
-RED=\033[0;31m
-GREEN=\033[0;32m
-YELLOW=\033[1;33m
-NC=\033[0m
+# Funzione per loggare il tempo
+define log_time
+	@echo -e "$(YELLOW)$1 at $$(date +%T)$(NC)"
+endef
 
-all: prep_dirs #stop_containers
+all: prep_dirs
 	@clear
-	@echo -e "$(RED)Rimozione del volume per evitare conflitti...$(NC)";
+	$(call log_time, Rimozione del volume per evitare conflitti...)
 	# @sudo docker volume rm ct;
-	@echo -e "$(YELLOW)configurazione server https locale$(NC)"
+	$(call log_time, Configurazione server https locale)
 	@chmod +x setup/setup_online_website.sh
 	@sudo ./setup/setup_online_website.sh
-	@echo -e "$(GREEN)configurazione completata$(NC)"
+	$(call log_time, Configurazione completata)
 	make -C ./srcs/common_tools/ all
-	@echo -e "$(YELLOW)Avvio container Docker...$(NC)"; \
+	$(call log_time, Avvio container Docker...)
 	if [ "$${DETATCH}" = "true" ]; then \
-		sudo docker compose -f ./docker-compose.yml up -d; \
+		docker-compose -f ./docker-compose.yml up -d; \
 	else \
-		sudo docker compose -f ./docker-compose.yml up; \
+		docker-compose -f ./docker-compose.yml up; \
 	fi
 
 $(CONTAINERS): prep_dirs
-	@if [ "$(docker ps -a | grep $@ | wc -l)" = "1" ]; then \
-		docker stop $@ \
-		docker rm $@; \
-		echo -e "$(GREEN)cleaned$(NC)"; \
+	@clear
+	@if [ "$$(docker ps -a | grep $@ | wc -l)" -gt 0 ]; then \
+		echo -e "$(YELLOW)Container $@ già esistente, fermo e rimuovo...$(NC)"; \
+		docker stop $@ || true; \
+		docker rm $@ || true; \
+		echo -e "$(GREEN)$@ rimosso correttamente$(NC)"; \
 	fi
-	@if [ "$(DETATCH)" = "true" ]; then \
-		docker compose -f ./docker-compose.yml up -d $@; \
+	$(call log_time, Pulizia immagini inutilizzate...)
+	@docker system prune -f > /dev/null || true
+	$(call log_time, Avvio container $@...)
+	if [ "$${DETATCH}" = "true" ]; then \
+		docker-compose -f ./docker-compose.yml up -d $@; \
 	else \
-		docker compose -f ./docker-compose.yml up $@; \
+		docker-compose -f ./docker-compose.yml up $@; \
 	fi
-	# @docker compose -f ./docker-compose.yml up $@
 
 stop_containers:
 	clear
-	@echo -e "${YELLOW}Stopping existing containers...${NC}"
-	# @sudo chmod +x /usr/bin/docker-compose
-	@docker compose -f ./docker-compose.yml stop
+	$(call log_time, Stopping existing containers...)
+	@sudo chmod +x /usr/bin/docker-compose
+	@docker-compose -f ./docker-compose.yml stop
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
 
 down:
-	@docker compose -f ./docker-compose.yml down
+	@docker-compose -f ./docker-compose.yml down
 
 re: clean prep_dirs
 	@clear
-	@echo -e "${YELLOW}configurazione server https locale${NC}"
+	$(call log_time, Configurazione server https locale)
 	@chmod +x setup/setup_online_website.sh
 	@sudo ./setup/setup_online_website.sh
-	@echo -e "${GREEN}configurazione completata${NC}"
+	$(call log_time, Configurazione completata)
 	make -C srcs/common_tools/ re
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
-	@docker compose -f ./docker-compose.yml up --build
+	@docker-compose -f ./docker-compose.yml up --build
 
 prep_dirs:
 	@echo -e "${YELLOW}Creating directories...${NC}"
@@ -80,7 +84,7 @@ clean:
 	@if [ "$$(docker ps -a -q | wc -l)" -gt 0 ]; then \
 		echo -e "Container Docker trovati, procedo con la pulizia..."; \
 		if [ "$$(docker ps -q | wc -l)" -gt 0 ]; then \
-			docker compose -f docker-compose.yml stop; \
+			docker-compose -f docker-compose.yml stop; \
 		else \
 			echo -e "${RED}Nessun container attivo da fermare.${NC}"; \
 		fi; \
@@ -89,23 +93,22 @@ clean:
 	else \
 		echo -e "${RED}Nessun container Docker trovato, skippo la parte Docker.${NC}"; \
 	fi
-	# Destroy all directories
-	rm -rf /data/wordpress
-	@echo -e "${GREEN}pulizia base completata	${NC}"
+	$(call log_time, Pulizia base completata)
 
 fclean: clean
 	@if [ "$$(docker ps -a -q | wc -l)" -gt 0 ] || [ "$$(docker images -q | wc -l)" -gt 0 ] || [ "$$(docker volume ls -q | wc -l)" -gt 0 ]; then \
 		echo -e "Risorse Docker trovate, avvio la pulizia profonda..."; \
-		docker compose down -v --remove-orphans; \
+		docker-compose down -v --remove-orphans; \
 		docker system prune -a --volumes -f; \
 		docker images -qa | xargs -r docker rmi -f || true; \
 		docker volume ls -q | xargs -r docker volume rm || true; \
 	else \
 		echo -e "${RED}Nessuna risorsa Docker trovata, skippo la pulizia.${NC}"; \
 	fi
-	@echo -e "${GREEN}pulizia completata${NC}"
+	$(call log_time, Pulizia completata)
 
 clean_imgs:
 	@docker images -qa | xargs -r docker rmi -f
 
-.PHONY: all stop_containers down re clean remove_all
+.PHONY: all stop_containers down re clean remove_all fclean
+ 

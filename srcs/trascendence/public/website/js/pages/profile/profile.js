@@ -1,7 +1,7 @@
 import { profile} from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
 import { showInfoModal } from "../../modal.js";
-import { navigate, current_user} from "../../main.js";
+import { navigate, current_user, token} from "../../main.js";
 
 export default function Profile() {
   return `
@@ -76,7 +76,7 @@ export function profileHandler()
 
 function updateLogin(current_user)
 {
-  let data = "{ display_name :" + JSON.stringify(current_user.display_name) + ", bio :" + JSON.stringify(current_user.bio) + ", image : " + current_user.image + " }";
+  let data = JSON.stringify({"params": {"display_name": current_user.display_name, "bio": current_user.bio, "image": current_user.image}, "token": token});
   fetch("http://localhost:8008",
   {
     method: "update_user",
@@ -85,33 +85,44 @@ function updateLogin(current_user)
   .then(response => response.json())
   .then(data =>{
     //console.log("(UPDATE_USER)\ndata update user profile = ", data);
+    if (data)
+    {
+      if (data.success !== "true")
+      {
+        remove_all(1, 1);
+        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + result.status + "\")", () => {});
+      }
+    }
   })
   .catch(error =>
   {
-    console.error("Error with update_user:", error);
+    showInfoModal("Error with update_user:", error);
   });
 }
 
 function updateGuest(current_user)
 {
-  console.log("hello");
-  let data = {
-    bio: current_user.bio
-    //image: current_user.image
-  };
+  let data = JSON.stringify({"params": {"bio": current_user.bio, "image": current_user.image}, "token": token});
   fetch("http://localhost:8008",
   {
     method: "update_user",
     body: data
   })
   .then(response => response.json())
-  .then(data =>
-  {
-    console.log("(UPDATE_USER)\ndata update user profile for guest  = ", data);
+  .then(data =>{
+    //console.log("(UPDATE_USER)\ndata update user profile = ", data);
+    if (data)
+    {
+      if (data.success !== "true")
+      {
+        remove_all(1, 1);
+        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + result.status + "\")", () => {});
+      }
+    }
   })
   .catch(error =>
   {
-    console.error("Error with update_user:", error);
+    showInfoModal("Error with update_user:", error);
   });
 }
 
@@ -139,13 +150,10 @@ function saveProfile(infoContainer) {
     saving += savename(me, infoContainer);
     current_user.display_name = me.display_name;
   }
+  if (current_user.type === "guest")
+    updateGuest(current_user);
   else
-  {
-    if (current_user.type === "guest")
-      updateGuest(current_user);
-    else
-      updateLogin(current_user);
-  }
+    updateLogin(current_user);
   showInfoModal(saving, () => {});
   history.back();
 }

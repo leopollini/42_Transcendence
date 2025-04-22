@@ -2,6 +2,7 @@ import { forza4GameData } from "../main/forza4.js";
 import { highlightColumn } from "./forza4_grid_visual.js";
 import { checkWin } from "./forza4_check_win.js";
 import { savef4StatsData } from "../data/forza4_game_stats.js";
+import { forza4_save } from "../../../main.js";
 
 export function createGrid(game) {
     //console.log("Creo griglia Forza 4");

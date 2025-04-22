@@ -7,7 +7,7 @@ export class Paddle {
         this.y = canvas.height / 2 - this.height / 2;
         this.radius = this.width / 2;
         this.color = color;
-        this.speedPercentage = 0.4;
+        this.speedPercentage = 0.5;
         this.baseSpeed = canvas.height * this.speedPercentage; // Base speed based on screen height
         this.speed = this.baseSpeed; // Initialize speed based on canvas height
         this.upKey = upKey;

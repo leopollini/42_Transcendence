@@ -50,18 +50,16 @@ server = WEBrick::HTTPServer.new(
   DocumentRoot: File.expand_path("../../public", __FILE__),
   RequestCallback: proc { |req, res| res['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0' },
   SSLEnable: true,
-  SSLCertificate: OpenSSL::X509::Certificate.new(File.read("./ssl_certs/server.crt")),
-  SSLPrivateKey: OpenSSL::PKey::RSA.new(File.read("./ssl_certs/server.key")),
+  SSLCertificate: cert,
+  SSLPrivateKey: key,
   SSLOptions: OpenSSL::SSL::OP_NO_SSLv3 | OpenSSL::SSL::OP_NO_SSLv2,
   SSLVerifyClient: OpenSSL::SSL::VERIFY_NONE,
-  SSLVerifyMode: OpenSSL::SSL::VERIFY_NONE,
-  ServerName: 'transcendence'
+  SSLVerifyMode: OpenSSL::SSL::VERIFY_NONE
 )
 
 class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(req, res)
     puts "####", req.request_method, res, "####"
-    #return request_sorter req if req.method == "OPTIONS"
     status, headers, body = APP.call(req.meta_vars)
     res.status = status
     res['Content-Security-Policy'] =
@@ -84,10 +82,6 @@ class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
       else
         body.each { |chunk| res.body << chunk }
       end
-    end
-  
-    if status >= 400
-      LOGGER.error("#{status} Error: #{req.path}".red)
     end
   end
 end

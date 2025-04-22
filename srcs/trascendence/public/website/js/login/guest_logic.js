@@ -1,7 +1,8 @@
-import { navigate, update_user } from "../main.js";
+import { navigate, save_global} from "../main.js";
 import { user, profile} from "./user.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInputModal, showInfoModal } from "../modal.js"
+import { remove_all } from "../error_main.js";
 
 function hasNoSpaces(str)
 {
@@ -58,8 +59,7 @@ function update_guest(curr_guest)
       curr_guest.image,
       "guest"
   );
-  let data = {"data" : {"username":guest_user.display_name,"image":guest_user.image},"login_as_guest":"true"};
-  data = JSON.stringify(data);
+  const data = JSON.stringify({data : {username: guest_user.display_name,image: guest_user.image, login_as_guest: "true"}});
   fetch("http://localhost:8008",
   {
       method: "login_user",
@@ -68,28 +68,32 @@ function update_guest(curr_guest)
   .then(response => response.json())
   .then(data =>
   {
-    //console.log("(LOGIN_USER)\ndatas = ", data);
-    if (data.status === "success" && data.success === "true")
+    if (data.status === "success")
     {
-        sessionStorage.setItem("already in", 1);
-        localStorage.setItem("session opened", 1);
-        update_user(guest_user);
-        navigate("/modes", "Modalità di gioco");
+      remove_all(1, 1);
+      save_global("acess", true);
+      save_global("token", data.token);
+      save_global("name", guest_user.display_name);
+      navigate("/modes", "Modalità di gioco");
     }
     else
     {
-        sessionStorage.setItem("already in", 0);
-        localStorage.setItem("session opened", 0);
-        guest_user = null;
-        if (data.status === "no users found")
-          showInfoModal("ERROR: Name already taken, try a different one", () => {});
-        else
-          showInfoModal("ERROR: An error has occured(\"" + data.status + "\")", () => {});
-        return;
+      remove_all(0, 0, 1);
+      guest_user = null;
+      if (data.status === "no users found")
+        showInfoModal("ERROR: Name already taken, try a different one", () => {});
+      else
+        showInfoModal("ERROR in LOGIN_USER: An error has occured(\"" + data.status + "\")", () => {});
+      if (window.location.pathname !== '/')
+        navigate("/", "home");
+      return;
     }
   })
   .catch(error =>
   {
-    console.error("Error with login_user:", error);
+    remove_all(0, 0, 1);
+    if (window.location.pathname !== '/')
+      navigate("/", "home");
+    showInfoModal("Error with login_user: (" + error + ")", () => {});
   })
 }

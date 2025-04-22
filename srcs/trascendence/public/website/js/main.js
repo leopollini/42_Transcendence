@@ -1,35 +1,45 @@
 import Login, { addLoginPageHandlers } from "./pages/profile/login.js";
-import Modes, {addModesPageHandlers} from "./pages/modes.js";
-import Tournament, { addTournamentPageHandlers } from "./pages/tournament/tournament.js";
-import PongGame from "./pages/pong_game.js";
-import ClassicPongLobbyRoom, { handleClassicPongLobby, addClassicPongLobbyPageHandlers } from "./pages/classic_pong_lobby.js";
-import Knockout, { addKnockoutPageHandlers } from "./pages/tournament/knockout.js";
-import Customize, { addCustomizeGame } from "./pages/profile/customize.js";
-import Roundrobin, { addRoundRobinPageHandlers } from "./pages/tournament/roundrobin.js";
-import RobinRanking, { addRobinRankingPageHandlers, robinDraw, assignPointsToPlayer } from "./pages/tournament/robindraw.js";
-import LobbyRoom, { addLobbyPageHandlers, handleLobby } from "./pages/tournament/tournament_lobby.js";
-import Bracket, { addBracketPageHandlers, drawBracket, backToBracket, resetBracketState } from "./pages/tournament/bracket.js";
-import { initializeGameCanvas } from "./game/pong/main/handling_Canvas.js";
+import Callback from "./login/login_logic.js";
+import Modes, { addModesPageHandlers } from "./pages/modes.js";
 import Profile, { profileHandler } from "./pages/profile/profile.js";
 import Settings, { addSettingsPageHandlers } from "./pages/profile/settings.js";
-import { userName } from "./pages/user_data.js";
+import Customize, { addCustomizeGame } from "./pages/profile/customize.js";
+
+import PongGame from "./pages/pong_game.js";
+import ClassicPongLobbyRoom, { handleClassicPongLobby, addClassicPongLobbyPageHandlers } from "./pages/classic_pong_lobby.js";
+
 import { Forza4Customize, forza4Config } from "./pages/forza4/forza4_customize.js";
 import { Forza4, startForza4Game } from "./game/forza4/main/forza4.js";
-import { GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers} from "./pages/game_statistics.js";
 import Forza4LobbyRoom, { handleForza4Lobby, addForza4LobbyPageHandlers } from "./pages/forza4/forza4_lobby.js";
+
+import Tournament, { addTournamentPageHandlers } from "./pages/tournament/tournament.js";
+import Knockout, { addKnockoutPageHandlers } from "./pages/tournament/knockout.js";
+import Roundrobin, { addRoundRobinPageHandlers } from "./pages/tournament/roundrobin.js";
+import LobbyRoom, { addLobbyPageHandlers, handleLobby } from "./pages/tournament/tournament_lobby.js";
+import Bracket, { addBracketPageHandlers, backToBracket, resetBracketState } from "./pages/tournament/bracket.js";
+import RobinRanking, {
+  addRobinRankingPageHandlers,
+  robinDraw,
+  assignPointsToPlayer,
+  reset_all
+} from "./pages/tournament/robindraw.js";
+
+import { initializeGameCanvas } from "./game/pong/main/handling_Canvas.js";
+import { userName } from "./pages/user_data.js";
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-import {restore_user } from "./login/user.js";
-import {check_valid_operation, remove_all, path_error} from "./error_main.js";
+import { GameUserStatistics, pongShowMatchDetails, gameUserStatisticsPageHandlers } from "./pages/game_statistics.js";
+import { check_valid_operation, remove_all } from "./error_main.js";
 import { showInfoModal } from "./modal.js";
-import {checkAuthentication} from "./login/login_logic.js";
+import { restore_user } from "./login/user.js";
+
 let buttonTitle;
-let winner;
-let players;
+let prev_path = null;
 
 // Mappa delle rotte
 const routes = {
-    "/": Login,
+    "/":Login,
+    "/callback": Callback,
     "/modes": Modes,
     "/classic": PongGame,
     "/classic/lobby": ClassicPongLobbyRoom,
@@ -52,21 +62,68 @@ const routes = {
     "/profile": Profile
 };
 
-export let current_user = null;
+export let Bracket_state, current_user, user_name, opponent, pong_save, forza4_save, token = null;
+export let Player1, Player2, in_game, winner, players, match_ended, robinranking, numPlayers = null;
+export let acess = false;
 
-export async function initUser()
+export function reset_all_let()
 {
-    current_user = await restore_user();
+    Bracket_state, current_user, user_name, opponent, pong_save, forza4_save, token = null;
+    Player1, Player2, in_game, winner, players, match_ended, robinranking, numPlayers = null;
 }
 
-
-export function update_user(user)
-{
-    current_user = user;
+export async function initUser() {
+    if (window.location.pathname !== "/")
+        current_user = await restore_user();
 }
 
-export function nullify_user()
-{
+function is_parsable(value, to_parse) {
+    if (value && typeof value === "string" && to_parse) {
+        try {
+            return JSON.parse(value);
+        }
+        catch {
+            return value;
+        }
+    }
+    return value;
+}
+
+export function save_global(type, data) {
+    let parsed_data = is_parsable(data, true);
+    if (type === "pong")
+        pong_save = parsed_data;
+    if (type === "name")
+        user_name = parsed_data;
+    if (type === "opponent")
+        opponent = parsed_data;
+    if (type === "forza4")
+        forza4_save = parsed_data;
+    if (type === "p1")
+        Player1 = parsed_data;
+    if (type === "p2")
+        Player2 = parsed_data;
+    if (type === "token")
+        token = parsed_data;
+    if (type === "bracket")
+        Bracket_state = parsed_data
+    if (type === "game")
+        in_game = parsed_data;
+    if (type === "winner")
+        winner = parsed_data;
+    if (type === "players")
+        players = parsed_data;
+    if (type === "end")
+        match_ended = parsed_data;
+    if (type === "robinranked")
+        robinranking = parsed_data;
+    if (type === "numP")
+        numPlayers = parsed_data;
+    if (type === "acess")
+        acess = parsed_data;
+}
+
+export function nullify_user() {
     current_user = null;
 }
 
@@ -80,12 +137,11 @@ export const navigate = async (path, title = "", lobbyPlayers) => {
 
 function createPlayersArray(numPlayers) {
     let players = [];
-    for (let i = 1; i <= numPlayers; i++)
-    {
+    for (let i = 1; i <= numPlayers; i++) {
         if (i === 1)
             players.push(userName);
         else
-        players.push(`Player ${i}`);
+            players.push(`Player ${i}`);
     }
     return players;
 }
@@ -94,14 +150,14 @@ function restoreBackground() {
     document.getElementById('app').classList.remove('no-background');
 }
 
-export default function No_Page()
-{
-    return `
-      <div class="error-container">
-        <h1>404 - Page not found</h1>
-        <p>Sorry, the page you're looking for doesn't exist.</p>
-      </div>
-    `;
+function set_prev_path() {
+    let path = window.location.pathname;
+    if (path === "/modes")
+        prev_path = "/modes";
+    else if (path === '/')
+        return;
+    else
+        prev_path = null;
 }
 
 // Caricamento dinamico del contenuto
@@ -109,61 +165,46 @@ const loadContent = async () => {
     const path = window.location.pathname;
     const app = document.getElementById("app");
     const component = routes[path];
-    let let_me_in = await checkAuthentication(path);
-    if (let_me_in === 1)
-    {
-        navigate("/", "Home");
+    set_prev_path();
+    if (!component) {
+        app.innerHTML = `
+            <div class="error-container">
+                <h1>404 - Page not found</h1>
+                <p>Sorry, the page you're looking for doesn't exist.</p>
+            </div>`
         return;
     }
-    else if (let_me_in === -1)
-    {
-        navigate("/modes", "Return to Game Mode");
-        return;
-    }
-    if (!component)
-    {
-        app.innerHTML = No_Page();
-        return;
-    }
-    if (check_valid_operation(path) === 1 || path_error(path) === 1)
+    if (await check_valid_operation(path, component) === 1)
         return;
     else
         await initUser();
+    setInterval(check_change, 100);
     let playerNames;
-    let numPlayers = 4
-    if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8" 
+    if (buttonTitle === "Robin4" || buttonTitle === "Robin5" || buttonTitle === "Robin6" || buttonTitle === "Robin7" || buttonTitle === "Robin8"
         || buttonTitle === "Bracket4" || buttonTitle === "Bracket8" || buttonTitle === "Bracket16")
         numPlayers = parseInt(buttonTitle.replace(/\D/g, ""), 10);
     if (!players)
         players = createPlayersArray(numPlayers);
-    //console.log("Players? " +players);
-    playerNames = players;  
-    //console.log("path => " + path);
-    if (path !== "/classic" && path !== "/forza4/game")
-        remove_all(1, 1);
-        
-    if (component)
-    {
-        app.innerHTML = component();//sicuro se lo purifichi blocca codici
+    playerNames = players;
+    if (component) {
+        app.innerHTML = component();
         if (path === "/classic" || path === "/VS_AI" || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game") {
             //console.log("playerzzzz2: " + players);
-            initializeGameCanvas(players);
+            in_game = 1;
+            initializeGameCanvas();
             document.getElementById('app').classList.add('no-background');
         }
         else
             restoreBackground();
-        switch (path)
-        {
+        switch (path) {
             case "/":
                 addLoginPageHandlers();
                 break;
             case "/profile":
                 profileHandler();
                 break;
-            case "/classic":
-                sessionStorage.setItem("in_game", true);
-                break;
             case "/classic/lobby":
+                in_game = 0;
                 addClassicPongLobbyPageHandlers();
                 handleClassicPongLobby();
                 break;
@@ -179,12 +220,12 @@ const loadContent = async () => {
                 break;
             case "/tournament/knockout/lobby":
                 addLobbyPageHandlers();
-                handleLobby("Bracket", numPlayers);
+                handleLobby("Bracket");
                 resetBracketState();
                 break;
             case "/tournament/roundrobin/lobby":
                 addLobbyPageHandlers();
-                handleLobby("Robin", numPlayers);
+                handleLobby("Robin");
                 break;
             case "/tournament/knockout/bracket":
                 addBracketPageHandlers();
@@ -192,11 +233,8 @@ const loadContent = async () => {
                 //console.log("title => " + buttonTitle);
                 if (buttonTitle === "Return from Match") {
                     //console.log("return to bracket");
-                    winner = sessionStorage.getItem('winner');
                     backToBracket(winner);
                 }
-                else
-                    drawBracket(players);          
                 break;
             case "/tournament/roundrobin":
                 addRoundRobinPageHandlers();
@@ -205,7 +243,6 @@ const loadContent = async () => {
                 addRobinRankingPageHandlers();
                 if (buttonTitle === "Return from Match") {
                     //console.log("return to bracket");
-                    winner = sessionStorage.getItem('winner');
                     assignPointsToPlayer(winner);
                 }
                 robinDraw(playerNames);
@@ -228,12 +265,13 @@ const loadContent = async () => {
                 gameUserStatisticsPageHandlers();
                 break;
             case "/forza4/findopponent":
-                handleForza4Lobby(); 
+                in_game = 0;
+                handleForza4Lobby();
                 addForza4LobbyPageHandlers();
                 break;
             case "/forza4/game":
-                startForza4Game(players);
-                sessionStorage.setItem("in_game", true);
+                startForza4Game();
+                in_game = 1;
                 break;
             default:
                 break;
@@ -248,22 +286,50 @@ const loadContent = async () => {
         document.getElementById("chatApp").innerHTML = "";//sicuro
     }
 };
+window.onpopstate = function () {
 
-    // Handling "Forward" and "Backward" browser buttons
-window.addEventListener("popstate", () => {
-    loadContent();
-});
-    
-
-window.addEventListener("popstate", () =>
-{
-    if (sessionStorage.getItem("in_game") === "true")
-    {
+};
+// Handling "Forward" and "Backward" browser buttons
+window.addEventListener("popstate", async() => {
+    const path = window.location.pathname;
+    if (prev_path === "/modes" && path === "/") {
+        showInfoModal("you have quitted the active session", () => { });
+        remove_all(0, 0, 1);
+    }
+    if (in_game === 1 && path !== '/tournament/knockout/bracket/game'
+        && path !== '/tournament/knockout/bracket' && path !== "/tournament/roundrobin/robinranking"
+        && path !== "/tournament/roundrobin/robinranking/game") {
         remove_all(1, 1);
-        sessionStorage.setItem("in_game", false);
-        showInfoModal("you successfully exited the game", () => {});
+        Bracket_state = null;
+        robinranking = null;
+        reset_all();
+        resetBracketState();
+        showInfoModal("you successfully exited the game", () => { });
+        await loadContent();
         return;
     }
+    if ((path === "/tournament/knockout/bracket" || path === "/tournament/roundrobin/robinranking/game"
+        || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking")
+        && match_ended !== 1 && prev_path !== "/modes") {
+        Bracket_state = null;
+        robinranking = null;
+        reset_all();
+        resetBracketState();
+        navigate("/modes", "Return to Game Mode");
+        showInfoModal("Leaving Tournament...", () => { });
+        return;
+    }
+    if (match_ended === 1 && (path === "/tournament/knockout/bracket/game" || 
+    path === "/tournament/roundrobin/robinranking/game")) {
+        Bracket_state = null;
+        robinranking = null;
+        reset_all();
+        resetBracketState();
+        navigate("/modes", "Return to Game Mode");
+        showInfoModal("You finised the tournament yay");
+        return;
+    }
+    await loadContent();
 });
 
 function initChat() {
@@ -277,19 +343,88 @@ function initChat() {
 // Initialize app
 document.addEventListener("DOMContentLoaded", loadContent);
 
-const channel = new BroadcastChannel("session_sync");
-
-window.addEventListener('beforeunload', () =>
-{
-    if (sessionStorage.getItem('already in') === '1')
-    {
-        localStorage.setItem('session opened', 0);
-        channel.postMessage("session_closed");
-    }
+window.addEventListener('keydown', function (e) {
+    const result = ((e.key === 'F5') || (e.ctrlKey && e.key === 'r'));
+    if (window.location.pathname !== '/' && result === true)
+        sessionStorage.setItem("refresh", true);
+    else
+        sessionStorage.setItem("refresh", false);
 });
 
-channel.addEventListener("message", (event) =>
+const check_change = () =>
 {
-    if (event.data === "session_closed")
-        remove_all(0,0, 1);
+    let path = window.location.pathname;
+    const session = localStorage.getItem("session opened");
+    const already = sessionStorage.getItem("already in");
+    if (path === "/")
+    {
+        if (session !== "0" || already !== "0")
+        {
+            showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
+            remove_all(0, 0, 1);
+        }
+    }
+    else
+    {
+        if(acess === true || acess === "true")
+        {
+            if (session !== '1' || already !== '1')
+            {
+                navigate("/", "home");
+                showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
+                remove_all(0, 0, 1);
+            }
+        }
+    }
+};
+
+function to_string(name, value, isjson) {
+    if (typeof value === "object" && value !== null && isjson)
+        sessionStorage.setItem(name, JSON.stringify(value));
+    else
+        sessionStorage.setItem(name, value);
+}
+
+function save_at_exit() {
+    if (user_name)
+        to_string("user_name", user_name, false);
+    if (pong_save)
+        to_string("pongData", pong_save, true);
+    if (opponent)
+        to_string("opponent", opponent, false);
+    if (forza4_save)
+        to_string("forza4Data", forza4_save, true);
+    if (Player1)
+        to_string("player1", Player1, false);
+    if (Player2)
+        to_string("player2", Player2, false);
+    if (Bracket_state)
+        to_string("bracketState", Bracket_state, true);
+    if (in_game)
+        to_string("game", in_game, false);
+    if (winner)
+        to_string("winner", winner, false);
+    if (players)
+        to_string("players", players, true);
+    if (match_ended)
+        to_string("end", match_ended, false);
+    if (robinranking)
+        to_string("robinranked", robinranking, true);
+    if (numPlayers)
+        to_string("numP", numPlayers, true);
+    if (acess === true || acess === "true")
+        to_string("acess", acess, false);
+    if (token)
+        to_string("token", token, false);
+}
+
+window.addEventListener('beforeunload', () => {
+    save_at_exit();
+    const refresh = sessionStorage.getItem("refresh");
+    if (refresh === 'false') {
+        if (sessionStorage.getItem('already in') === '1') {
+            remove_all(0, 0, 1);
+            return (0);
+        }
+    }
 });
