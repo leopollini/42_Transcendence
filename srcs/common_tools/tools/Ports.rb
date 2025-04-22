@@ -41,6 +41,7 @@ module Ports
     'chat' => ['chat', 6087, 1],
     'broadcast' => ['internal_chat_support', 6088, 1],
     'send_msg' => ['internal_chat_support', 6088, 1],
+    'get_online' => ['internal_chat_support', 6088, 1],
 
     'match_invitation_request' => ['matchmaking', 6009, 1],
     'save_pong_game' => ['game_data_manager', 8790, 1],
@@ -51,6 +52,9 @@ module Ports
     'drop_games' => ['game_data_manager', 8790, 2],
 
     'create_tournament' => ['matchmaking', 6009, 1]
+  }
+  ROUTES = {
+    "internal_chat_support" => "chat"
   }
   MAX_MSG_LEN = 100_000
 end
@@ -102,9 +106,11 @@ module SimpleServer
   # JSON object (not in string form)
   def self.method_req(method, msg = {}, do_close = true)
     raise "Bad method request (#{method})" if Ports::HASH[method].nil?
-    puts "Resolving host: #{Ports::HASH[method][0]}"
+    service = Ports::HASH[method][0]
+    host = (Ports::ROUTES[service].nil? ? service : Ports::ROUTES[service])
+    puts "Resolving host: #{host}"
     begin
-      service = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
+      service = TCPSocket.new host, Ports::HASH[method][1]
     rescue => r
       return {'status' => "connection failed. Maybe service closed? (#{r.to_s})", 'success' => 'false'}.to_s
     end
