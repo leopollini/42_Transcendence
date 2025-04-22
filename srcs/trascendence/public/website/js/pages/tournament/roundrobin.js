@@ -1,4 +1,4 @@
-import { navigate } from "../../main.js";
+import { navigate, save_global} from "../../main.js";
 import { showInfoModal } from "../../modal.js";
 
 export default function Roundrobin() {
@@ -101,6 +101,7 @@ export const addRoundRobinPageHandlers = () => {
     const radioButtons = document.querySelectorAll("input[name='players']");
     const backImageButton = document.getElementById('backImageButton');
 
+    save_global("numP", null);
     radioButtons.forEach(radioButton => {
         radioButton.addEventListener('change', () => {
             navigate("/tournament/roundrobin/lobby", "Robin"+radioButton.value);  

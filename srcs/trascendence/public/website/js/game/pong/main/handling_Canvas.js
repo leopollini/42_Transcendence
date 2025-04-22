@@ -1,11 +1,11 @@
 import { startPongGame, PongGame } from "./pong.js";
-import { current_user } from "../../../main.js";
+import { current_user} from "../../../main.js";
 let gameInstance;
 
-export function initializeGameCanvas(matchPlayers) {
+export function initializeGameCanvas() {
     //console.log("Inizializzazione game canvas");
     const path = window.location.pathname;
-    let players;
+    let players_single;
 
     //console.log("PATH =>" +path);
     const gameCanvas = document.getElementById('gameCanvas');
@@ -20,20 +20,19 @@ export function initializeGameCanvas(matchPlayers) {
     if (current_user)
     {
         setTimeout(() => {
-            if (path === "/V.S._AI") {
-                players = [current_user.display_name, "AI"];
-                startPongGame(players, "ai");
+            if (path === "/VS_AI") {
+                players_single = [current_user.display_name, "AI"];
+                startPongGame("ai");
             } 
             else if (path === "/classic") {
-                startPongGame(matchPlayers, "classic");
+                startPongGame("classic");
             }
             else {
                 //players = JSON.parse(sessionStorage.getItem('matchPlayers')) || ["Player 1", "Player 2"];
-                console.log("inizio partita torneo => "+matchPlayers);
+                //console.log("inizio partita torneo => "+ matchPlayers);
                 const mode = path.includes("knockout") ? "knockout" : "roundrobin";
-                startPongGame(matchPlayers, mode);
+                startPongGame(mode);
             }
-            
             gameInstance = new PongGame();
             gameInstance.start();
         }, 50);

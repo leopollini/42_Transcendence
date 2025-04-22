@@ -1,4 +1,4 @@
-import { navigate } from "../main.js";
+import { navigate, save_global} from "../main.js";
 import { current_user } from "../main.js";
 
 let invitedPlayers = [];
@@ -57,7 +57,9 @@ export function handleClassicPongLobby() {
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
     
-    const players = ["Alice", "Bob", "Charlie", "David"];
+    const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
+    "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
+    "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
     players.forEach(player => {
         const div = document.createElement("div");
         div.classList.add("player");
@@ -76,6 +78,7 @@ export function handleClassicPongLobby() {
 }
 
 export function addClassicPongLobbyPageHandlers() {
+    save_global("game", 0);
     const toggleStartMatch = document.getElementById("pongToggleStartMatch");
     const matchPlayers = document.getElementById("pongMatchPlayers");
     const inviteButton = document.getElementById("pongInviteButton");
@@ -86,7 +89,7 @@ export function addClassicPongLobbyPageHandlers() {
             newPlayer.style.color = "white";
             newPlayer.onclick = null;
             const playerName = newPlayer.textContent.trim();
-            sessionStorage.setItem("opponent", playerName);
+            save_global("opponent",playerName);
             matchPlayers.appendChild(newPlayer);
             numPlayersAccepted++;
             numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;

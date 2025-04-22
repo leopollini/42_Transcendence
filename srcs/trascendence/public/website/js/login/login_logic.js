@@ -1,98 +1,110 @@
-import { navigate} from "../main.js";
-import { update_image, change_name} from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
-import { remove_all } from "../error_main.js";
+import { remove_all } from "../utils_main/error_main.js";
+import { acess, navigate, save_global, token, user_name} from "../main.js";
+import { update_image, change_name} from "../pages/modes.js"
 
-async function get_data()
-{
-  try
-  {
-    const data = JSON.stringify({});
+export default function Callback() {
+  return `
+    `;
+}
+
+export async function addCallbackPageHandlers() {
+  let let_me_in = await checkAuthentication(window.location.pathname);
+  if (let_me_in === 1) {
+    await navigate("/", "Home");
+    return (1);
+  }
+  else if (let_me_in === -1) {
+    await navigate("/modes", "Return to Game Mode");
+    return (1);
+  }
+}
+
+async function checkAuthentication() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    if (!code) {
+      showInfoModal("Missing OAuth parameters.", () => { });
+      navigate("/", "Return to home");
+      remove_all(0, 0, 1);
+      return;
+    }
+    const response = await fetch('/api/callback?' + params.toString());
+    const data = await response.json();
+    if (data.success) {
+      save_global("name", data.name);
+      save_global("token", data.token);
+      save_global("acess", true);
+      await get_data();
+      showInfoModal(data.message, () => { });
+      navigate("/modes", "Modalità di gioco", true, window.location.pathname);
+    } else {
+      showInfoModal("Autenticazione fallita: " + (data.error || "Unknown Error"), () => {
+      });
+      navigate("/", "Return to home");
+      remove_all(0, 0, 1);
+    }
+  } catch (error) {
+    showInfoModal("Errore durante la gestione del callback: " + error.message, () => { });
+    remove_all(0, 0, 1);
+    navigate("/", "Return to home");
+  }
+}
+
+async function get_data() {
+  try {
+    const data = JSON.stringify({ "params": { "display_name": user_name }, "token": token });
     const response = await fetch("http://localhost:8008", {
-        method: "get_user",
-        body: data
+      method: "get_user",
+      body: data
     })
     const result = await response.json();
-    console.log("(GET_USER)\ndata login = ", result);
-    let name;
-    if (result.user && Array.isArray(result.user))
-      name = result.user.find(user => user.entered === 1);
-    console.log("name: ", name);
-    if (name)
-    {
-      const user = name;
+    save_global("token", data.token);
+    if (result && result.status === "success"){
       let new_user =
       {
-        email: user.email,
-        login_name: user.display_name,
-        realname: user.realname,
-        image: user.image,
-        bio: user.bio,
+        email: result.user[0].email,
+        login_name: result.user[0].display_name,
+        realname: result.user[0].realname,
+        image: result.user[0].image,
+        bio: result.user[0].bio,
         type: "login"
       };
       remove_all(1, 1);
-      sessionStorage.setItem("user_name", new_user.realname);
       change_name(new_user.login_name);
       update_image(new_user.image);
-      update_user(new_user);
-      return ;
+      return;
     }
-    else
-    {
-      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => {});;
+    else {
       remove_all(0, 0, 1);
-      navigate("/", "login");
+      if (window.location.pathname !== '/')
+        navigate("/", "home");
+      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => { });;
       return;
     }
   }
-  catch (error)
-  {
-    showInfoModal("Error during Login in get_user: " + error.message, () => {});
+  catch (error) {
+    console.log("error = ", error);
+    remove_all(0, 0, 1);
+    if (window.location.pathname !== '/')
+      navigate("/", "home");
+    showInfoModal("Error during Login in get_user: " + error.message, () => { });
     return;
   }
 }
 
 export async function performLogin() {
-    try
-    {
-      const response = await fetch('/auth/login');
-      const data = await response.json();
+  try {
+    const response = await fetch('/auth/login');
+    const data = await response.json();
+    console.log("data = ", data);
+    if (data.auth_url) {
       window.location.href = data.auth_url;
-    }
-    catch (error)
-    {
-      showInfoModal("Error during login: " + error.message, () => {});
-    }
-}
+    } else
+      throw new Error("No auth_url received");
 
-export const checkAuthentication = async (path) =>
-{
-  if (path === "/callback")
-  {
-    try
-    {
-      const response = await fetch('/api/callback?' + new URLSearchParams(window.location.search));
-      const data = await response.json();
-      
-      //console.log("data: ", data);
-      if (data.success === true)
-      {
-        showInfoModal(data.message, () => {});
-        await get_data()
-        navigate("/modes", "Modalità di gioco");
-        return (0);
-      }
-      else
-      {
-        showInfoModal("Autenticazione fallita: " + (data.error || "Unknown Error"), () => {});
-        return (1);
-      }
-
-    }
-    catch (error)
-    {
-      showInfoModal("Errore durante la gestione del callback: " + error.message, () => {});
-      return (1);
-    }
+  } catch (error) {
+    showInfoModal("Error during login: " + error.message, () => { });
   }
-};
+}

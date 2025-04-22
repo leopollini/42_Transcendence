@@ -14,17 +14,15 @@ class OAuthClient
     @client = OAuth2::Client.new(
       @client_id,
       @client_secret,
-      site: "https://api.intra.42.fr",
-      authorize_url: "/oauth/authorize",
-      token_url: "/oauth/token"
+      site: 'https://api.intra.42.fr',
+      authorize_url: '/oauth/authorize',
+      token_url: '/oauth/token'
     )
   end
 
   def auth_url
     @client.auth_code.authorize_url(
-      redirect_uri: @redirect_uri,
-      scope: 'public',
-      state: 'state_value'
+      redirect_uri: @redirect_uri
     )
   end
   
@@ -37,7 +35,10 @@ class OAuthClient
   end
   
   def get_token(code)
-    @client.auth_code.get_token(code, redirect_uri: @redirect_uri)
+    @client.auth_code.get_token(
+      code,
+      redirect_uri: @redirect_uri
+    )
   end
-
+  
 end

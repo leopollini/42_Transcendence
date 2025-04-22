@@ -1,6 +1,6 @@
 import { navigate, current_user} from "../../../main.js";
 import { showInfoModal } from "../../../modal.js";
-import { remove_all } from "../../../error_main.js";
+import { remove_all } from "../../../utils_main/error_main.js";
 
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,
@@ -14,14 +14,19 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         navigate("/VS_AI", "Modalità AI");
     });
 
+    // !test per torneo da togliere poi
     tournamentButton?.addEventListener('click', () => {
+        current_user.type = "login";
         if (current_user.type === "guest")
         {
             showInfoModal("You must be logged to use this feature!", () => {});
             return;
         }
         else
+        {
+            current_user.type = "guest";
             navigate("/tournament", "Modalità Torneo");
+        }
     });
 
     forza4Button?.addEventListener('click', () => {
@@ -50,7 +55,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         });
     }
     else
-        console.error("profile icon not found!");
+        showInfoModal("profile icon not found!", () => {});
     if (history)
     {
         history.addEventListener("click", () => {
@@ -64,7 +69,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         });
     }
     else 
-        console.error("history icon not found!");
+        showInfoModal("history icon not found!", () => {});
     if (logout)
     {
         logout.addEventListener("click", () => {
@@ -78,5 +83,5 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         });
     }
     else 
-        console.error("logout icon not found!");
+        showInfoModal("logout icon not found!", () => {});
 }

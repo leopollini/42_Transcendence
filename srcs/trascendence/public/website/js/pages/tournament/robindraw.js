@@ -1,5 +1,5 @@
-import { navigate } from "../../main.js";
-
+import { navigate, robinranking, save_global, match_ended} from "../../main.js";
+import { showInfoModal } from "../../modal.js";
 let playerList;
 let playerNames = [];
 let matchesListRobin = [];
@@ -38,6 +38,16 @@ function shuffleMatchesArray(array) {
     }
 }
 
+export function reset_all()
+{
+    playerList = null;
+    playerNames = null;
+    firstMatch = true;
+    nextMatch = null;
+    lastMatch = null;
+    matchesListRobin = null;
+}
+
 function initializePlayers(players) {
     return players.map(playerName => ({
         name: playerName,
@@ -55,13 +65,20 @@ function findPlayersWithSameScore() {
     return playersEqualScore;
 }
 
-function findNextMatch(rankingRobinCtx) {
+function same_match(tiebreaker, nextMatch, rankingRobinCtx)
+{
+    if (!tiebreaker)
+        rankingRobinCtx.fillText("Next match: " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
+    else 
+        rankingRobinCtx.fillText("Next Match (t): " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
+}
+
+function findNextMatch(rankingRobinCtx, existing_match) {
     let attempts;
     let tiebreaker;
     attempts = 0;
 
-
-    //console.log("find the next match");
+    //console.log("find the next match")
     if (matchesListRobin.length === 0) {
         if (playerList[0].points == playerList[1].points)
         {
@@ -73,18 +90,19 @@ function findNextMatch(rankingRobinCtx) {
         }
         else if (!nextMatch) //No more matches (Tournament finished)
         {
+            save_global("end", 1);
             rankingRobinCtx.font = '30px Liberty';
             rankingRobinCtx.textAlign = 'left';
             rankingRobinCtx.fillStyle = 'white';
             rankingRobinCtx.fillText(playerList[0].name + " Win the Tournament!", 80, 500);
             rankingRobinCtx.fillText("Congratulations!", 150, 540);
             playRobinMatchButton.style.display = "none";
-            robinBackToMenuButton.style.display = "block";
+            if (robinBackToMenuButton)
+                robinBackToMenuButton.style.display = "block";
             tiebreaker = false;
             return;
         }
     }
-    
     if (playerNames.length > 4)
     {
         // Search until you find a match to play
@@ -112,7 +130,12 @@ function findNextMatch(rankingRobinCtx) {
         rankingRobinCtx.font = '30px Liberty';
         rankingRobinCtx.textAlign = 'left';
         rankingRobinCtx.fillStyle = 'white';
-        if (!tiebreaker)
+        if (existing_match)
+        {
+            same_match(tiebreaker, nextMatch, rankingRobinCtx);
+            return;
+        }
+        else if (!tiebreaker)
             rankingRobinCtx.fillText("Next match: " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
         else 
             rankingRobinCtx.fillText("Next Match (t): " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
@@ -123,6 +146,7 @@ function findNextMatch(rankingRobinCtx) {
 }
 
 export function assignPointsToPlayer(winner) {
+    robinranking.nextMatch = null;
     for (let i = 0; i < playerNames.length; i++) {
         if (playerList[i].name === winner)
             playerList[i].points += 3;
@@ -134,10 +158,11 @@ function populateMatchesList(playerList) {
     for (let i = 0; i < playerList.length; i++) {
         for (let j = i + 1; j < playerList.length; j++) {
             matchesListRobin.push({player1: playerList[i].name, player2: playerList[j].name});
-            console.log(playerList[i].name + " vs " + playerList[j].name);
+            //console.log(playerList[i].name + " vs " + playerList[j].name);
         }
     }
     shuffleMatchesArray(matchesListRobin);
+    save_global("robinranked", give_data());
 }
 
 
@@ -151,6 +176,17 @@ export function robinDraw(players) {
     playRobinMatchButton.style.display = "block";
     rankingRobinCanvas.style.display = "block";
 
+
+    if (robinranking && (!playerList || !playerNames || !matchesListRobin ||
+    !firstMatch || !nextMatch || !lastMatch))
+    {
+        playerList = robinranking.playerList
+        playerNames = robinranking.playerNames;
+        matchesListRobin = robinranking.matchesListRobin;
+        firstMatch = robinranking.firstMatch;
+        nextMatch = robinranking.nextMatch;
+        lastMatch = robinranking.lastMatch;
+    }
 
     if (!playerList)
         playerList = initializePlayers(players);
@@ -178,7 +214,21 @@ export function robinDraw(players) {
     }
 
     // Check next match to play
-    findNextMatch(rankingRobinCtx);
+    findNextMatch(rankingRobinCtx, nextMatch);
+    save_global("robinranked", give_data());
+}
+
+function give_data()
+{
+    let robin_data = {
+        playerList,
+        playerNames,
+        matchesListRobin,
+        firstMatch,
+        nextMatch,
+        lastMatch
+    }
+    return robin_data;
 }
 
 export const addRobinRankingPageHandlers = () => {
@@ -186,13 +236,14 @@ export const addRobinRankingPageHandlers = () => {
     const robinBackToMenuButton = document.getElementById('robinBackToMenuButton');
     const backImageButton = document.getElementById('backImageButton');
 
-
     playRobinMatchButton?.addEventListener('click', () => {
-        const players = [];
-        players.push(nextMatch.player1);
-        players.push(nextMatch.player2);
-        sessionStorage.setItem('matchPlayers', JSON.stringify(players));
-        nextMatch = null;
+        /*const players = [];
+        players.push(robinranking.nextMatch.player1);
+        players.push(robinranking.nextMatch.player2);*/
+        //sessionStorage.setItem('matchPlayers', JSON.stringify(players));
+        save_global("p1", robinranking.nextMatch.player1);
+        save_global("p2", robinranking.nextMatch.player2);
+        robinranking.nextMatch = null;
         navigate("/tournament/roundrobin/robinranking/game", "RoundRobin Pong Game");
     });
 
@@ -203,6 +254,19 @@ export const addRobinRankingPageHandlers = () => {
     });
 
     backImageButton?.addEventListener('click', () => {
+        save_global("p1", null);
+        save_global("p2", null);
+        save_global("bracket", null);
+        save_global("robinranked", null);
+        save_global("players", null);
+        playerList = null;
+        playerNames = null;
+        matchesListRobin = null;
+        firstMatch = true;
+        nextMatch = null;
+        lastMatch = null;  
+        if (match_ended === 1)
+            showInfoModal("You finised the tournament yay");
         navigate("/modes", "Return to Game Mode");
     });
 };

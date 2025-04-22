@@ -9,6 +9,19 @@ module Ports
     #  1 -> user wfqew
     #  2 -> API key
     
+    # '' => ['receiver', 8008],
+    # 'GET' => ['auth', 443],
+    # 'POST' => ['request_manager', 9000],
+    # 'HEAD' => ['request_manager', 9000],
+    # 'show_users' => ['request_manager', 9000],
+    # 'tokenizer' => ['tokenizer', 7890],
+
+    # "method" => ["service_to_call", port_to_service, securiy_level]
+    # SECURITY LEVELS:
+    #  0 -> none
+    #  1 -> user wfqew
+    #  2 -> API key
+    
     # 'POST' => ['request_manager', 9000],
     # 'HEAD' => ['request_manager', 9000],
     # 'show_users' => ['request_manager', 9000],
@@ -24,11 +37,12 @@ module Ports
     'logout_user' => ['user_manager', 7080, 2],         # CALLED BY CHAT AT LOGOUT
     'drop_users' => ['user_manager', 7080, 2],          # CALLED BY CHAT AT LOGOUT
     'get_user_by_token' => ['user_manager', 7080, 1],
-    
+
     'chat' => ['chat', 6087, 1],
     'broadcast' => ['internal_chat_support', 6088, 1],
     'send_msg' => ['internal_chat_support', 6088, 1],
 
+    'match_invitation_request' => ['matchmaking', 6009, 1],
     'save_pong_game' => ['game_data_manager', 8790, 1],
     'get_pong_games' => ['game_data_manager', 8790, 1],
     'save_f4_game' => ['game_data_manager', 8790, 1],
