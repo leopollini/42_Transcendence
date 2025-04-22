@@ -33,7 +33,6 @@ export function initializeGameCanvas() {
                 const mode = path.includes("knockout") ? "knockout" : "roundrobin";
                 startPongGame(mode);
             }
-            
             gameInstance = new PongGame();
             gameInstance.start();
         }, 50);

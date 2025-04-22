@@ -1,6 +1,6 @@
 import { navigate, current_user} from "../../../main.js";
 import { showInfoModal } from "../../../modal.js";
-import { remove_all } from "../../../error_main.js";
+import { remove_all } from "../../../utils_main/error_main.js";
 
 export function handle_modes_logic(classicButton, aiButton, tournamentButton, 
         forza4Button, avatarImage, menuContainer, Settings, profileIcon,

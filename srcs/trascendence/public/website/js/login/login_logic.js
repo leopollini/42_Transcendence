@@ -1,6 +1,6 @@
 import { showInfoModal } from "../modal.js";
-import { remove_all } from "../error_main.js";
-import { navigate, save_global, token} from "../main.js";
+import { remove_all } from "../utils_main/error_main.js";
+import { acess, navigate, save_global, token, user_name} from "../main.js";
 import { update_image, change_name} from "../pages/modes.js"
 
 export default function Callback() {
@@ -32,13 +32,13 @@ async function checkAuthentication() {
     }
     const response = await fetch('/api/callback?' + params.toString());
     const data = await response.json();
-
-    console.log("data: ", data);
     if (data.success) {
-      save_global("name", data.realname);
-      showInfoModal(data.message, () => { });
+      save_global("name", data.name);
+      save_global("token", data.token);
+      save_global("acess", true);
       await get_data();
-      navigate("/modes", "Modalità di gioco");
+      showInfoModal(data.message, () => { });
+      navigate("/modes", "Modalità di gioco", true, window.location.pathname);
     } else {
       showInfoModal("Autenticazione fallita: " + (data.error || "Unknown Error"), () => {
       });
@@ -60,16 +60,15 @@ async function get_data() {
       body: data
     })
     const result = await response.json();
-    console.log("(GET_USER)\ndata login = ", result);
     save_global("token", data.token);
-    if (result && result.status === "true") {
+    if (result && result.status === "success"){
       let new_user =
       {
-        email: result.email,
-        login_name: result.display_name,
-        realname: result.realname,
-        image: result.image,
-        bio: result.bio,
+        email: result.user[0].email,
+        login_name: result.user[0].display_name,
+        realname: result.user[0].realname,
+        image: result.user[0].image,
+        bio: result.user[0].bio,
         type: "login"
       };
       remove_all(1, 1);
@@ -86,6 +85,7 @@ async function get_data() {
     }
   }
   catch (error) {
+    console.log("error = ", error);
     remove_all(0, 0, 1);
     if (window.location.pathname !== '/')
       navigate("/", "home");

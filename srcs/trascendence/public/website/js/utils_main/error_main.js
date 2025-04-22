@@ -1,9 +1,9 @@
-import { free_users } from "./security/security.js";
-import { resetMatchStatsData } from "./game/pong/data/game_stats.js";
-import {nullify_user, navigate, reset_all_let, current_user,opponent, save_global,in_game, user_name} from "./main.js";
-import { showInfoModal } from "./modal.js";
-import { resetBracketState } from "./pages/tournament/bracket.js";
-import { addCallbackPageHandlers } from "./login/login_logic.js";
+import { free_users } from "../security/security.js";
+import { resetMatchStatsData } from "../game/pong/data/game_stats.js";
+import {navigate, reset_all_let, current_user,opponent, save_global,in_game, user_name, acess} from "../main.js";
+import { showInfoModal } from "../modal.js";
+import { resetBracketState } from "../pages/tournament/bracket.js";
+import { addCallbackPageHandlers } from "../login/login_logic.js";
 
 function reset_value(path) {
     let session = localStorage.getItem('session opened');
@@ -20,14 +20,6 @@ function reset_value(path) {
     }
     if (already === '1' && session === '0')
         localStorage.setItem('session opened', 1);
-    /* if ((already !== '1' && already !== '0') || (session !== '1' && session !== '0')) {
-        if (path !== '/') {
-            navigate("/", "home");
-            remove_all(0, 0, 1);
-        }
-        remove_all(0, 0);
-        showInfoModal("Error: Operation uniavable,quitting session...");
-    } */
 }
 
 export function remove_all(session, already, all) {
@@ -38,11 +30,10 @@ export function remove_all(session, already, all) {
             else
                 save_global("name", current_user.display_name);
         }
-        reset_all_let();
-        save_global("acess", false);
         if (current_user && user_name)
             free_users();
-        nullify_user();
+        reset_all_let();
+        save_global("acess", false);
     }
     localStorage.clear();
     sessionStorage.clear();
@@ -53,7 +44,7 @@ export function remove_all(session, already, all) {
 export async function check_valid_operation(path) {
     reset_value(path);
     refresh_reset(path);
-    if (path === "/callback")
+    if (path === "/callback" && acess === false)
     {   
         await addCallbackPageHandlers();
         return (1);
@@ -88,6 +79,14 @@ function refresh_reset(path) {
         sessionStorage.removeItem("user_name");
     }
     if (path !== '/') {
+        if (sessionStorage.getItem("PlayerName")) {
+            save_global("PlayerName", sessionStorage.getItem("PlayerName"));
+            sessionStorage.removeItem("PlayerName");
+        }
+        if (sessionStorage.getItem("prev_path")) {
+            save_global("prev_path", sessionStorage.getItem("prev_path"));
+            sessionStorage.removeItem("prev_path");
+        }
         if (sessionStorage.getItem("pongData")) {
             save_global("pong", sessionStorage.getItem("pongData"));
             sessionStorage.removeItem("pongData");

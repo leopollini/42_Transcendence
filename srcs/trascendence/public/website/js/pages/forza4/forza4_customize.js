@@ -1,11 +1,11 @@
 import { navigate, save_global, forza4_save} from "../../main.js";
 import { forza4CustomData } from "../../game/forza4/data/forza4_game_global.js";
-import { setToken1Color, setToken2Color, setBoardBackground, setPowerUpState } from "../../game/forza4/data/forza4_game_global.js";
+//import { setToken1Color, setToken2Color, setBoardBackground, setPowerUpState } from "../../game/forza4/data/forza4_game_global.js";
 
 
 let forza4Data;
 
-export function Forza4Customize() {
+export default function Forza4Customize() {
   const html = `
     <section id="forza4Customize" class="customize-container">
       <h1 class="page-title">Forza 4 Customization</h1>

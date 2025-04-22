@@ -1,7 +1,7 @@
 import { navigate, user_name, token } from "../main.js";
 import { updateProfileUI } from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
-import { remove_all } from "../error_main.js";
+import { remove_all } from "../utils_main/error_main.js";
 
 export class user {
     constructor(image, name, login_name, email, bio) {
@@ -35,9 +35,14 @@ export class Friend {
 
 function set_user(user, type)
 {
+    let name;
+    if (type === "guest")
+        name = user.username;
+    else
+        name = user.display_name;
     let new_user = new profile(
         user.email,
-        user.username,
+        user.username || user.display_name,
         user.realname,
         user.bio,
         user.image,
@@ -58,13 +63,12 @@ export async function restore_user() {
             })
 
         let result = await response.json();
-        //console.log("(get_user)\nData login = ", result);
-        if (result) {
+        if (result && result.status === "success") {
             let ref_user;
             if (result.guest)
                 ref_user = set_user(result.guest, "guest");
             else
-                ref_user = set_user(result.user, "login");
+                ref_user = set_user(result.user[0], "login");
             remove_all(1, 1);
             updateProfileUI(ref_user);
             return ref_user;

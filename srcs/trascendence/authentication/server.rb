@@ -67,7 +67,7 @@ class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
     "script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; " \
     "style-src 'self' https://fonts.googleapis.com; " \
     "font-src 'self' https://fonts.gstatic.com; " \
-    "img-src 'self' data:; " \
+    "img-src 'self' data: https://cdn.intra.42.fr; " \
     "connect-src 'self' http://localhost:8008 ws://localhost:6087; " \
     "object-src 'none'";    
   

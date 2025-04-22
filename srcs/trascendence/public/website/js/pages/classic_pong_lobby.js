@@ -78,6 +78,7 @@ export function handleClassicPongLobby() {
 }
 
 export function addClassicPongLobbyPageHandlers() {
+    save_global("game", 0);
     const toggleStartMatch = document.getElementById("pongToggleStartMatch");
     const matchPlayers = document.getElementById("pongMatchPlayers");
     const inviteButton = document.getElementById("pongInviteButton");

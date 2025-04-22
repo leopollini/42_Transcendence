@@ -76,7 +76,12 @@ export function profileHandler()
 
 function updateLogin(current_user)
 {
-  let data = JSON.stringify({"params": {"display_name": current_user.display_name, "bio": current_user.bio, "image": current_user.image}, "token": token});
+  let data = JSON.stringify({
+  "new_params": {
+  "display_name": current_user.display_name,
+  "bio": current_user.bio,
+  "image": current_user.image},
+  "token": token});
   fetch("http://localhost:8008",
   {
     method: "update_user",
@@ -102,7 +107,11 @@ function updateLogin(current_user)
 
 function updateGuest(current_user)
 {
-  let data = JSON.stringify({"params": {"bio": current_user.bio, "image": current_user.image}, "token": token});
+  let data = JSON.stringify({
+  "new_params": {
+  "bio": current_user.bio,
+  "image": current_user.image},
+  "token": token});
   fetch("http://localhost:8008",
   {
     method: "update_user",
@@ -128,6 +137,7 @@ function updateGuest(current_user)
 
 function saveProfile(infoContainer) {
   let saving;
+  let myname;
   if (current_user.image === me.image)
     saving = "no canges in image have been made\n";
   else
@@ -149,6 +159,8 @@ function saveProfile(infoContainer) {
   {
     saving += savename(me, infoContainer);
     current_user.display_name = me.display_name;
+    if (current_user.display_name === me.display_name)
+      saving += "✅saved new name successfully\n";
   }
   if (current_user.type === "guest")
     updateGuest(current_user);

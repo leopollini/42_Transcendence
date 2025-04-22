@@ -1,7 +1,5 @@
 import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { setUserName } from './user_data.js';
-import { showInfoModal } from '../modal.js';
-import { remove_all } from '../error_main.js';
 
 export default function Modes()
 {

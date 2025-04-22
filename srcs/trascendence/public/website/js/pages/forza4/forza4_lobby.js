@@ -41,6 +41,7 @@ export default function Forza4LobbyRoom() {
 
 
 export function handleForza4Lobby() {
+    save_global("game", 0);
     const onlinePlayers = document.getElementById("f4OnlinePlayers");
     const matchPlayers = document.getElementById("f4MatchPlayers");
     const inviteButton = document.getElementById("f4InviteButton");

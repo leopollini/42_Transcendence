@@ -2,7 +2,7 @@ import { navigate, save_global} from "../main.js";
 import { user, profile} from "./user.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInputModal, showInfoModal } from "../modal.js"
-import { remove_all } from "../error_main.js";
+import { remove_all } from "../utils_main/error_main.js";
 
 function hasNoSpaces(str)
 {

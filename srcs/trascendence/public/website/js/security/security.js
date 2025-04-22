@@ -1,6 +1,6 @@
 import { user_name } from "../main.js";
 import { showInfoModal } from "../modal.js";
-import { remove_all } from "../error_main.js";
+import { remove_all } from "../utils_main/error_main.js";
 export async function validateUploadedImage(file)
 {
     return new Promise((resolve, reject) =>
@@ -68,7 +68,7 @@ export function free_users()
 {
     try
     {
-        let data = JSON.stringify({"diplay_name" : user_name});
+        let data = JSON.stringify({"display_name" : user_name});
         fetch("http://localhost:8008",
         {
             method: "logout_user",
@@ -99,6 +99,7 @@ export function free_users()
     }
     catch (error)
     {
+        console.log("error = ", error);
         remove_all(0, 0);
         if (window.location.pathname !== '/')
             navigate("/", "home");

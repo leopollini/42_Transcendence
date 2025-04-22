@@ -10,7 +10,7 @@ let ties = 0;
 let f4UserData;
 let pongUserData;
 
-export function GameUserStatistics() {
+export default function GameUserStatistics() {
     return `
         <img id="backImageButton" src="../website/images/home.png" alt="Back" class="back-button">
         <h1 class="text h1_margin">

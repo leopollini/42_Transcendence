@@ -10,7 +10,7 @@ export function createStarsBackground(game, count) {
 export function renderBackground(game) {
     // Walls
 
-    if (pongGameData.background == "pingpong") {
+    if (pongGameData.background== "pingpong") {
         // Background
         game.ctx.fillStyle = "#1d8819";
         game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);

@@ -130,6 +130,10 @@ class GuestsList
   end
 
   def exists?(username)
-    @guest[@index[username]]['deleted'] == -1 if @index[username]
+    if @index.key?(username)
+      @guest[@index[username]] && @guest[@index[username]]['deleted'] == -1
+    else
+      false
+    end
   end
 end

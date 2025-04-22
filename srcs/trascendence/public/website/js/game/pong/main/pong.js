@@ -28,6 +28,7 @@ export function startPongGame(gameMode) {
   backToRobinButton = document.getElementById("backToRobinButton");
   backToMenuButton = document.getElementById("backToMenuButton");
 
+  console
   // Hide the buttons when the game starts
   if (backToBracketButton)
     backToBracketButton.hidden = true;
@@ -320,8 +321,3 @@ export class PongGame {
     window.addEventListener("resize", () => this.resize());
   }
 }
-
-window.addEventListener("beforeunload", () =>
-{
-
-});

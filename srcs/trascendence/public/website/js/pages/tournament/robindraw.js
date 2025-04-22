@@ -65,13 +65,20 @@ function findPlayersWithSameScore() {
     return playersEqualScore;
 }
 
-function findNextMatch(rankingRobinCtx) {
+function same_match(tiebreaker, nextMatch, rankingRobinCtx)
+{
+    if (!tiebreaker)
+        rankingRobinCtx.fillText("Next match: " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
+    else 
+        rankingRobinCtx.fillText("Next Match (t): " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
+}
+
+function findNextMatch(rankingRobinCtx, existing_match) {
     let attempts;
     let tiebreaker;
     attempts = 0;
 
-
-    //console.log("find the next match");
+    //console.log("find the next match")
     if (matchesListRobin.length === 0) {
         if (playerList[0].points == playerList[1].points)
         {
@@ -96,7 +103,6 @@ function findNextMatch(rankingRobinCtx) {
             return;
         }
     }
-    
     if (playerNames.length > 4)
     {
         // Search until you find a match to play
@@ -124,7 +130,12 @@ function findNextMatch(rankingRobinCtx) {
         rankingRobinCtx.font = '30px Liberty';
         rankingRobinCtx.textAlign = 'left';
         rankingRobinCtx.fillStyle = 'white';
-        if (!tiebreaker)
+        if (existing_match)
+        {
+            same_match(tiebreaker, nextMatch, rankingRobinCtx);
+            return;
+        }
+        else if (!tiebreaker)
             rankingRobinCtx.fillText("Next match: " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
         else 
             rankingRobinCtx.fillText("Next Match (t): " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
@@ -135,6 +146,7 @@ function findNextMatch(rankingRobinCtx) {
 }
 
 export function assignPointsToPlayer(winner) {
+    robinranking.nextMatch = null;
     for (let i = 0; i < playerNames.length; i++) {
         if (playerList[i].name === winner)
             playerList[i].points += 3;
@@ -163,6 +175,8 @@ export function robinDraw(players) {
 
     playRobinMatchButton.style.display = "block";
     rankingRobinCanvas.style.display = "block";
+
+
     if (robinranking && (!playerList || !playerNames || !matchesListRobin ||
     !firstMatch || !nextMatch || !lastMatch))
     {
@@ -200,8 +214,7 @@ export function robinDraw(players) {
     }
 
     // Check next match to play
-    findNextMatch(rankingRobinCtx);
-    
+    findNextMatch(rankingRobinCtx, nextMatch);
     save_global("robinranked", give_data());
 }
 

@@ -1,15 +1,15 @@
-import { current_user, forza4_save, navigate, opponent, players } from "../../../main.js";
+import { current_user, forza4_save, navigate, opponent, players, save_global } from "../../../main.js";
 import { forza4CustomData } from "../data/forza4_game_global.js";
 import { createGrid, redrawGrid } from "../board/forza4_grid.js";
 import { updateTimer, resetTimer } from "../other/forza4_timer.js";
 import { activatePowerup } from "../board/forza4_powerup.js";
-import { remove_all } from "../../../error_main.js";
+import { remove_all } from "../../../utils_main/error_main.js";
 
 export let forza4GameData;
 let backImageButton;
 let matchPlayers = [];
 
-export function Forza4() {
+export default function Forza4() {
     return `
         <div id="forza4Game">
             <div id="f4players">
@@ -39,12 +39,14 @@ export function Forza4() {
 export function startForza4Game() {
     //console.log("start forza 4 game");
     //console.log(players);
+    save_global("game", 1);
     backImageButton = document.getElementById('backImageButton');
     matchPlayers = players;
     if (forza4_save !== null)
         forza4GameData = forza4_save;
     else
         forza4GameData = forza4CustomData;
+    save_global("game", 1);
     return new Forza4Game();
 }
 

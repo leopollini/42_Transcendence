@@ -46,21 +46,25 @@ def login_user(client, obj)
   data['token'] = Digest::SHA256.hexdigest(Time.now.to_s)
 
   return GUEST.add_guest(data) if data['login_as_guest'].to_s == 'true'
-
   usr = LOGIN.select_specific 'realname', data['realname'].to_s, [], false
   if usr.nil?
     return user_creat(data) if obj['do_create'].to_s == 'true'
     return {'status' => 'user not found', 'success' => 'false', 'service' => 'user_manager'}
   end
+
   puts "user already in database, updating with new info".yellow
   (update_user(client, {"new_params" => data})).merge({'token' => 'loltoken'})
 end
 
 def update_user(_client, obj = nil)
   puts 'update_user called'.green if DEBUG_MODE
-  puts "Diomerds " + obj.to_s.grey
+  puts "Obj " + obj.to_s.gray
 
-  new_params = obj['new_params'].slice(UPDATABLE_PARAMS)
+  if (obj && obj['new_params'])
+    puts "new params = (#{obj['new_params']})".yellow
+    new_params = obj['new_params'].slice(UPDATABLE_PARAMS)
+    puts "updated params = #{new_params}".yellow
+  end
   return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['display_name'].to_s == ""
   LOGIN.valueManipulation 'display_name', obj['display_name'].to_s, new_params
   return DEFAULT_SUCCESS_RES.clone
