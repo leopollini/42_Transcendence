@@ -17,7 +17,7 @@ NC=\033[0m
 all: prep_dirs #stop_containers
 	@clear
 	@echo -e "$(RED)Rimozione del volume per evitare conflitti...$(NC)";
-	@sudo docker volume rm ct;
+	# @sudo docker volume rm ct;
 	@echo -e "$(YELLOW)configurazione server https locale$(NC)"
 	@chmod +x setup/setup_online_website.sh
 	@sudo ./setup/setup_online_website.sh
@@ -25,9 +25,9 @@ all: prep_dirs #stop_containers
 	make -C ./srcs/common_tools/ all
 	@echo -e "$(YELLOW)Avvio container Docker...$(NC)"; \
 	if [ "$${DETATCH}" = "true" ]; then \
-		sudo docker-compose -f ./docker-compose.yml up -d; \
+		sudo docker compose -f ./docker-compose.yml up -d; \
 	else \
-		sudo docker-compose -f ./docker-compose.yml up; \
+		sudo docker compose -f ./docker-compose.yml up; \
 	fi
 
 $(CONTAINERS): prep_dirs
@@ -37,22 +37,22 @@ $(CONTAINERS): prep_dirs
 		echo -e "$(GREEN)cleaned$(NC)"; \
 	fi
 	@if [ "$(DETATCH)" = "true" ]; then \
-		docker-compose -f ./docker-compose.yml up -d $@; \
+		docker compose -f ./docker-compose.yml up -d $@; \
 	else \
-		docker-compose -f ./docker-compose.yml up $@; \
+		docker compose -f ./docker-compose.yml up $@; \
 	fi
-	# @docker-compose -f ./docker-compose.yml up $@
+	# @docker compose -f ./docker-compose.yml up $@
 
 stop_containers:
 	clear
 	@echo -e "${YELLOW}Stopping existing containers...${NC}"
-	@sudo chmod +x /usr/bin/docker-compose
-	@docker-compose -f ./docker-compose.yml stop
+	# @sudo chmod +x /usr/bin/docker-compose
+	@docker compose -f ./docker-compose.yml stop
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
 
 down:
-	@docker-compose -f ./docker-compose.yml down
+	@docker compose -f ./docker-compose.yml down
 
 re: clean prep_dirs
 	@clear
@@ -63,7 +63,7 @@ re: clean prep_dirs
 	make -C srcs/common_tools/ re
 	@docker ps -qa | xargs -r docker stop
 	@docker ps -qa | xargs -r docker rm
-	@docker-compose -f ./docker-compose.yml up --build
+	@docker compose -f ./docker-compose.yml up --build
 
 prep_dirs:
 	@echo -e "${YELLOW}Creating directories...${NC}"
@@ -80,7 +80,7 @@ clean:
 	@if [ "$$(docker ps -a -q | wc -l)" -gt 0 ]; then \
 		echo -e "Container Docker trovati, procedo con la pulizia..."; \
 		if [ "$$(docker ps -q | wc -l)" -gt 0 ]; then \
-			docker-compose -f docker-compose.yml stop; \
+			docker compose -f docker-compose.yml stop; \
 		else \
 			echo -e "${RED}Nessun container attivo da fermare.${NC}"; \
 		fi; \
@@ -96,7 +96,7 @@ clean:
 fclean: clean
 	@if [ "$$(docker ps -a -q | wc -l)" -gt 0 ] || [ "$$(docker images -q | wc -l)" -gt 0 ] || [ "$$(docker volume ls -q | wc -l)" -gt 0 ]; then \
 		echo -e "Risorse Docker trovate, avvio la pulizia profonda..."; \
-		docker-compose down -v --remove-orphans; \
+		docker compose down -v --remove-orphans; \
 		docker system prune -a --volumes -f; \
 		docker images -qa | xargs -r docker rmi -f || true; \
 		docker volume ls -q | xargs -r docker volume rm || true; \

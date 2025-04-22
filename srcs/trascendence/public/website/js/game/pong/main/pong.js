@@ -153,7 +153,7 @@ export class PongGame {
       requestAnimationFrame(() => this.loop());
     }
   }
-
+  
   update() {
     if (!this.gamePaused && !this.gameEnd) {
       this.ball.update(
