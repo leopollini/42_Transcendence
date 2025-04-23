@@ -61,9 +61,7 @@ def update_user(_client, obj = nil)
   puts "Obj " + obj.to_s.gray
 
   if (obj && obj['new_params'])
-    puts "new params = (#{obj['new_params']})".yellow
     new_params = obj['new_params'].slice(UPDATABLE_PARAMS)
-    puts "updated params = #{new_params}".yellow
   end
   return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['display_name'].to_s == ""
   LOGIN.valueManipulation 'display_name', obj['display_name'].to_s, new_params

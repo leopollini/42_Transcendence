@@ -1,6 +1,6 @@
 import { free_users } from "../security/security.js";
 import { resetMatchStatsData } from "../game/pong/data/game_stats.js";
-import {navigate, reset_all_let, current_user,opponent, save_global,in_game, user_name, acess} from "../main.js";
+import {navigate, reset_all_let, current_user,opponent, save_global,in_game, user_name, acess, Player1, Player2} from "../main.js";
 import { showInfoModal } from "../modal.js";
 import { resetBracketState } from "../pages/tournament/bracket.js";
 import { addCallbackPageHandlers } from "../login/login_logic.js";
@@ -149,6 +149,14 @@ function refresh_reset(path) {
 async function cont_check(path) {
     if (!opponent && (path === "/classic" || path === "/forza4/game")) {
         navigate("/modes", "return to modes");
+        showInfoModal("the operation you are doing is forbidden", () => { });
+        return (1);
+    }
+    if (in_game === 0 && (path === "/tournament/roundrobin/robinranking/game" ||
+    path === "/tournament/knockout/bracket/game" || path === "/tournament/knockout/bracket" ||
+    path === "/tournament/roundrobin/robinranking"))
+    {
+        navigate("/modes", "modes");
         showInfoModal("the operation you are doing is forbidden", () => { });
         return (1);
     }
