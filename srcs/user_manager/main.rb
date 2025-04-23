@@ -31,7 +31,7 @@ LOGIN = BetterPG::SimplePG.new 'users',
 GUEST = GuestsList.new
 MANDATORY_DATA = %w[email display_name realname bio image]
 GET_USER_SECURE_INFO = %w[display_name created image]
-UPDATABLE_PARAMS = %w[display_name email image bio]
+NON_UPDATABLE_PARAMS = %w[realname created level entered token]
 
 def user_creat(data)
   puts "Cteating new user as:".green, data
@@ -61,13 +61,19 @@ def update_user(_client, obj = nil)
   puts "Obj " + obj.to_s.gray
 
   if (obj && obj['new_params'])
-    puts "new params = (#{obj['new_params']})".yellow
-    new_params = obj['new_params'].slice(UPDATABLE_PARAMS)
+    puts "new params = #{obj['new_params']}".yellow
+    puts "avoiding by   #{NON_UPDATABLE_PARAMS}".yellow
+    new_params = obj['new_params'].except NON_UPDATABLE_PARAMS
     puts "updated params = #{new_params}".yellow
+  else
+    return DEFAULT_MISSING_PARAM.clone
   end
 
-  return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['display_name'].to_s == ""
-  LOGIN.valueManipulation 'display_name', obj['display_name'].to_s, new_params
+  return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['token'].to_s.empty?
+  guest = GUEST.exists_token? obj['token']
+  return GUEST.update_guest(guest, new_params) if guest
+
+  LOGIN.updateValue 'token', obj['token'].to_s, new_params
   return DEFAULT_SUCCESS_RES.clone
 end
 

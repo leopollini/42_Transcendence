@@ -2,7 +2,7 @@
 
 /var/common/setup_tools.sh
 
-GEMS=("pg" "digest" "dotenv" "openssl" "base64" "colorize" "securerandom")
+GEMS=("pg" "digest" "dotenv" "colorize" "securerandom")
 
 for gm in "${GEMS[@]}"
 do

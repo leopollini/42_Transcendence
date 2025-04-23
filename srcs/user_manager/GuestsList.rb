@@ -1,6 +1,6 @@
 
 
-MAX_GUEST_COUNT = 10
+MAX_GUEST_COUNT = 50
 
 require 'dotenv'
 require 'colorize'
@@ -14,8 +14,8 @@ class GuestsList
   end
   
   def reset()
-    @guests = Array.new(MAX_GUEST_COUNT + 1)
-    @index = Hash.new
+    @guests = [nil]
+    @index = {}
     @counter_index = 0
   end
 
@@ -28,7 +28,8 @@ class GuestsList
     @counter_index = (@counter_index + 1) % MAX_GUEST_COUNT
   
     @index.delete(@guests[i]['username']) if @guests[i]
-  
+
+    
     @guests[i] = {
       'username' => username,
       'created' => Time.now.to_i,
@@ -37,10 +38,9 @@ class GuestsList
       'image' => data['image'].to_s,
       'token' => data['token']
     }
-  
+    
     @index[username] = i
-  
-  # TOKEN MANAGEMENT
+    
     {
       'service' => 'user_manager',
       'status' => 'success',
@@ -81,14 +81,15 @@ class GuestsList
   
   def update_guest(username, new_data)
     index = @index[username]
-    return { 'status' => "user #{username} not found", 'success' => 'false' } if index.nil?
+    return { 'status' => "user not found (#{username})", 'success' => 'false' } if index.nil?
   
     guest = @guests[index]
-    return { 'status' => "cannot change this info", 'success' => 'false' } if new_data['username'] || new_data['created'] || new_data['deleted']
-    return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio', 'image']).empty?
+    puts "modifying #{username}'s info: #{new_data}".green
+    return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio']).empty?
+    # return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio', 'image']).empty?
   
     guest['bio'] = new_data['bio'] if new_data['bio']
-    guest['image'] = new_data['image'] if new_data['image']
+    # guest['image'] = new_data['image'] if new_data['image']
     { 'status' => 'success', 'success' => 'true' }
   end
 
@@ -131,9 +132,16 @@ class GuestsList
 
   def exists?(username)
     if @index.key?(username)
-      @guest[@index[username]] && @guest[@index[username]]['deleted'] == -1
+      @guests[@index[username].to_i] && @guests[@index[username].to_i]['deleted'].to_i == -1
     else
       false
     end
+  end
+
+  def exists_token?(token)
+    @guests.each do |g|
+      return g['username'] if g && g['token'].to_s == token.to_s
+    end
+      nil
   end
 end

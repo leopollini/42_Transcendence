@@ -77,11 +77,12 @@ export function profileHandler()
 function updateLogin(current_user)
 {
   let data = JSON.stringify({
+  "token": token,
   "new_params": {
   "display_name": current_user.display_name,
   "bio": current_user.bio,
-  "image": current_user.image},
-  "token": token});
+  "image": current_user.image}});
+  console.log("(UPDATE_USER)\ndata update user profile = ", data);
   fetch("http://localhost:8008",
   {
     method: "update_user",
@@ -89,7 +90,6 @@ function updateLogin(current_user)
   })
   .then(response => response.json())
   .then(data =>{
-    //console.log("(UPDATE_USER)\ndata update user profile = ", data);
     if (data)
     {
       if (data.success !== "true")
@@ -108,10 +108,11 @@ function updateLogin(current_user)
 function updateGuest(current_user)
 {
   let data = JSON.stringify({
+  "token": token,
   "new_params": {
   "bio": current_user.bio,
-  "image": current_user.image},
-  "token": token});
+  "image": current_user.image}});
+  console.log("(UPDATE_USER)\ndata update user profile = ", data);
   fetch("http://localhost:8008",
   {
     method: "update_user",
@@ -119,7 +120,6 @@ function updateGuest(current_user)
   })
   .then(response => response.json())
   .then(data =>{
-    //console.log("(UPDATE_USER)\ndata update user profile = ", data);
     if (data)
     {
       if (data.success !== "true")
