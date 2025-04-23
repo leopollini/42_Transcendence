@@ -68,9 +68,9 @@
 /* Pulsante per tornare al menu */
 #f4BackToMenuButton {
     display: none;
+    color: #ffffff;
+    padding: 0 1.5em; 
     margin: 1vh;
-    width: 2vh;
-    height: 2vh;
 }
 
 
@@ -84,7 +84,7 @@
 /* Pulsanti power-up*/
 
 .f4-button-style {
-    font-size: 2.5vh;
+    font-size: clamp(0.8rem, 1.4vw + 0.5rem, 1.3rem);
     padding: 0.75em 1.5em;
     color: #0fffcf;
     background-color: transparent;
@@ -94,7 +94,7 @@
     transition: all 0.4s ease-in-out;
     outline: none;
     margin: 12px;
-    width: 16vw;
+    width: clamp(160px, 18vw, 240px);
     height: 8vh;
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
     display: inline-flex;

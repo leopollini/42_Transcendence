@@ -57,10 +57,10 @@ export async function restore_user() {
             return null;
         let data = JSON.stringify({ "params": { "display_name": user_name, "token": token } });
         const response = await fetch("http://localhost:8008",
-            {
-                method: "get_user",
-                body: data
-            })
+        {
+            method: "get_user",
+            body: data
+        })
 
         let result = await response.json();
         if (result && result.status === "success") {
@@ -82,11 +82,22 @@ export async function restore_user() {
         }
     }
     catch (error) {
-        console.log("Eroor in get_user = ", error);
+        console.log("Error in get_user = ", error);
         remove_all(0, 0, 1);
         if (window.location.pathname !== '/')
             navigate("/", "home");
         showInfoModal("Error with get_user:", error);
         return null;
     }
+}
+
+export async function online(name)
+{
+    const response = await fetch("http://localhost:6088",
+    {
+        method: "get_online",
+        body: {}
+    })
+    let result = await response.json();
+    console.log("result = ", result);
 }

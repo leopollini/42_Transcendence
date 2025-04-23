@@ -102,4 +102,5 @@ body {
   
 .hidden-button {
     display: none;
+    margin-top: 10vh;
 }

@@ -9,7 +9,7 @@ export let forza4GameData;
 let backImageButton;
 let matchPlayers = [];
 
-export default function Forza4() {
+export function Forza4() {
     return `
         <div id="forza4Game">
             <div id="f4players">
@@ -28,7 +28,7 @@ export default function Forza4() {
                 <div id="f4board"></div>
             </div>
             <div id="f4message"></div>
-            <button id="f4BackToMenuButton" class="button-style">Back to Menu</button>
+            <button id="f4BackToMenuButton" class="f4-button-style hidden-button">Back to Menu</button>
         </div>
         <div class="avatar-container">
             <img id="backImageButton" src="../website/images/home.png" alt="Back" class="back-button">

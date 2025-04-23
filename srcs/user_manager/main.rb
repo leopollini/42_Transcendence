@@ -31,7 +31,7 @@ LOGIN = BetterPG::SimplePG.new 'users',
 GUEST = GuestsList.new
 MANDATORY_DATA = %w[email display_name realname bio image]
 GET_USER_SECURE_INFO = %w[display_name, created, image]
-UPDATABLE_PARAMS = %w[display_name, email, image, bio]
+UPDATABLE_PARAMS = %w[display_name email image bio]
 
 def user_creat(data)
   puts "Cteating new user as:".green, data
