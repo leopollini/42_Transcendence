@@ -76,7 +76,7 @@ def matchmake(client, server)
   
   res = make_match(bobj['players'], bobj['tournament_mode'])
   puts res
-  client.puts res
+  client.puts res.to_json
   # client.puts({"status"=>"WIP", "success" => "false"}.to_json)
 end
 
