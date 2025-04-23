@@ -16,7 +16,6 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
 
     // !test per torneo da togliere poi
     tournamentButton?.addEventListener('click', () => {
-        current_user.type = "login";
         if (current_user.type === "guest")
         {
             showInfoModal("You must be logged to use this feature!", () => {});
@@ -75,6 +74,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
         logout.addEventListener("click", () => {
             if (!current_user)
             {
+                showInfoModal("You logged out successfully", () => {});
                 navigate("/", "logout");
                 return;
             }

@@ -6,6 +6,10 @@ import { resetBracketState } from "../pages/tournament/bracket.js";
 import { addCallbackPageHandlers } from "../login/login_logic.js";
 
 function reset_value(path) {
+    if (sessionStorage.getItem("user_name")) {
+        save_global("name", sessionStorage.getItem("user_name"));
+        sessionStorage.removeItem("user_name");
+    }
     let session = localStorage.getItem('session opened');
     let already = sessionStorage.getItem('already in');
     if (in_game && path === "/tournament/knockout/lobby")
@@ -43,7 +47,6 @@ export function remove_all(session, already, all) {
 
 export async function check_valid_operation(path) {
     reset_value(path);
-    refresh_reset(path);
     if (path === "/callback" && acess === false)
     {   
         await addCallbackPageHandlers();
@@ -63,6 +66,7 @@ export async function check_valid_operation(path) {
         if (continue_error_check(path) === 1)
             return (1);
     }
+    refresh_reset(path);
     if (await cont_check(path) === 1)
         return (1);
     if (path !== "/" && path !== "/classic" && path !== "/forza4/game"
@@ -74,10 +78,6 @@ export async function check_valid_operation(path) {
 }
 
 function refresh_reset(path) {
-    if (sessionStorage.getItem("user_name")) {
-        save_global("name", sessionStorage.getItem("user_name"));
-        sessionStorage.removeItem("user_name");
-    }
     if (path !== '/') {
         if (sessionStorage.getItem("PlayerName")) {
             save_global("PlayerName", sessionStorage.getItem("PlayerName"));
@@ -171,6 +171,7 @@ async function cont_check(path) {
 function continue_error_check(path) {
     let session = localStorage.getItem('session opened');
     let already = sessionStorage.getItem('already in');
+    //console.log("session = " + session + "\nalready = " + already);
     if ((session === '1' && already === '0')
     || (already === '0' && session === '0')) {
         remove_all(0, 0, 1);

@@ -7,7 +7,9 @@ import { handle_popstate, save_at_exit} from "./utils_main/listener_Compacter.js
 import { util_main, set_prev_path} from "./utils_main/utils.js";
 
 export let Bracket_state = null,
+           refresh = false,
            current_user = null,
+           tournament = null,
            user_name = null,
            opponent = null,
            pong_save = null,
@@ -23,9 +25,8 @@ export let Bracket_state = null,
            match_ended = null,
            robinranking = null,
            numPlayers = null,
-           buttonTitle = null;
-
-export let acess = false;
+           buttonTitle = null,
+           acess = false;
 
 export function reset_all_let()
 {
@@ -33,6 +34,7 @@ export function reset_all_let()
     current_user = null,
     user_name = null,
     opponent = null,
+    tournament = null,
     pong_save = null,
     forza4_save = null,
     token = null,
@@ -72,10 +74,14 @@ export function save_global(type, data) {
         forza4_save = parsed_data;
     if (type === "p1")
         Player1 = parsed_data;
+    if (type === "refresh")
+        refresh = parsed_data;
     if (type === "p2")
         Player2 = parsed_data;
     if (type === "token")
         token = parsed_data;
+    if (type === "tournament")
+        tournament = parsed_data;
     if (type === "bracket")
         Bracket_state = parsed_data
     if (type === "game")
@@ -102,13 +108,19 @@ export function save_global(type, data) {
 
 window.addEventListener('beforeunload', () => {
     save_at_exit();
-    const refresh = sessionStorage.getItem("refresh");
-    if (refresh === 'false') {
+    if (refresh === false) {
         if (sessionStorage.getItem('already in') === '1') {
             remove_all(0, 0, 1);
             return (0);
         }
     }
+    
+});
+
+window.addEventListener('keydown', function (e) {
+    const result = ((e.key === 'F5') || (e.ctrlKey && e.key === 'r'));
+    if (result === true)
+        refresh = true;
 });
 
 //restore logged da sistemare
@@ -167,12 +179,4 @@ document.addEventListener("DOMContentLoaded", loadContent);
 // Handling "Forward" and "Backward" browser buttons
 window.addEventListener("popstate", async() => {
     handle_popstate();
-});
-
-window.addEventListener('keydown', function (e) {
-    const result = ((e.key === 'F5') || (e.ctrlKey && e.key === 'r'));
-    if (window.location.pathname !== '/' && result === true)
-        sessionStorage.setItem("refresh", true);
-    else
-        sessionStorage.setItem("refresh", false);
 });

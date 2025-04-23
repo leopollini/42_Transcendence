@@ -2,6 +2,7 @@ import { profile} from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
 import { showInfoModal } from "../../modal.js";
 import { navigate, current_user, token} from "../../main.js";
+import { remove_all } from "../../utils_main/error_main.js";
 
 export default function Profile() {
   return `
@@ -77,6 +78,7 @@ export function profileHandler()
 function updateLogin(current_user)
 {
   let data = JSON.stringify({
+  "realname": current_user.display_name,
   "new_params": {
   "display_name": current_user.display_name,
   "bio": current_user.bio,
@@ -89,19 +91,18 @@ function updateLogin(current_user)
   })
   .then(response => response.json())
   .then(data =>{
-    //console.log("(UPDATE_USER)\ndata update user profile = ", data);
     if (data)
     {
       if (data.success !== "true")
       {
         remove_all(1, 1);
-        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + result.status + "\")", () => {});
+        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
       }
     }
   })
   .catch(error =>
   {
-    showInfoModal("Error with update_user:", error);
+    showInfoModal("Error with update_user:" + error, () => {});
   });
 }
 
@@ -119,13 +120,12 @@ function updateGuest(current_user)
   })
   .then(response => response.json())
   .then(data =>{
-    //console.log("(UPDATE_USER)\ndata update user profile = ", data);
     if (data)
     {
       if (data.success !== "true")
       {
         remove_all(1, 1);
-        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + result.status + "\")", () => {});
+        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
       }
     }
   })
@@ -139,7 +139,7 @@ function saveProfile(infoContainer) {
   let saving;
   let myname;
   if (current_user.image === me.image)
-    saving = "no canges in image have been made\n";
+    saving = "⚠️no canges in image have been made\n";
   else
   saving = "✅saved image successfully\n";
   current_user.image = me.image;
@@ -149,7 +149,7 @@ function saveProfile(infoContainer) {
   else
     checkbio = null;
   if (checkbio && checkbio === me.bio)
-    saving += "no canges in bio have been made\n";
+    saving += "⚠️no canges in bio have been made\n";
   else
   {
     saving += savebio(me, infoContainer);
@@ -162,10 +162,10 @@ function saveProfile(infoContainer) {
     if (current_user.display_name === me.display_name)
       saving += "✅saved new name successfully\n";
   }
-  if (current_user.type === "guest")
+  /*if (current_user.type === "guest")
     updateGuest(current_user);
   else
-    updateLogin(current_user);
+    updateLogin(current_user);*/
   showInfoModal(saving, () => {});
   history.back();
 }

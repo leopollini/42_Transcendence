@@ -1,8 +1,7 @@
 import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
-import { current_user } from '../../main.js';
-import { online } from '../../login/user.js';
+import { current_user } from '../../main.js'
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -438,7 +437,6 @@ class ChatApp {
         const profileItem = menu.querySelector('[data-action="profile"]');
         const blockItem = menu.querySelector('[data-action="block"]');
     
-        online(null);
         //controllar login
         // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
         if (user === this.username) {

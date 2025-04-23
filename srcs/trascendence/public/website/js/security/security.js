@@ -77,7 +77,6 @@ export function free_users()
         .then(response => response.json())
         .then(data =>
         {
-            console.log("data of logout = ", data);
             if (data)
             {
                 if (data.status === " (guest) does not exist")
@@ -94,12 +93,11 @@ export function free_users()
             remove_all(0, 0);
             if (window.location.pathname !== '/')
                 navigate("/", "home");
-            showInfoModal("Error with fetch logout_user:", error);
+            showInfoModal("Error with fetch logout_user:" +  error, () => {});
         });
     }
     catch (error)
     {
-        console.log("error = ", error);
         remove_all(0, 0);
         if (window.location.pathname !== '/')
             navigate("/", "home");

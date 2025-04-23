@@ -9,7 +9,7 @@ export let forza4GameData;
 let backImageButton;
 let matchPlayers = [];
 
-export function Forza4() {
+export default function Forza4() {
     return `
         <div id="forza4Game">
             <div id="f4players">
@@ -101,8 +101,9 @@ class Forza4Game {
 
     handleBackToMenu() {
         this.destroy();
+        // old bg color-> #b97070
         document.getElementById("app").style.background = 
-            "linear-gradient(35deg, #b97070, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
+            "linear-gradient(35deg, #491f1f, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";
         resetTimer(this);
         navigate("/modes", "Game Modes");
     }

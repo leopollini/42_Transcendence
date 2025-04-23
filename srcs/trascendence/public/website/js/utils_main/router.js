@@ -66,8 +66,8 @@ export const handlerMap = {
         resetBracketState();
     },
     "/tournament/knockout/lobby": () => {
-        addLobbyPageHandlers();
         handleLobby("Bracket");
+        addLobbyPageHandlers();
         resetBracketState();
     },
     "/tournament/roundrobin/lobby": () => {

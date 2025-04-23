@@ -91,13 +91,35 @@ export async function restore_user() {
     }
 }
 
-export async function online(name)
+/*export async function online(name)
 {
-    const response = await fetch("http://localhost:6088",
+}*/
+
+export async function exist(name)
+{
+    try
     {
-        method: "get_online",
-        body: {}
-    })
-    let result = await response.json();
-    console.log("result = ", result);
+        const response = await fetch("http://localhost:8008",
+            {
+                method: "get_user",
+                body: JSON.stringify({})
+            });
+            const data = await response.json();
+            let userFound = false;
+            console.log("data = ", data);
+            console.log("guest = ", data.guest);
+            if (Array.isArray(data.guest)) {
+                userFound = data.guest.includes(name);
+            }
+            console.log("user = ", data.user);
+            if (!userFound && Array.isArray(data.user)) {
+                userFound = data.user.includes(name);
+            }
+            return userFound;
+    }
+    catch (error)
+    {
+        showInfoModal("An error has occured in exist  (" + error + ")");
+        return false;
+    }
 }

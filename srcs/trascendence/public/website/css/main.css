@@ -50,6 +50,11 @@ body {
     background-color: #000000;
 }
 
+#infoMessage {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
 #app {
     display: flex;
     flex-direction: column;

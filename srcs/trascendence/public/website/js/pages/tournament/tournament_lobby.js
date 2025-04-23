@@ -1,7 +1,5 @@
-import { navigate, current_user, save_global, numPlayers } from "../../main.js";
-import { resetBracketState } from "./bracket.js";
+import { navigate, current_user, save_global, numPlayers, tournament} from "../../main.js";
 let invitedPlayers = [];
-let tournament;
 let selectedPlayer;
 let numPlayersLabel;
 let numPlayersAccepted = 0;
@@ -55,9 +53,9 @@ export function handleLobby(type) {
     selectedPlayer = null;
     totalPlayers = Number(numPlayers);
     if (type === "Bracket")
-        tournament = "knockout";
+        save_global("tournament","knockout");
     else
-        tournament = "roundrobin";
+        save_global("tournament", "roundrobin");
     numPlayersLabel.textContent = "0/" + totalPlayers;
 
     if (current_user) {
@@ -139,7 +137,7 @@ export function addLobbyPageHandlers() {
     };
 
     toggleStartTournament?.addEventListener('click', async() => {
-        //console.log("tournament =>" + tournament);
+        console.log("tournament =>" + tournament);
         save_global("game", 1);
         if (tournament === "knockout")
             createKnockoutMatches();
