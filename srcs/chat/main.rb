@@ -79,7 +79,7 @@ class ChatService < WEBrick::Websocket::Servlet
         ChatStore.clients[@username].unblock_user target
 
       when 'match_request'
-        ChatStore.clients[data['to'].to_s].send_me({'from' => @username}, "match_request")
+        ChatStore.clients[data['to'].to_s].send_me({'from' => @username, 'data' => data['data']}, "match_request")
 
       when 'match_response'
         ChatStore.clients[data['to'].to_s].send_me({'accepted' => data['accepted'].to_s}, "match_response")

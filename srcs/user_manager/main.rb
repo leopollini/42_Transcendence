@@ -30,8 +30,8 @@ LOGIN = BetterPG::SimplePG.new 'users',
 
 GUEST = GuestsList.new
 MANDATORY_DATA = %w[email display_name realname bio image]
-GET_USER_SECURE_INFO = %w[display_name, created, image]
-UPDATABLE_PARAMS = %w[display_name, email, image, bio]
+GET_USER_SECURE_INFO = %w[display_name created image]
+UPDATABLE_PARAMS = %w[display_name email image bio]
 
 def user_creat(data)
   puts "Cteating new user as:".green, data
@@ -65,6 +65,7 @@ def update_user(_client, obj = nil)
     new_params = obj['new_params'].slice(UPDATABLE_PARAMS)
     puts "updated params = #{new_params}".yellow
   end
+
   return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['display_name'].to_s == ""
   LOGIN.valueManipulation 'display_name', obj['display_name'].to_s, new_params
   return DEFAULT_SUCCESS_RES.clone
