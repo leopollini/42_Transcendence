@@ -123,3 +123,40 @@ export async function exist(name)
         return false;
     }
 }
+
+/*export async function is_online(name)
+{
+    try {
+        const response = await fetch("http://localhost:8008", {
+            method: "get_online",
+            body: JSON.stringify({})
+        });
+
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log("users online =>", users_online);
+        return users_online; 
+    } catch (error) {
+        console.error("Fetch error:", error);
+        throw error; // Rilancia l'errore se vuoi gestirlo al livello superiore
+    }
+}*/
+
+/*export async function exist(name) {
+    try {
+        const response = await fetch("http://localhost:8008",
+        {
+            method: "get_user",
+            body: {}
+        })
+
+        let result = await response.json();
+        return true;
+    }
+    catch (error) {
+        showInfoModal("Error with get_user:" + error, () => {});
+        return false;
+    }
+}*/
