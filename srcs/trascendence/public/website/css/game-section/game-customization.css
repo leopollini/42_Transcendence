@@ -1,51 +1,62 @@
+.customize-container {
+    width: 95%;
+    max-width: 1400px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: rgba(9, 160, 155, 0.1);
+    border-radius: 13px;
+    box-shadow: 0 0 12px rgba(9, 160, 155, 0.3);
+    color: #f1f1f1;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    animation: fadeIn 0.8s ease-out;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
 
-/*------------------------------------------ Page Customize Styles start----------------------------------------*/
-.customize-title {
-    font-size: 36px;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-title {
     text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: 3rem;
     color: #ffffff;
-    margin: 50px 0 20px;
+}
+
+.customize-options {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.option-group {
+    padding: 2rem;
+    border-radius: 8px;
+    background: #2222225c;
 }
 
 .section-title {
-    font-size: 24px;
-    text-align: center;
+    margin-bottom: 1.5rem;
     color: #ffffff;
-    margin-bottom: 8px;
+    font-size: 2rem;
+    text-align: center;
 }
 
-#customize-container {
+.game-preview-flex {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    gap: 15px;
-    padding: 20px 10px;
-    box-sizing: border-box;
-}
-
-.customize-content {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    gap: 20px;
+    gap: 2rem;
     flex-wrap: wrap;
-}
-
-#game-customize {
-    width: 48%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    justify-content: space-between;
 }
 
 .color-picker-section {
+    flex: 1;
+    min-width: 300px;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    gap: 1.5rem;
 }
 
 .color-picker {
@@ -72,110 +83,56 @@
     cursor: pointer;
 }
 
-#preview {
-    width: 48%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.preview-canvas {
+.preview-wrapper {
+    flex: 1;
+    min-width: 300px;
     width: 100%;
-    height: 255px;
-    border: 2px solid #09a09b;
+    aspect-ratio: 2 / 1;
+    background: #000;
+    border: 3px solid #09a09b;
     border-radius: 15px;
-    box-shadow: 0 0 8px rgba(9, 160, 155, 0.3);
-    margin-top: 15px;
+    box-shadow: 0 0 8px rgba(9,160,155,0.3);
+    position: relative;
+    overflow: hidden; /* clip canvas to rounded corners */
 }
 
-.backgrounds-section {
+.preview-wrapper canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    image-rendering: crisp-edges;
+}
+
+.background-buttons {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
+    justify-content: space-around;
+    margin-bottom: 1rem;
 }
 
-.backgrounds-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    justify-items: center;
-}
-
-.background-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-
-
-.background-label {
-    display: inline-flex;
-    width: clamp(110px, 12vw, 200px);
-    align-items: center;
-    justify-content: center;
-    padding: 8px 16px;
-    border-radius: 5px;
-    background-color: rgb(0 255 247 / 16%);;
-    box-shadow: 0 0 8px rgba(9, 160, 155, 0.3);
+.bg-button {
+    flex: 1;
+    margin: 0 0.5rem;
+    padding: 0.75rem;
+    background: #491f1f;
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 1.1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.bg-button:hover {
+    background: #732a2a;
+}
+
+.background-selected {
     text-align: center;
-}
-
-.background-checkbox {
-    display: none;
-}
-
-.background-text {
-    font-size: 18px;
-    color: #122322;
-    transition: color 0.3s ease, transform 0.3s ease, text-shadow 0.3s ease;
-    user-select: none;
-    margin-left: 12px;
-}
-
-.background-checkbox:checked + .background-text {
-    color: #ffffff;
-    transform: scale(1.1);
-}
-
-.background-label:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(9, 160, 155, 0.4);
-}
-
-.background-label:active {
-    color: #09a09b;
-    transform: translateY(0);
-    box-shadow: 0 4px 8px rgba(9, 160, 155, 0.3);
-}
-
-.customization-button {
-    font-size: clamp(0.8rem, 1.5vw, 1.4rem);
-    padding: 0.3em 0.6em;
-    color: #ffffff;
-    background-color: transparent;
-    border: 2px solid #0fffcf;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.4s ease-in-out;
-    outline: none;
-    margin: 15px;
-    width: clamp(120px, 12vw, 220px);
-    box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
-}
-
-.customization-button:hover {
-    background-color: rgba(0, 255, 255, 0.2);
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    font-style: italic;
+    color: #cccccc;
+    font-size: 1.1rem;
+    padding: 0.5rem 0;
 }
 
 .powerup-container {
@@ -201,7 +158,7 @@
 
 .powerup-label {
     display: inline-flex;
-    width: clamp(110px, 12vw, 200px);
+    width: clamp(100px, 50%, 200px);
     align-items: center;
     justify-content: center;
     padding: 8px 16px;
@@ -220,4 +177,38 @@
 
 .powerup-label:active {
     color: #09a09b;
-}/*------------------------------------------ Page Customize Styles end----------------------------------------*/
+}
+
+.customization-button {
+    display: block;
+    width: clamp(100px, 50%, 200px);
+    margin: 2rem auto 0;
+    font-size: clamp(1rem, 1.5vw, 1.4rem);
+    padding: 0.6em 1.2em;
+    color: #ffffff;
+    background-color: transparent;
+    border: 2px solid #0fffcf;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.4s ease-in-out;
+    box-shadow: 0 0 8px rgba(0,255,255,0.3);
+}
+
+.customization-button:hover {
+    background-color: rgba(0,255,255,0.2);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0,255,255,0.5);
+}
+
+@media (max-width: 768px) {
+    .option-group { padding: 1.5rem; }
+    .page-title { font-size: 2.3rem; }
+    .section-title { font-size: 1.6rem; }
+    .game-preview-flex { flex-direction: column; }
+    .background-buttons { flex-direction: column; gap: 0.75rem; }
+}
+
+@media (max-width: 480px) {
+    .color-picker { flex-direction: column; align-items: flex-start; }
+    .background-buttons { flex-direction: column; }
+}

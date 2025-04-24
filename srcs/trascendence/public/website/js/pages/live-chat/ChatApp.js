@@ -61,11 +61,25 @@ class ChatApp {
             blockedUsersButton: document.getElementById('blockedUsersButton')
         };
 
+        // Rendi il menu contestuale draggable
         makeDraggable(this.elements.contextMenu);
 
+        // Event listener per passare a “blocked users”
         this.elements.blockedUsersButton.addEventListener('click', () => {
             this.switchToBlockedUsers();
         });
+    
+        // ——— Blocca le liste in stato di default ———
+        // Mostra solo Friends, nascondi le altre due
+        this.elements.friendsList.style.display         = 'block';
+        this.elements.friendRequestsList.style.display  = 'none';
+        this.elements.blockedUsersList.style.display    = 'none';
+    
+        // Evidenzia il pulsante “Friends” come attivo
+        this.elements.friendsButton.classList.add('active');
+        this.elements.friendRequestsButton.classList.remove('active');
+        this.elements.blockedUsersButton.classList.remove('active');
+        // ——— Fine blocco di default ———
     }
 
     initializeGeneralChat() {
@@ -334,40 +348,59 @@ class ChatApp {
 
     updateFriendRequestsUI() {
         if (!this.elements.friendRequestsList) return;
+    
+        // Pulisce la lista
         this.elements.friendRequestsList.textContent = '';
-        this.elements.friendRequestsList.textContent = '';
+    
         this.receivedRequests.forEach((req, index) => {
-            const formattedName = req.from.charAt(0) + req.from.slice(1);
+            // Fallback: se req.from è undefined, considera req come stringa username
+            const fromUser = (req && typeof req === 'object' && req.from)
+                ? req.from
+                : String(req);
+            const formattedName = fromUser.charAt(0) + fromUser.slice(1);
+    
+            // Crea il container della richiesta
             const item = document.createElement('div');
             item.className = 'friend-request-item';
 
+            // Nome
             const nameSpan = document.createElement('span');
             nameSpan.textContent = formattedName;
+            item.appendChild(nameSpan);
 
+            // Bottoni
             const buttonsDiv = document.createElement('div');
+    
             const acceptButton = document.createElement('button');
             acceptButton.className = 'accept-request';
             acceptButton.dataset.index = index;
+    
             const rejectButton = document.createElement('button');
             rejectButton.className = 'reject-request';
             rejectButton.dataset.index = index;
 
             buttonsDiv.appendChild(acceptButton);
             buttonsDiv.appendChild(rejectButton);
-            item.appendChild(nameSpan);
             item.appendChild(buttonsDiv);
 
             this.elements.friendRequestsList.appendChild(item);
         });
 
-        const acceptButtons = document.querySelectorAll('.accept-request');
-        acceptButtons.forEach(btn => {
-            btn.onclick = (e) => {
-                const idx = e.target.dataset.index;
+        // Attacca gli handler dopo aver creato i bottoni
+        document.querySelectorAll('.accept-request').forEach(btn => {
+            btn.onclick = e => {
+                const idx = e.currentTarget.dataset.index;
                 const req = this.receivedRequests[idx];
-                this.socket.send(JSON.stringify({ type: "friend_response", to: req.from, accepted: true }));
-                this.friends.add(req.from);
-                const chatId = this.getPrivateChatId(this.username, req.from);
+                const fromUser = (req && req.from) ? req.from : String(req);
+    
+                this.socket.send(JSON.stringify({
+                    type: "friend_response",
+                    to: fromUser,
+                    accepted: true
+                }));
+                this.friends.add(fromUser);
+    
+                const chatId = this.getPrivateChatId(this.username, fromUser);
                 if (this.disabledChats[chatId]) {
                     delete this.disabledChats[chatId];
                     if (this.currentChat === chatId) {
@@ -379,17 +412,25 @@ class ChatApp {
                 this.updateFriendsList();
             };
         });
-        const rejectButtons = document.querySelectorAll('.reject-request');
-        rejectButtons.forEach(btn => {
-            btn.onclick = (e) => {
-                const idx = e.target.dataset.index;
+    
+        document.querySelectorAll('.reject-request').forEach(btn => {
+            btn.onclick = e => {
+                const idx = e.currentTarget.dataset.index;
                 const req = this.receivedRequests[idx];
-                this.socket.send(JSON.stringify({ type: "friend_response", to: req.from, accepted: false }));
+                const fromUser = (req && req.from) ? req.from : String(req);
+    
+                this.socket.send(JSON.stringify({
+                    type: "friend_response",
+                    to: fromUser,
+                    accepted: false
+                }));
+    
                 this.receivedRequests.splice(idx, 1);
                 this.updateFriendRequestsUI();
             };
         });
 
+        // Aggiorna badge richieste
         const badge = document.getElementById('friendRequestsBadge');
         if (badge) {
             if (this.receivedRequests.length > 0) {
@@ -439,7 +480,7 @@ class ChatApp {
     
         //controllar login
         // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
-        if (user === this.username) {
+        if (user === this.username && (current_user.type === "guest" || current_user.type === "login")) {
             chatItem.style.display = 'none';
             addFriendItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
@@ -447,6 +488,7 @@ class ChatApp {
             blockItem.style.display = 'none';
             return;
         }
+              
         
         if (this.blockedUsers.has(user)) {
             chatItem.style.display = 'none';
@@ -568,7 +610,7 @@ class ChatApp {
                 userEmail.style.display = 'none';
             }
             if (!current_user.bio)
-                userBio.textContent = "no bio yet";
+                userBio.textContent = "Indicates the desired height of glyphs from the font. For scalable fonts, the font-size is a scale factor applied to the EM unit of the font. (Note that certain glyphs may bleed outside their EM box.) For non-scalable fonts, the font-size is converted into absolute units and matched against the declared font-size of the font, using the same absolute coordinate space for both of the matched values.";
             else
                 userBio.textContent = current_user.bio;
             userimage.src = current_user.image;

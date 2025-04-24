@@ -42,7 +42,31 @@ export default function LobbyRoom() {
 }
 
 
-export function handleLobby(type) {
+async function fetchOnlineUsers() {
+    try {
+        const response = await fetch("http://localhost:8008", {
+            method: "get_online",
+            body: JSON.stringify({ include_guests: true })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
+        }
+        const data = await response.json();
+        let users_online = [];
+        data.online_users.forEach(user => {
+                if (user !== current_user.display_name)
+                    users_online.push(user);    
+        }); 
+        console.log("users online =>", users_online);
+        return users_online; 
+    } catch (error) {
+        console.error("Fetch error:", error);
+        throw error; // Rilancia l'errore se vuoi gestirlo al livello superiore
+    }
+}
+
+export async function handleLobby(type) {
     const onlinePlayers = document.getElementById("onlinePlayers");
     const tournamentPlayers = document.getElementById("tournamentPlayers");
     const inviteButton = document.getElementById("inviteButton");
@@ -67,9 +91,12 @@ export function handleLobby(type) {
         numPlayersAccepted++;
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
+
     const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
-    "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
-    "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
+        "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
+        "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
+    //let players = await fetchOnlineUsers();
+
     players.forEach(player => {
         const div = document.createElement("div");
         div.classList.add("player");
@@ -91,7 +118,7 @@ function createKnockoutMatches()
         method: "create_tournament",
         body: JSON.stringify({
             players: invitedPlayers,
-            tournament_mode: tournament,
+            mode: tournament,
         }),
     })
     .then(response => {
@@ -137,7 +164,7 @@ export function addLobbyPageHandlers() {
     };
 
     toggleStartTournament?.addEventListener('click', async() => {
-        console.log("tournament =>" + tournament);
+        //console.log("tournament =>" + tournament);
         save_global("game", 1);
         if (tournament === "knockout")
             createKnockoutMatches();

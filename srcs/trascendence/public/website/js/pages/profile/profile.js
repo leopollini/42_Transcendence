@@ -14,7 +14,7 @@ export default function Profile() {
           <input type="file" id="imageUploadInput" accept="image/*">
         </div>
         <!-- Informazioni -->
-        <section id="yourData" class="profile-info">
+        <section id="yourData" class="profile-info1">
           <h3 id="myName"></h3>
           <div id="changeDisplayName" class="form-group display-name-group">
             <label for="displayNameInput">Change your display name:</label>

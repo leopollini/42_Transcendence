@@ -74,7 +74,7 @@ def matchmake(client, server)
   
   puts "am matchmakimg lol".green
   
-  res = make_match(bobj['players'], bobj['tournament_mode'])
+  res = make_match(bobj['players'], bobj['mode'])
   puts res
   client.puts res.to_json
   # client.puts({"status"=>"WIP", "success" => "false"}.to_json)

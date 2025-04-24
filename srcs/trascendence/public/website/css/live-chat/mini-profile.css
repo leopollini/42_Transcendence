@@ -7,7 +7,7 @@
     background: rgba(10, 33, 32, 0.8);
     padding: 2rem;
     border-radius: 1rem;
-    width: 600px;
+  width: 700px;             /* Aumentata larghezza da 600px a 700px */
     max-height: 90vh;
     overflow-y: auto;
     display: none;
@@ -30,13 +30,13 @@
   .header-left {
     display: flex;
     align-items: center;
-    gap: 4.2rem;
+  gap: 3rem;
   }
   
   /* Avatar del Profilo aggiornato */
   .profile-avatar {
-    width: 140px;
-    height: 80px;
+  width: 115px;
+  height: 110px;
     border-radius: 50%;
     border: 2px solid #ffffff;
     object-fit: cover;
@@ -47,6 +47,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+  margin-left: 2rem; /* Spostamento verso destra */
   }
   
   /* Wrapper per titolo e statistiche */
@@ -58,32 +59,32 @@
   /* Titolo del profilo aggiornato */
   .chat-title {
     margin: 0;
-    font-size: 2rem;
+  font-size: 1.6rem;
     font-weight: bold;
   }
   
   /* Statistiche del profilo */
   .profile-stats {
-    font-size: 1rem;
+  font-size: 0.9rem;
     color: #d1d1d1;
     margin-top: 0.5rem;
+  text-shadow: none;
   }
   
   /* Stato Amico aggiornato */
   .friend-status {
-    font-size: 1.1rem;
+  font-size: 1rem;
     color: #ffcc00;
     margin-top: 0.5rem;
   }
   
-  /* Pulsante di chiusura (X) aggiornato:
-     - Posizionato in alto a destra all'interno di .profile-modal
-     - Senza background */
-  .close-profile, .icon-button {
+/* Pulsante di chiusura (X) aggiornato: posizionato in alto a destra all'interno di .profile-modal */
+.close-profile,
+.icon-button {
     position: absolute;
     top: 0.5rem;
     right: 1.5rem;
-    font-size: 2rem;
+  font-size: 1.6rem;
     background: none;
     border: none;
     color: #fff;
@@ -92,7 +93,8 @@
     padding: 0;
   }
   
-  .close-profile, .icon-button:hover {
+.close-profile,
+.icon-button:hover {
     transform: scale(1.1);
   }
   
@@ -104,21 +106,51 @@
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    font-size: 1.1rem;
-    line-height: 1.8;
+  font-size: 1rem;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   }
   
   .profile-details p {
-    margin: 0.8rem 0;
     display: flex;
-    align-items: center;
+  align-items: flex-start;
+  margin: 0;
+  flex-wrap: nowrap;
   }
   
   .profile-details strong {
     display: inline-block;
-    width: 140px;
+  width: 120px;
     font-weight: bold;
+  font-size: 1rem;
     color: #ffcc00;
+  flex-shrink: 0;
+}
+
+/* Bio utente: testo a fianco della label 'Bio:' */
+.profile-details p span#userBio {
+  display: block;
+  flex: 1;                  /* Occupiamo lo spazio rimanente */
+  max-height: 8rem;
+  overflow-y: auto;
+  margin-left: 0.5rem;      /* Spazio tra label e testo */
+  line-height: 1.4;
+  font-size: 0.9rem;
+  color: #fff;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Personalizzazione scrollbar (solo WebKit) */
+.profile-details p span#userBio::-webkit-scrollbar {
+  width: 6px;
+}
+.profile-details p span#userBio::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
   }
   
   /* Badge Messaggi Non Letti */
@@ -126,13 +158,13 @@
     position: absolute;
     right: 32px;
     top: 30%;
-    width: 18px;
-    height: 18px;
+  width: 16px;
+  height: 16px;
     background: red;
     color: white;
     border-radius: 50%;
     padding: 2px 6px;
-    font-size: 10px;
+  font-size: 9px;
     display: none;
   }
   
@@ -141,15 +173,17 @@
   .status-text.offline {
     color: #e0f7fa;
     font-weight: bold;
+  font-size: 0.9rem;
+  text-shadow: none;
   }
   
   .status-indicator {
-    width: 10px;
-    height: 10px;
+  width: 8px;
+  height: 8px;
     border-radius: 50%;
     display: inline-block;
-    margin-left: 12px;
-    margin-top: 8px;
+  margin-left: 10px;
+  margin-top: 10px;
   }
   
   .status-indicator.online {
@@ -159,3 +193,8 @@
   .status-indicator.offline {
     background-color: red;
   }
+
+#userLosses,
+#userWins {
+  text-shadow: none;
+}

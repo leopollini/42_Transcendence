@@ -22,7 +22,7 @@ class GuestsList
   def add_guest(data)
     username = data['username']
     return DEFAULT_MISSING_PARAM.clone unless username.is_a?(String)
-    return { 'status' => 'username already in use', 'success' => 'false' } if @index.key?(username)
+    return { 'status' => 'username taken', 'success' => 'false' } if @index.key?(username)
   
     i = @counter_index
     @counter_index = (@counter_index + 1) % MAX_GUEST_COUNT

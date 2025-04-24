@@ -59,35 +59,35 @@ export default function GameUserStatistics() {
                 <div class="stats-card hidden1" id="forza4StatsSection">
                     <dl class="stats-grid">
                         <div class="stat-item">
-                            <dt>Total matches played:</dt>
+                            <dt>Total matches played</dt>
                             <dd id="totalMatches" aria-live="polite">-</dd>
                         </div>
                          <div class="stat-item">
-                            <dt>Points:</dt>
+                            <dt>Points</dt>
                             <dd id="points" aria-live="polite">-</dd>
                         </div>
                         <div class="stat-item">
-                            <dt>Wins:</dt>
+                            <dt>Wins</dt>
                             <dd id="totalWins" aria-live="polite">-</dd>
                         </div>
                         <div class="stat-item">
-                            <dt>Losses:</dt>
+                            <dt>Losses</dt>
                             <dd id="totalLosses" aria-live="polite">-</dd>
                         </div>
                         <div class="stat-item">
-                            <dt>Ties:</dt>
+                            <dt>Ties</dt>
                             <dd id="totalTies" aria-live="polite">-</dd>
                         </div>
                         <div class="stat-item">
-                            <dt>Victory Rate:</dt>
+                            <dt>Victory Rate</dt>
                             <dd id="victoryRate" aria-live="polite">-</dd>
                         </div>
                         <div class="stat-item">
-                            <dt>Average Moves:</dt>
+                            <dt>Average Moves</dt>
                             <dd id="averageMoves" aria-live="polite">-</dd>
                         </div>
                         <div class="stat-item">
-                            <dt>Average Time:</dt>
+                            <dt>Average Time</dt>
                             <dd id="averageTime" aria-live="polite"><time datetime="PT0M0S">-</time></dd>
                         </div>
                     </dl>
