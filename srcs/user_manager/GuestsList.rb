@@ -85,11 +85,11 @@ class GuestsList
   
     guest = @guests[index]
     puts "modifying #{username}'s info: #{new_data}".green
-    return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio']).empty?
+    return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio', 'image', 'display_name']).empty?
     # return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio', 'image']).empty?
   
     guest['bio'] = new_data['bio'] if new_data['bio']
-    # guest['image'] = new_data['image'] if new_data['image']
+    guest['image'] = new_data['image'] if new_data['image']
     { 'status' => 'success', 'success' => 'true' }
   end
 

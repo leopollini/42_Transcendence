@@ -3,7 +3,8 @@ forza4_save, Bracket_state, in_game, winner, match_ended, robinranking,
 numPlayers, acess, token, prev_path, loadContent,
 save_global, navigate,
 playerNames,
-tournament} from "../main.js";
+tournament
+} from "../main.js";
 import { resetBracketState } from "../pages/tournament/bracket.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "./error_main.js";
@@ -66,8 +67,6 @@ export async function handle_popstate()
         if (path !== "/")
             navigate("/", "home");
     }
-    console.log("prev_path = ", prev_path);
-    console.log("path = ", path); 
     if (prev_path === "/" && path === "/callback")
     {
         showInfoModal("i can't let you do this sorry", () => {});

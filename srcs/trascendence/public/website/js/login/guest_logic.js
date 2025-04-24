@@ -1,44 +1,14 @@
 import { navigate, save_global} from "../main.js";
-import { user, profile} from "./user.js";
+import { user, profile, check_name} from "./user.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInputModal, showInfoModal } from "../modal.js"
 import { remove_all } from "../utils_main/error_main.js";
 
-function hasNoSpaces(str)
+export async function guest_login()
 {
-  return !/\s/.test(str);
-}
-
-function alphanum(str) {
-  return /^[a-zA-Z0-9]+$/.test(str);
-}
-
-export function guest_login()
-{
-    showInputModal("Inserisci il tuo nickname", (name) => {
-      name = name.trim();
-      if (alphanum(name) === false)
-      {
-        showInfoModal("Invalid name format(please try again)...", () => {});
-        return;
-      }
-      if (hasNoSpaces(name) === false)
-      {
-        showInfoModal("Name cannot have spaces", () => {});
-        return;
-      }
-      if (name.length < 4)
-      {
-        showInfoModal("Name too short.", () => {});
-        return;
-      }
-      
-      if (name.length >= 15) {
-        showInfoModal("Name too long.", () => {});
-        return;
-      }
-      
-      addGuest(name);
+    showInputModal("Inserisci il tuo nickname", async (name) => {
+      if (await check_name(name) === true)
+        addGuest(name);
     });
 }
 

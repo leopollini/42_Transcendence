@@ -78,12 +78,11 @@ export function profileHandler()
 function updateLogin(current_user)
 {
   let data = JSON.stringify({
-  "realname": current_user.display_name,
+  "token": token,
   "new_params": {
   "display_name": current_user.display_name,
   "bio": current_user.bio,
-  "image": current_user.image},
-  "token": token});
+  "image": current_user.image}});
   fetch("http://localhost:8008",
   {
     method: "update_user",
@@ -91,13 +90,11 @@ function updateLogin(current_user)
   })
   .then(response => response.json())
   .then(data =>{
-    if (data)
+    console.log("data update = ", data);
+    if (data && data.success !== "true")
     {
-      if (data.success !== "true")
-      {
-        remove_all(1, 1);
-        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
-      }
+      remove_all(1, 1);
+      showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
     }
   })
   .catch(error =>
@@ -109,10 +106,10 @@ function updateLogin(current_user)
 function updateGuest(current_user)
 {
   let data = JSON.stringify({
+  "token": token,
   "new_params": {
   "bio": current_user.bio,
-  "image": current_user.image},
-  "token": token});
+  "image": current_user.image}});
   fetch("http://localhost:8008",
   {
     method: "update_user",
@@ -120,13 +117,10 @@ function updateGuest(current_user)
   })
   .then(response => response.json())
   .then(data =>{
-    if (data)
+    if (data && data.success !== "true")
     {
-      if (data.success !== "true")
-      {
-        remove_all(1, 1);
-        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
-      }
+      remove_all(1, 1);
+      showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
     }
   })
   .catch(error =>
@@ -162,10 +156,10 @@ function saveProfile(infoContainer) {
     if (current_user.display_name === me.display_name)
       saving += "✅saved new name successfully\n";
   }
-  /*if (current_user.type === "guest")
+  if (current_user.type === "guest")
     updateGuest(current_user);
   else
-    updateLogin(current_user);*/
+    updateLogin(current_user);
   showInfoModal(saving, () => {});
   history.back();
 }
