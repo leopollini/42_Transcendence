@@ -94,9 +94,7 @@ export async function handleLobby(type) {
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
 
-
     let players = await fetchOnlineUsers();
-
 
     players.forEach(player => {
         const div = document.createElement("div");
@@ -119,11 +117,7 @@ function createKnockoutMatches()
         method: "create_tournament",
         body: JSON.stringify({
             players: invitedPlayers,
-<<<<<<< HEAD
             mode: tournament,
-=======
-            tournament_mode: tournament,
->>>>>>> 486aab4b7f94963eae7ea616eb46651e5bf30b7f
         }),
     })
     .then(response => {
