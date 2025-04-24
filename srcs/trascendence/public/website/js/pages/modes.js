@@ -94,7 +94,7 @@ export function update_image(image)
     }, 100);
 }
 
-export function change_name(name) {
+export async function change_name(name) {
     const checknameInterval = setInterval(() => {
         const avatarName = document.getElementById('avatarName');
         if (avatarName)

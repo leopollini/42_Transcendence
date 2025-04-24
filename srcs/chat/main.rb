@@ -79,7 +79,7 @@ class ChatService < WEBrick::Websocket::Servlet
         ChatStore.clients[@username].unblock_user target
 
       when 'match_request'
-        ChatStore.clients[data['to'].to_s].send_me({'from' => @username}, "match_request")
+        ChatStore.clients[data['to'].to_s].send_me({'from' => @username, 'data' => data['data']}, "match_request")
 
       when 'match_response'
         ChatStore.clients[data['to'].to_s].send_me({'accepted' => data['accepted'].to_s}, "match_response")
@@ -122,7 +122,7 @@ def internal_call(client, server)
     ChatStore.clients[bobj['to']].send_me({'date' => Time.now.iso8601, 'from' => 'sys', 'content' => bobj['content']}, bobj['type'] ? bobj['type'] : 'message') rescue r
     client.puts
   when 'get_online'
-    client.puts ChatStore.get_online(bobj['include_guests']).to_json
+    client.puts ChatStore.get_online(bobj['include_guests'].to_s).to_json
   else
     puts "Unknown method called (#{bobj['method']})"
   end

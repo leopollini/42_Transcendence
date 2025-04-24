@@ -45,7 +45,7 @@ class Client
 
   def close_sock
     @socket_open = false
-    # @socket.close
+    @socket.close
   end
 
   def load_unread
@@ -98,15 +98,15 @@ class ChatStore
 
   def self.purge
     @@mutex.synchronize do
-      @clients = @clients.filter {| user, cli | cli.alive?}
+      @clients = @clients.filter {| usr, cli | cli.alive?}
     end
   end
 
   def self.sys_broadcast(msg, avoid = "")
     puts "broadcasting message: #{msg}"
     @@mutex.synchronize do
-      @@clients.each do | user, cli |
-        cli.send_me({ 'content' => msg }, 'system') unless user == avoid
+      @@clients.each do | usr, cli |
+        cli.send_me({ 'content' => msg }, 'system') unless usr == avoid
       end
     end
   end
@@ -114,8 +114,8 @@ class ChatStore
   def self.broadcast(content, type, avoid = "")
     puts "broadcasting message: #{content}"
     @@mutex.synchronize do
-      @@clients.each do | user, cli |
-        cli.send_me(content, type) unless user == avoid
+      @@clients.each do | usr, cli |
+        cli.send_me(content, type) unless usr == avoid
       end
     end
   end
@@ -160,14 +160,14 @@ class ChatStore
     ChatStore.remove_friend(target, user)
     @@clients[user].send_sys "You have blocked #{target}"
     @@clients[target].send_sys "You have been blocked by #{user}"
-    @@clients[user].block_user target
+    @@clients[user].block_usr target
 
     remove_friend target, user
   end
 
   def self.get_client_state(user)
     client = ChatStore.clients[user]
-    info = {"friends" => client.friends, "friend_requests" => client.get_waiting_friends, "blocked_users" => client.blocked}
+    info = {"friends" => client.friends, "friend_requests" => client.get_waiting_friends, "blocked_users" => client.blocked, "pending_requests" => ["ASDASD"]}
     puts "sending state info: #{info}"
     client.send_me(info, "state")
   end
@@ -185,9 +185,9 @@ class ChatStore
   end
 
   def self.get_online(include_guests)
-    users = @@clients.keys
+    users = (@@clients.select {|u, c| c.alive?}).keys
     puts "all connected users: " + users.to_s
-    if include_guests.to_s != 'true'
+    if include_guests == 'false'
       login_users = []
       (JSON.parse SimpleServer::method_req("get_user", {'avoid_guests' => 'true'}))['user'].each do |u|
         login_users << u['display_name']

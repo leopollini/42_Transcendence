@@ -27,12 +27,13 @@ export function savename(me, yourDataSection)
     polname.style.width = "50%";
     
     if (!newname)
-        return("🚨Error: No Name saved(Please enter a name next time)\n");
+        return("⚠️Error: No Name saved(Please enter a name next time)\n");
     if (newname.length < 4)
         return("🚨Error: Name too short(" + newname + ")\n");
     if (newname.length >= 15)
         return("🚨Error: Name too long(" + newname + ")\n");
-    if (exist(newname) === true)
+    //if (exist(newname) === true)
+    if (me.display_name !== newname)
     {
         me.display_name = JSON.stringify(newname);
         return ("✅Saved name successfully(" + newname + ")\n");

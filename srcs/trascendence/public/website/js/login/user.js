@@ -151,7 +151,6 @@ export async function exist(name)
             method: "get_user",
             body: {}
         })
-
         let result = await response.json();
         return true;
     }
@@ -160,3 +159,38 @@ export async function exist(name)
         return false;
     }
 }*/
+
+function hasNoSpaces(str)
+{
+  return !/\s/.test(str);
+}
+
+function alphanum(str) {
+  return /^[a-zA-Z0-9]+$/.test(str);
+}
+
+export async function check_name(name)
+{
+    name = name.trim();
+    if (alphanum(name) === false)
+    {
+        showInfoModal("Invalid name format(please try again)...", () => {});
+        return false;
+    }
+    if (hasNoSpaces(name) === false)
+    {
+        showInfoModal("Name cannot have spaces", () => {});
+        return false;
+    }
+    if (name.length < 4)
+    {
+        showInfoModal("Name too short.", () => {});
+        return false;
+    }
+    
+    if (name.length >= 15) {
+        showInfoModal("Name too long.", () => {});
+        return false;
+    }
+    return true;
+}

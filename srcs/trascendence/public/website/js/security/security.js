@@ -5,7 +5,7 @@ export async function validateUploadedImage(file)
 {
     return new Promise((resolve, reject) =>
     {
-        if (file.size > 5 * 1024 * 1024) 
+        if (file.size > 5 * 128 * 128) 
         {
             showInfoModal("Error: Image file is too large. Maximum size is 5MB.", () => {});
             return reject();
