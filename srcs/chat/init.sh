@@ -2,9 +2,9 @@
 
 /var/common/setup_tools.sh
 
-GEMS=('webrick-websocket')
+GEMS=('webrick-websocket' 'colorize' 'json')
 
-for gm in $GEMS
+for gm in "${GEMS[@]}"
 do
     if [ -z "$(gem list | grep $gm)" ]; then
         gem install $gm

@@ -44,7 +44,31 @@ export default function LobbyRoom() {
 }
 
 
-export function handleLobby(type) {
+async function fetchOnlineUsers() {
+    try {
+        const response = await fetch("http://localhost:8008", {
+            method: "get_online",
+            body: JSON.stringify({ include_guests: true })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
+        }
+        const data = await response.json();
+        let users_online = [];
+        data.online_users.forEach(user => {
+                if (user !== current_user.display_name)
+                    users_online.push(user);    
+        }); 
+        console.log("users online =>", users_online);
+        return users_online; 
+    } catch (error) {
+        console.error("Fetch error:", error);
+        throw error; // Rilancia l'errore se vuoi gestirlo al livello superiore
+    }
+}
+
+export async function handleLobby(type) {
     const onlinePlayers = document.getElementById("onlinePlayers");
     const tournamentPlayers = document.getElementById("tournamentPlayers");
     const inviteButton = document.getElementById("inviteButton");
@@ -54,7 +78,10 @@ export function handleLobby(type) {
     numPlayersAccepted = 0;
     selectedPlayer = null;
     totalPlayers = Number(numPlayers);
-    tournament = type;
+    if (type === "Bracket")
+        tournament = "knockout";
+    else
+        tournament = "roundrobin";
     numPlayersLabel.textContent = "0/" + totalPlayers;
 
     if (current_user) {
@@ -66,9 +93,11 @@ export function handleLobby(type) {
         numPlayersAccepted++;
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
-    const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
-    "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
-    "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
+
+
+    let players = await fetchOnlineUsers();
+
+
     players.forEach(player => {
         const div = document.createElement("div");
         div.classList.add("player");
@@ -82,6 +111,33 @@ export function handleLobby(type) {
         };
         onlinePlayers.appendChild(div);
     });
+}
+
+function createKnockoutMatches()
+{
+    fetch("http://localhost:8008", {
+        method: "create_tournament",
+        body: JSON.stringify({
+            players: invitedPlayers,
+            mode: tournament,
+        }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
+        }
+        return response.status === 204 ? {} : response.json();
+    })
+    .then(data => {
+        console.log("Create Tournament response: ", data.matches);
+        invitedPlayers = [];
+         data.matches.forEach(match => {
+            [match.player1, match.player2].forEach(player => {
+                invitedPlayers.push(player);
+            });
+        }); 
+    })
+    .catch(error => console.error("Fetch error:", error));
 }
 
 export function addLobbyPageHandlers() {
@@ -108,10 +164,14 @@ export function addLobbyPageHandlers() {
         }
     };
 
-    toggleStartTournament?.addEventListener('click', () => {
+    toggleStartTournament?.addEventListener('click', async() => {
         //console.log("tournament =>" + tournament);
         save_global("game", 1);
-        if (tournament === "Bracket")
+        if (tournament === "knockout")
+            createKnockoutMatches();
+        console.log("match players: ", invitedPlayers);
+        
+        if (tournament === "knockout")
             navigate("/tournament/knockout/bracket", "Starting knockout tournament", invitedPlayers);
         else
             navigate("/tournament/roundrobin/robinranking", "Starting roundrobin tournament", invitedPlayers);
@@ -122,178 +182,3 @@ export function addLobbyPageHandlers() {
         //invitedPlayers = [];     
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // export function handleLobby(tournamentType, totPlayers) {
-// //     ////console.log("total players = " + totPlayers);
-   
-
-// //     const numPlayersLabel = document.getElementById("numPlayers");
-// //     numPlayersLabel.innerHTML = "0/" + Number(totPlayers);
-// // }
-
-// function updateCanvas() {
-//     const onlineUserscanvas = document.getElementById('lobbyUsersCanvas');
-//     const ctx = canvas.getContext('2d');
-//     const toggleStartTournament = document.getElementById('toggleStartTournament');
-
-//     // Puliamo il canvas
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-
-//     // Impostiamo il font e il colore del testo
-//     ctx.font = "40px Liberty";
-//     ctx.fillStyle = "white";
-
-//     invitedPlayers.forEach((player, index) => {
-//         ctx.fillText(player, 20, 60 + index * 50);
-//     });
-
-//     // Aggiorniamo anche il contatore dei giocatori
-//     const numPlayersLabel = document.getElementById("numPlayers");
-//     numPlayersLabel.innerHTML = `${invitedPlayers.length}/${canvas.dataset.totalPlayers}`;
-
-//     //console.log(canvas.dataset.totalPlayers);
-//     //console.log("length: " +invitedPlayers.length);
-//     if (invitedPlayers.length === Number(canvas.dataset.totalPlayers)) {
-//         //console.log("eoeijoeij")
-//         toggleStartTournament.disabled = false;
-//     }
-// }
-
-
-// export function handleLobby(type, totPlayers) {
-//     /*const canvas = document.getElementById('lobbyUsersCanvas');
-//     const ctx = canvas.getContext('2d');
-    
-//     canvas.width = window.innerWidth * 0.5; 
-//     canvas.height = window.innerHeight; 
-//     invitedPlayers = [];
-//     tournament = type;
-//     canvas.dataset.totalPlayers = totPlayers;
-
-//     ctx.font = "40px Liberty";
-//     ctx.fillStyle = "white";
-//     ctx.clearRect(0, 0, canvas.width, canvas.height); // Puliamo il canvas inizialmente
-
-//     invitedPlayers.push(current_user.display_name);*/
-
-//     updateCanvas(); // Disegniamo gli utenti invitati
-// }
-
-// function searchUser(username) {
-//     /*const playerSearchResult = document.getElementById("playerSearchResult");
-//     const toggleInviteUser = document.getElementById("toggleInviteUser");
-    
-//     if (!username)
-//         return;
-//     fetch("http://localhost:8008", {
-//             method: "get_user",
-//             body: JSON.stringify({ 
-//                 "params" : [{}] 
-//             }) 
-//         })
-//         .then(response => response.json())
-//         .then(data =>
-//         {
-//             if (!data || (!data.user && !data.guest)) 
-//             {
-//                 nullify_user();
-//                 alert("ERROR: no users found...");
-//                 navigate("/", "home");
-//                 return;
-//             }
-//             let user_name;
-//             let find_user = data.user?.find(u => u.username === username);
-//             if (!find_user)
-//                 find_user = data.guest?.find(g => g.username === username);
-//             if (find_user) 
-//             {
-
-//                 user_name = find_user;
-//                 if (user_name) {
-//                     playerSearchResult.style.color = "green";
-//                     playerSearchResult.innerHTML = "User Found: " + user_name.username;
-//                     toggleInviteUser.disabled = false;
-//                 }
-//             }
-//             else {
-//                 playerSearchResult.style.color = "red";
-//                 playerSearchResult.innerHTML = "User Not Found";
-//                 toggleInviteUser.disabled = true;
-//             }
-//         })
-//         .catch(error => {
-//             console.error("Error fetching user data:", error);
-//         });*/
-// }
-
-
-// export function addLobbyPageHandlers() {
-//     /*const backImageButton = document.getElementById('backImageButton');
-//     const toggleSearchUser = document.getElementById('toggleSearchUser');
-//     const toggleInviteUser = document.getElementById('toggleInviteUser');
-//     const pongPlayerSearch = document.getElementById('pongPlayerSearch');
-//     //const toggleAddUserRaw = document.getElementById('toggleAddUserRaw');
-//     const toggleStartTournament = document.getElementById('toggleStartTournament');
-//     const canvas = document.getElementById('lobbyUsersCanvas');
-
-//     backImageButton?.addEventListener('click', () => {
-//         navigate("/modes", "Return to Game Mode");   
-//         invitedPlayers = [];     
-//     });
-
-//     toggleSearchUser?.addEventListener('click', () => {
-//         //console.log("searching user...." +pongPlayerSearch.value);
-
-//         searchUser(pongPlayerSearch.value);
-//     });
-
-//     toggleInviteUser?.addEventListener('click', () => {
-//         const playerSearchResult = document.getElementById("playerSearchResult").textContent;
-        
-//         if (playerSearchResult.startsWith("User Found: ")) {
-//             const playerName = playerSearchResult.replace("User Found: ", "");
-
-//             if (!invitedPlayers.includes(playerName)) {
-//                 invitedPlayers.push(playerName); // Aggiungiamo il giocatore alla lista
-//                 updateCanvas(); // Ridisegnamo il canvas
-//             }
-//         }
-//     });
-
-//     /*toggleAddUserRaw?.addEventListener('click', () => {
-//         const playerName = pongPlayerSearch.value;
-//         if (!invitedPlayers.includes(playerName) && playerName && invitedPlayers.length < canvas.dataset.totalPlayers) {
-//             //console.log("adding player");
-//             invitedPlayers.push(playerName);
-//             updateCanvas(); 
-//         }
-//     });*/
-
-//     toggleStartTournament?.addEventListener('click', () => {
-//         if (tournament === "Bracket")
-//             navigate("/tournament/knockout/bracket", "Starting knockout tournament", invitedPlayers);
-//         else
-//             navigate("/tournament/roundrobin/robinranking", "Starting roundrobin tournament", invitedPlayers);
-//     });
-
-// }

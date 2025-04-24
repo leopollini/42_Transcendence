@@ -170,7 +170,7 @@ export function drawBracket(match_players) {
         document.getElementById('knockoutMatchButton').style.display = 'block';
         matchesThisRound = matchesPerRound;
         initializeBracket();
-        bracketPlayers[0] = shuffleArray(match_players.slice()); // Create array match_players copy
+        bracketPlayers[0] = match_players.slice(); // Create array match_players copy
     }
     matchBoxPos[0] = [];
 

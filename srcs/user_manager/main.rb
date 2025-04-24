@@ -30,8 +30,8 @@ LOGIN = BetterPG::SimplePG.new 'users',
 
 GUEST = GuestsList.new
 MANDATORY_DATA = %w[email display_name realname bio image]
-GET_USER_SECURE_INFO = %w[display_name, created, image]
-UPDATABLE_PARAMS = %w[display_name, email, image, bio]
+GET_USER_SECURE_INFO = %w[display_name created image]
+NON_UPDATABLE_PARAMS = %w[realname created level entered token]
 
 def user_creat(data)
   puts "Cteating new user as:".green, data
@@ -46,23 +46,34 @@ def login_user(client, obj)
   data['token'] = Digest::SHA256.hexdigest(Time.now.to_s)
 
   return GUEST.add_guest(data) if data['login_as_guest'].to_s == 'true'
-
   usr = LOGIN.select_specific 'realname', data['realname'].to_s, [], false
   if usr.nil?
     return user_creat(data) if obj['do_create'].to_s == 'true'
     return {'status' => 'user not found', 'success' => 'false', 'service' => 'user_manager'}
   end
+
   puts "user already in database, updating with new info".yellow
   (update_user(client, {"new_params" => data})).merge({'token' => 'loltoken'})
 end
 
 def update_user(_client, obj = nil)
   puts 'update_user called'.green if DEBUG_MODE
-  puts "Diomerds " + obj.to_s.grey
+  puts "Obj " + obj.to_s.gray
 
-  new_params = obj['new_params'].slice(UPDATABLE_PARAMS)
-  return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['display_name'].to_s == ""
-  LOGIN.valueManipulation 'display_name', obj['display_name'].to_s, new_params
+  if (obj && obj['new_params'])
+    puts "new params = #{obj['new_params']}".yellow
+    puts "avoiding by   #{NON_UPDATABLE_PARAMS}".yellow
+    new_params = obj['new_params'].except NON_UPDATABLE_PARAMS
+    puts "updated params = #{new_params}".yellow
+  else
+    return DEFAULT_MISSING_PARAM.clone
+  end
+
+  return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['token'].to_s.empty?
+  guest = GUEST.exists_token? obj['token']
+  return GUEST.update_guest(guest, new_params) if guest
+
+  LOGIN.updateValue 'token', obj['token'].to_s, new_params
   return DEFAULT_SUCCESS_RES.clone
 end
 
@@ -85,9 +96,9 @@ def get_user(_client, obj = nil)
   puts 'get_user called'.green if DEBUG_MODE
   params = obj['params']
   if params.nil? || params.empty?
-    users = LOGIN.select
+    users =  (obj['avoid_logins'] == 'true' ? [] : LOGIN.select )
     users.each {| u | u = u.slice(GET_USER_SECURE_INFO)}
-    guests = GUEST.get_all_guests
+    guests = (obj['avoid_guests'] == 'true' ? [] : GUEST.get_all_guests)
     guests.each {| u | u = u.slice(GET_USER_SECURE_INFO)}
     return {'status' => (users.empty? && guests.empty? ? 'no user found' : 'returning whole database'), 'success' => 'true', 
               'guest' => guests, 'user' => users}
