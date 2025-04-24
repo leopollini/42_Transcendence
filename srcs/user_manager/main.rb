@@ -33,27 +33,31 @@ MANDATORY_DATA = %w[email display_name realname bio image]
 GET_USER_SECURE_INFO = %w[display_name created image]
 NON_UPDATABLE_PARAMS = %w[realname created level entered token]
 
-def user_creat(data)
+def user_creat(data, token)
   puts "Cteating new user as:".green, data
   return DEFAULT_MISSING_PARAM.clone if (MANDATORY_DATA - data.keys).empty?
   LOGIN.addValues data
-  return DEFAULT_SUCCESS_RES.merge({'token' => 'loltoken'})
+  return DEFAULT_SUCCESS_RES.merge({'token' => token})
 end
 
 def login_user(client, obj)
   puts "login_user called".green
   data = obj['data']
-  data['token'] = Digest::SHA256.hexdigest(Time.now.to_s)
+  return {"status"=> "bad request", 'success' => 'fase'} if data.nil?
+  data['token'] = Digest::SHA256.hexdigest(Time.now.to_s + data['realname'].to_s + data['username'].to_s)
 
-  return GUEST.add_guest(data) if data['login_as_guest'].to_s == 'true'
   usr = LOGIN.select_specific 'realname', data['realname'].to_s, [], false
+  if data['login_as_guest'].to_s == 'true'
+    return {"status" => "username taken", "success" => "false"} if usr
+    return GUEST.add_guest(data)
+  end
   if usr.nil?
-    return user_creat(data) if obj['do_create'].to_s == 'true'
+    return user_creat(data, token) if obj['do_create'].to_s == 'true'
     return {'status' => 'user not found', 'success' => 'false', 'service' => 'user_manager'}
   end
 
   puts "user already in database, updating with new info".yellow
-  (update_user(client, {"new_params" => data})).merge({'token' => 'loltoken'})
+  (update_user(client, {"new_params" => data})).merge({'token' => token})
 end
 
 def update_user(_client, obj = nil)
