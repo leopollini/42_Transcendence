@@ -45,7 +45,7 @@ class Client
 
   def close_sock
     @socket_open = false
-    # @socket.close
+    @socket.close
   end
 
   def load_unread
@@ -167,7 +167,7 @@ class ChatStore
 
   def self.get_client_state(user)
     client = ChatStore.clients[user]
-    info = {"friends" => client.friends, "friend_requests" => client.get_waiting_friends, "blocked_users" => client.blocked}
+    info = {"friends" => client.friends, "friend_requests" => client.get_waiting_friends, "blocked_users" => client.blocked, "pending_requests" => ["ASDASD"]}
     puts "sending state info: #{info}"
     client.send_me(info, "state")
   end
@@ -185,9 +185,9 @@ class ChatStore
   end
 
   def self.get_online(include_guests)
-    users = @@clients.keys
+    users = (@@clients.select {|u, c| c.alive?}).keys
     puts "all connected users: " + users.to_s
-    if include_guests.to_s != 'true'
+    if include_guests == 'false'
       login_users = []
       (JSON.parse SimpleServer::method_req("get_user", {'avoid_guests' => 'true'}))['user'].each do |u|
         login_users << u['display_name']

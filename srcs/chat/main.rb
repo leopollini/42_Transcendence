@@ -122,7 +122,7 @@ def internal_call(client, server)
     ChatStore.clients[bobj['to']].send_me({'date' => Time.now.iso8601, 'from' => 'sys', 'content' => bobj['content']}, bobj['type'] ? bobj['type'] : 'message') rescue r
     client.puts
   when 'get_online'
-    client.puts ChatStore.get_online(bobj['include_guests']).to_json
+    client.puts ChatStore.get_online(bobj['include_guests'].to_s).to_json
   else
     puts "Unknown method called (#{bobj['method']})"
   end

@@ -63,6 +63,25 @@ def make_match(players, mode)
   return {'status' => 'success', 'success' => 'true', 'matches' => matches}
 end
 
+def get_online_opponents
+  online_users = JSON.parse(SimpleServer::method_req('get_online'))
+  puts "online users response: #{online_users}"
+  puts "online users: #{online_users} (#{online_users['success'].to_s})"
+  return DEFAULT_ERROR_RES.clone if online_users['success'].to_s != 'true'
+  online_users = online_users['online_users']
+  return DEFAULT_ERROR_RES.clone if online_users.nil?
+  rank = {}
+  online_users.each do |p|
+    rk = JSON.parse SimpleServer.method_req('get_pong_games', {'display_name' => p, 'get_rank' => 'true'})
+    puts "Response for Rank of #{p}: #{rk}"
+    return DEFAULT_ERROR_RES.clone if rk['success'].to_s != 'true'
+    rank[rk['rank']] = p
+  end
+  puts "Rank before sorting: #{rank}".yellow
+  rank.sort
+  {'status' => 'success', 'success' => 'true', 'ranked players' => rank}
+end
+
 def matchmake(client, server)
   puts "matchmaking called"
   t = select [client], [], [], 20 # waits for client, a few seconds
@@ -72,13 +91,20 @@ def matchmake(client, server)
   bobj = JSON.parse msg
   puts "Content:".yellow, bobj
   
-  puts "am matchmakimg lol".green
+  res = case bobj['method']
+  when 'create_tournament'
+    puts "am matchmakimg lol".green
+    make_match(bobj['players'], bobj['mode'])
+  when 'get_online_opponents'
+    get_online_opponents()
+  end  
   
-  res = make_match(bobj['players'], bobj['mode'])
-  puts res
-  client.puts res
+  
+  puts res.to_json
+  client.puts res.to_json
+  res
   # client.puts({"status"=>"WIP", "success" => "false"}.to_json)
 end
 
 puts 'matchmaking active at port ' + PORT.to_s + "\n"
-(SimpleServer::SimplerTCP.new PORT, :matchmake).start_loop 
+(SimpleServer::SimplerTCP.new PORT, :matchmake).start_loop

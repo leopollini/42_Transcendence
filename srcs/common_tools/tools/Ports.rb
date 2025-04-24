@@ -51,7 +51,8 @@ module Ports
     'get_all_games' => ['game_data_manager', 8790, 1],
     'drop_games' => ['game_data_manager', 8790, 2],
 
-    'create_tournament' => ['matchmaking', 6009, 1]
+    'create_tournament' => ['matchmaking', 6009, 1],
+    'get_online_opponents' => ['matchmaking', 6009, 1]
   }
   ROUTES = {
     "internal_chat_support" => "chat"
