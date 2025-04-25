@@ -232,7 +232,7 @@ function matchesTimeRank() {
 
   if (rankPoints < 0) rankPoints = 0;
 
-  console.log("rankpointss => " + rankPoints);
+  //console.log("rankpointss => " + rankPoints);
   pointsLabel.textContent = rankPoints;
 }
 

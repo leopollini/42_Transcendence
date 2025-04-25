@@ -7,7 +7,7 @@ export async function validateUploadedImage(file)
     {
         if (file.size > 5 * 128 * 128) 
         {
-            showInfoModal("Error: Image file is too large. Maximum size is 5MB.", () => {});
+            showInfoModal("Error: Image file is too large.\nTry some smaller", () => {});
             return reject();
         }
 
@@ -90,7 +90,7 @@ export function free_users()
         })
         .catch(error =>
         {
-            remove_all(0, 0);
+            remove_all(0, 0, 1);
             if (window.location.pathname !== '/')
                 navigate("/", "home");
             showInfoModal("Error with fetch logout_user:" +  error, () => {});
@@ -98,7 +98,7 @@ export function free_users()
     }
     catch (error)
     {
-        remove_all(0, 0);
+        remove_all(0, 0, 1);
         if (window.location.pathname !== '/')
             navigate("/", "home");
         showInfoModal("Error in logout_user:", error);

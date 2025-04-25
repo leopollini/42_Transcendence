@@ -12,6 +12,7 @@ export default function Callback() {
 export async function addCallbackPageHandlers() {
   let let_me_in = await checkAuthentication(window.location.pathname);
   if (let_me_in === 1) {
+    remove_all(0, 0, 1);
     await navigate("/", "Home");
     return (1);
   }
@@ -26,9 +27,9 @@ async function checkAuthentication() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     if (!code) {
-      showInfoModal("Missing OAuth parameters.", () => { });
-      navigate("/", "Return to home");
       remove_all(0, 0, 1);
+      navigate("/", "Return to home");
+      showInfoModal("Missing OAuth parameters.", () => { });
       return;
     }
     const response = await fetch('/api/callback?' + params.toString());
@@ -39,23 +40,21 @@ async function checkAuthentication() {
       save_global("acess", true);
       await get_data();
       showInfoModal(data.message, () => { });
-      navigate("/modes", "Modalità di gioco", true, window.location.pathname);
+      navigate("/modes", "Modalità di gioco");
     } else {
+      remove_all(0, 0, 1);
+      navigate("/", "Return to home");
       showInfoModal("Autenticazione fallita: " + (data.error || "Unknown Error"), () => {
       });
-      navigate("/", "Return to home");
-      remove_all(0, 0, 1);
     }
   } catch (error) {
-    showInfoModal("Errore durante la gestione del callback: " + error.message, () => { });
     remove_all(0, 0, 1);
     navigate("/", "Return to home");
+    showInfoModal("Errore durante la gestione del callback: " + error.message, () => { });
   }
 }
 
 async function update_with_new_name(name) {
-  console.log("token = ", token);
-  console.log("name = ", name)
   let data = JSON.stringify({
     "token": token,
     "new_params": {
@@ -72,7 +71,6 @@ async function update_with_new_name(name) {
         if (data.success !== "true")
         {
           remove_all(0, 0, 1);
-          reset_all_let();
           navigate("/", "home");
           showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
         }
@@ -81,7 +79,6 @@ async function update_with_new_name(name) {
     .catch(error =>
     {
       remove_all(0, 0, 1);
-      reset_all_let();
       navigate("/", "home");
       showInfoModal("Error with update_user:" + error, () => {});
     });
@@ -92,8 +89,8 @@ async function set_user(result)
   const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
   const name = await promptModal("Inserisci il tuo nickname");
   if ((await check_name(name)) !== true) {
+    console.log("invalid name");
     remove_all(0, 0, 1);
-    reset_all_let();
     navigate("/", "home");
     return;
   }
@@ -149,7 +146,6 @@ async function get_data() {
     }
   }
   catch (error) {
-    console.log("error = ", error);
     remove_all(0, 0, 1);
     if (window.location.pathname !== '/')
       navigate("/", "home");

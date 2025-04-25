@@ -62,20 +62,21 @@ export async function handle_popstate()
 
     if (prev_path === "/modes" && (path === "/" || path === "/callback"))
     {
-        remove_all(0, 0, 1);
-        showInfoModal("you have quitted the active session", () => { });
+        await remove_all(0, 0, 1);
         if (path !== "/")
             navigate("/", "home");
+        showInfoModal("you have quitted the active session", () => { });
     }
     if (prev_path === "/" && path === "/callback")
     {
+        await remove_all(0, 0, 1);
         showInfoModal("i can't let you do this sorry", () => {});
         navigate("/", "home");
     }
     if (in_game === 1 && path !== '/tournament/knockout/bracket/game'
     && path !== '/tournament/knockout/bracket' && path !== "/tournament/roundrobin/robinranking"
     && path !== "/tournament/roundrobin/robinranking/game") {
-        remove_all(1, 1);
+        await remove_all(1, 1);
         save_global("bracket", null);
         save_global("robinranked", null);
         reset_all();
@@ -109,41 +110,3 @@ export async function handle_popstate()
     }
     await loadContent();
 }
-
-export const check_change = () =>
-{
-    let path = window.location.pathname;
-    const session = localStorage.getItem("session opened");
-    const already = sessionStorage.getItem("already in");
-    if (path === "/")
-    {
-        if (session !== "0" || already !== "0")
-        {
-            showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
-            remove_all(0, 0, 1);
-        }
-        else if (!session || !already)
-        {
-            showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
-            remove_all(0, 0, 1);
-        }
-    }
-    else
-    {
-        if(acess === true || acess === "true")
-        {
-            if (session !== '1' || already !== '1')
-            {
-                navigate("/", "home");
-                showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
-                remove_all(0, 0, 1);
-            }
-            else if (!session || !already)
-            {
-                navigate("/", "home");
-                showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
-                remove_all(0, 0, 1);
-            }
-        }
-    }
-};

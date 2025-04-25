@@ -2,6 +2,7 @@ import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
 import { current_user } from '../../main.js'
+import { is_online } from '../../login/user.js';
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -480,7 +481,8 @@ class ChatApp {
     
         //controllar login
         // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
-        if (user === this.username && (current_user.type === "guest" || current_user.type === "login")) {
+        if ((user === this.username && (current_user.type === "guest" || current_user.type === "login"))
+        || is_online(user) === false) {
             chatItem.style.display = 'none';
             addFriendItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
@@ -585,7 +587,7 @@ class ChatApp {
         this.hideContextMenu();
     }
 
-    set_profile_info()
+    set_profile_info(user_in_chat)
     {
         const userimage = document.querySelector("#profileAvatar");
         const profileDetails = document.querySelector('.profile-details');
@@ -596,7 +598,14 @@ class ChatApp {
         const userBio = document.querySelector('#userBio');
         if (current_user)
         {
-            lastOnline.textContent = "Online";
+            console.log("is online? = ", is_online(user_in_chat));
+            if (is_online(user_in_chat))
+                lastOnline.textContent = "Online";
+            else
+            {
+                lastOnline.textContent = "Offliene";
+                return;
+            }
             statusIndicator.classList.remove('offline');
             statusIndicator.classList.add('online');
             if (current_user.type === "login")
@@ -629,7 +638,7 @@ class ChatApp {
             profileStatusElement.style.display = 'block';
             profileStatusElement.textContent = this.friends.has(this.selectedUser) ? 'Friend' : 'Not a Friend';
         }
-        this.set_profile_info();
+        this.set_profile_info(this.username);
         modal.style.display = 'block';
     }
 }

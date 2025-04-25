@@ -58,7 +58,7 @@ async function fetchOnlineUsers() {
                 if (user !== current_user.display_name)
                     users_online.push(user);    
         }); 
-        console.log("users online =>", users_online);
+        //console.log("users online =>", users_online);
         return users_online; 
     } catch (error) {
         console.error("Fetch error:", error);
@@ -92,10 +92,10 @@ export async function handleLobby(type) {
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
 
-    const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
+    /*const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
         "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
-        "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
-    //let players = await fetchOnlineUsers();
+        "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];*/
+    let players = await fetchOnlineUsers();
 
     players.forEach(player => {
         const div = document.createElement("div");
@@ -128,7 +128,7 @@ function createKnockoutMatches()
         return response.status === 204 ? {} : response.json();
     })
     .then(data => {
-        console.log("Create Tournament response: ", data.matches);
+        //console.log("Create Tournament response: ", data.matches);
         invitedPlayers = [];
          data.matches.forEach(match => {
             [match.player1, match.player2].forEach(player => {
@@ -168,7 +168,7 @@ export function addLobbyPageHandlers() {
         save_global("game", 1);
         if (tournament === "knockout")
             createKnockoutMatches();
-        console.log("match players: ", invitedPlayers);
+        //console.log("match players: ", invitedPlayers);
         
         if (tournament === "knockout")
             navigate("/tournament/knockout/bracket", "Starting knockout tournament", invitedPlayers);

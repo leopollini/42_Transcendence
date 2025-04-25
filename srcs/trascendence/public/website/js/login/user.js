@@ -2,6 +2,7 @@ import { navigate, user_name, token } from "../main.js";
 import { updateProfileUI } from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../utils_main/error_main.js";
+import { userName } from "../pages/user_data.js";
 
 export class user {
     constructor(image, name, login_name, email, bio) {
@@ -63,6 +64,7 @@ export async function restore_user() {
         })
 
         let result = await response.json();
+        console.log("result = ", result);
         if (result && result.status === "success") {
             let ref_user;
             if (result.guest)
@@ -77,23 +79,18 @@ export async function restore_user() {
             remove_all(0, 0, 1);
             if (window.location.pathname !== '/')
                 navigate("/", "home");
-            showInfoModal("ERROR GET_USER: An error has occured(\"" + result.status + "\")", () => { });
+            showInfoModal("ERROR GET_USER IN RESTORE USER: An error has occured(\"" + result.status + "\")", () => { });
             return null;
         }
     }
     catch (error) {
-        console.log("Error in get_user = ", error);
         remove_all(0, 0, 1);
         if (window.location.pathname !== '/')
             navigate("/", "home");
-        showInfoModal("Error with get_user:", error);
+        showInfoModal("ERROR GET_USER IN RESTORE USER CATCHED:" + error, () => {});
         return null;
     }
 }
-
-/*export async function online(name)
-{
-}*/
 
 export async function exist(name)
 {
@@ -124,41 +121,23 @@ export async function exist(name)
     }
 }
 
-/*export async function is_online(name)
+export async function is_online(name)
 {
     try {
         const response = await fetch("http://localhost:8008", {
             method: "get_online",
             body: JSON.stringify({})
         });
-
-        if (!response.ok) {
-            throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
-        }
         const data = await response.json();
-        console.log("users online =>", users_online);
-        return users_online; 
+        console.log("data = ", data);
+        if (Array.isArray(data.online_users))
+            return data.online_users.includes(name);
+        return false;
     } catch (error) {
-        console.error("Fetch error:", error);
-        throw error; // Rilancia l'errore se vuoi gestirlo al livello superiore
-    }
-}*/
-
-/*export async function exist(name) {
-    try {
-        const response = await fetch("http://localhost:8008",
-        {
-            method: "get_user",
-            body: {}
-        })
-        let result = await response.json();
-        return true;
-    }
-    catch (error) {
-        showInfoModal("Error with get_user:" + error, () => {});
+        showInfoModal("is_online has encountered an error = " + error, () => {});
         return false;
     }
-}*/
+}
 
 function hasNoSpaces(str)
 {

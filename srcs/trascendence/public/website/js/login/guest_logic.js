@@ -1,9 +1,8 @@
-import { navigate, save_global} from "../main.js";
+import { navigate, save_global, user_name} from "../main.js";
 import { user, profile, check_name} from "./user.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInputModal, showInfoModal } from "../modal.js"
 import { remove_all } from "../utils_main/error_main.js";
-
 export async function guest_login()
 {
     showInputModal("Inserisci il tuo nickname", async (name) => {

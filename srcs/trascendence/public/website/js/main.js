@@ -3,7 +3,7 @@ import ChatApp from "./pages/live-chat/ChatApp.js";
 
 import {remove_all } from "./utils_main/error_main.js";
 import { routes, handlerMap} from "./utils_main/router.js"
-import { handle_popstate, save_at_exit, check_change} from "./utils_main/listener_Compacter.js";
+import { handle_popstate, save_at_exit} from "./utils_main/listener_Compacter.js";
 import { util_main, set_prev_path} from "./utils_main/utils.js";
 
 export let Bracket_state = null,
@@ -31,13 +31,15 @@ export let Bracket_state = null,
 export function reset_all_let()
 {
     Bracket_state = null,
+    refresh = false,
     current_user = null,
+    tournament = null,
     user_name = null,
     opponent = null,
-    tournament = null,
     pong_save = null,
     forza4_save = null,
     token = null,
+    prev_path = null,
     playerNames = null,
     Player1 = null,
     Player2 = null,
@@ -47,7 +49,8 @@ export function reset_all_let()
     match_ended = null,
     robinranking = null,
     numPlayers = null,
-    buttonTitle = null;
+    buttonTitle = null,
+    acess = false;
 }
 
 function is_parsable(value, to_parse) {
@@ -106,15 +109,14 @@ export function save_global(type, data) {
         playerNames = parsed_data
 }
 
-window.addEventListener('beforeunload', () => {
+window.addEventListener('beforeunload', async () => {
     save_at_exit();
-    if (refresh === false) {
+    if (refresh === false && path !== '/') {
         if (sessionStorage.getItem('already in') === '1') {
-            remove_all(0, 0, 1);
+            await remove_all(0, 0, 1);
             return (0);
         }
-    }
-    
+    } 
 });
 
 window.addEventListener('keydown', function (e) {
@@ -127,12 +129,7 @@ window.addEventListener('keydown', function (e) {
 export const navigate = async (path, new_title = "", lobbyPlayers) => {
     buttonTitle = new_title;
     players = lobbyPlayers;
-    if (prev_path === "/callback")
-    {
-        history.replaceState({ path }, new_title, path);
-    }
-    else
-        history.pushState({ path }, new_title, path);
+    history.pushState({ path }, new_title, path);
     await loadContent();
 };
 
@@ -152,7 +149,6 @@ export const loadContent = async () => {
     }
     if (await util_main(path, component, app) === -2)
         return;
-    setInterval(check_change, 100);
     if (handlerMap[path]) {
         handlerMap[path]();
     }
