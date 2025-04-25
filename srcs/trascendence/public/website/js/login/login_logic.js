@@ -1,5 +1,9 @@
 import { showInfoModal, showInputModal } from "../modal.js";
+import { showInfoModal, showInputModal } from "../modal.js";
 import { remove_all } from "../utils_main/error_main.js";
+import { navigate, reset_all_let, save_global, token, user_name } from "../main.js";
+import { update_image, change_name } from "../pages/modes.js"
+import { check_name } from "./user.js";
 import { navigate, reset_all_let, save_global, token, user_name } from "../main.js";
 import { update_image, change_name } from "../pages/modes.js"
 import { check_name } from "./user.js";
@@ -135,6 +139,7 @@ async function get_data() {
     const result = await response.json();
     if (result && result.status === "success"){
       await set_user(result);
+      await set_user(result);
       return;
     }
     else {
@@ -161,6 +166,7 @@ export async function performLogin() {
     if (data.auth_url) {
       window.location.href = data.auth_url;
     } else
+    throw new Error("No auth_url received");
     throw new Error("No auth_url received");
   } catch (error) {
     showInfoModal("Error during login: " + error.message, () => { });

@@ -8,6 +8,9 @@ export async function guest_login()
     showInputModal("Inserisci il tuo nickname", async (name) => {
       if (await check_name(name) === true)
         addGuest(name);
+    showInputModal("Inserisci il tuo nickname", async (name) => {
+      if (await check_name(name) === true)
+        addGuest(name);
     });
 }
 

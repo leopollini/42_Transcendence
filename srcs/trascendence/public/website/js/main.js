@@ -3,7 +3,7 @@ import ChatApp from "./pages/live-chat/ChatApp.js";
 
 import {remove_all } from "./utils_main/error_main.js";
 import { routes, handlerMap} from "./utils_main/router.js"
-import { handle_popstate, save_at_exit} from "./utils_main/listener_Compacter.js";
+import { handle_popstate, save_at_exit, check_change} from "./utils_main/listener_Compacter.js";
 import { util_main, set_prev_path} from "./utils_main/utils.js";
 
 export let Bracket_state = null,
@@ -149,6 +149,7 @@ export const loadContent = async () => {
     }
     if (await util_main(path, component, app) === -2)
         return;
+    setInterval(check_change, 100);
     if (handlerMap[path]) {
         handlerMap[path]();
     }
