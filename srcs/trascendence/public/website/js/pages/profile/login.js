@@ -47,10 +47,10 @@ function handle_access(loginButton, guestButton)
             performLogin();
     });
     guestButton.addEventListener("click", () => {
-        if (sessionStorage.getItem('already in') === '0'
-        && localStorage.getItem('session opened') === '1')
-            showInfoModal("You've already logged in!", () => {});
-        else
+        // if (sessionStorage.getItem('already in') === '0'
+        // && localStorage.getItem('session opened') === '1')
+        //     showInfoModal("You've already logged in!", () => {});
+        // else
             guest_login();
     });
 }

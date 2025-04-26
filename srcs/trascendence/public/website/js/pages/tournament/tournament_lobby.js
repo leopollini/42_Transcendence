@@ -1,11 +1,16 @@
 import { navigate, current_user, save_global, numPlayers } from "../../main.js";
 import { resetBracketState } from "./bracket.js";
+import { initSocket, sendMessage } from "../live-chat/socketHandler.js";
+import { showInfoModal } from "../../modal.js";
+import { fetchOnlineUsers } from "../get_online_users.js";
+
 let invitedPlayers = [];
 let tournament;
 let selectedPlayer;
 let numPlayersLabel;
 let numPlayersAccepted = 0;
 let totalPlayers;
+let socket;
 
 export default function LobbyRoom() {
     return `
@@ -43,47 +48,79 @@ export default function LobbyRoom() {
         <button id="toggleStartTournament" class="button-style" disabled>Start Tournament</button>`;
 }
 
-
-async function fetchOnlineUsers() {
-    try {
-        const response = await fetch("http://localhost:8008", {
-            method: "get_online",
-            body: JSON.stringify({ include_guests: true })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
-        }
-        const data = await response.json();
-        let users_online = [];
-        data.online_users.forEach(user => {
-                if (user !== current_user.display_name)
-                    users_online.push(user);    
-        }); 
-        console.log("users online =>", users_online);
-        return users_online; 
-    } catch (error) {
-        console.error("Fetch error:", error);
-        throw error; // Rilancia l'errore se vuoi gestirlo al livello superiore
-    }
-}
-
 export async function handleLobby(type) {
+    if (!socket && current_user) {
+        // Initialize socket
+        socket = initSocket(current_user.display_name, /* chatAppInstance se necessario */);
+        
+        // Handle incoming invite responses
+        socket.onmessage = (event) => {
+            let msg = JSON.parse(event.data);
+            
+            if (msg.type === "match_response") {
+                const accepted = msg.data.accepted === true || msg.data.accepted === "true";
+                console.log("📩 Risposta ricevuta:", msg);
+                const tournamentPlayers = document.getElementById("tournamentPlayers");
+                const numPlayersLabel = document.getElementById("numPlayersLabel");
+                const toggleStartTournament = document.getElementById("toggleStartTournament");
+                console.log("message accepted =>", msg.data.accepted);
+                if (accepted) {
+                    console.log("📩 L'utente ha accettato l'invito");
+                    console.log("utente", msg.data.from);
+                    showInfoModal(`${msg.data.from} ha accettato l'invito al torneo!`, () => {
+                        // Add player to tournament
+                        const newPlayer = document.createElement("div");
+                        newPlayer.classList.add("player");
+                        newPlayer.textContent = msg.data.from;
+                        tournamentPlayers.appendChild(newPlayer);
+                        
+                        numPlayersAccepted++;
+                        numPlayersLabel.textContent = numPlayersAccepted + "/" + totalPlayers;
+                        invitedPlayers.push(msg.data.from);
+                        
+                        // Remove player from online list
+                        const onlinePlayers = document.querySelectorAll("#onlinePlayers .player");
+                        onlinePlayers.forEach(player => {
+                            if (player.textContent === msg.data.from) {
+                                player.remove();
+                            }
+                        });
+                        
+                        // If number of players reached total, enable start match button
+                        if (numPlayersAccepted === totalPlayers) {
+                            toggleStartTournament.disabled = false;
+                        }
+                    });
+                } else {
+                    console.log("📩 L'utente ha rifiutato l'invito");
+                    //showInfoModal(`${msg.data ? msg.data.from : msg.from} ha rifiutato l'invito al torneo.`, () => {});
+                }
+            }
+            
+        };
+    }
+
     const onlinePlayers = document.getElementById("onlinePlayers");
     const tournamentPlayers = document.getElementById("tournamentPlayers");
     const inviteButton = document.getElementById("inviteButton");
     numPlayersLabel = document.getElementById("numPlayersLabel");
     
+    // Reset state
+    onlinePlayers.innerHTML = "";
+    tournamentPlayers.innerHTML = "";
     invitedPlayers = [];
     numPlayersAccepted = 0;
     selectedPlayer = null;
     totalPlayers = Number(numPlayers);
+    
     if (type === "Bracket")
         tournament = "knockout";
     else
         tournament = "roundrobin";
+        
     numPlayersLabel.textContent = "0/" + totalPlayers;
 
+    // Add organizer to tournament
     if (current_user) {
         const creatorDiv = document.createElement("div");
         creatorDiv.classList.add("player");
@@ -91,10 +128,15 @@ export async function handleLobby(type) {
         tournamentPlayers.appendChild(creatorDiv);
         invitedPlayers.push(current_user.display_name);
         numPlayersAccepted++;
-        numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
+        numPlayersLabel.textContent = numPlayersAccepted + "/" + totalPlayers;
     }
 
-    let players = await fetchOnlineUsers();
+    // Load online users list
+    let players = await fetchOnlineUsers(current_user.display_name);
+
+    // let players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
+    // "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
+    // "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
 
     players.forEach(player => {
         const div = document.createElement("div");
@@ -111,8 +153,7 @@ export async function handleLobby(type) {
     });
 }
 
-function createKnockoutMatches()
-{
+function createKnockoutMatches() {
     fetch("http://localhost:8008", {
         method: "create_tournament",
         body: JSON.stringify({
@@ -143,27 +184,26 @@ export function addLobbyPageHandlers() {
     save_global("game", null);
     save_global("players", null);
     save_global("robinranked", null);
+    
     const toggleStartTournament = document.getElementById("toggleStartTournament");
+    const inviteButton = document.getElementById("inviteButton");
+    const backImageButton = document.getElementById("backImageButton");
+
     inviteButton.onclick = () => {
         if (selectedPlayer && numPlayersAccepted < totalPlayers) {
-            const newPlayer = selectedPlayer.cloneNode(true);
-            newPlayer.style.background = "";
-            newPlayer.style.color = "white";
-            newPlayer.onclick = null;
-            tournamentPlayers.appendChild(newPlayer);
-            numPlayersAccepted++;
-            numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
-            invitedPlayers.push(selectedPlayer.textContent);
-            selectedPlayer.remove();
-            selectedPlayer = null;
+            // Send Request to selected player
+            sendMessage({
+                type: "match_request",
+                to: selectedPlayer.textContent
+            });
+            
+            //showInfoModal(`Invito inviato a ${selectedPlayer.textContent}. Attendere risposta...`, () => {});
+            
             inviteButton.disabled = true;
-            if (numPlayersAccepted === totalPlayers)
-                toggleStartTournament.disabled = false;
         }
     };
 
     toggleStartTournament?.addEventListener('click', async() => {
-        //console.log("tournament =>" + tournament);
         save_global("game", 1);
         if (tournament === "knockout")
             createKnockoutMatches();
@@ -177,6 +217,5 @@ export function addLobbyPageHandlers() {
 
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");   
-        //invitedPlayers = [];     
     });
 }

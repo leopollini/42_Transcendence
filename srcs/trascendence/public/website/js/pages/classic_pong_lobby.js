@@ -1,11 +1,15 @@
 import { navigate, save_global} from "../main.js";
 import { current_user } from "../main.js";
+import { initSocket, sendMessage } from "./live-chat/socketHandler.js";
+import { showInfoModal } from "../modal.js";
+import { fetchOnlineUsers } from "./get_online_users.js";
 
 let invitedPlayers = [];
 let selectedPlayer;
 let numPlayersLabel;
 let numPlayersAccepted = 0;
 let totalPlayers = 2;
+let socket;
 
 export default function ClassicPongLobbyRoom() {
     return `
@@ -37,7 +41,58 @@ export default function ClassicPongLobbyRoom() {
 }
 
 
-export function handleClassicPongLobby() {
+
+export async function handleClassicPongLobby() {
+    if (!socket && current_user) {
+        // Initialize socket
+        socket = initSocket(current_user.display_name, /* chatAppInstance se necessario */);
+        
+        // Handle incoming invite responses
+        socket.onmessage = (event) => {
+            let msg = JSON.parse(event.data);
+            
+            if (msg.type === "match_response") {
+                const accepted = msg.data.accepted === true || msg.data.accepted === "true";
+                console.log("📩 Risposta ricevuta:", msg);
+                const matchPlayers = document.getElementById("pongMatchPlayers");
+                const numPlayersLabel = document.getElementById("pongNumPlayersLabel");
+                const toggleStartMatch = document.getElementById("pongToggleStartMatch");
+                console.log("message accepted =>", msg.data.accepted);
+                if (accepted) {
+                    console.log("📩 L'utente ha accettato l'invito");
+                    console.log("utente", msg.data.from);
+                    showInfoModal(`${msg.data.from} ha accettato l'invito al torneo!`, () => {
+                        // Add player to match
+                        const newPlayer = document.createElement("div");
+                        newPlayer.classList.add("player");
+                        newPlayer.textContent = msg.data.from;
+                        matchPlayers.appendChild(newPlayer);
+                        save_global("opponent", msg.data.from);
+                        numPlayersAccepted++;
+                        numPlayersLabel.textContent = numPlayersAccepted + "/" + totalPlayers;
+                        invitedPlayers.push(msg.data.from);
+                        
+                        // Remove player from online list
+                        const onlinePlayers = document.querySelectorAll("#onlinePlayers .player");
+                        onlinePlayers.forEach(player => {
+                            if (player.textContent === msg.data.from) {
+                                player.remove();
+                            }
+                        });
+                        // If number of players reached total, enable start match button
+                        if (numPlayersAccepted === totalPlayers) {
+                            toggleStartMatch.disabled = false;
+                        }
+                    });
+                } else {
+                    console.log("📩 L'utente ha rifiutato l'invito");
+                    //showInfoModal(`${msg.data ? msg.data.from : msg.from} ha rifiutato l'invito al torneo.`, () => {});
+                }
+            }
+            
+        };
+    }
+
     const onlinePlayers = document.getElementById("onlinePlayers");
     const matchPlayers = document.getElementById("pongMatchPlayers");
     const inviteButton = document.getElementById("pongInviteButton");
@@ -57,9 +112,12 @@ export function handleClassicPongLobby() {
         numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
     }
     
-    const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
-    "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
-    "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
+    let players = await fetchOnlineUsers(current_user.display_name);
+
+    // const players = ["Alice", "Bob", "Charlie", "David", "Marco", "Mario", 
+    // "Samuele", "Samir", "Leonardo", "Rostik", "Pasquale_R.", "Salvatore_A.",
+    // "Alberto_A.", "Steve", "Ronald", "Ciccio", "Briciola", "Rocco"];
+
     players.forEach(player => {
         const div = document.createElement("div");
         div.classList.add("player");
@@ -79,29 +137,38 @@ export function handleClassicPongLobby() {
 
 export function addClassicPongLobbyPageHandlers() {
     const toggleStartMatch = document.getElementById("pongToggleStartMatch");
-    const matchPlayers = document.getElementById("pongMatchPlayers");
     const inviteButton = document.getElementById("pongInviteButton");
+    const backImageButton = document.getElementById("backImageButton");
+
     inviteButton.onclick = () => {
         if (selectedPlayer && numPlayersAccepted < totalPlayers) {
-            const newPlayer = selectedPlayer.cloneNode(true);
-            newPlayer.style.background = "";
-            newPlayer.style.color = "white";
-            newPlayer.onclick = null;
-            const playerName = newPlayer.textContent.trim();
-            save_global("opponent",playerName);
-            matchPlayers.appendChild(newPlayer);
-            numPlayersAccepted++;
-            numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
-            invitedPlayers.push(selectedPlayer.textContent);
-            selectedPlayer.remove();
-            selectedPlayer = null;
+            // Send Request to selected player
+            sendMessage({
+                type: "match_request",
+                to: selectedPlayer.textContent
+            });
             inviteButton.disabled = true;
-            if (numPlayersAccepted === totalPlayers)
-                toggleStartMatch.disabled = false;
+            // const newPlayer = selectedPlayer.cloneNode(true);
+            // newPlayer.style.background = "";
+            // newPlayer.style.color = "white";
+            // newPlayer.onclick = null;
+            // const playerName = newPlayer.textContent.trim();
+            // save_global("opponent",playerName);
+            // matchPlayers.appendChild(newPlayer);
+            // numPlayersAccepted++;
+            // numPlayersLabel.textContent = numPlayersAccepted + "/" +  totalPlayers;
+            // invitedPlayers.push(selectedPlayer.textContent);
+            // selectedPlayer.remove();
+            // selectedPlayer = null;
+            // inviteButton.disabled = true;
+            // if (numPlayersAccepted === totalPlayers)
+            //     toggleStartMatch.disabled = false;
         }
     };
 
     toggleStartMatch?.addEventListener('click', () => {
+        save_global("game", 1);
+        console.log("invited players =>", invitedPlayers);
         navigate( "/classic", "Pong Classic Game", invitedPlayers);
     });
 

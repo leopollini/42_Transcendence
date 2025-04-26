@@ -1,7 +1,7 @@
 import { matchData } from './game_global.js';
 import { formatTime } from '../other/timer.js';
 
-export async function saveMatchStatsData(p1Name, p2Name, scoreP1, scoreP2) {
+export function saveMatchStatsData(p1Name, p2Name, scoreP1, scoreP2) {
     matchData.player1 = p1Name;
     matchData.player2 = p2Name;
     matchData.scorep1 = scoreP1;
@@ -21,6 +21,8 @@ function saveUserStatsData(matchData) {
     const matchTime = matchData.seconds;
     const longestRally = matchData.longestRally;
 
+    console.log("player1: ", player1);
+    console.log("player2: ", player2);
     fetch("http://localhost:8008", {
         method: "save_pong_game",
         body: JSON.stringify({
@@ -40,19 +42,19 @@ function saveUserStatsData(matchData) {
     })
     .then(data => {
         //console.log("saving...");
-        //console.log("Save Pong Game response: ", data);
+        console.log("Save Pong Game response: ", data);
 
         // Second fetch call (only if first fetch was successful)   
         return fetch("http://localhost:8008", {
             method: "get_pong_games",
             body: JSON.stringify({
-                realname: player1,
+                display_name: player1,
             }),
         });
     })
     .then(response => response.json())
     .then(data => {
-        //console.log("Get Pong Game response: ", data);
+        console.log("Get Pong Game response: ", data);
     })
     .catch(error => console.error("Fetch error:", error));
 }

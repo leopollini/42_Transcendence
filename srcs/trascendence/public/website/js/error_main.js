@@ -1,6 +1,6 @@
 import { free_users } from "./security/security.js";
 import { resetMatchStatsData } from "./game/pong/data/game_stats.js";
-import {nullify_user, navigate, reset_all_let, current_user,opponent, save_global,in_game, user_name} from "./main.js";
+import {nullify_user, navigate, reset_all_let, current_user, opponent, save_global,in_game, user_name} from "./main.js";
 import { showInfoModal } from "./modal.js";
 import { resetBracketState } from "./pages/tournament/bracket.js";
 import { addCallbackPageHandlers } from "./login/login_logic.js";

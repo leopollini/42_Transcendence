@@ -90,7 +90,9 @@ function is_parsable(value, to_parse) {
 }
 
 export function save_global(type, data) {
+    console.log("dataaaa", data);
     let parsed_data = is_parsable(data, true);
+    console.log("save global", type, parsed_data);
     if (type === "pong")
         pong_save = parsed_data;
     if (type === "name")
@@ -360,8 +362,8 @@ const check_change = () =>
     {
         if (session !== "0" || already !== "0")
         {
-            showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
-            remove_all(0, 0, 1);
+            // showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
+            // remove_all(0, 0, 1);
         }
     }
     else
@@ -370,9 +372,9 @@ const check_change = () =>
         {
             if (session !== '1' || already !== '1')
             {
-                navigate("/", "home");
-                showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
-                remove_all(0, 0, 1);
+                // navigate("/", "home");
+                // showInfoModal("Error: invalid operation...\nRestarting data...", () => {} );
+                // remove_all(0, 0, 1);
             }
         }
     }

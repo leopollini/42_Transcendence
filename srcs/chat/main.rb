@@ -82,7 +82,7 @@ class ChatService < WEBrick::Websocket::Servlet
         ChatStore.clients[data['to'].to_s].send_me({'from' => @username, 'data' => data['data']}, "match_request")
 
       when 'match_response'
-        ChatStore.clients[data['to'].to_s].send_me({'accepted' => data['accepted'].to_s}, "match_response")
+        ChatStore.clients[data['to'].to_s].send_me({'from' => @username, 'accepted' => data['accepted'].to_s}, "match_response")
 
       when 'get_online_users'
         ChatStore.clients[@username].send_me({'users' => ChatStore.clients.filter{|c| c.alive?}}, 'online_users_list')
