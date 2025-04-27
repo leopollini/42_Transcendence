@@ -64,7 +64,6 @@ export async function restore_user() {
         })
 
         let result = await response.json();
-        console.log("result = ", result);
         if (result && result.status === "success") {
             let ref_user;
             if (result.guest)
@@ -96,29 +95,35 @@ export async function exist(name)
 {
     try
     {
+        let data = JSON.stringify({"params": {"display_name": name}});
+        console.log("data = ", data);
         const response = await fetch("http://localhost:8008",
-            {
-                method: "get_user",
-                body: JSON.stringify({})
-            });
-            const data = await response.json();
-            let userFound = false;
-            console.log("data = ", data);
-            console.log("guest = ", data.guest);
-            if (Array.isArray(data.guest)) {
-                userFound = data.guest.includes(name);
-            }
-            console.log("user = ", data.user);
-            if (!userFound && Array.isArray(data.user)) {
-                userFound = data.user.includes(name);
-            }
-            return userFound;
+        {
+            method: "get_user",
+            body: data
+        });
+        const result = await response.json();
+        console.log("result: ", result + "\n\nresult.status: ", result.status);
+        if (result.status === "no user found")
+            return true;
+        else
+            return false;
     }
     catch (error)
     {
         showInfoModal("An error has occured in exist  (" + error + ")");
         return false;
     }
+}
+
+export function escapeHtml(str)
+{
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
 }
 
 export async function is_online(name)
@@ -129,7 +134,6 @@ export async function is_online(name)
             body: JSON.stringify({})
         });
         const data = await response.json();
-        console.log("data = ", data);
         if (Array.isArray(data.online_users))
             return data.online_users.includes(name);
         return false;
@@ -150,7 +154,7 @@ function alphanum(str) {
 
 export async function check_name(name)
 {
-    name = name.trim();
+    name = escapeHtml(String(name).trim());
     if (alphanum(name) === false)
     {
         showInfoModal("Invalid name format(please try again)...", () => {});

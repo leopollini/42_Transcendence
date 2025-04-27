@@ -1,9 +1,19 @@
 import { validateUploadedImage } from "../../../security/security.js";
 import { showInfoModal } from "../../../modal.js";
 import { exist } from "../../../login/user.js";
-export function savebio(me, yourDataSection) {
+import { escapeHtml } from "../../../login/user.js";
+function formatBio(bio) {
+    let str = typeof bio === 'string' ? bio : JSON.stringify(bio);
+    str = str
+        .trim()
+        .replace(/^"|"$/g, '')
+        .replace(/\\n/g, '\n');
+    return escapeHtml(str);
+}
+
+export function savebio(me, yourDataSection, current_user) {
     const bioInput = yourDataSection.querySelector('#bioInput');
-    const newBio = bioInput.value;
+    let newBio = bioInput.value;
 
     let polbio = yourDataSection.querySelector('#bioSection');
     polbio.style.width = "50%";
@@ -12,12 +22,15 @@ export function savebio(me, yourDataSection) {
         return ("⚠️No Bio saved(Please enter a bio next time)\n");
     if (newBio.length >= 400)
         return ("🚨Error: Bio too big\n");
-    me.bio = JSON.stringify(newBio);
+    if (current_user.bio === newBio)
+        return ("⚠️no canges in bio have been made\n")
+    me.bio = newBio;
+    current_user.bio = formatBio(me.bio);
     return ("✅saved bio successfully\n");
 }
 
 
-export function savename(me, yourDataSection) {
+export async function savename(me, yourDataSection, current_user) {
     const changeName = yourDataSection.querySelector('#displayNameInput');
     const newname = changeName.value;
 
@@ -30,15 +43,22 @@ export function savename(me, yourDataSection) {
         return ("🚨Error: Name too short(" + newname + ")\n");
     if (newname.length >= 15)
         return ("🚨Error: Name too long(" + newname + ")\n");
-    if (exist(newname) === false && menubar.display_name !== newname) {
-        me.display_name = JSON.stringify(newname);
+    if (newname === me.display_name)
+        return ("⚠️No change in name have been made\n");
+    let result = await exist(newname);
+    if (result === true && me.display_name !== newname) {
+        me.display_name = escapeHtml(newname.trim()); 
+        current_user.display_name = me.display_name;
         return ("✅Saved name successfully(" + newname + ")\n");
     }
     else
+    {
+        console.log("not exist");
         return ("🚨Error: name already taken(" + newname + ")\n");
+    }
 }
 
-export async function saveimage(me, yourDataSection) {
+export async function saveimage(me, yourDataSection, current_user) {
     const imageUploadInput = yourDataSection.querySelector('#imageUploadInput');
     const profileImage = yourDataSection.querySelector('#profileImage');
 
@@ -62,6 +82,7 @@ export async function saveimage(me, yourDataSection) {
                     me.image = newImage;
                     profileImage.src = newImage;
                     showInfoModal("image changed successfully", () => { });
+
                 };
                 reader.readAsDataURL(file);
             }

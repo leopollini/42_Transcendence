@@ -242,7 +242,7 @@ export async function showCharts() {
     const response = await fetch("http://localhost:8008", {
       method: "get_pong_games",
       body: JSON.stringify({
-        realname: userName,
+        display_name: userName,
       }),
     });
     const data = await response.json();

@@ -34,13 +34,15 @@ async function home_error(path, already, session) {
     }
     if (sessionStorage.getItem('already in') === '1') {
         await remove_all(0, 0, 1);
+        showInfoModal("Invalid value at HOME(\"/\")", () => {});
         return (0);
     }
     return (0);
 }
 
 async function not_home(path, session, already) {
-    if (((session !== '0' && session !== '1') || (already !== '0' && already !== '1') || already === '0'))
+    if ((session !== '0' && session !== '1') || (already !== '0' && already !== '1') ||
+    (session === '0' && already === '1'))
     {
         await remove_all(0, 0, 1);
         showInfoModal("Invalid operation detected.Returning Home and resetting...", () => {});
@@ -49,6 +51,13 @@ async function not_home(path, session, already) {
     }
     if (path === "/callback" && acess === false) {
         await addCallbackPageHandlers();
+        return (1);
+    }
+    if (already === '0')
+    {
+        await remove_all(0, 0, 1);
+        showInfoModal("Session invalided returning home...", () => {});
+        navigate("/", "home");
         return (1);
     }
     if (in_game && path === "/tournament/knockout/lobby")
@@ -117,9 +126,9 @@ async function refresh_reset() {
         save_global("forza4", sessionStorage.getItem("forza4Data"));
         sessionStorage.removeItem("forza4Data");
     }
-        if (sessionStorage.getItem("player1")) {
-            save_global("p1", sessionStorage.getItem("player1"));
-        sessionStorage.removeItem("player1");
+    if (sessionStorage.getItem("player1")) {
+        save_global("p1", sessionStorage.getItem("player1"));
+    sessionStorage.removeItem("player1");
     }
     if (sessionStorage.getItem("player2")) {
         save_global("p2", sessionStorage.getItem("player2"));

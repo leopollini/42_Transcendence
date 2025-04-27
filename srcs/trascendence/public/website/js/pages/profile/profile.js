@@ -46,7 +46,7 @@ function insert_user_data(current_user)
   return current_user;
 }
 
-export function profileHandler()
+export async function profileHandler()
 {
   let back_to_menu = document.querySelector("#back");
   back_to_menu.addEventListener("click", () =>
@@ -67,9 +67,8 @@ export function profileHandler()
   // Pre-compila il campo bio se già salvato
   const bioInput = infoContainer.querySelector("#bioInput");
   bioInput.value = me.bio;
-  
   const save = document.querySelector("#save");
-  saveimage(me, card);
+  saveimage(me, card, current_user);
   save.addEventListener("click", () => {
     saveProfile(infoContainer);
   });
@@ -129,33 +128,18 @@ function updateGuest(current_user)
   });
 }
 
-function saveProfile(infoContainer) {
+async function saveProfile(infoContainer) {
   let saving;
-  let myname;
-  if (current_user.image === me.image)
+  if (me.image === current_user.image)
     saving = "⚠️no canges in image have been made\n";
   else
-  saving = "✅saved image successfully\n";
-  current_user.image = me.image;
-  let checkbio;
-  if (current_user.bio)
-    checkbio = current_user.bio.replace(/^"/, '').replace(/"$/, '').replace(/\\n/g, "\n");
-  else
-    checkbio = null;
-  if (checkbio && checkbio === me.bio)
-    saving += "⚠️no canges in bio have been made\n";
-  else
   {
-    saving += savebio(me, infoContainer);
-    current_user.bio = me.bio;
+    saving = "✅saved image successfully\n";
+    current_user.image = me.image;
   }
+  saving += savebio(me, infoContainer, current_user);
   if (current_user.type === "login")
-  {
-    saving += savename(me, infoContainer);
-    current_user.display_name = me.display_name;
-    if (current_user.display_name === me.display_name)
-      saving += "✅saved new name successfully\n";
-  }
+    saving += await savename(me, infoContainer, current_user);
   if (current_user.type === "guest")
     updateGuest(current_user);
   else

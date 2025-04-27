@@ -7,7 +7,7 @@ import ClassicPongLobbyRoom, {addClassicPongLobbyPageHandlers, handleClassicPong
 import Profile, {profileHandler} from "../pages/profile/profile.js";
 import Settings, {addSettingsPageHandlers}from "../pages/profile/settings.js";
 import Customize, {addCustomizeGame} from "../pages/profile/customize.js";
-import GameUserStatistics, {pongShowMatchDetails} from "../pages/game_statistics.js";
+import GameUserStatistics, {pongShowMatchDetails, gameUserStatisticsPageHandlers} from "../pages/game_statistics.js";
 import Forza4Customize, {forza4Config} from "../pages/forza4/forza4_customize.js";
 import Forza4, {startForza4Game} from "../game/forza4/main/forza4.js";
 import Forza4LobbyRoom, {handleForza4Lobby, addForza4LobbyPageHandlers} from "../pages/forza4/forza4_lobby.js";

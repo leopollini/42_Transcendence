@@ -1,4 +1,4 @@
-import { save_global, buttonTitle, players, numPlayers, token } from "../main.js";
+import { save_global, buttonTitle, players, numPlayers, token, user_name } from "../main.js";
 import { check_valid_operation } from "./error_main.js";
 import { initializeGameCanvas } from "../game/pong/main/handling_Canvas.js";
 import { userName } from "../pages/user_data.js";

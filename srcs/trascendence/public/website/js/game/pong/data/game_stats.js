@@ -1,7 +1,7 @@
 import { matchData } from './game_global.js';
 import { formatTime } from '../other/timer.js';
 
-export async function saveMatchStatsData(p1Name, p2Name, scoreP1, scoreP2) {
+export function saveMatchStatsData(p1Name, p2Name, scoreP1, scoreP2) {
     matchData.player1 = p1Name;
     matchData.player2 = p2Name;
     matchData.scorep1 = scoreP1;
@@ -46,7 +46,7 @@ function saveUserStatsData(matchData) {
         return fetch("http://localhost:8008", {
             method: "get_pong_games",
             body: JSON.stringify({
-                realname: player1,
+                display_name: player1,
             }),
         });
     })

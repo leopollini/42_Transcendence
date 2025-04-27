@@ -1,8 +1,8 @@
 import { initSocket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
-import { current_user } from '../../main.js'
-import { is_online } from '../../login/user.js';
+import { current_user } from '../../main.js';
+
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -37,7 +37,7 @@ class ChatApp {
         if (current_user && current_user.display_name)
             this.username = current_user.display_name;
         else
-            this.username = "USERNAME NOT DEFINED :(:(";
+            this.username = "default";
         this.socket = initSocket(this.username, this);
     }
 
@@ -466,7 +466,7 @@ class ChatApp {
         this.updateBlockedUsersList();
     }
 
-    showContextMenuForUser(user, x, y) {
+    async showContextMenuForUser(user, x, y) {
         this.selectedUser = user;
         const menu = this.elements.contextMenu;
         menu.style.display = 'block';
@@ -481,8 +481,9 @@ class ChatApp {
     
         //controllar login
         // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
-        if ((user === this.username && (current_user.type === "guest" || current_user.type === "login"))
-        || is_online(user) === false) {
+        const online = await is_online(user);
+        if ((user === this.username) || (user !== this.username && online === false))
+        {
             chatItem.style.display = 'none';
             addFriendItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
@@ -490,8 +491,7 @@ class ChatApp {
             blockItem.style.display = 'none';
             return;
         }
-              
-        
+
         if (this.blockedUsers.has(user)) {
             chatItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
@@ -587,23 +587,31 @@ class ChatApp {
         this.hideContextMenu();
     }
 
-    set_profile_info(user_in_chat)
+    async set_profile_info(user_in_chat)
     {
+        console.log("user = ", user_in_chat);
         const userimage = document.querySelector("#profileAvatar");
         const profileDetails = document.querySelector('.profile-details');
-        const lastOnline = profileDetails.querySelector('#lastOnline');
         const statusIndicator = profileDetails.querySelector('#statusIndicator');
+        const lastOnline = profileDetails.querySelector('#lastOnline');
         const realname = document.querySelector('p > #realname').parentElement;
         const userEmail = document.querySelector('p > #userEmail').parentElement;
         const userBio = document.querySelector('#userBio');
+        const bioParagraph = document.querySelector('p > #userBio').parentElement; // Trova il paragrafo della bio
         if (current_user)
         {
-            console.log("is online? = ", is_online(user_in_chat));
-            if (is_online(user_in_chat))
-                lastOnline.textContent = "Online";
+            const online = await is_online(user_in_chat);
+            if (online)
+                lastOnline.textContent = "ONLINE";
             else
             {
-                lastOnline.textContent = "Offliene";
+                lastOnline.textContent = "OFFLINE";
+                realname.style.display = 'none';
+                userEmail.style.display = 'none';
+                bioParagraph.style.display = 'none';
+                userimage.src = "../website/images/offline.png";
+                statusIndicator.classList.remove('online');
+                statusIndicator.classList.add('offline');
                 return;
             }
             statusIndicator.classList.remove('offline');
@@ -618,7 +626,8 @@ class ChatApp {
                 realname.style.display = 'none';
                 userEmail.style.display = 'none';
             }
-            if (!current_user.bio)
+            console.log("bio = ", current_user.bio);
+            if (!current_user.bio && current_user.display_name === user_in_chat)
                 userBio.textContent = "Indicates the desired height of glyphs from the font. For scalable fonts, the font-size is a scale factor applied to the EM unit of the font. (Note that certain glyphs may bleed outside their EM box.) For non-scalable fonts, the font-size is converted into absolute units and matched against the declared font-size of the font, using the same absolute coordinate space for both of the matched values.";
             else
                 userBio.textContent = current_user.bio;
@@ -638,7 +647,7 @@ class ChatApp {
             profileStatusElement.style.display = 'block';
             profileStatusElement.textContent = this.friends.has(this.selectedUser) ? 'Friend' : 'Not a Friend';
         }
-        this.set_profile_info(this.username);
+        this.set_profile_info(this.selectedUser);
         modal.style.display = 'block';
     }
 }

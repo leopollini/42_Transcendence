@@ -1,12 +1,8 @@
 import { showInfoModal, showInputModal } from "../modal.js";
-import { showInfoModal, showInputModal } from "../modal.js";
 import { remove_all } from "../utils_main/error_main.js";
 import { navigate, reset_all_let, save_global, token, user_name } from "../main.js";
 import { update_image, change_name } from "../pages/modes.js"
-import { check_name } from "./user.js";
-import { navigate, reset_all_let, save_global, token, user_name } from "../main.js";
-import { update_image, change_name } from "../pages/modes.js"
-import { check_name } from "./user.js";
+import { check_name, escapeHtml } from "./user.js";
 
 export default function Callback() {
   return `
@@ -93,7 +89,6 @@ async function set_user(result)
   const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
   const name = await promptModal("Inserisci il tuo nickname");
   if ((await check_name(name)) !== true) {
-    console.log("invalid name");
     remove_all(0, 0, 1);
     navigate("/", "home");
     return;
@@ -101,14 +96,14 @@ async function set_user(result)
   let new_user =
   {
     email: result.user[0].email,
-    login_name: name,
+    login_name: escapeHtml(String(name).trim()),
     realname: result.user[0].realname,
     image: result.user[0].image,
     bio: result.user[0].bio,
     type: "login"
   };
   await update_with_new_name(name);
-  remove_all(1, 1);
+  await remove_all(1, 1);
   change_name(new_user.login_name);
   update_image(new_user.image);
 }
@@ -139,7 +134,6 @@ async function get_data() {
     const result = await response.json();
     if (result && result.status === "success"){
       await set_user(result);
-      await set_user(result);
       return;
     }
     else {
@@ -163,10 +157,9 @@ export async function performLogin() {
   try {
     const response = await fetch('/auth/login');
     const data = await response.json();
-    if (data.auth_url) {
+    if (data.auth_url)
       window.location.href = data.auth_url;
-    } else
-    throw new Error("No auth_url received");
+    else
     throw new Error("No auth_url received");
   } catch (error) {
     showInfoModal("Error during login: " + error.message, () => { });
