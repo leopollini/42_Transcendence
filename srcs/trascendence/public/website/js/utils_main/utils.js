@@ -1,4 +1,4 @@
-import { save_global, buttonTitle, players, numPlayers, token, user_name } from "../main.js";
+import { save_global, buttonTitle, players, numPlayers, acess } from "../main.js";
 import { check_valid_operation } from "./error_main.js";
 import { initializeGameCanvas } from "../game/pong/main/handling_Canvas.js";
 import { userName } from "../pages/user_data.js";
@@ -30,7 +30,7 @@ export function set_prev_path() {
 export async function util_main(path, component, app) {
     if (await check_valid_operation(path, component) === 1)
         return (-2);
-    if (window.location.pathname !== "/") 
+    if (window.location.pathname !== "/" && acess === true) 
         save_global("user", await restore_user());
     if (/^Robin[4-8]$/.test(buttonTitle) || /^Bracket(4|8|16)$/.test(buttonTitle))
         save_global("numP", parseInt(buttonTitle.replace(/\D/g, ""), 10));

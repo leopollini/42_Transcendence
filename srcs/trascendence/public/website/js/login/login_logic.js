@@ -27,30 +27,26 @@ async function checkAuthentication() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     if (!code) {
-      remove_all(0, 0, 1);
-      navigate("/", "Return to home");
       showInfoModal("Missing OAuth parameters.", () => { });
-      return;
+      return (1);
     }
     const response = await fetch('/api/callback?' + params.toString());
     const data = await response.json();
     if (data.success) {
       save_global("name", data.name);
       save_global("token", data.token);
+      if (await get_data() === 1)
+        return (1);
       save_global("acess", true);
-      await get_data();
       showInfoModal(data.message, () => { });
-      navigate("/modes", "Modalità di gioco");
+      return (-1);
     } else {
-      remove_all(0, 0, 1);
-      navigate("/", "Return to home");
-      showInfoModal("Autenticazione fallita: " + (data.error || "Unknown Error"), () => {
-      });
+      showInfoModal("Autenticazione fallita: " + (data.error || "Unknown Error"), () => {});
+      return (1);
     }
   } catch (error) {
-    remove_all(0, 0, 1);
-    navigate("/", "Return to home");
     showInfoModal("Errore durante la gestione del callback: " + error.message, () => { });
+    return (1);
   }
 }
 
@@ -58,40 +54,36 @@ async function update_with_new_name(name) {
   let data = JSON.stringify({
     "token": token,
     "new_params": {
-    "display_name": name}});
-    fetch("http://localhost:8008",
+      "display_name": name
+    }
+  });
+  fetch("http://localhost:8008",
     {
       method: "update_user",
       body: data
     })
     .then(response => response.json())
-    .then(data =>{
-      if (data)
-      {
-        if (data.success !== "true")
-        {
+    .then(data => {
+      if (data) {
+        if (data.success !== "true") {
           remove_all(0, 0, 1);
           navigate("/", "home");
-          showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
+          showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => { });
         }
       }
     })
-    .catch(error =>
-    {
+    .catch(error => {
       remove_all(0, 0, 1);
       navigate("/", "home");
-      showInfoModal("Error with update_user:" + error, () => {});
+      showInfoModal("Error with update_user:" + error, () => { });
     });
 }
 
-async function set_user(result)
-{
+async function set_user(result) {
   const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
   const name = await promptModal("Inserisci il tuo nickname");
   if ((await check_name(name)) !== true) {
-    remove_all(0, 0, 1);
-    navigate("/", "home");
-    return;
+    return (1);
   }
   let new_user =
   {
@@ -132,16 +124,17 @@ async function get_data() {
       body: data
     })
     const result = await response.json();
-    if (result && result.status === "success"){
-      await set_user(result);
-      return;
+    if (result && result.status === "success") {
+      if (await set_user(result) === 1)
+        return (1);
+      return (0);
     }
     else {
       remove_all(0, 0, 1);
       if (window.location.pathname !== '/')
         navigate("/", "home");
       showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => { });;
-      return;
+      return (1);
     }
   }
   catch (error) {
@@ -149,7 +142,7 @@ async function get_data() {
     if (window.location.pathname !== '/')
       navigate("/", "home");
     showInfoModal("Error during Login in get_user: " + error.message, () => { });
-    return;
+    return (1);
   }
 }
 
@@ -160,7 +153,7 @@ export async function performLogin() {
     if (data.auth_url)
       window.location.href = data.auth_url;
     else
-    throw new Error("No auth_url received");
+      throw new Error("No auth_url received");
   } catch (error) {
     showInfoModal("Error during login: " + error.message, () => { });
   }
