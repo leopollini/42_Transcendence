@@ -19,9 +19,10 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             showInfoModal("You must be logged to use this feature!", () => { });
             return;
         }
-        else {
-            current_user.type = "guest";
-            navigate("/tournament", "Modalità Torneo");
+        else
+        {
+            navigate("/tournament", "Modalità Torneo")
+            showInfoModal("All the customization saved are temporarly disabled in tournament", () => {});
         }
     });
 
