@@ -177,3 +177,40 @@ export async function check_name(name)
     }
     return true;
 }
+
+export async function another_user_info(name)
+{
+    try {
+        let data = JSON.stringify({ "params": { "display_name": name }});
+        const response = await fetch("http://localhost:8008",
+        {
+            method: "get_user",
+            body: data
+        })
+        let result = await response.json();
+        if (result.user && result.user[0])
+            return(result.user[0]);
+        else if (result.guest)
+        {
+            let user = new profile(null,
+            result.guest.display_name,
+            null,
+            result.guest.bio,
+            result.guest.image,
+            "guest");
+            return (user);
+        }
+        else
+        {
+            showInfoModal("Error: Unknown user", () => {});
+            remove_all(1, 1);
+            return null;
+        }
+    }
+    catch(error)
+    {
+        showInfoModal("catched this error = (" +  error + ")", () => {});
+        remove_all(1, 1)
+
+    }
+}
