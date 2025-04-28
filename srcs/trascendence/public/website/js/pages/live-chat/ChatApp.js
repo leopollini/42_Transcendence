@@ -624,54 +624,57 @@ class ChatApp {
         const lastOnline = profileDetails?.querySelector('#lastOnline');
 
         const userimage = document.querySelector("#profileAvatar");
-        const realnameSpan = document.querySelector('#realname');
-        const realname = realnameSpan?.closest('p');
-        const userEmailSpan = document.querySelector('#userEmail');
-        const userEmail = userEmailSpan?.closest('p');
-        const userBioSpan = document.querySelector('#userBio');
-        const bioParagraph = userBioSpan?.closest('p');
+        const realname = document.getElementById('realname');
+        const userEmail = document.getElementById('userEmail');
+        const userBio = document.getElementById('userBio');
         if (current_user) {
             let online = await is_online(user_in_chat);
             lastOnline.textContent = online ? 'ONLINE' : 'OFFLINE';
             if (online)
                 this.set_online_data(userimage, statusIndicator, realname, userEmail, userBio, user_in_chat);
             else
-                this.set_offline_data(userimage, statusIndicator, realname, userEmail, userBio, bioParagraph);
+                this.set_offline_data(userimage, statusIndicator, realname, userEmail, userBio, user_in_chat);
         }
     }
 
     async set_online_data(userimage, statusIndicator, realname, userEmail, userBio, user_in_chat) {
-        statusIndicator.classList.remove('offline');
-        statusIndicator.classList.add('online');
+        statusIndicator.classList.replace('offline', 'online');
         let user_selected;
         if (current_user.display_name !== user_in_chat)
             user_selected = await another_user_info(user_in_chat);
         else
             user_selected = current_user;
-        if (user_selected) {
-            if (user_selected.realname)
-                realname.textContent = user_selected.realname;
-            else
-                realname.style.display = 'none';
-            if (user_selected.email)
-                userEmail.textContent = user_selected.email;
-            else
-                userEmail.style.display = 'none';
-            if (user_selected.bio)
-                userBio.textContent = user_selected.bio;
-            else
-                userBio.textContent = "Indicates the desired height of glyphs from the font. For scalable fonts, the font-size is a scale factor applied to the EM unit of the font. (Note that certain glyphs may bleed outside their EM box.) For non-scalable fonts, the font-size is converted into absolute units and matched against the declared font-size of the font, using the same absolute coordinate space for both of the matched values.";
-            userimage.src = user_selected.image;
+        if (!user_selected)
+            return;
+
+        if (user_selected.realname)
+            realname.textContent = user_selected.realname;
+        else
+            realname.textContent = "Nessun Nome Reale per questo utente";
+
+        if (user_selected.email)
+            userEmail.textContent = user_selected.email;
+        else
+            userEmail.textContent = "Nessuna Email per questo utente";
+
+
+        if (user_selected.bio)
+            userBio.textContent = user_selected.bio;
+        else
+        {
+            //userBio.textContent = "Indicates the desired height of glyphs from the font. For scalable fonts, the font-size is a scale factor applied to the EM unit of the font. (Note that certain glyphs may bleed outside their EM box.) For non-scalable fonts, the font-size is converted into absolute units and matched against the declared font-size of the font, using the same absolute coordinate space for both of the matched values.";
+            userBio.textContent = "Nessuna bio per questo utente";
         }
+        userimage.src = user_selected.image;
     }
 
-    set_offline_data(userimage, statusIndicator, realname, userEmail, userBio, bioParagraph) {
-        realname.style.display = 'none';
-        userEmail.style.display = 'none';
-        bioParagraph.style.display = 'none';
+    set_offline_data(userimage, statusIndicator, realname, userEmail, userBio) {
+        realname.textContent = "Nessun informazione per questo utente";
+        userEmail.textContent = "Nessun informazione per questo utente";
+        userBio.textContent = "Nessun informazione per questo utente";
         userimage.src = "../website/images/offline.png";
-        statusIndicator.classList.remove('online');
-        statusIndicator.classList.add('offline');
+        statusIndicator.classList.replace('online', 'offline');
+
     }
 
 }
