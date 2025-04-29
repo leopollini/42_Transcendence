@@ -67,10 +67,11 @@ class GuestsList
   
   def get_all_guests()
     t = @guests.clone    #watch out! Could be deleting original object
-    t[1..].each do |g|
+    t.each do |g|
       if g.nil?
         t.delete g 
       else
+        puts "ASLIHASDHKAJSDH SLICING!"
         g.slice!(g.keys - ['token'])
       end
     end

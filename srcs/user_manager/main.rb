@@ -33,7 +33,7 @@ MANDATORY_DATA = %w[email display_name realname bio image]
 GET_USER_SECURE_INFO = %w[display_name created image]
 NON_UPDATABLE_PARAMS = %w[realname created level entered token]
 
-logged_in = []
+LOGGED_IN = []
 
 def user_creat(data, token)
   puts "Cteating new user as:".green, data
@@ -48,15 +48,12 @@ def login_user(client, obj)
   return {"status"=> "bad request", 'success' => 'fase'} if data.nil?
   token = Digest::SHA256.hexdigest(Time.now.to_s + data['realname'].to_s + data['username'].to_s)
 
-  if data['login_as_guest'].to_s == 'true'
-    return GUEST.add_guest(data)
-  end
-  return {'status' => 'another user with this username is already playing', 'success' => 'false'} if logged_in.include? data['display_name']
+  return {'status' => 'another user with this username is already playing', 'success' => 'false'} if LOGGED_IN.include? data['display_name']
   usr = LOGIN.select_specific 'realname', data['realname'].to_s, [], false
   puts "found: #{usr}".yellow
   if data['login_as_guest'].to_s == 'true'
     return {"status" => "username taken", "success" => "false"} if usr
-    return GUEST.add_guest(data, logged_in)
+    return GUEST.add_guest(data, LOGGED_IN)
   end
   if usr.nil?
     return user_creat(data, token) if obj['do_create'].to_s == 'true'
@@ -64,7 +61,7 @@ def login_user(client, obj)
   end
 
   puts "user already in database, updating with new info".yellow
-  logged_in << data['display_name']
+  LOGGED_IN << data['display_name']
   (update_user(client, {"new_params" => data})).merge({'token' => token})
 end
 
@@ -92,9 +89,9 @@ end
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
   username = obj["display_name"]
-  return GUEST.del_guest(username, logged_in) if GUEST.exists? username
+  return GUEST.del_guest(username, LOGGED_IN) if GUEST.exists? username
   LOGIN.updateValue 'display_name', username, {'token' => 'null'}
-  logged_in.delete username
+  LOGGED_IN.delete username
   {"status"=>"success", "success"=>"true"}
 end
 
@@ -110,9 +107,9 @@ def get_user(_client, obj = nil)
   params = obj['params']
   if params.nil? || params.empty?
     users =  (obj['avoid_logins'] == 'true' ? [] : LOGIN.select )
-    users.each {| u | u = u.slice(GET_USER_SECURE_INFO)}
+    users.each {| u | u = u.slice(GET_USER_SECURE_INFO) if u}
     guests = (obj['avoid_guests'] == 'true' ? [] : GUEST.get_all_guests)
-    guests.each {| u | u = u.slice(GET_USER_SECURE_INFO)}
+    guests.each {| u | u = u.slice(GET_USER_SECURE_INFO) if u}
     return {'status' => (users.empty? && guests.empty? ? 'no user found' : 'returning whole database'), 'success' => 'true', 
               'guest' => guests, 'user' => users}
   end
@@ -130,7 +127,7 @@ def get_user(_client, obj = nil)
 end
 
 def user_manager(client, _server)
-  puts "user manager called"
+  puts "user manager called".yellow, "oline users: #{LOGGED_IN}"
   res = DEFAULT_ERROR_RES.clone
   t = select [client], [], [], 20 # waits for client, a few seconds
   return if t.nil? || t[0].empty? || client.closed?

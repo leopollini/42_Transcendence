@@ -1,5 +1,6 @@
 import { showConfirmModal, showInfoModal } from "../../modal.js";
 import { renderHtmlAsText } from "../../security/security.js";
+import { token } from "../../main.js";
 
 let socket;
 
@@ -7,9 +8,9 @@ function initSocket(username, chatAppInstance) {
     socket = new WebSocket('ws://localhost:6087');
 
     socket.onopen = () => {
-        socket.send(JSON.stringify({ type: "join", username, token }));
+        socket.send(JSON.stringify({ type: "join", 'username': username, 'token': token }));
 
-        socket.send(JSON.stringify({ type: "get_state", username }));
+        socket.send(JSON.stringify({ type: "get_state", 'username': username }));
     };
 
     socket.onmessage = (event) => {
