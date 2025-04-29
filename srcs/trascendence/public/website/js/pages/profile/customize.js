@@ -1,4 +1,4 @@
-import { navigate, save_global } from "../../main.js";
+import { navigate, pong_save, save_global } from "../../main.js";
 import { pongCustomData } from "../../game/pong/data/game_global.js";
 
 let pongData;
@@ -94,6 +94,8 @@ function setupCanvas() {
   ctx = previewCanvas.getContext("2d");
   ctx.scale(dpr, dpr);
   ctx.imageSmoothingEnabled = false;
+  if (pong_save)
+    pongData = pong_save;
   drawPreview();
 }
 

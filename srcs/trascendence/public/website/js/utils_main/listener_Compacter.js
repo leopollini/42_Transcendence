@@ -56,6 +56,16 @@ export function save_at_exit() {
         to_string("PlayerName", playerNames, true);
 }
 
+function reset_tournament_data()
+{
+    save_global("bracket", null);
+    save_global("robinranked", null);
+    save_global("game", 0);
+    save_global("tournament", null);
+    
+    resetBracketState();
+}
+
 export async function handle_popstate()
 {
     const path = window.location.pathname;
@@ -76,11 +86,7 @@ export async function handle_popstate()
     if (in_game === 1 && path !== '/tournament/knockout/bracket/game'
     && path !== '/tournament/knockout/bracket' && path !== "/tournament/roundrobin/robinranking"
     && path !== "/tournament/roundrobin/robinranking/game") {
-        await remove_all(1, 1);
-        save_global("bracket", null);
-        save_global("robinranked", null);
-        reset_all();
-        resetBracketState();
+        reset_tournament_data();
         showInfoModal("you successfully exited the game", () => { });
         await loadContent();
         return;
@@ -88,22 +94,14 @@ export async function handle_popstate()
     if ((path === "/tournament/knockout/bracket" || path === "/tournament/roundrobin/robinranking/game"
     || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking")
     && match_ended !== 1) {
-        reset_all();
-        save_global("bracket", null);
-        save_global("robinranked", null);
-        reset_all();
-        resetBracketState();
+        reset_tournament_data();
         navigate("/modes", "Return to Game Mode", true);
         showInfoModal("Leaving Tournament...", () => { });
         return;
     }
     if (match_ended === 1 && (path === "/tournament/knockout/bracket/game" || 
     path === "/tournament/roundrobin/robinranking/game")) {
-        reset_all();
-        save_global("bracket", null);
-        save_global("robinranked", null);
-        reset_all();
-        resetBracketState();
+        reset_tournament_data();
         navigate("/modes", "Return to Game Mode");
         showInfoModal("You finised the tournament yay");
         return;

@@ -29,8 +29,9 @@ export let Bracket_state = null,
     acess = false;
 
 export function reset_all_let() {
+    if (window.location.pathname === "/")
+        refresh = null;
     Bracket_state = null,
-        refresh = null,
         current_user = null,
         tournament = null,
         user_name = null,
