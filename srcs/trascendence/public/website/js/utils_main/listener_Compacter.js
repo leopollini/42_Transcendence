@@ -3,12 +3,12 @@ forza4_save, Bracket_state, in_game, winner, match_ended, robinranking,
 numPlayers, acess, token, prev_path, loadContent,
 save_global, navigate,
 playerNames,
-tournament
+tournament,
+stat_name
 } from "../main.js";
 import { resetBracketState } from "../pages/tournament/bracket.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "./error_main.js";
-import { pongShowMatchDetails } from "../pages/game_statistics.js";
 
 function to_string(name, value, isjson) {
     if (typeof value === "object" && value !== null && isjson)
@@ -24,6 +24,8 @@ export function save_at_exit() {
         to_string("pongData", pong_save, true);
     if (opponent)
         to_string("opponent", opponent, false);
+    if (stat_name)
+        to_string("stat_name", stat_name, false);
     if (forza4_save)
         to_string("forza4Data", forza4_save, true);
     if (Player1)
@@ -62,7 +64,6 @@ function reset_tournament_data()
     save_global("robinranked", null);
     save_global("game", 0);
     save_global("tournament", null);
-    
     resetBracketState();
 }
 

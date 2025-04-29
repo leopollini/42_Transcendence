@@ -1,8 +1,9 @@
-import { navigate } from "../main.js";
+import { navigate, save_global, stat_name } from "../main.js";
 import { userName } from "./user_data.js";
 import { formatTime } from "../game/pong/other/timer.js";
 import { showCharts } from "./tournament/charts.js";
 import { showInfoModal } from "../modal.js";
+import { user } from "../login/user.js";
 
 let wins = 0;
 let losses = 0;
@@ -40,7 +41,7 @@ export default function GameUserStatistics() {
                     <span class="gamestats-text">Pong Charts</span>
                 </label>
                 <label class="gamestats-label">
-                    <input type="radio" id="pongMatchesCheckbox" name="gamestats" class="gamestats-checkbox" checked />
+                    <input type="radio" id="pongMatchesCheckbox" name="gamestats" class="gamestats-checkbox" />
                     <span class="gamestats-text">Pong Matches</span>
                 </label>
                 <label class="gamestats-label">
@@ -317,10 +318,12 @@ export function forza4ShowMatchDetails() {
 
 }
 
-
-
 async function getPongMatchesData() {
     try {
+        if (!userName)
+            userName = stat_name;
+        else
+            save_global("stat_name", userName);
         const response = await fetch("http://localhost:8008", {
             method: "get_pong_games",
             body: JSON.stringify({
@@ -331,7 +334,7 @@ async function getPongMatchesData() {
         //console.log("Get Pong Game response: ", data);
         if (data.games) {
             pongUserData = data.games;
-            console.log("f4UserData aggiornata: ", pongUserData);
+            console.log("pongUserData aggiornata: ", pongUserData);
         }
     } catch (error) {
     console.error("Fetch error:", error);

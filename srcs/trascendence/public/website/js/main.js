@@ -12,6 +12,7 @@ export let Bracket_state = null,
     tournament = null,
     user_name = null,
     opponent = null,
+    stat_name = null,
     pong_save = null,
     forza4_save = null,
     token = null,
@@ -32,6 +33,7 @@ export function reset_all_let() {
     if (window.location.pathname === "/")
         refresh = null;
     Bracket_state = null,
+        stat_name = null,
         current_user = null,
         tournament = null,
         user_name = null,
@@ -81,6 +83,8 @@ export function save_global(type, data) {
         Player2 = parsed_data;
     if (type === "token")
         token = parsed_data;
+    if (type === "stat_name")
+        stat_name = parsed_data;
     if (type === "tournament")
         tournament = parsed_data;
     if (type === "bracket")
