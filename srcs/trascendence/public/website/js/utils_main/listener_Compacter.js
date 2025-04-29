@@ -8,7 +8,7 @@ tournament
 import { resetBracketState } from "../pages/tournament/bracket.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "./error_main.js";
-import { reset_all } from "../pages/tournament/robindraw.js";
+import { pongShowMatchDetails } from "../pages/game_statistics.js";
 
 function to_string(name, value, isjson) {
     if (typeof value === "object" && value !== null && isjson)

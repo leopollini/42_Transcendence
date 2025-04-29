@@ -111,10 +111,7 @@ window.addEventListener('beforeunload', () => {
     save_at_exit();
     if (refresh === false && window.location.pathname !== '/') {
         if (sessionStorage.getItem('already in') === '1')
-        {
             remove_all(0, 0, 1);
-            navigate("/", "home");
-        }
     }
 });
 

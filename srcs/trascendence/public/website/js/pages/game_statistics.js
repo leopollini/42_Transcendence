@@ -331,7 +331,7 @@ async function getPongMatchesData() {
         //console.log("Get Pong Game response: ", data);
         if (data.games) {
             pongUserData = data.games;
-            //console.log("f4UserData aggiornata: ", pongUserData);
+            console.log("f4UserData aggiornata: ", pongUserData);
         }
     } catch (error) {
     console.error("Fetch error:", error);

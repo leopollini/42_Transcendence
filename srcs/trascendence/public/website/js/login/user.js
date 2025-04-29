@@ -108,11 +108,14 @@ export async function exist(name)
         if (result.status === "no user found")
             return true;
         else
+        {
+            
             return false;
+        }
     }
     catch (error)
     {
-        showInfoModal("An error has occured in exist  (" + error + ")");
+        showInfoModal("An error has occured in exist  (" + error + ")", () => {});
         return false;
     }
 }
@@ -176,12 +179,12 @@ export async function check_name(name)
         showInfoModal("Name too long.", () => {});
         return false;
     }
-    let it_exist = await exist(name);
+    /*let it_exist = await exist(name);
     if (it_exist === false)
     {
         showInfoModal("Name already taken", () => {});
         return false;
-    }
+    }*/
     return true;
 }
 
