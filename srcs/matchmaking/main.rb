@@ -93,7 +93,7 @@ def matchmake(client, server)
   
   res = case bobj['method']
   when 'create_tournament'
-    puts "am matchmakimg lol".green
+  puts "am matchmakimg lol".green
     make_match(bobj['players'], bobj['mode'])
   when 'get_online_opponents'
     get_online_opponents()

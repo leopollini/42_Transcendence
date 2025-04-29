@@ -7,7 +7,7 @@ function initSocket(username, chatAppInstance) {
     socket = new WebSocket('ws://localhost:6087');
 
     socket.onopen = () => {
-        socket.send(JSON.stringify({ type: "join", username }));
+        socket.send(JSON.stringify({ type: "join", username, token }));
 
         socket.send(JSON.stringify({ type: "get_state", username }));
     };
@@ -112,14 +112,18 @@ function initSocket(username, chatAppInstance) {
         else if (msg.type === "match_request") {
             // L'utente ricevente visualizza la richiesta di partita tramite modal di conferma
             const sender = msg.data ? msg.data.from : msg.from; // "userA"
+            const receiver = username; // "userB"
+           
             showConfirmModal(
               `${sender} ti ha invitato a una partita. Accetti?`,
               () => { // onConfirm: utente conferma
                   const response = {
                       type: "match_response",
                       to: sender,
+                      from: receiver,
                       accepted: true
                   };
+                  console.log("receiver", receiver);
                   console.log("⚡ Invio risposta all'invito:", response);
                   socket.send(JSON.stringify(response));
               },
@@ -127,6 +131,7 @@ function initSocket(username, chatAppInstance) {
                   const response = {
                       type: "match_response",
                       to: sender,
+                      from: receiver,
                       accepted: false
                   };
                   console.log("⚡ Invio risposta all'invito:", response);

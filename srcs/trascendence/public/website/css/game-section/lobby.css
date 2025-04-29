@@ -1,71 +1,161 @@
-#lobbyUsersList {
+/* Lobby CSS semplificato con layout migliorato */
+.lobby {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    overflow: auto;
+    justify-content: center;
+    min-height: calc(100vh - 80px);
+    padding: 4rem 1rem;
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-#lobbyRoom {
-    display: flex;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-    overflow: auto;
-}
-
-#playerSearchForm {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: auto;
-}
-
-/* #playerSearchResult {
-    margin-top: 20px;
-} */
-
-#playersAdded {
+.lobby__container {
+    width: 100%;
+    max-width: 1000px;
+    padding: 4rem;
+    border-radius: 1.5rem;
+    background-color: rgba(9, 160, 155, 0.1);
+    box-shadow: 0 0 12px rgba(9, 160, 155, 0.3);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: auto;
+    gap: 4rem;
 }
 
-.lobbyContainer {
+.lobby__title {
+    margin: 0;
+    text-align: center;
+    font-size: clamp(1.25rem, 2vw, 2.5rem);
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.lobby__content {
+    display: grid;
+    gap: 4rem;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    grid-auto-rows: 1fr;
+    /* uguale altezza per ogni sezione */
+}
+
+@media (min-width: 768px) {
+    .lobby__content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.lobby__section {
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background-color: rgba(9, 160, 155, 0.1);
+    box-shadow: 0 0 12px rgba(9, 160, 155, 0.3);
     display: flex;
-    gap: 20px;
-    color: white;
-    background: #134946;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.lobbyBox {
-    width: 200px;
-    height: 300px;
-    background: #09a09b;
-    border: 1px solid #ffffff;
-    border-radius: 10px;
+/* Header sezione con sottotitolo e badge */
+.lobby__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lobby__subtitle {
+    margin: 0;
+    font-size: clamp(1rem, 1.5vw, 1.5rem);
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.lobby__badge {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #ffffff;
+    background-color: #491f1f;
+    border-radius: 9999px;
+    align-self: flex-start;
+}
+
+#onlinePlayers,
+#pongMatchPlayers {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 15rem;
     overflow-y: auto;
-    padding: 10px;
+    padding-right: 1rem;
 }
 
-
-.lobbyPlayer {
-    padding: 5px;
+.player {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background-color: #f1f5f90d;
+    color: #ffffff;
+    font-weight: 500;
     cursor: pointer;
-    border-bottom: 1px solid #ddd;
+    transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
-.lobbyPlayer:hover {
-    background-color: #e0e0e0;
+.player:hover,
+.player:focus {
+    background-color: #2563eb;
+    color: #ffffff;
+    outline: none;
 }
 
-.lobbyLabel {
-    font-weight: bold;
-    margin-bottom: 5px;
+/* Footer con bottone */
+.lobby__footer {
+    display: flex;
+    justify-content: center;
+}
+
+.lobby__divider {
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 1.5rem 0;
+}
+
+/* Button Lobby Style */
+.button-lobby {
+    padding: 0.75em 1.5em;
+    color: #ffffff;
+    background-color: transparent;
+    border: 2px solid #0fffcf;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.4s ease-in-out;
+    outline: none;
+    margin: 12px;
+    width: clamp(160px, 18vw, 240px);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.button-lobby:hover {
+    color: #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    background-color: rgba(0, 255, 255, 0.2);
+}
+
+.button-lobby:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), 0 0 30px rgba(0, 255, 255, 0.3);
+    background-color: rgba(0, 255, 255, 0.15);
+    transition: all 0.3s ease;
+}
+
+.button-lobby:disabled {
+    color: #054d3e;
+    border: 2px solid #054d3e;
+    cursor: not-allowed;
 }

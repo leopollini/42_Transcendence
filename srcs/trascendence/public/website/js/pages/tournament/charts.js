@@ -232,7 +232,7 @@ function matchesTimeRank() {
 
   if (rankPoints < 0) rankPoints = 0;
 
-  console.log("rankpointss => " + rankPoints);
+  //console.log("rankpointss => " + rankPoints);
   pointsLabel.textContent = rankPoints;
 }
 
@@ -242,7 +242,7 @@ export async function showCharts() {
     const response = await fetch("http://localhost:8008", {
       method: "get_pong_games",
       body: JSON.stringify({
-        realname: userName,
+        display_name: userName,
       }),
     });
     const data = await response.json();

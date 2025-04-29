@@ -5,9 +5,9 @@ export async function validateUploadedImage(file)
 {
     return new Promise((resolve, reject) =>
     {
-        if (file.size > 5 * 1024 * 1024) 
+        if (file.size > 5 * 128 * 128) 
         {
-            showInfoModal("Error: Image file is too large. Maximum size is 5MB.", () => {});
+            showInfoModal("Error: Image file is too large.\nTry some smaller", () => {});
             return reject();
         }
 
@@ -77,7 +77,6 @@ export function free_users()
         .then(response => response.json())
         .then(data =>
         {
-            console.log("data of logout = ", data);
             if (data)
             {
                 if (data.status === " (guest) does not exist")
@@ -91,16 +90,15 @@ export function free_users()
         })
         .catch(error =>
         {
-            remove_all(0, 0);
+            remove_all(0, 0, 1);
             if (window.location.pathname !== '/')
                 navigate("/", "home");
-            showInfoModal("Error with fetch logout_user:", error);
+            showInfoModal("Error with fetch logout_user:" +  error, () => {});
         });
     }
     catch (error)
     {
-        console.log("error = ", error);
-        remove_all(0, 0);
+        remove_all(0, 0, 1);
         if (window.location.pathname !== '/')
             navigate("/", "home");
         showInfoModal("Error in logout_user:", error);

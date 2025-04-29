@@ -19,7 +19,7 @@ class GuestsList
     @counter_index = 0
   end
 
-  def add_guest(data)
+  def add_guest(data, logged_in)
     username = data['username']
     return DEFAULT_MISSING_PARAM.clone unless username.is_a?(String)
     return { 'status' => 'username taken', 'success' => 'false' } if @index.key?(username)
@@ -40,7 +40,8 @@ class GuestsList
     }
     
     @index[username] = i
-    
+    logged_in << username
+
     {
       'service' => 'user_manager',
       'status' => 'success',
@@ -50,12 +51,13 @@ class GuestsList
     }
   end
   
-  def del_guest(username)
+  def del_guest(username, logged_in)
     index = @index[username]
     return { 'status' => 'user not found', 'success' => 'false' } if index.nil?
   
     @guests[index] = nil
     @index.delete(username)
+    logged_in.delete username
   
     {
       'status' => 'success',
@@ -85,7 +87,7 @@ class GuestsList
   
     guest = @guests[index]
     puts "modifying #{username}'s info: #{new_data}".green
-    return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio']).empty?
+    return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio', 'image', 'display_name']).empty?
     # return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio', 'image']).empty?
   
     guest['bio'] = new_data['bio'] if new_data['bio']

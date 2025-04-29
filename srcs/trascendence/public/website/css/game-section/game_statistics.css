@@ -243,10 +243,11 @@
 .gamestats-text {
     font-size: 18px;
     text-align: center;
-    color: #122322;
+    color: #7a8d8c;
     transition: color 0.3s ease, transform 0.3s ease, text-shadow 0.3s ease;
     user-select: none;
     margin-left: 0; /* Rimosso il margine laterale */
+    text-shadow: none;
 }
 
 

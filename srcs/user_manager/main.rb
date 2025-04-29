@@ -33,6 +33,8 @@ MANDATORY_DATA = %w[email display_name realname bio image]
 GET_USER_SECURE_INFO = %w[display_name created image]
 NON_UPDATABLE_PARAMS = %w[realname created level entered token]
 
+logged_in = []
+
 def user_creat(data, token)
   puts "Cteating new user as:".green, data
   return DEFAULT_MISSING_PARAM.clone if (MANDATORY_DATA - data.keys).empty?
@@ -44,12 +46,17 @@ def login_user(client, obj)
   puts "login_user called".green
   data = obj['data']
   return {"status"=> "bad request", 'success' => 'fase'} if data.nil?
-  data['token'] = Digest::SHA256.hexdigest(Time.now.to_s + data['realname'].to_s + data['username'].to_s)
+  token = Digest::SHA256.hexdigest(Time.now.to_s + data['realname'].to_s + data['username'].to_s)
 
+  if data['login_as_guest'].to_s == 'true'
+    return GUEST.add_guest(data)
+  end
+  return {'status' => 'another user with this username is already playing', 'success' => 'false'} if logged_in.include? data['display_name']
   usr = LOGIN.select_specific 'realname', data['realname'].to_s, [], false
+  puts "found: #{usr}".yellow
   if data['login_as_guest'].to_s == 'true'
     return {"status" => "username taken", "success" => "false"} if usr
-    return GUEST.add_guest(data)
+    return GUEST.add_guest(data, logged_in)
   end
   if usr.nil?
     return user_creat(data, token) if obj['do_create'].to_s == 'true'
@@ -57,6 +64,7 @@ def login_user(client, obj)
   end
 
   puts "user already in database, updating with new info".yellow
+  logged_in << data['display_name']
   (update_user(client, {"new_params" => data})).merge({'token' => token})
 end
 
@@ -84,8 +92,9 @@ end
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
   username = obj["display_name"]
-  return GUEST.del_guest(username) if GUEST.exists? username
+  return GUEST.del_guest(username, logged_in) if GUEST.exists? username
   LOGIN.updateValue 'display_name', username, {'token' => 'null'}
+  logged_in.delete username
   {"status"=>"success", "success"=>"true"}
 end
 

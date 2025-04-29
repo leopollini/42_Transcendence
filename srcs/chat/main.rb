@@ -22,7 +22,8 @@ class ChatService < WEBrick::Websocket::Servlet
 
   def socket_close(sock)
     ChatStore.close_client(@username) if @username
-    puts "#{@username} left the chat"
+    puts "#{@username} left the chat, loggin out..."
+    method_req('logout_user', {'display_name' => @username, 'token' => @token})
   end
   
   def socket_text(sock, text)
@@ -36,6 +37,7 @@ class ChatService < WEBrick::Websocket::Servlet
       case data["type"].to_s
       when "join"
         @username = data["username"].to_s
+        @token = data["token"].to_s
         ChatStore.joined @username, sock
         ChatStore.sys_broadcast "#{@username} joined the chat!", @username
         puts "joined: #{@username}"
@@ -79,10 +81,10 @@ class ChatService < WEBrick::Websocket::Servlet
         ChatStore.clients[@username].unblock_user target
 
       when 'match_request'
-        ChatStore.clients[data['to'].to_s].send_me({'from' => @username, 'data' => data['data']}, "match_request")
+        ChatStore.clients[data['to'].to_s].send_me({'from' => @username, 'data' => data['data'], 'data' => data['data']}, "match_request")
 
       when 'match_response'
-        ChatStore.clients[data['to'].to_s].send_me({'accepted' => data['accepted'].to_s}, "match_response")
+        ChatStore.clients[data['to'].to_s].send_me({'from' => @username, 'accepted' => data['accepted'].to_s}, "match_response")
 
       when 'get_online_users'
         ChatStore.clients[@username].send_me({'users' => ChatStore.clients.filter{|c| c.alive?}}, 'online_users_list')
@@ -122,7 +124,7 @@ def internal_call(client, server)
     ChatStore.clients[bobj['to']].send_me({'date' => Time.now.iso8601, 'from' => 'sys', 'content' => bobj['content']}, bobj['type'] ? bobj['type'] : 'message') rescue r
     client.puts
   when 'get_online'
-    client.puts ChatStore.get_online(bobj['include_guests'].to_s).to_json
+    client.puts ChatStore.get_online.to_json
   else
     puts "Unknown method called (#{bobj['method']})"
   end

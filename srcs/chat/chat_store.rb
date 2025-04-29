@@ -45,7 +45,6 @@ class Client
 
   def close_sock
     @socket_open = false
-    @socket.close
   end
 
   def load_unread

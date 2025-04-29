@@ -1,4 +1,5 @@
 import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
+import { save_global } from '../main.js';
 import { setUserName } from './user_data.js';
 
 export default function Modes()
@@ -65,6 +66,7 @@ export function updateProfileUI(profile)
 }
 
 export const addModesPageHandlers = () => {
+    save_global("game", 0);
     const classicButton = document.getElementById('classicButton');
     const aiButton = document.getElementById('aiButton');
     const tournamentButton = document.getElementById('tournamentButton');
@@ -92,7 +94,7 @@ export function update_image(image)
     }, 100);
 }
 
-export function change_name(name) {
+export async function change_name(name) {
     const checknameInterval = setInterval(() => {
         const avatarName = document.getElementById('avatarName');
         if (avatarName)

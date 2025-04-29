@@ -47,13 +47,13 @@ export default function Bracket() {
 }
 
 // Shuffle players
-function shuffleArray(array) {
+/*function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
-}
+}*/
 
 function drawLine(x1, y1, x2, y2, ctx) {
     ctx.beginPath();
@@ -170,7 +170,7 @@ export function drawBracket(match_players) {
         document.getElementById('knockoutMatchButton').style.display = 'block';
         matchesThisRound = matchesPerRound;
         initializeBracket();
-        bracketPlayers[0] = shuffleArray(match_players.slice()); // Create array match_players copy
+        bracketPlayers[0] = match_players.slice(); // Create array match_players copy
     }
     matchBoxPos[0] = [];
 

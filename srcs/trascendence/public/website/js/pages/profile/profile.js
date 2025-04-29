@@ -2,6 +2,7 @@ import { profile} from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
 import { showInfoModal } from "../../modal.js";
 import { navigate, current_user, token} from "../../main.js";
+import { remove_all } from "../../utils_main/error_main.js";
 
 export default function Profile() {
   return `
@@ -13,7 +14,7 @@ export default function Profile() {
           <input type="file" id="imageUploadInput" accept="image/*">
         </div>
         <!-- Informazioni -->
-        <section id="yourData" class="profile-info">
+        <section id="yourData" class="profile-info1">
           <h3 id="myName"></h3>
           <div id="changeDisplayName" class="form-group display-name-group">
             <label for="displayNameInput">Change your display name:</label>
@@ -45,7 +46,7 @@ function insert_user_data(current_user)
   return current_user;
 }
 
-export function profileHandler()
+export async function profileHandler()
 {
   let back_to_menu = document.querySelector("#back");
   back_to_menu.addEventListener("click", () =>
@@ -66,9 +67,8 @@ export function profileHandler()
   // Pre-compila il campo bio se già salvato
   const bioInput = infoContainer.querySelector("#bioInput");
   bioInput.value = me.bio;
-  
   const save = document.querySelector("#save");
-  saveimage(me, card);
+  saveimage(me, card, current_user);
   save.addEventListener("click", () => {
     saveProfile(infoContainer);
   });
@@ -82,7 +82,6 @@ function updateLogin(current_user)
   "display_name": current_user.display_name,
   "bio": current_user.bio,
   "image": current_user.image}});
-  console.log("(UPDATE_USER)\ndata update user profile = ", data);
   fetch("http://localhost:8008",
   {
     method: "update_user",
@@ -90,18 +89,16 @@ function updateLogin(current_user)
   })
   .then(response => response.json())
   .then(data =>{
-    if (data)
+    console.log("data update = ", data);
+    if (data && data.success !== "true")
     {
-      if (data.success !== "true")
-      {
-        remove_all(1, 1);
-        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + result.status + "\")", () => {});
-      }
+      remove_all(1, 1);
+      showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
     }
   })
   .catch(error =>
   {
-    showInfoModal("Error with update_user:", error);
+    showInfoModal("Error with update_user:" + error, () => {});
   });
 }
 
@@ -111,8 +108,8 @@ function updateGuest(current_user)
   "token": token,
   "new_params": {
   "bio": current_user.bio,
-  "image": current_user.image}});
-  console.log("(UPDATE_USER)\ndata update user profile = ", data);
+  "image": current_user.image},
+  "token": token});
   fetch("http://localhost:8008",
   {
     method: "update_user",
@@ -120,13 +117,10 @@ function updateGuest(current_user)
   })
   .then(response => response.json())
   .then(data =>{
-    if (data)
+    if (data && data.success !== "true")
     {
-      if (data.success !== "true")
-      {
-        remove_all(1, 1);
-        showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + result.status + "\")", () => {});
-      }
+      remove_all(1, 1);
+      showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
     }
   })
   .catch(error =>
@@ -135,33 +129,18 @@ function updateGuest(current_user)
   });
 }
 
-function saveProfile(infoContainer) {
+async function saveProfile(infoContainer) {
   let saving;
-  let myname;
-  if (current_user.image === me.image)
-    saving = "no canges in image have been made\n";
-  else
-  saving = "✅saved image successfully\n";
-  current_user.image = me.image;
-  let checkbio;
-  if (current_user.bio)
-    checkbio = current_user.bio.replace(/^"/, '').replace(/"$/, '').replace(/\\n/g, "\n");
-  else
-    checkbio = null;
-  if (checkbio && checkbio === me.bio)
-    saving += "no canges in bio have been made\n";
+  if (me.image === current_user.image)
+    saving = "⚠️no canges in image have been made\n";
   else
   {
-    saving += savebio(me, infoContainer);
-    current_user.bio = me.bio;
+    saving = "✅saved image successfully\n";
+    current_user.image = me.image;
   }
+  saving += savebio(me, infoContainer, current_user);
   if (current_user.type === "login")
-  {
-    saving += savename(me, infoContainer);
-    current_user.display_name = me.display_name;
-    if (current_user.display_name === me.display_name)
-      saving += "✅saved new name successfully\n";
-  }
+    saving += await savename(me, infoContainer, current_user);
   if (current_user.type === "guest")
     updateGuest(current_user);
   else

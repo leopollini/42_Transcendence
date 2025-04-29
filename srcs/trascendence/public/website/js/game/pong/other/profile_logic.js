@@ -1,86 +1,97 @@
-import { validateUploadedImage} from "../../../security/security.js";
+import { validateUploadedImage } from "../../../security/security.js";
 import { showInfoModal } from "../../../modal.js";
-export function savebio(me, yourDataSection)
-{
+import { exist } from "../../../login/user.js";
+import { escapeHtml } from "../../../login/user.js";
+function formatBio(bio) {
+    let str = typeof bio === 'string' ? bio : JSON.stringify(bio);
+    str = str
+        .trim()
+        .replace(/^"|"$/g, '')
+        .replace(/\\n/g, '\n');
+    return escapeHtml(str);
+}
+
+export function savebio(me, yourDataSection, current_user) {
     const bioInput = yourDataSection.querySelector('#bioInput');
-    const newBio = bioInput.value;
+    let newBio = bioInput.value;
 
     let polbio = yourDataSection.querySelector('#bioSection');
     polbio.style.width = "50%";
 
     if (!newBio)
-        return ("No Bio saved(Please enter a bio next time)\n");
+        return ("⚠️No Bio saved(Please enter a bio next time)\n");
     if (newBio.length >= 400)
-        return ("Error: Bio too big\n");
-    me.bio = JSON.stringify(newBio);
-    return("✅saved bio successfully\n");
+        return ("🚨Error: Bio too big\n");
+    if (current_user.bio === newBio)
+        return ("⚠️no canges in bio have been made\n")
+    me.bio = newBio;
+    current_user.bio = formatBio(me.bio);
+    return ("✅saved bio successfully\n");
 }
 
 
-export function savename(me, yourDataSection)
-{
+export async function savename(me, yourDataSection, current_user) {
     const changeName = yourDataSection.querySelector('#displayNameInput');
     const newname = changeName.value;
 
     let polname = yourDataSection.querySelector('#changeDisplayName');
     polname.style.width = "50%";
-    
+
     if (!newname)
-        return("Error: No Name saved(Please enter a name next time)\n");
+        return ("⚠️Error: No Name saved(Please enter a name next time)\n");
     if (newname.length < 4)
-        return("Error: Name too short(" + newname + ")\n");
+        return ("🚨Error: Name too short(" + newname + ")\n");
     if (newname.length >= 15)
-        return("Error: Name too long(" + newname + ")\n");
-    if (me.display_name !== newname)
-    {
-        me.display_name = newname;
+        return ("🚨Error: Name too long(" + newname + ")\n");
+    if (newname === me.display_name)
+        return ("⚠️No change in name have been made\n");
+    let result = await exist(newname);
+    if (result === true && me.display_name !== newname) {
+        me.display_name = escapeHtml(newname.trim()); 
+        current_user.display_name = me.display_name;
         return ("✅Saved name successfully(" + newname + ")\n");
     }
     else
-        return ("Error: name already taken(" + newname + ")\n");
+    {
+        console.log("not exist");
+        return ("🚨Error: name already taken(" + newname + ")\n");
+    }
 }
 
-export async function saveimage(me, yourDataSection) {
+export async function saveimage(me, yourDataSection, current_user) {
     const imageUploadInput = yourDataSection.querySelector('#imageUploadInput');
     const profileImage = yourDataSection.querySelector('#profileImage');
 
-    profileImage.addEventListener('click', () =>
-    {
+    profileImage.addEventListener('click', () => {
         imageUploadInput.value = '';
         imageUploadInput.click();
     });
 
-    imageUploadInput.addEventListener('change', async (event) =>
-    {
+    imageUploadInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
-        if (file)
-        {
-            try
-            {
+        if (file) {
+            try {
                 await validateUploadedImage(file);
                 const reader = new FileReader();
-                reader.onload = async (e) => 
-                {
+                reader.onload = async (e) => {
                     const newImage = e.target.result;
-                    if (profileImage.src === newImage)
-                    {
-                        showInfoModal("This image is already selected.", () => {});
+                    if (profileImage.src === newImage) {
+                        showInfoModal("This image is already selected.", () => { });
                         return;
                     }
                     me.image = newImage;
                     profileImage.src = newImage;
-                    showInfoModal("image changed successfully", () => {});
+                    showInfoModal("image changed successfully", () => { });
+
                 };
                 reader.readAsDataURL(file);
             }
-            catch (error)
-            {
+            catch (error) {
                 console.log("error = ", error);
             }
         }
-        else
-        {
-            showInfoModal("Error: No file selected.", () => {});
+        else {
+            showInfoModal("🚨Error: No file selected.", () => { });
             return;
         }
     });

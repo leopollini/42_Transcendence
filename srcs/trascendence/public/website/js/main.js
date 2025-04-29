@@ -1,51 +1,55 @@
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
 
-import {remove_all } from "./utils_main/error_main.js";
-import { routes, handlerMap} from "./utils_main/router.js"
-import { handle_popstate, save_at_exit} from "./utils_main/listener_Compacter.js";
-import { util_main, set_prev_path} from "./utils_main/utils.js";
+import { remove_all } from "./utils_main/error_main.js";
+import { routes, handlerMap } from "./utils_main/router.js"
+import { handle_popstate, save_at_exit } from "./utils_main/listener_Compacter.js";
+import { util_main, set_prev_path } from "./utils_main/utils.js";
 
 export let Bracket_state = null,
-           current_user = null,
-           user_name = null,
-           opponent = null,
-           pong_save = null,
-           forza4_save = null,
-           token = null,
-           prev_path = null,
-           playerNames = null,
-           Player1 = null,
-           Player2 = null,
-           in_game = null,
-           winner = null,
-           players = null,
-           match_ended = null,
-           robinranking = null,
-           numPlayers = null,
-           buttonTitle = null;
-
-export let acess = false;
-
-export function reset_all_let()
-{
-    Bracket_state = null,
+    refresh = false,
     current_user = null,
+    tournament = null,
     user_name = null,
     opponent = null,
     pong_save = null,
     forza4_save = null,
     token = null,
+    prev_path = null,
     playerNames = null,
     Player1 = null,
     Player2 = null,
-    in_game = null,
+    in_game = 0,
     winner = null,
     players = null,
     match_ended = null,
     robinranking = null,
     numPlayers = null,
-    buttonTitle = null;
+    buttonTitle = null,
+    acess = false;
+
+export function reset_all_let() {
+    Bracket_state = null,
+        refresh = null,
+        current_user = null,
+        tournament = null,
+        user_name = null,
+        opponent = null,
+        pong_save = null,
+        forza4_save = null,
+        token = null,
+        prev_path = null,
+        playerNames = null,
+        Player1 = null,
+        Player2 = null,
+        in_game = 0,
+        winner = null,
+        players = null,
+        match_ended = null,
+        robinranking = null,
+        numPlayers = null,
+        buttonTitle = null,
+        acess = false;
 }
 
 function is_parsable(value, to_parse) {
@@ -76,6 +80,8 @@ export function save_global(type, data) {
         Player2 = parsed_data;
     if (type === "token")
         token = parsed_data;
+    if (type === "tournament")
+        tournament = parsed_data;
     if (type === "bracket")
         Bracket_state = parsed_data
     if (type === "game")
@@ -102,25 +108,30 @@ export function save_global(type, data) {
 
 window.addEventListener('beforeunload', () => {
     save_at_exit();
-    const refresh = sessionStorage.getItem("refresh");
-    if (refresh === 'false') {
-        if (sessionStorage.getItem('already in') === '1') {
+    if (refresh === false && window.location.pathname !== '/') {
+        if (sessionStorage.getItem('already in') === '1')
+        {
             remove_all(0, 0, 1);
-            return (0);
+            navigate("/", "home");
         }
     }
+});
+
+
+document.addEventListener('keydown', (e) => {
+    const key = e.key.toLowerCase();
+    const isReloadKey = key === 'f5' ||
+        ((e.ctrlKey || e.metaKey) && key === 'r');
+
+    if (isReloadKey)
+        refresh = true;
 });
 
 //restore logged da sistemare
 export const navigate = async (path, new_title = "", lobbyPlayers) => {
     buttonTitle = new_title;
     players = lobbyPlayers;
-    if (prev_path === "/callback")
-    {
-        history.replaceState({ path }, new_title, path);
-    }
-    else
-        history.pushState({ path }, new_title, path);
+    history.pushState({ path }, new_title, path);
     await loadContent();
 };
 
@@ -165,14 +176,6 @@ function initChat() {
 document.addEventListener("DOMContentLoaded", loadContent);
 
 // Handling "Forward" and "Backward" browser buttons
-window.addEventListener("popstate", async() => {
+window.addEventListener("popstate", async () => {
     handle_popstate();
-});
-
-window.addEventListener('keydown', function (e) {
-    const result = ((e.key === 'F5') || (e.ctrlKey && e.key === 'r'));
-    if (window.location.pathname !== '/' && result === true)
-        sessionStorage.setItem("refresh", true);
-    else
-        sessionStorage.setItem("refresh", false);
 });
