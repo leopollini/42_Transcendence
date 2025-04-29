@@ -34,7 +34,7 @@ export class Paddle {
 
         this.x = paddleRelativeX * game.canvas.width;
         this.y = paddleRelativeY * game.canvas.height;
-    
+
         // Recalculate paddle speed
         this.baseSpeed = paddleRelativeSpeed * game.canvas.height;
         // Calculate new radius
@@ -63,7 +63,7 @@ export class Paddle {
     }
 
     shrink() {
-        this.height = this.height / 2;  
+        this.height = this.height / 2;
     }
 
     predictBallY(ball) {
@@ -85,34 +85,35 @@ export class Paddle {
         return ball.y;
     }
 
-    move_ia(ball, game, lastMoveTime) {
+    move_ia(ball, game) {
         const now = Date.now();
-        if (now - lastMoveTime > 1000) // 1 secondo
-            lastMoveTime = now;
-        
-        if (ball.speedX > 0) { // Ball moving from left to right
-            this.speed = this.baseSpeed * this.speedPercentage;
-    
-            let targetY = this.predictBallY(ball);  // Future ball y prevision
-            let currentCenter = this.y + this.height / 2; // Current paddle center
-            let distance = targetY - currentCenter;  // Distance between ball and paddle
-            let direction = Math.sign(distance);  // Move direction
-    
-            // Smoothing to avoid sudden paddle AI oscillations
-            let smoothingFactor = 4; // Reduce if AI is too slow
-            let aiSpeed = this.speed * game.deltaTime * smoothingFactor; 
-    
-            // If distance is bigger than paddle speed, move gradually
-            if (Math.abs(distance) > aiSpeed)
-                this.y += aiSpeed * direction;
-            else
-                this.y += distance; // Move directly to target position if the ball is near
-    
-            // Limit paddle range movement 
-            this.y = Math.max(game.wallThickness * 1.5, Math.min(this.canvas.height - this.height - game.wallThickness * 1.5, this.y));
+        if (this.lastPredictTime === undefined) {
+            this.lastPredictTime = 0;
+            this.targetY = this.y + this.height / 2;
         }
+
+        if (now - game.lastMoveTime >= 1000) {
+            game.lastMoveTime = now;
+            this._targetY = this.predictBallY(ball);
+        }
+
+        if (ball.speedX <= 0)
+            return;
+
+        const centerY = this.y + this.height / 2;
+        const distance = this._targetY - centerY;
+        const direction = Math.sign(distance);
+        const speed = this.baseSpeed * game.deltaTime;
+
+        if (Math.abs(distance) > 1) {
+            this.y += direction * Math.min(Math.abs(distance), speed);
+        }
+
+        const minY = game.wallThickness * 1.5;
+        const maxY = this.canvas.height - this.height - game.wallThickness * 1.5;
+        this.y = Math.max(minY, Math.min(maxY, this.y));
     }
-    
+
     render(ctx) {
         ctx.fillStyle = this.color;
         this.drawRoundedRect(ctx);

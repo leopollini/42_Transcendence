@@ -103,7 +103,8 @@ export async function exist(name)
             body: data
         });
         const result = await response.json();
-        console.log("result: ", result + "\n\nresult.status: ", result.status);
+        console.log("result = ", result);
+        console.log("result.status: ", result.status);
         if (result.status === "no user found")
             return true;
         else
@@ -173,6 +174,12 @@ export async function check_name(name)
     
     if (name.length >= 15) {
         showInfoModal("Name too long.", () => {});
+        return false;
+    }
+    let it_exist = await exist(name);
+    if (it_exist === false)
+    {
+        showInfoModal("Name already taken", () => {});
         return false;
     }
     return true;

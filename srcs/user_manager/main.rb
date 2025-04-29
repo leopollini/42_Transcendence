@@ -45,7 +45,9 @@ def login_user(client, obj)
   data = obj['data']
   data['token'] = Digest::SHA256.hexdigest(Time.now.to_s)
 
-  return GUEST.add_guest(data) if data['login_as_guest'].to_s == 'true'
+  if data['login_as_guest'].to_s == 'true'
+    return GUEST.add_guest(data)
+  end
   usr = LOGIN.select_specific 'realname', data['realname'].to_s, [], false
   if usr.nil?
     return user_creat(data) if obj['do_create'].to_s == 'true'
