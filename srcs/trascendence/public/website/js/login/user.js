@@ -70,22 +70,17 @@ export async function restore_user() {
                 ref_user = set_user(result.guest, "guest");
             else
                 ref_user = set_user(result.user[0], "login");
-            remove_all(1, 1);
             updateProfileUI(ref_user);
             return ref_user;
         }
         else {
-            remove_all(0, 0, 1);
-            if (window.location.pathname !== '/')
-                navigate("/", "home");
+            remove_all();
             showInfoModal("ERROR GET_USER IN RESTORE USER: An error has occured(\"" + result.status + "\")", () => { });
             return null;
         }
     }
     catch (error) {
-        remove_all(0, 0, 1);
-        if (window.location.pathname !== '/')
-            navigate("/", "home");
+        remove_all();
         showInfoModal("ERROR GET_USER IN RESTORE USER CATCHED:" + error, () => {});
         return null;
     }
@@ -213,14 +208,14 @@ export async function another_user_info(name)
         else
         {
             showInfoModal("Error: Unknown user", () => {});
-            remove_all(1, 1);
+            remove_all();
             return null;
         }
     }
     catch(error)
     {
+        if (window.location.pathname !== "/")
+            navigate("/", "home");
         showInfoModal("catched this error = (" +  error + ")", () => {});
-        remove_all(1, 1)
-
     }
 }

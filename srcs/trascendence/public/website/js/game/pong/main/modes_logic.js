@@ -60,12 +60,7 @@ export function handle_modes_logic(classicButton, aiButton, tournamentButton,
             navigate("/userstats", "Game User Statistics");
     });
     logout?.addEventListener("click", async() => {
-        await remove_all(0, 0, 1);
-        if (!current_user) {
-            showInfoModal("You logged out successfully", () => { });
-            navigate("/", "logout");
-            return;
-        }
-        navigate("/", "logout");
+        showInfoModal("You logged out successfully", () => { });
+        await remove_all();
     });
 }

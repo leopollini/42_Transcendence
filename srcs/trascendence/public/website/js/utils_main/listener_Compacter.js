@@ -4,7 +4,8 @@ numPlayers, acess, token, prev_path, loadContent,
 save_global, navigate,
 playerNames,
 tournament,
-stat_name
+stat_name,
+persist
 } from "../main.js";
 import { resetBracketState } from "../pages/tournament/bracket.js";
 import { showInfoModal } from "../modal.js";
@@ -24,6 +25,8 @@ export function save_at_exit() {
         to_string("pongData", pong_save, true);
     if (opponent)
         to_string("opponent", opponent, false);
+    if (persist)
+        to_string("persist", persist, false);
     if (stat_name)
         to_string("stat_name", stat_name, false);
     if (forza4_save)
@@ -58,12 +61,19 @@ export function save_at_exit() {
         to_string("PlayerName", playerNames, true);
 }
 
-function reset_tournament_data()
+export function reset_tournament_data()
 {
     save_global("bracket", null);
     save_global("robinranked", null);
     save_global("game", 0);
     save_global("tournament", null);
+    save_global("opponent", null);
+    save_global("stat_name", null);
+    save_global("PlayerName", null);
+    save_global("p1", null);
+    save_global("p2", null);
+    save_global("players", null);
+    save_global("winner", null);
     resetBracketState();
 }
 
@@ -71,18 +81,11 @@ export async function handle_popstate()
 {
     const path = window.location.pathname;
 
-    if (prev_path === "/modes" && (path === "/" || path === "/callback"))
+    if ((prev_path === "/modes" && (path === "/" || path === "/callback")) ||
+    prev_path === "/" && path === "/callback")
     {
-        await remove_all(0, 0, 1);
-        if (path !== "/")
-            navigate("/", "home");
         showInfoModal("you have quitted the active session", () => { });
-    }
-    if (prev_path === "/" && path === "/callback")
-    {
-        await remove_all(0, 0, 1);
-        showInfoModal("i can't let you do this sorry", () => {});
-        navigate("/", "home");
+        await remove_all();
     }
     if (in_game === 1 && path !== '/tournament/knockout/bracket/game'
     && path !== '/tournament/knockout/bracket' && path !== "/tournament/roundrobin/robinranking"

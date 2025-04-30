@@ -14,6 +14,7 @@ export let Bracket_state = null,
     opponent = null,
     stat_name = null,
     pong_save = null,
+    persist = 0,
     forza4_save = null,
     token = null,
     prev_path = null,
@@ -73,6 +74,8 @@ export function save_global(type, data) {
         pong_save = parsed_data;
     if (type === "name")
         user_name = parsed_data;
+    if (type === "persist")
+        persist = parsed_data;
     if (type === "opponent")
         opponent = parsed_data;
     if (type === "forza4")
@@ -114,8 +117,11 @@ export function save_global(type, data) {
 window.addEventListener('beforeunload', () => {
     save_at_exit();
     if (refresh === false && window.location.pathname !== '/') {
-        if (sessionStorage.getItem('already in') === '1')
-            remove_all(0, 0, 1);
+        if (acess)
+        {
+            console.log("DUMB");
+            remove_all();
+        }
     }
 });
 
@@ -157,13 +163,19 @@ export const loadContent = async () => {
         handlerMap[path]();
     }
 
-    const chatRoutes = ["/modes"]; // aggiungi qui le rotte dove vuoi visualizzare la chat
-    if (chatRoutes.includes(path)) {
-        initChat();
+    if (path !== "/classic" && path !== "/forza4/game"
+        && path !== "/tournament/knockout/bracket/game" && path !== "/tournament/roundrobin/robinranking/game" && path !== "/") {
+        if (persist === 0) {
+            console.log("hello there");
+            initChat();
+            persist = 1;
+        }
     } else {
         // If don't needed, empty the chat content
         document.getElementById("chatApp").innerHTML = "";//sicuro
     }
+    /*const chatRoutes = ["/modes"]; // aggiungi qui le rotte dove vuoi visualizzare la chat
+    if (chatRoutes.includes(path)) {*/
 };
 
 function initChat() {

@@ -29,7 +29,7 @@ module Other_logic
     response.content_type = 'application/json'
     response.write({
       success: true,
-      message: "!!(Authenticated Succesfully)!!",
+      message: "!!Authenticated Succesfully!!",
       name: display_name,
       token: token
     }.to_json)
