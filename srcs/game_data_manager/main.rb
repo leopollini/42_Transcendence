@@ -2,6 +2,7 @@
 
 # require 'timeout'
 require 'json'
+require 'colorize'
 
 # load ((File.file? '/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')
 
@@ -77,7 +78,6 @@ end
 def drop_games()
   GAMES_PONG.dropTable
   GAMES_F4.dropTable
-  exit
 end
 
 def game_data_manager(client, _server)
@@ -88,24 +88,28 @@ def game_data_manager(client, _server)
   bobj = RequestUnpacker::Unpacker.new.unpack msg
 
   puts bobj.to_json
-  
-  res = case bobj['method'].to_s
-  when 'get_pong_games'
-    get_pong bobj
-  when 'save_pong_game'
-    save_pong bobj
-  when 'get_f4_games'
-    get_f4 bobj
-  when 'save_f4_game'
-    save_f4 bobj
-  when 'get_all_games'
-    get_all_games
-  when 'drop_games'
-    drop_games
-  else
-    {'status' => 'bad method', 'success' => 'false'}
+  begin
+    res = case bobj['method'].to_s
+    when 'get_pong_games'
+      get_pong bobj
+    when 'save_pong_game'
+      save_pong bobj
+    when 'get_f4_games'
+      get_f4 bobj
+    when 'save_f4_game'
+      save_f4 bobj
+    when 'get_all_games'
+      get_all_games
+    when 'drop_games'
+      drop_games
+    else
+      {'status' => 'bad method', 'success' => 'false'}
+    end
+  rescue => r
+    puts "Error: #{r.message}".red
+    puts "Backtrace: #{r.backtrace.join("\n")}".red
+    client.puts res.to_json
   end
-  client.puts res.to_json
 end
 
 puts 'game_data_manager active at port ' + PORT.to_s + "\n"

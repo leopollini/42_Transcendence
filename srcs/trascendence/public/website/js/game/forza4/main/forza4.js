@@ -3,7 +3,6 @@ import { forza4CustomData } from "../data/forza4_game_global.js";
 import { createGrid, redrawGrid } from "../board/forza4_grid.js";
 import { updateTimer, resetTimer } from "../other/forza4_timer.js";
 import { activatePowerup } from "../board/forza4_powerup.js";
-import { remove_all } from "../../../utils_main/error_main.js";
 
 export let forza4GameData;
 let backImageButton;
@@ -109,7 +108,6 @@ class Forza4Game {
     }
 
     async handleBackButton() {
-        await remove_all(1, 1);
         this.destroy();
         document.getElementById("app").style.background = 
             "linear-gradient(35deg, #491f1f, #134946), radial-gradient(circle, rgba(255, 243, 255, 0.2) 30%, transparent 60%)";

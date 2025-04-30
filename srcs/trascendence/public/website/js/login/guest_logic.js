@@ -42,7 +42,6 @@ function update_guest(curr_guest)
   {
     if (data.status === "success")
     {
-      remove_all(1, 1);
       save_global("acess", true);
       save_global("token", data.token);
       save_global("name", guest_user.display_name);
@@ -50,22 +49,18 @@ function update_guest(curr_guest)
     }
     else
     {
-      remove_all(0, 0, 1);
       guest_user = null;
       if (data.status === "no users found")
         showInfoModal("ERROR: Name already taken, try a different one", () => {});
       else
-        showInfoModal("ERROR in LOGIN_USER: An error has occured(\"" + data.status + "\")", () => {});
-      if (window.location.pathname !== '/')
-        navigate("/", "home");
+      showInfoModal("ERROR in LOGIN_USER: An error has occured(\"" + data.status + "\")", () => {});
+      remove_all();
       return;
     }
   })
   .catch(error =>
   {
-    remove_all(0, 0, 1);
-    if (window.location.pathname !== '/')
-      navigate("/", "home");
+    remove_all();
     showInfoModal("Error with login_user: (" + error + ")", () => {});
   })
 }

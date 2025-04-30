@@ -1,9 +1,7 @@
 import { navigate, save_global, stat_name } from "../main.js";
-import { userName } from "./user_data.js";
+import { userName, setUserName} from "./user_data.js";
 import { formatTime } from "../game/pong/other/timer.js";
 import { showCharts } from "./tournament/charts.js";
-import { showInfoModal } from "../modal.js";
-import { user } from "../login/user.js";
 
 let wins = 0;
 let losses = 0;
@@ -133,8 +131,9 @@ async function forza4CalculateUserStatistics() {
     wins = 0;
     losses = 0;
     ties = 0;
-
-
+    console.log("stat_name = ", stat_name);
+    if (stat_name)
+        setUserName(stat_name);
     try {
         const response = await fetch("http://localhost:8008", {
             method: "get_f4_games",
@@ -203,13 +202,14 @@ export async function forza4ShowUserStatistics() {
     const stats = await forza4CalculateUserStatistics();
 
     if (!stats) {
-        showInfoModal("No statistics available for this player.", () => {});
+        //showInfoModal("No statistics available for this player.", () => {});
         return;
     }
 
     //console.log("stats total matches" + stats.totalMatches);
 
     // Popola il template con i dati
+    
     document.getElementById('totalMatches').textContent = stats.totalMatches;
     document.getElementById('totalWins').textContent = stats.totalWins;
     document.getElementById('totalLosses').textContent = stats.totalLosses;
@@ -320,10 +320,7 @@ export function forza4ShowMatchDetails() {
 
 async function getPongMatchesData() {
     try {
-        if (!userName)
-            userName = stat_name;
-        else
-            save_global("stat_name", userName);
+        save_global("stat_name", userName);
         const response = await fetch("http://localhost:8008", {
             method: "get_pong_games",
             body: JSON.stringify({
@@ -346,12 +343,13 @@ export async function pongShowMatchDetails() {
     
     await getPongMatchesData();
 
-    if (!pongUserData) {
-        return null;
-    }
+    // if (!pongUserData) {
+    //     return null;
+    // }
 
     pongMatchDetailsContainer.textContent = "";
 
+    //console.log("pong users len = ", pongUserData.length);
     if (pongUserData && pongUserData.length > 0) {
         pongUserData.forEach(match => {
             const opponent = match.player1 === userName ? match.player2 : match.player1;
@@ -462,7 +460,7 @@ export function gameUserStatisticsPageHandlers() {
 
     pongMatchesCheckbox?.addEventListener('change', () => {
         if (pongMatchesCheckbox.checked) {
-            //console.log("pong matches");
+            console.log("pong matches");
             document.getElementById('pongMatchDetailsContainer').classList.remove('hidden1');
             document.getElementById('pongChartsSection').classList.add('hidden1');
             document.getElementById('forza4StatsSection').classList.add('hidden1');

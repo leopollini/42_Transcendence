@@ -12,8 +12,7 @@ export default function Callback() {
 export async function addCallbackPageHandlers() {
   let let_me_in = await checkAuthentication(window.location.pathname);
   if (let_me_in === 1) {
-    remove_all(0, 0, 1);
-    await navigate("/", "Home");
+    remove_all();
     return (1);
   }
   else if (let_me_in === -1) {
@@ -66,15 +65,13 @@ async function update_with_new_name(name) {
     .then(data => {
       if (data) {
         if (data.success !== "true") {
-          remove_all(0, 0, 1);
-          navigate("/", "home");
+          remove_all();
           showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => { });
         }
       }
     })
     .catch(error => {
-      remove_all(0, 0, 1);
-      navigate("/", "home");
+      remove_all();
       showInfoModal("Error with update_user:" + error, () => { });
     });
 }
@@ -95,7 +92,7 @@ async function set_user(result) {
     type: "login"
   };
   await update_with_new_name(name);
-  await remove_all(1, 1);
+  save_global("acess", true);
   change_name(new_user.login_name);
   update_image(new_user.image);
 }
@@ -111,7 +108,6 @@ async function set_user(result) {
     bio: result.user[0].bio,
     type: "login"
   };
-  remove_all(1, 1);
   change_name(new_user.login_name);
   update_image(new_user.image);
 }*/
@@ -130,17 +126,13 @@ async function get_data() {
       return (0);
     }
     else {
-      remove_all(0, 0, 1);
-      if (window.location.pathname !== '/')
-        navigate("/", "home");
+      remove_all();
       showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => { });;
       return (1);
     }
   }
   catch (error) {
-    remove_all(0, 0, 1);
-    if (window.location.pathname !== '/')
-      navigate("/", "home");
+    remove_all();
     showInfoModal("Error during Login in get_user: " + error.message, () => { });
     return (1);
   }

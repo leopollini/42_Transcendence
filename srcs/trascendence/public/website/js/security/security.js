@@ -1,6 +1,5 @@
 import { user_name } from "../main.js";
 import { showInfoModal } from "../modal.js";
-import { remove_all } from "../utils_main/error_main.js";
 export async function validateUploadedImage(file)
 {
     return new Promise((resolve, reject) =>
@@ -90,17 +89,11 @@ export function free_users()
         })
         .catch(error =>
         {
-            remove_all(0, 0, 1);
-            if (window.location.pathname !== '/')
-                navigate("/", "home");
             showInfoModal("Error with fetch logout_user:" +  error, () => {});
         });
     }
     catch (error)
     {
-        remove_all(0, 0, 1);
-        if (window.location.pathname !== '/')
-            navigate("/", "home");
         showInfoModal("Error in logout_user:", error);
     }
 }
