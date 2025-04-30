@@ -85,7 +85,7 @@ module BetterPG
     # add columns to current table. ELEMENTS MUST CONTAIN DATA TYPE
     def addColumns(*columns)
       print 'Creating columns ' # if Ports::DEBUG_MODE
-      (columns - get_exisitng_columns).each do |c|
+      columns.each do |c|
         # (columns - get_exisitng_columns).each do |c|
         exec 'ALTER TABLE', @name, 'ADD', c
         print c, ' ' # if Ports::DEBUG_MODE
