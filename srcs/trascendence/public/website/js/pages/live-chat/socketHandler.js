@@ -149,9 +149,9 @@ function initSocket(username, chatAppInstance) {
             console.log("📩 Risposta ricevuta:", msg);
             if (msg.data && msg.data.accepted)
                 // Modal informativo: solo un pulsante OK
-                showInfoModal("L'invito è stato accettato! Puoi avviare la partita.", () => {});
+                showInfoModal("the invite was accepted! you can start the match.", () => {});
             else
-                showInfoModal("L'invito è stato rifiutato.", () => {});
+                showInfoModal("the invite was rejected.", () => {});
         }                                  
     };
     return socket;
@@ -161,7 +161,7 @@ function sendMessage(message) {
     if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify(message));
     } else {
-        console.error("Socket non è connesso o non pronto.");
+        console.log("Socket non è connesso o non pronto.");
     }
 }
 

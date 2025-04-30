@@ -1,5 +1,6 @@
 import { Bracket_state, in_game, navigate, save_global, players, match_ended, winner} from "../../main.js";
 import { showInfoModal } from "../../modal.js";
+import { reset_tournament_data } from "../../utils_main/listener_Compacter.js";
 let boxColor = 'black';
 let matchBoxPos = [];
 let matchesPerRound = 8;
@@ -308,14 +309,10 @@ export const addBracketPageHandlers = async () => {
     });
 
     backImageButton?.addEventListener('click', () => {
-        if (match_ended === 1)
-            showInfoModal("You finised the tournament yay");
-        save_global("bracket", null);
-        save_global("p1", null);
-        save_global("p2", null);
-        save_global("bracket", null);
-        save_global("players", null);
         navigate("/modes", "Return to Game Mode");
+        if (match_ended === 1)
+            showInfoModal("You finished the tournament!");
+        reset_tournament_data();
         resetBracketState();
         bracketPlayers = [];
     });

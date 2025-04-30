@@ -39,11 +39,11 @@ async function checkAuthentication() {
       showInfoModal(data.message, () => { });
       return (-1);
     } else {
-      showInfoModal("Autenticazione fallita: " + (data.error || "Unknown Error"), () => {});
+      showInfoModal("Authentication failed: " + (data.error || "Unknown Error"), () => {});
       return (1);
     }
   } catch (error) {
-    showInfoModal("Errore durante la gestione del callback: " + error.message, () => { });
+    showInfoModal("ERROR handling in callback: " + error.message, () => { });
     return (1);
   }
 }

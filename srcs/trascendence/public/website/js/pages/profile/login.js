@@ -1,6 +1,5 @@
 import { guest_login } from "../../login/guest_logic.js";
 import { performLogin } from "../../login/login_logic.js";
-import { showInfoModal } from "../../modal.js";
 
 export default function Login() {
     return `

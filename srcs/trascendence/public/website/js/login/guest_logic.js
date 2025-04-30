@@ -62,6 +62,6 @@ function update_guest(curr_guest)
   .catch(error =>
   {
     remove_all();
-    showInfoModal("Error with login_user: (" + error + ")", () => {});
+    showInfoModal("ERROR: with login_user: (" + error + ")", () => {});
   })
 }

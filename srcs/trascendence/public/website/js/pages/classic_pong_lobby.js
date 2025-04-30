@@ -61,7 +61,7 @@ export async function handleClassicPongLobby() {
                 if (accepted) {
                     console.log("📩 L'utente ha accettato l'invito");
                     console.log("utente", msg.data.from);
-                    showInfoModal(`${msg.data.from} ha accettato l'invito alla modalita classica!`, () => {
+                    showInfoModal(`${msg.data.from} has accepted the invite to classic mode!`, () => {
                         // Add player to match
                         const newPlayer = document.createElement("div");
                         newPlayer.classList.add("player");
@@ -131,7 +131,7 @@ function handleSocketMessage(msg) {
     if (msg.type === "match_response") {
         const accepted = msg.data.accepted === true || msg.data.accepted === "true";
         if (accepted) {
-            showInfoModal(`${msg.data.from} ha accettato l'invito alla modalita classica!`, () => {
+            showInfoModal(`${msg.data.from} has accepted the invite to classic mode!`, () => {
                 addPlayerToMatch(msg.data.from);
 
                 // Rimuovi l'utente dalla lista online se presente

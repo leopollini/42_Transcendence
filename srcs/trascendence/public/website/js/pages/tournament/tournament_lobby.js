@@ -66,7 +66,7 @@ export async function handleLobby(type) {
                 if (accepted) {
                     console.log("📩 L'utente ha accettato l'invito");
                     console.log("utente", msg.data.from);
-                    showInfoModal(`${msg.data.from} ha accettato l'invito al torneo!`, () => {
+                    showInfoModal(`${msg.data.from} has accepted the invite to the tournament!`, () => {
                         // Add player to tournament
                         const newPlayer = document.createElement("div");
                         newPlayer.classList.add("player");
