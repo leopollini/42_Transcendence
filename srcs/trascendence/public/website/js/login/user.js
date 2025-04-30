@@ -64,7 +64,7 @@ export async function restore_user() {
         })
 
         let result = await response.json();
-        if (result && result.status === "success") {
+        if (result && result.success === "true") {
             let ref_user;
             if (result.guest)
                 ref_user = set_user(result.guest, "guest");
@@ -102,7 +102,6 @@ export async function exist(name)
             return true;
         else
         {
-            
             return false;
         }
     }

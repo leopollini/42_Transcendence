@@ -40,7 +40,7 @@ function update_guest(curr_guest)
   .then(response => response.json())
   .then(data =>
   {
-    if (data.status === "success")
+    if (data.success === "true")
     {
       console.log("data = ", data);
       save_global("acess", true);

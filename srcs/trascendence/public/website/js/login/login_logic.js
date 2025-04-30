@@ -41,7 +41,7 @@ async function checkAuthentication() {
       showInfoModal(data.message, () => { });
       return (-1);
     } else {
-      showInfoModal("Authentication failed: " + (data.error || "Unknown Error"), () => {});
+      showInfoModal("Authentication failed: " + data.status, () => {});
       return (1);
     }
   } catch (error) {
@@ -98,21 +98,6 @@ async function set_user(result) {
   update_image(new_user.image);
 }
 
-/*function set_user()
-{
-  let new_user =
-  {
-    email: result.user[0].email,
-    login_name: result.user[0].display_name,
-    realname: result.user[0].realname,
-    image: result.user[0].image,
-    bio: result.user[0].bio,
-    type: "login"
-  };
-  change_name(new_user.login_name);
-  update_image(new_user.image);
-}*/
-
 async function get_data() {
   try {
     console.log("username = ", user_name);
@@ -122,7 +107,7 @@ async function get_data() {
       body: data
     })
     const result = await response.json();
-    if (result && result.status === "success") {
+    if (result && result.success === "true") {
       if (await set_user(result) === 1)
         return (1);
       return (0);

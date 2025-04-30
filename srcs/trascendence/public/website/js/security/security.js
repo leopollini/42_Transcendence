@@ -82,7 +82,7 @@ export function free_users()
                     return;
                 if (data.status && data.success)
                 {
-                    if (data.status !== "success" && data.success !== "true")
+                    if (data.success !== "true")
                         showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
                 }
             }

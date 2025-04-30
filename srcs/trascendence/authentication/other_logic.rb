@@ -25,14 +25,15 @@ module Other_logic
     request.session[:authenticated] = true
     request.session[:token] = token.token
 
-    user = get_user_data_from_oauth_provider(token.token)['user'].to_h
+    res = get_user_data_from_oauth_provider(token.token)
+    user = res['user']
     puts "result: #{user}".yellow
     # realname = user['realname']
   
     response.content_type = 'application/json'
     response.write({
-      success: true,
-      message: "!!Authenticated Succesfully!!",
+      success: res['success'].to_s,
+      message: (res['success'] == "true" ? "!!Authenticated Succesfully!!" : res[]),
       token: token.token,
     }.merge(user).to_json)
   end

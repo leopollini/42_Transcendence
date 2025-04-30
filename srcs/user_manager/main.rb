@@ -66,7 +66,7 @@ def login_user(client, obj)
   # (update_user(client, {"new_params" => data})).merge({'token' => token})
 
   
-  return {'status' => 'user already online', 'success' => 'false'} if usr['token']
+  return {'status' => 'user already online', 'success' => 'false'} if usr['token'].nil?
   
   LOGIN.updateValue('realname', usr['realname'], {'token' => data['token']})
   #SET TOKEN PLEASE
