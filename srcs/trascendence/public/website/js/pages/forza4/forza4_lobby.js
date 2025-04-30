@@ -65,7 +65,7 @@ export async function handleForza4Lobby() {
                 if (accepted) {
                     console.log("📩 L'utente ha accettato l'invito");
                     console.log("utente", msg.data.from);
-                    showInfoModal(`${msg.data.from} ha accettato l'invito al forza4!`, () => {
+                    showInfoModal(`${msg.data.from} has accepted the invite to forza4!`, () => {
                         // Add player to match
                         const newPlayer = document.createElement("div");
                         newPlayer.classList.add("player");

@@ -81,14 +81,14 @@ def drop_games()
 end
 
 def game_data_manager(client, _server)
-  t = select [client], [], [], 20 # waits for client, a few seconds
-  return if t[0].empty? || client.closed?
-
-  msg = client.read_nonblock Ports::MAX_MSG_LEN
-  bobj = RequestUnpacker::Unpacker.new.unpack msg
-
-  puts bobj.to_json
   begin
+    t = select [client], [], [], 20 # waits for client, a few seconds
+    return if t[0].empty? || client.closed?
+
+    msg = client.read_nonblock Ports::MAX_MSG_LEN
+    bobj = RequestUnpacker::Unpacker.new.unpack msg
+
+    puts bobj.to_json
     res = case bobj['method'].to_s
     when 'get_pong_games'
       get_pong bobj
@@ -105,10 +105,11 @@ def game_data_manager(client, _server)
     else
       {'status' => 'bad method', 'success' => 'false'}
     end
+    client.puts res.to_json
   rescue => r
     puts "Error: #{r.message}".red
     puts "Backtrace: #{r.backtrace.join("\n")}".red
-    client.puts res.to_json
+    client.puts({'status' => 'error', 'success' => 'false'}.to_json) unless client.closed?
   end
 end
 

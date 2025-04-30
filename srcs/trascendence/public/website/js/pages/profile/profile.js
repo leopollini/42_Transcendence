@@ -91,14 +91,10 @@ function updateLogin(current_user)
   .then(data =>{
     console.log("data update = ", data);
     if (data && data.success !== "true")
-    {
-      remove_all();
       showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
-    }
   })
   .catch(error =>
   {
-    remove_all();
     showInfoModal("Error with update_user:" + error, () => {});
   });
 }
@@ -119,14 +115,10 @@ function updateGuest(current_user)
   .then(response => response.json())
   .then(data =>{
     if (data && data.success !== "true")
-    {
-      remove_all();
       showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
-    }
   })
   .catch(error =>
   {
-    remove_all();
     showInfoModal("Error with update_user:", error);
   });
 }

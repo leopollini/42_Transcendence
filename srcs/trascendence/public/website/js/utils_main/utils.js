@@ -1,7 +1,6 @@
-import { save_global, buttonTitle, players, numPlayers, acess } from "../main.js";
+import { save_global, buttonTitle, players, numPlayers, acess, user_name } from "../main.js";
 import { check_valid_operation } from "./error_main.js";
 import { initializeGameCanvas } from "../game/pong/main/handling_Canvas.js";
-import { userName } from "../pages/user_data.js";
 import { restore_user} from "../login/user.js";
 
 const gamePaths = [
@@ -13,7 +12,7 @@ const gamePaths = [
 
 function createPlayersArray(numPlayers) {
     return Array.from({ length: numPlayers }, (_, i) =>
-        i === 0 ? userName : `Player ${i + 1}`
+        i === 0 ? user_name : `Player ${i + 1}`
     );
 }
 

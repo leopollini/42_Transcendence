@@ -3,6 +3,7 @@ import { current_user } from "../main.js";
 import { initSocket, sendMessage } from "./live-chat/socketHandler.js";
 import { showInfoModal } from "../modal.js";
 import { fetchOnlineUsers } from "./get_online_users.js";
+import { is_online } from "../login/user.js";
 
 let invitedPlayers = [];
 let selectedPlayer = null;
@@ -42,7 +43,6 @@ export default function ClassicPongLobbyRoom() {
 }
 
 export async function handleClassicPongLobby() {
-    save_global("game", 0);
     if (!socket && current_user) {
         // Initialize socket
         socket = initSocket(current_user.display_name, /* chatAppInstance se necessario */);
@@ -50,7 +50,7 @@ export async function handleClassicPongLobby() {
         // Handle incoming invite responses
         socket.onmessage = (event) => {
             let msg = JSON.parse(event.data);
-            
+
             if (msg.type === "match_response") {
                 const accepted = msg.data.accepted === true || msg.data.accepted === "true";
                 console.log("📩 Risposta ricevuta:", msg);
@@ -61,7 +61,7 @@ export async function handleClassicPongLobby() {
                 if (accepted) {
                     console.log("📩 L'utente ha accettato l'invito");
                     console.log("utente", msg.data.from);
-                    showInfoModal(`${msg.data.from} ha accettato l'invito alla modalita classica!`, () => {
+                    showInfoModal(`${msg.data.from} has accepted the invite to classic mode!`, () => {
                         // Add player to match
                         const newPlayer = document.createElement("div");
                         newPlayer.classList.add("player");
@@ -71,7 +71,7 @@ export async function handleClassicPongLobby() {
                         numPlayersAccepted++;
                         numPlayersLabel.textContent = numPlayersAccepted + "/" + totalPlayers;
                         invitedPlayers.push(msg.data.from);
-                        
+
                         // Remove player from online list
                         const onlinePlayers = document.querySelectorAll("#onlinePlayers .player");
                         onlinePlayers.forEach(player => {
@@ -89,7 +89,7 @@ export async function handleClassicPongLobby() {
                     //showInfoModal(`${msg.data ? msg.data.from : msg.from} ha rifiutato l'invito alla modalita classica.`, () => {});
                 }
             }
-            
+
         };
     }
 
@@ -114,7 +114,7 @@ export async function handleClassicPongLobby() {
     }
     // Carica giocatori online
     const players = await fetchOnlineUsers(current_user.display_name);
-    console.log("onlione users = ", players);
+    //console.log("onlione users = ", players);
     renderOnlinePlayers(players, onlinePlayers, inviteButton);
 
     // Aggiorna badge numero giocatori
@@ -131,7 +131,7 @@ function handleSocketMessage(msg) {
     if (msg.type === "match_response") {
         const accepted = msg.data.accepted === true || msg.data.accepted === "true";
         if (accepted) {
-            showInfoModal(`${msg.data.from} ha accettato l'invito alla modalita classica!`, () => {
+            showInfoModal(`${msg.data.from} has accepted the invite to classic mode!`, () => {
                 addPlayerToMatch(msg.data.from);
 
                 // Rimuovi l'utente dalla lista online se presente
@@ -200,13 +200,17 @@ function updatePlayerStatus(toggleStartMatch) {
     }
 }
 
-export function addClassicPongLobbyPageHandlers() {
+export async function addClassicPongLobbyPageHandlers() {
     const toggleStartMatch = document.getElementById("pongToggleStartMatch");
     const inviteButton = document.getElementById("pongInviteButton");
     const backImageButton = document.getElementById("backImageButton");
 
-    inviteButton.onclick = () => {
+    inviteButton.onclick = async () => {
         if (selectedPlayer && numPlayersAccepted < totalPlayers) {
+            if (await is_online(selectedPlayer.textContent) === false) {
+                showInfoModal("Error: user not online anymore", () => { });
+                return;
+            }
             sendMessage({
                 type: "match_request",
                 to: selectedPlayer.textContent

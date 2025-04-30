@@ -97,7 +97,6 @@ export const handlerMap = {
     },
     "/userstats": () => {
         GameUserStatistics();
-        //pongShowMatchDetails();
         gameUserStatisticsPageHandlers();
     },
     "/forza4/findopponent": () => {

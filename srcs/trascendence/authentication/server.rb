@@ -46,7 +46,6 @@ key = OpenSSL::PKey::RSA.new(File.read(key_path))
 
 server = WEBrick::HTTPServer.new(
   Port: PORT,
-  BindAddress: '0.0.0.0',
   DocumentRoot: File.expand_path("../../public", __FILE__),
   RequestCallback: proc { |req, res| res['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0' },
   SSLEnable: true,
@@ -54,7 +53,7 @@ server = WEBrick::HTTPServer.new(
   SSLPrivateKey: key,
   SSLOptions: OpenSSL::SSL::OP_NO_SSLv3 | OpenSSL::SSL::OP_NO_SSLv2,
   SSLVerifyClient: OpenSSL::SSL::VERIFY_NONE,
-  SSLVerifyMode: OpenSSL::SSL::VERIFY_NONE
+  SSLVerifyMode: OpenSSL::SSL::VERIFY_NONE,
 )
 
 class RootDirManager < WEBrick::HTTPServlet::AbstractServlet

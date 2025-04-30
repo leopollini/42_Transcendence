@@ -1,4 +1,4 @@
-import { navigate, save_global, user_name} from "../main.js";
+import { navigate, save_global, token, user_name} from "../main.js";
 import { user, profile, check_name, escapeHtml} from "./user.js";
 import { update_image, change_name} from "../pages/modes.js";
 import { showInputModal, showInfoModal } from "../modal.js"
@@ -42,6 +42,7 @@ function update_guest(curr_guest)
   {
     if (data.status === "success")
     {
+      //console.log("data = ", data);
       save_global("acess", true);
       save_global("token", data.token);
       save_global("name", guest_user.display_name);
@@ -61,6 +62,6 @@ function update_guest(curr_guest)
   .catch(error =>
   {
     remove_all();
-    showInfoModal("Error with login_user: (" + error + ")", () => {});
+    showInfoModal("ERROR: with login_user: (" + error + ")", () => {});
   })
 }

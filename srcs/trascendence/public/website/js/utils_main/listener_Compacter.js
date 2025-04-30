@@ -1,11 +1,11 @@
-import { user_name, players, Player1, Player2, pong_save, opponent,
-forza4_save, Bracket_state, in_game, winner, match_ended, robinranking,
-numPlayers, acess, token, prev_path, loadContent,
-save_global, navigate,
-playerNames,
-tournament,
-stat_name,
-persist
+import {
+    user_name, players, Player1, Player2, pong_save, opponent,
+    forza4_save, Bracket_state, in_game, winner, match_ended, robinranking,
+    numPlayers, acess, token, prev_path, loadContent,
+    save_global, navigate,
+    playerNames,
+    tournament,
+    persist
 } from "../main.js";
 import { resetBracketState } from "../pages/tournament/bracket.js";
 import { showInfoModal } from "../modal.js";
@@ -27,8 +27,6 @@ export function save_at_exit() {
         to_string("opponent", opponent, false);
     if (persist)
         to_string("persist", persist, false);
-    if (stat_name)
-        to_string("stat_name", stat_name, false);
     if (forza4_save)
         to_string("forza4Data", forza4_save, true);
     if (Player1)
@@ -61,8 +59,7 @@ export function save_at_exit() {
         to_string("PlayerName", playerNames, true);
 }
 
-export function reset_tournament_data()
-{
+export function reset_tournament_data() {
     save_global("bracket", null);
     save_global("robinranked", null);
     save_global("game", 0);
@@ -77,34 +74,32 @@ export function reset_tournament_data()
     resetBracketState();
 }
 
-export async function handle_popstate()
-{
+export async function handle_popstate() {
     const path = window.location.pathname;
 
     if ((prev_path === "/modes" && (path === "/" || path === "/callback")) ||
-    prev_path === "/" && path === "/callback")
-    {
+        prev_path === "/" && path === "/callback") {
         showInfoModal("you have quitted the active session", () => { });
         await remove_all();
     }
     if (in_game === 1 && path !== '/tournament/knockout/bracket/game'
-    && path !== '/tournament/knockout/bracket' && path !== "/tournament/roundrobin/robinranking"
-    && path !== "/tournament/roundrobin/robinranking/game") {
+        && path !== '/tournament/knockout/bracket' && path !== "/tournament/roundrobin/robinranking"
+        && path !== "/tournament/roundrobin/robinranking/game") {
         reset_tournament_data();
         showInfoModal("you successfully exited the game", () => { });
         await loadContent();
         return;
     }
     if ((path === "/tournament/knockout/bracket" || path === "/tournament/roundrobin/robinranking/game"
-    || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking")
-    && match_ended !== 1) {
+        || path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking")
+        && match_ended !== 1) {
         reset_tournament_data();
         navigate("/modes", "Return to Game Mode", true);
         showInfoModal("Leaving Tournament...", () => { });
         return;
     }
-    if (match_ended === 1 && (path === "/tournament/knockout/bracket/game" || 
-    path === "/tournament/roundrobin/robinranking/game")) {
+    if (match_ended === 1 && (path === "/tournament/knockout/bracket/game" ||
+        path === "/tournament/roundrobin/robinranking/game")) {
         reset_tournament_data();
         navigate("/modes", "Return to Game Mode");
         showInfoModal("You finised the tournament yay");

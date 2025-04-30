@@ -1,6 +1,6 @@
 import { free_users } from "../security/security.js";
 import { resetMatchStatsData } from "../game/pong/data/game_stats.js";
-import { navigate, reset_all_let, current_user, opponent, save_global, in_game, user_name, acess } from "../main.js";
+import { navigate, reset_all_let, current_user, opponent, save_global, in_game, user_name, acess, invalid } from "../main.js";
 import { showInfoModal } from "../modal.js";
 import { resetBracketState } from "../pages/tournament/bracket.js";
 import { addCallbackPageHandlers } from "../login/login_logic.js";
@@ -8,6 +8,13 @@ import { reset_tournament_data } from "./listener_Compacter.js";
 
 export async function check_valid_operation(path) {
     await refresh_reset();
+    if (invalid === 1 && path === "/")
+    {
+        showInfoModal("Error: Session lost", () => {});
+        save_global("invalid", 0);
+        navigate("/", "home");
+        return(1);
+    }
     if (path !== '/') {
         if (await not_home(path) === 1)
             return (1);
@@ -50,7 +57,7 @@ async function not_home(path) {
         resetBracketState();
         resetMatchStatsData();
     }
-    if (!acess) {
+    if (acess === false) {
         showInfoModal("ERROR: accessing unauthorized page...", () => { });
         await remove_all();
         return (1);
@@ -99,6 +106,10 @@ async function refresh_reset() {
         save_global("bracket", sessionStorage.getItem("bracketState"));
         sessionStorage.removeItem("bracketState");
     }
+    if (sessionStorage.getItem("invalid")) {
+        save_global("invalid", sessionStorage.getItem("invalid"));
+        sessionStorage.removeItem("invalid");
+    }
     if (sessionStorage.getItem("game")) {
         save_global("game", sessionStorage.getItem("game"));
         sessionStorage.removeItem("game");
@@ -143,7 +154,6 @@ export async function remove_all() {
     if (current_user && user_name)
         free_users();
     reset_all_let();
-    save_global("acess", false);
     if (window.location.pathname !== "/")
         navigate("/", "home");
 }

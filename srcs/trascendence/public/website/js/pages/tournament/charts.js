@@ -1,5 +1,4 @@
-import { navigate } from "../../main.js";
-import { userName } from "../user_data.js";
+import { navigate, user_name } from "../../main.js";
 import { formatTime } from "../../game/pong/other/timer.js";
 
 let userData;
@@ -64,7 +63,7 @@ export function Charts() {
 function drawRalliesChart(matchesData) {
   const longestRallies = matchesData.map((match) => match.longest_rally);
   const opponents = matchesData.map((match) =>
-    match.player1 === userName ? match.player2 : match.player1
+    match.player1 === user_name ? match.player2 : match.player1
   );
 
   const ralliesCtx = document
@@ -105,8 +104,8 @@ function drawWinLossChart() {
   wins = 0;
   losses = 0;
   userData.forEach((game) => {
-    if (game.player1 === userName || game.player2 === userName) {
-      if (game.winner === userName) {
+    if (game.player1 === user_name || game.player2 === user_name) {
+      if (game.winner === user_name) {
         wins++;
       } else {
         losses++;
@@ -160,7 +159,7 @@ function drawWinLossHistoryChart(matchesData) {
   matchesData.forEach((match, index) => {
     labels.push("Match " + (index + 1));
 
-    if (match.winner === userName) {
+    if (match.winner === user_name) {
       cumulativeScore += 1;
       currentStreak += 1;
       winStreak = Math.max(winStreak, currentStreak);
@@ -237,12 +236,12 @@ function matchesTimeRank() {
 }
 
 export async function showCharts() {
-  //playerName = userName;
+  //playerName = user_name;
   try {
     const response = await fetch("http://localhost:8008", {
       method: "get_pong_games",
       body: JSON.stringify({
-        display_name: userName,
+        display_name: user_name,
       }),
     });
     const data = await response.json();
