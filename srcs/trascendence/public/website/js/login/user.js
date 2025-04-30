@@ -56,6 +56,7 @@ export async function restore_user() {
         if (window.location.pathname === '/')
             return null;
         let data = JSON.stringify({ "params": { "display_name": user_name, "token": token } });
+        console.log("username: ", user_name);
         const response = await fetch("http://localhost:8008",
         {
             method: "get_user",
@@ -171,12 +172,12 @@ export async function check_name(name)
         showInfoModal("Name too long.", () => {});
         return false;
     }
-    /*let it_exist = await exist(name);
+    let it_exist = await exist(name);
     if (it_exist === false)
     {
         showInfoModal("Name already taken", () => {});
         return false;
-    }*/
+    }
     return true;
 }
 

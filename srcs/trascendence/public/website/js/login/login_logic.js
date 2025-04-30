@@ -31,8 +31,10 @@ async function checkAuthentication() {
     }
     const response = await fetch('/api/callback?' + params.toString());
     const data = await response.json();
+    console.log("data = ", data);
     if (data.success) {
-      save_global("name", data.name);
+      console.log("data = ", data);
+      save_global("name", data.display_name);
       save_global("token", data.token);
       if (await get_data() === 1)
         return (1);
@@ -88,6 +90,8 @@ async function set_user(result) {
     bio: result.user[0].bio,
     type: "login"
   };
+  save_global("name", new_user.login_name);
+  console.log("username after set = ", user_name);
   await update_with_new_name(name);
   save_global("acess", true);
   change_name(new_user.login_name);
@@ -111,6 +115,7 @@ async function set_user(result) {
 
 async function get_data() {
   try {
+    console.log("username = ", user_name);
     const data = JSON.stringify({ "params": { "display_name": user_name }, "token": token });
     const response = await fetch("http://localhost:8008", {
       method: "get_user",
@@ -123,7 +128,7 @@ async function get_data() {
       return (0);
     }
     else {
-      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => { });;
+      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + result.status + "\")", () => { });;
       return (1);
     }
   }

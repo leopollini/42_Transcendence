@@ -23,7 +23,7 @@ class ChatService < WEBrick::Websocket::Servlet
   def socket_close(sock)
     ChatStore.close_client(@username) if @username
     puts "#{@username} left the chat, loggin out..."
-    method_req('logout_user', {'display_name' => @username, 'token' => @token})
+    # SimpleServer::method_req('logout_user', {'display_name' => @username, 'token' => @token})
   end
   
   def socket_text(sock, text)

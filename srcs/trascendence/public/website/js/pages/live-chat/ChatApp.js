@@ -34,7 +34,7 @@ class ChatApp {
         this.initializeElements();
         setupEventListeners(this);
         this.initializeGeneralChat();
-
+        console.log("current_user in chat lol: ", current_user);
         if (current_user && current_user.display_name)
             this.username = current_user.display_name;
         else

@@ -42,7 +42,7 @@ function update_guest(curr_guest)
   {
     if (data.status === "success")
     {
-      //console.log("data = ", data);
+      console.log("data = ", data);
       save_global("acess", true);
       save_global("token", data.token);
       save_global("name", guest_user.display_name);

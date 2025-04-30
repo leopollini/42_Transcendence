@@ -3,6 +3,7 @@ require 'pg'
 require 'colorize'
 require 'logger'
 require 'rack'
+require 'securerandom'
 require_relative ((File.file?('/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../../common_tools/tools/Ports.rb'))
 
 module Other_logic
@@ -24,15 +25,16 @@ module Other_logic
     request.session[:authenticated] = true
     request.session[:token] = token.token
 
-    display_name, token = get_user_data_from_oauth_provider(token.token)
+    user = get_user_data_from_oauth_provider(token.token)['user'].to_h
+    puts "result: #{user}".yellow
+    # realname = user['realname']
   
     response.content_type = 'application/json'
     response.write({
       success: true,
       message: "!!Authenticated Succesfully!!",
-      name: display_name,
-      token: token
-    }.to_json)
+      token: token.token,
+    }.merge(user).to_json)
   end
   
   def get_user_data_from_oauth_provider(token)
@@ -58,12 +60,12 @@ module Other_logic
         realname: realname,
         email: email,
         image: image,
-        display_name: display_name
+        display_name: display_name,
+        token: token
       },
       do_create: true
     }
-    token = JSON.parse(SimpleServer.method_req("login_user", payload))["token"]
-    return display_name, token
+    JSON.parse(SimpleServer.method_req("login_user", payload))
   end
 
   def login(request, response, client)

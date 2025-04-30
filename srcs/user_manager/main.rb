@@ -29,43 +29,51 @@ LOGIN = BetterPG::SimplePG.new 'users',
                                 'created NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT', 'token TEXT']
 
 GUEST = GuestsList.new
-MANDATORY_DATA = %w[email display_name realname bio image]
+MANDATORY_DATA = %w[email display_name realname bio image token]
 GET_USER_SECURE_INFO = %w[display_name created image]
 NON_UPDATABLE_PARAMS = %w[realname created level entered token]
 
-LOGGED_IN = []
+# LOGGED_IN = []
 
 def user_creat(data, token)
   puts "Cteating new user as:".green, data
   return DEFAULT_MISSING_PARAM.clone if (MANDATORY_DATA - data.keys).empty?
   LOGIN.addValues data
-  return DEFAULT_SUCCESS_RES.merge({'token' => token})
+  return DEFAULT_SUCCESS_RES.merge({'token' => token, 'user' => (LOGIN.select_specific 'realname', data['realname'].to_s, [], false)})
 end
 
 def login_user(client, obj)
   puts "login_user called".green
   data = obj['data']
   return {"status"=> "bad request", 'success' => 'fase'} if data.nil?
-  token = Digest::SHA256.hexdigest(Time.now.to_s + data['realname'].to_s + data['username'].to_s)
+  token = data['token']
 
-  return {'status' => 'another user with this username is already playing', 'success' => 'false'} if LOGGED_IN.include? data['display_name']
-  usr = LOGIN.select_specific 'realname', data['realname'].to_s, [], false
-  puts "found: #{usr}".yellow
+  # return {'status' => 'another user with this username is already playing', 'success' => 'false'} if 
   if data['login_as_guest'].to_s == 'true'
-    return {"status" => "username taken", "success" => "false"} if usr
-    return GUEST.add_guest(data, LOGGED_IN)
+    res = get_user(client, {"params" => {"display_name" => data['display_name']}})
+    return {"status" => "username taken", "success" => "false"} if res['success'].to_s == 'true'
+    return GUEST.add_guest(data)
   end
+  usr = data['realname'] ? (LOGIN.select_specific 'realname', data['realname'].to_s, [], false) : nil
+  puts "found: #{usr}".yellow
   if usr.nil?
     return user_creat(data, token) if obj['do_create'].to_s == 'true'
     return {'status' => 'user not found', 'success' => 'false', 'service' => 'user_manager'}
   end
 
-  puts "user already in database, updating with new info".yellow
-  LOGGED_IN << data['display_name']
-  (update_user(client, {"new_params" => data})).merge({'token' => token})
+  # puts "user already in database, updating with new info".yellow
+  # LOGGED_IN << data['display_name']
+  # (update_user(client, {"new_params" => data})).merge({'token' => token})
+
+  
+  return {'status' => 'user already online', 'success' => 'false'} if usr['token']
+  
+  LOGIN.updateValue('realname', usr['realname'], {'token' => data['token']})
+  #SET TOKEN PLEASE
+  DEFAULT_SUCCESS_RES.merge({'token' => token, 'user' => usr})
 end
 
-def update_user(_client, obj = nil)
+def update_user(client, obj = nil)
   puts 'update_user called'.green if DEBUG_MODE
   puts "Obj " + obj.to_s.gray
 
@@ -75,10 +83,10 @@ def update_user(_client, obj = nil)
     new_params = obj['new_params'].except NON_UPDATABLE_PARAMS
     puts "updated params = #{new_params}".yellow
   else
-    return DEFAULT_MISSING_PARAM.clone
+    return {'status' => 'missing new params', 'success' => 'false'}.clone
   end
-
-  return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['token'].to_s.empty?
+  return {'status' => 'username taken', 'success' => 'false'} if get_user(client, {'params' => {'display_name' => new_params['display_name']}})['success'].to_s == "true"
+  return DEFAULT_MISSING_PARAM.clone if new_params.empty?
   guest = GUEST.exists_token? obj['token']
   return GUEST.update_guest(guest, new_params) if guest
 
@@ -89,9 +97,9 @@ end
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
   username = obj["display_name"]
-  return GUEST.del_guest(username, LOGGED_IN) if GUEST.exists? username
+  return GUEST.del_guest(username) if GUEST.exists? username
   LOGIN.updateValue 'display_name', username, {'token' => 'null'}
-  LOGGED_IN.delete username
+  # LOGGED_IN.delete username
   {"status"=>"success", "success"=>"true"}
 end
 
@@ -123,12 +131,12 @@ def get_user(_client, obj = nil)
     end
     return DEFAULT_SUCCESS_RES.merge({'user' => user})
   end
-  get_user_by_token if params['token']
+  return get_user_by_token if params['token']
   DEFAULT_MISSING_PARAM.clone
 end
 
 def user_manager(client, _server)
-  puts "user manager called".yellow, "oline users: #{LOGGED_IN}"
+  # puts "user manager called".yellow, "oline users: #{LOGGED_IN}"
   res = DEFAULT_ERROR_RES.clone
   t = select [client], [], [], 20 # waits for client, a few seconds
   return if t.nil? || t[0].empty? || client.closed?

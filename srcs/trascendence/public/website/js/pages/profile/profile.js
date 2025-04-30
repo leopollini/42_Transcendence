@@ -1,7 +1,7 @@
-import { profile} from "../../login/user.js";
+import { profile } from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
 import { showInfoModal } from "../../modal.js";
-import { navigate, current_user, token} from "../../main.js";
+import { navigate, current_user, token } from "../../main.js";
 import { remove_all } from "../../utils_main/error_main.js";
 
 export default function Profile() {
@@ -37,8 +37,7 @@ export default function Profile() {
 
 export let me = new profile(null, null, null, null, null, null);
 
-function insert_user_data(current_user)
-{
+function insert_user_data(current_user) {
   me.display_name = current_user.display_name;
   me.realname = current_user.realname || null;
   me.image = current_user.image;
@@ -46,11 +45,9 @@ function insert_user_data(current_user)
   return current_user;
 }
 
-export async function profileHandler()
-{
+export async function profileHandler() {
   let back_to_menu = document.querySelector("#back");
-  back_to_menu.addEventListener("click", () =>
-  {
+  back_to_menu.addEventListener("click", () => {
     navigate("/modes", "Return to Game Mode");
   });
   insert_user_data(current_user);
@@ -63,7 +60,7 @@ export async function profileHandler()
   const infoContainer = card.querySelector("#yourData");
 
   updateDisplayNames(infoContainer);
-  
+
   // Pre-compila il campo bio se già salvato
   const bioInput = infoContainer.querySelector("#bioInput");
   bioInput.value = me.bio;
@@ -74,61 +71,67 @@ export async function profileHandler()
   });
 }
 
-function updateLogin(current_user)
-{
+function updateLogin(current_user) {
   let data = JSON.stringify({
-  "token": token,
-  "new_params": {
-  "display_name": current_user.display_name,
-  "bio": current_user.bio,
-  "image": current_user.image}});
-  fetch("http://localhost:8008",
-  {
-    method: "update_user",
-    body: data
-  })
-  .then(response => response.json())
-  .then(data =>{
-    console.log("data update = ", data);
-    if (data && data.success !== "true")
-      showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
-  })
-  .catch(error =>
-  {
-    showInfoModal("Error with update_user:" + error, () => {});
+    "token": token,
+    "new_params": {
+      "display_name": current_user.display_name,
+      "bio": current_user.bio,
+      "image": current_user.image
+    }
   });
+  fetch("http://localhost:8008",
+    {
+      method: "update_user",
+      body: data
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data) {
+        if (data.status === "user already online")
+          showInfoModal(data.status, () => { });
+        else if (data.success !== "true")
+          showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => { });
+      }
+    })
+    .catch(error => {
+      showInfoModal("Error with update_user:" + error, () => { });
+    });
 }
 
-function updateGuest(current_user)
-{
+function updateGuest(current_user) {
   let data = JSON.stringify({
-  "token": token,
-  "new_params": {
-  "bio": current_user.bio,
-  "image": current_user.image},
-  "token": token});
-  fetch("http://localhost:8008",
-  {
-    method: "update_user",
-    body: data
-  })
-  .then(response => response.json())
-  .then(data =>{
-    if (data && data.success !== "true")
-      showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => {});
-  })
-  .catch(error =>
-  {
-    showInfoModal("Error with update_user:", error);
+    "token": token,
+    "new_params": {
+      "bio": current_user.bio,
+      "image": current_user.image
+    },
+    "token": token
   });
+  fetch("http://localhost:8008",
+    {
+      method: "update_user",
+      body: data
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data) {
+        if (data.status === "user already online")
+          showInfoModal(data.status, () => { });
+        else if (data.success !== "true")
+          showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => { });
+      }
+    })
+    .catch(error => {
+      showInfoModal("Error with update_user:", error);
+    });
 }
 
 async function saveProfile(infoContainer) {
   let saving;
   if (me.image === current_user.image)
     saving = "⚠️no canges in image have been made\n";
-  else
-  {
+  else {
     saving = "✅saved image successfully\n";
     current_user.image = me.image;
   }
@@ -139,7 +142,7 @@ async function saveProfile(infoContainer) {
     updateGuest(current_user);
   else
     updateLogin(current_user);
-  showInfoModal(saving, () => {});
+  showInfoModal(saving, () => { });
   history.back();
 }
 
