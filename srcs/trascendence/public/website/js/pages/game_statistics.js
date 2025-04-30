@@ -1,5 +1,4 @@
-import { navigate, save_global, stat_name } from "../main.js";
-import { userName, setUserName} from "./user_data.js";
+import { navigate, save_global, user_name } from "../main.js";
 import { formatTime } from "../game/pong/other/timer.js";
 import { showCharts } from "./tournament/charts.js";
 
@@ -131,14 +130,11 @@ async function forza4CalculateUserStatistics() {
     wins = 0;
     losses = 0;
     ties = 0;
-    console.log("stat_name = ", stat_name);
-    if (stat_name)
-        setUserName(stat_name);
     try {
         const response = await fetch("http://localhost:8008", {
             method: "get_f4_games",
             body: JSON.stringify({
-            realname: userName,
+            realname: user_name,
             }),
         });
         const data = await response.json();
@@ -157,8 +153,8 @@ async function forza4CalculateUserStatistics() {
       totalMoves = 0;
       totalTime = 0;
       f4UserData.forEach(game => {
-        if (game.player1 === userName || game.player2 === userName) {
-            if (game.winner === userName)
+        if (game.player1 === user_name || game.player2 === user_name) {
+            if (game.winner === user_name)
                 wins++;
             else if (game.winner === 'tie') 
                 ties++;
@@ -228,8 +224,8 @@ export function forza4ShowMatchDetails() {
 
     if (f4UserData && f4UserData.length > 0) {
         f4UserData.forEach(match => {
-            const opponent = match.player1 === userName ? match.player2 : match.player1;
-            const isWinner = match.winner === userName;
+            const opponent = match.player1 === user_name ? match.player2 : match.player1;
+            const isWinner = match.winner === user_name;
             let resultText;
             let resultClass;
 
@@ -254,7 +250,7 @@ export function forza4ShowMatchDetails() {
 
             const playersDiv = document.createElement('div');
             playersDiv.classList.add('players');
-            playersDiv.textContent = `${userName} vs ${opponent}`;
+            playersDiv.textContent = `${user_name} vs ${opponent}`;
 
             const matchInfoDiv = document.createElement('div');
             matchInfoDiv.classList.add('match-info');
@@ -320,15 +316,16 @@ export function forza4ShowMatchDetails() {
 
 async function getPongMatchesData() {
     try {
-        save_global("stat_name", userName);
+        if (!user_name)
+            return;
         const response = await fetch("http://localhost:8008", {
             method: "get_pong_games",
             body: JSON.stringify({
-            display_name: userName,
+            display_name: user_name,
             }),
         });
         const data = await response.json();
-        //console.log("Get Pong Game response: ", data);
+        console.log("Get Pong Game response: ", data);
         if (data.games) {
             pongUserData = data.games;
             console.log("pongUserData aggiornata: ", pongUserData);
@@ -352,8 +349,8 @@ export async function pongShowMatchDetails() {
     //console.log("pong users len = ", pongUserData.length);
     if (pongUserData && pongUserData.length > 0) {
         pongUserData.forEach(match => {
-            const opponent = match.player1 === userName ? match.player2 : match.player1;
-            const isWinner = match.winner === userName;
+            const opponent = match.player1 === user_name ? match.player2 : match.player1;
+            const isWinner = match.winner === user_name;
             let resultText;
             let resultClass;
 
@@ -371,7 +368,7 @@ export async function pongShowMatchDetails() {
 
             const playersDiv = document.createElement('div');
             playersDiv.classList.add('players');
-            playersDiv.textContent = `${userName} vs ${opponent}`;
+            playersDiv.textContent = `${user_name} vs ${opponent}`;
 
             const matchInfoDiv = document.createElement('div');
             matchInfoDiv.classList.add('match-info');
@@ -437,12 +434,13 @@ export async function pongShowMatchDetails() {
 
 
 export function gameUserStatisticsPageHandlers() {
+    console.log("username = ", user_name);
     const backImageButton = document.getElementById('backImageButton');
     const pongChartsCheckbox = document.getElementById('pongChartsCheckbox');
     const pongMatchesCheckbox = document.getElementById('pongMatchesCheckbox');
     const forza4StatsCheckbox = document.getElementById('forza4StatsCheckbox');
     const forza4MatchesCheckbox = document.getElementById('forza4MatchesCheckbox');
-
+    
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");
     });

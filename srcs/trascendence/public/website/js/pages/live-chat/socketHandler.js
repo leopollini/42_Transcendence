@@ -4,6 +4,11 @@ import { token } from "../../main.js";
 
 let socket;
 
+export function closeSocket() {
+    if (socket)
+        socket.close();
+}
+
 function initSocket(username, chatAppInstance) {
     socket = new WebSocket('ws://localhost:6087');
 

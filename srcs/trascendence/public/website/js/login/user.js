@@ -2,7 +2,6 @@ import { navigate, user_name, token } from "../main.js";
 import { updateProfileUI } from "../pages/modes.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../utils_main/error_main.js";
-import { userName } from "../pages/user_data.js";
 
 export class user {
     constructor(image, name, login_name, email, bio) {
@@ -91,15 +90,13 @@ export async function exist(name)
     try
     {
         let data = JSON.stringify({"params": {"display_name": name}});
-        console.log("data = ", data);
         const response = await fetch("http://localhost:8008",
         {
             method: "get_user",
             body: data
         });
         const result = await response.json();
-        console.log("result = ", result);
-        console.log("result.status: ", result.status);
+        //console.log("result = ", result);
         if (result.status === "no user found")
             return true;
         else

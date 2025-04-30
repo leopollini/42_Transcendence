@@ -36,7 +36,6 @@ async function checkAuthentication() {
       save_global("token", data.token);
       if (await get_data() === 1)
         return (1);
-      save_global("acess", true);
       showInfoModal(data.message, () => { });
       return (-1);
     } else {
@@ -65,13 +64,11 @@ async function update_with_new_name(name) {
     .then(data => {
       if (data) {
         if (data.success !== "true") {
-          remove_all();
           showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => { });
         }
       }
     })
     .catch(error => {
-      remove_all();
       showInfoModal("Error with update_user:" + error, () => { });
     });
 }
@@ -126,13 +123,11 @@ async function get_data() {
       return (0);
     }
     else {
-      remove_all();
       showInfoModal("ERROR Login GET_USER: An error has occured(\"" + data.status + "\")", () => { });;
       return (1);
     }
   }
   catch (error) {
-    remove_all();
     showInfoModal("Error during Login in get_user: " + error.message, () => { });
     return (1);
   }

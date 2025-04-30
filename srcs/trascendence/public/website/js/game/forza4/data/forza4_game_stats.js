@@ -1,5 +1,5 @@
 
-import { userName } from "../../../pages/user_data.js";
+import { user_name } from "../../../main.js";
 export function savef4StatsData(game, isTie) {
     
     let winner;
@@ -37,7 +37,8 @@ export function savef4StatsData(game, isTie) {
         return fetch("http://localhost:8008", {
             method: "get_f4_games",
             body: JSON.stringify({
-                realname: userName,
+                //realname: current_user.realname
+                realname: user_name,
             }),
         });
     })

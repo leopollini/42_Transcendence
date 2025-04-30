@@ -31,7 +31,7 @@ all: prep_dirs
 	fi
 
 $(CONTAINERS): prep_dirs
-	# @clear
+	@clear
 	@if [ "$$(docker ps -a | grep $@ | wc -l)" -gt 0 ]; then \
 		echo -e "$(YELLOW)Container $@ già esistente, fermo e rimuovo...$(NC)"; \
 		docker stop $@ || true; \

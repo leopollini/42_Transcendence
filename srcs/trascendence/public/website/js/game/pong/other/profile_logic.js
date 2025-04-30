@@ -52,10 +52,7 @@ export async function savename(me, yourDataSection, current_user) {
         return ("✅Saved name successfully(" + newname + ")\n");
     }
     else
-    {
-        console.log("not exist");
         return ("🚨Error: name already taken(" + newname + ")\n");
-    }
 }
 
 export async function saveimage(me, yourDataSection, current_user) {
@@ -87,7 +84,7 @@ export async function saveimage(me, yourDataSection, current_user) {
                 reader.readAsDataURL(file);
             }
             catch (error) {
-                console.log("error = ", error);
+                showInfoModal("Error in Image Updater (" + error + ")", () => {})
             }
         }
         else {

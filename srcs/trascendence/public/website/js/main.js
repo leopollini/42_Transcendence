@@ -5,6 +5,7 @@ import { remove_all } from "./utils_main/error_main.js";
 import { routes, handlerMap } from "./utils_main/router.js"
 import { handle_popstate, save_at_exit } from "./utils_main/listener_Compacter.js";
 import { util_main, set_prev_path } from "./utils_main/utils.js";
+import { closeSocket } from "./pages/live-chat/socketHandler.js";
 
 export let Bracket_state = null,
     refresh = false,
@@ -12,11 +13,11 @@ export let Bracket_state = null,
     tournament = null,
     user_name = null,
     opponent = null,
-    stat_name = null,
     pong_save = null,
     persist = 0,
     forza4_save = null,
     token = null,
+    invalid = 0,
     prev_path = null,
     playerNames = null,
     Player1 = null,
@@ -34,7 +35,6 @@ export function reset_all_let() {
     if (window.location.pathname === "/")
         refresh = null;
     Bracket_state = null,
-        stat_name = null,
         current_user = null,
         tournament = null,
         user_name = null,
@@ -86,8 +86,8 @@ export function save_global(type, data) {
         Player2 = parsed_data;
     if (type === "token")
         token = parsed_data;
-    if (type === "stat_name")
-        stat_name = parsed_data;
+    if (type === "invalid")
+        invalid = parsed_data;
     if (type === "tournament")
         tournament = parsed_data;
     if (type === "bracket")
@@ -119,12 +119,12 @@ window.addEventListener('beforeunload', () => {
     if (refresh === false && window.location.pathname !== '/') {
         if (acess)
         {
-            console.log("DUMB");
             remove_all();
+            closeSocket();
+            sessionStorage.setItem("invalid", 1);
         }
     }
 });
-
 
 document.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();
@@ -165,11 +165,7 @@ export const loadContent = async () => {
 
     if (path !== "/classic" && path !== "/forza4/game"
         && path !== "/tournament/knockout/bracket/game" && path !== "/tournament/roundrobin/robinranking/game" && path !== "/") {
-        if (persist === 0) {
-            console.log("hello there");
-            initChat();
-            persist = 1;
-        }
+        initChat();
     } else {
         // If don't needed, empty the chat content
         document.getElementById("chatApp").innerHTML = "";//sicuro
@@ -182,7 +178,7 @@ function initChat() {
     const chatContainer = document.getElementById("chatApp");
     // Insert chat template
     chatContainer.innerHTML = LiveChat();//sicuro
-    // Initialize chat logic by creating the ChatApp instance   
+    // Initialize chat logic by creating the ChatApp instance
     new ChatApp();
 }
 

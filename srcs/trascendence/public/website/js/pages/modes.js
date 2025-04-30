@@ -1,6 +1,5 @@
 import {handle_modes_logic } from '../game/pong/main/modes_logic.js';
 import { save_global } from '../main.js';
-import { setUserName } from './user_data.js';
 
 export default function Modes()
 {
@@ -100,7 +99,6 @@ export async function change_name(name) {
         if (avatarName)
         {
             avatarName.textContent = name;
-            setUserName(name);
             clearInterval(checknameInterval);
         }
     }, 100);
