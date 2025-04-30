@@ -65,7 +65,7 @@ module BetterPG
         dropTable
       end
       begin
-        exec 'CREATE TABLE ', @name, ' (', columns.join(', '), ');'
+        exec 'CREATE TABLE', @name, '(', columns.join(', '), ');'
       rescue PG::DuplicateTable
         addColumns(*columns)
         @columns = better_columns columns
@@ -120,7 +120,7 @@ module BetterPG
         req = ['SELECT ' + @columns.join(', ') + ' FROM', @name]
         t = []
         keys.each_with_index do |k, i|
-          t.append cols[i] + "='" + k.to_s + "'" if i < cols.count && cols[i] && k && !k.to_s.empty?
+          t.append cols[i] + "='" + (k.is_a?(String) ? @pg.escape_string(k) : k.to_s) + "'" if i < cols.count && cols[i] && k && !k.to_s.empty?
         end
         req.append('WHERE ' + t.join(' ' + logic + ' ')) unless t.empty?
         fullkeys.each do |k|
@@ -138,7 +138,7 @@ module BetterPG
       begin
         req = ['DELETE FROM', @name]
         keys.each_with_index do |k, i|
-          req.append 'WHERE ' + cols[i] + '=' + k if k
+          req.append 'WHERE ' + cols[i] + '=' + (k.is_a?(String) ? @pg.escape_string(k) : k if k)
         end
         fullkeys.each do |k|
           req.append 'WHERE ' + k
@@ -148,13 +148,16 @@ module BetterPG
         res if res
       rescue PG::UndefinedColumn, IndexError => e
         puts e
-        []
+        return []
       end
     end
 
     def addValues(content)
       return if content.nil? || content.empty?
       raise "invalid addValues request: requesting a column which exists not" unless (content.keys - @columns).empty?
+      content.each do |k, v|
+        v = @pg.escape_string(v) if v.is_a? String
+      end
       exec 'INSERT INTO', @name, (content.keys.size != 0 ? '(' + content.keys.join(', ') + ')' : ''), 'VALUES',
            "('" + content.values.join("', '") + "')"
       puts 'Added ' + content.values.to_s + ' as ' + content.keys.to_s + ' to ' + @name
@@ -162,12 +165,12 @@ module BetterPG
 
     # send a query like this: 'UPDATE table SET set_key1 = set_val1, set_key2 = set_val2, ... WHERE key = val'. KEY VAL PAIR MUST BE UNIVOQUE
     def updateValue(key = '', val = '', set = {})
+      raise "invalid updateValue request: changing a column which exists not" unless (set.keys - @columns).empty?
       return [] if set.nil? || set.empty?
       req = ['UPDATE', @name, 'SET']
       t = []
-      raise "invalid updateValue request: changing a column which exists not" unless (set.keys - @columns).empty?
       set.each do |k, v|
-        t << "#{k} = '#{v}'" if k && v
+        t << "#{k} = '#{v.is_a?(String) ? @pg.escape_string(v) : v.to_s}'" if k && v
       end
       req << t.join(',')
       req.append ['WHERE', key.to_s, '=', "'#{val.to_s}'"]
@@ -176,9 +179,8 @@ module BetterPG
 
     # send a query like this: 'UPDATE table SET #{string} WHERE key = val'. KEY VAL PAIR MUST BE UNIVOQUE
     def valueManipulation(key, val, string = "")
-      return [{}] if string.nil? || string.empty?
-
-      exec ['UPDATE', @name, 'SET', string, 'WHERE', key, '=', "'#{val}'"]
+      return [] if string.nil? || string.empty?
+      exec ['UPDATE', @name, 'SET', string.to_s, 'WHERE', key.to_s, '=', val.to_s]
     end
 
     # drop column from current table
@@ -205,8 +207,8 @@ module BetterPG
 
     def exec(*strs)
       puts strs.join(' ')
-      return @pg.exec(strs.join(' ')) if strs.size != 0
-      [{}]
+      return @pg.exec(strs.join(' ').to_s) if strs.size != 0
+      []
     end
   end
 end

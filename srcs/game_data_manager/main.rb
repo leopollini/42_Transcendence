@@ -36,12 +36,13 @@ end
 
 def save_pong(obj)
   puts 'save_pong called'
+  # obj = obj.slice GAMES_PONG.getColumns if obj.is_a? Hash
   return {'status' => 'missing game params', 'success' => 'false'} unless (%w[player1 player2 score1 score2 begin_time longest_rally] - obj.keys).empty?
   obj['winner'] = obj['player1'] if obj['score1'].to_i > obj['score2'].to_i
   obj['winner'] = obj['player2'] if obj['score1'].to_i < obj['score2'].to_i
   obj['winner'] ||= 'tie'
-  # obj['duration'] = Time.now.to_i - obj['begin_time'].to_i
-  obj['duration'] = obj['begin_time']
+  obj['duration'] = Time.now.to_i - obj['begin_time'].to_i
+  # obj['duration'] = obj['begin_time']
   obj = obj.slice(*(obj.keys & GAMES_PONG.getColumns))
   GAMES_PONG.addValues obj
 

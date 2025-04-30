@@ -138,9 +138,9 @@ class ChatStore
     @@mutex.synchronize do
       @@clients[accepter].send_sys("You have #{accepted ? "accepted" : "denied"} #{requester}'s friend request!")
       @@clients[requester].send_me({"accepted" => accepted, 'from' => accepter}, 'friend_response')
-      if accepted
-        @@clients[requester].get_waiting_friends.delete accepter
-        @@clients[accepter].get_waiting_friends.delete requester
+      @@clients[requester].get_waiting_friends.delete accepter
+      @@clients[accepter].get_waiting_friends.delete requester
+      if accepted == 'true'
         @@clients[requester].add_friend accepter
         @@clients[accepter].add_friend requester
       end
@@ -186,7 +186,7 @@ class ChatStore
   def self.get_online(include_guests)
     users = (@@clients.select {|u, c| c.alive?}).keys
     puts "all connected users: " + users.to_s
-    if include_guests == 'false'
+    if include_guests.to_s == 'false'
       login_users = []
       (JSON.parse SimpleServer::method_req("get_user", {'avoid_guests' => 'true'}))['user'].each do |u|
         login_users << u['display_name']

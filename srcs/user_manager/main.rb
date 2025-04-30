@@ -113,7 +113,8 @@ def get_user(_client, obj = nil)
     return {'status' => (users.empty? && guests.empty? ? 'no user found' : 'returning whole database'), 'success' => 'true', 
               'guest' => guests, 'user' => users}
   end
-  if name = params['display_name']
+  name = params['display_name']
+  if name
     user = LOGIN.select(['display_name'], [name])
     if user.empty?
       guest = GUEST.get_by_name(name)

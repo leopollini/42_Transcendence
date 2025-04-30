@@ -14,7 +14,7 @@ class GuestsList
   end
   
   def reset()
-    @guests = [nil]
+    @guests = []
     @index = {}
     @counter_index = 0
   end
@@ -79,6 +79,7 @@ class GuestsList
   end
 
   def get_by_name(name)
+    return nil if @index[name].nil?
     @guests[@index[name].to_i]
   end
   
@@ -99,7 +100,7 @@ class GuestsList
   def get_token_name(token)
     unless @guests.empty?
       return {'statuts' => 'bad token', 'success' => 'false'} if token.nil?
-      @guests[1..].each do |entry|
+      @guests[].each do |entry|
         next if entry.nil?
         if entry['token'].to_s.strip == token.to_s.strip
           return {
@@ -121,7 +122,7 @@ class GuestsList
 
   def del_guest_by_token(token)
     unless @guests.empty?
-      @guests[1..].each_with_index do |entry, index|
+      @guests[].each_with_index do |entry, index|
         next if entry.nil?
         if entry['token'].to_s.strip == token.to_s.strip
           @guests.delete_at(index + 1)
@@ -129,7 +130,7 @@ class GuestsList
           return {'service' => 'user_manager', 'status' => "guest deleted succesfully", 'success' => 'true'}
         end
       end
-      return {'service' => 'user_manager', 'status' => " (guest) does not exist", 'success' => 'false'}
+      return {'service' => 'user_manager', 'status' => " guest does not exist", 'success' => 'false'}
     end
   end
 

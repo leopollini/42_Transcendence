@@ -139,8 +139,9 @@ module SimpleServer
         Thread.start(@@server.accept) do |client|
           begin
             method(@@function).call(client, self)
-            # rescue => r
-            # 	puts "Catched: " + r.to_s + "(" + r.class.to_s + ")\n" + r.backtrace.join("\n") if DEBUG_MODE
+          rescue => r
+            puts "Catched: " + r.to_s + "(" + r.class.to_s + ")\n" + r.backtrace.join("\n") if DEBUG_MODE
+            raise r
           end
           client.close if @@close && !client.closed?
           puts 'Connection concluded' if DEBUG_MODE

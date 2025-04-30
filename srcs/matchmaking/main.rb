@@ -63,7 +63,7 @@ def make_match(players, mode)
   return {'status' => 'success', 'success' => 'true', 'matches' => matches}
 end
 
-def get_online_opponents
+def get_online_opponents(obj)
   online_users = JSON.parse(SimpleServer::method_req('get_online'))
   puts "online users response: #{online_users}"
   puts "online users: #{online_users} (#{online_users['success'].to_s})"
@@ -71,15 +71,29 @@ def get_online_opponents
   online_users = online_users['online_users']
   return DEFAULT_ERROR_RES.clone if online_users.nil?
   rank = {}
+  me = obj['username']
+  me_rank = 0
   online_users.each do |p|
     rk = JSON.parse SimpleServer.method_req('get_pong_games', {'display_name' => p, 'get_rank' => 'true'})
     puts "Response for Rank of #{p}: #{rk}"
     return DEFAULT_ERROR_RES.clone if rk['success'].to_s != 'true'
-    rank[rk['rank']] = p
+    rank[rk['rank']] ||= []
+    rank[rk['rank']] << p
+    me_rank = rk['rank'].to_i if me && p == me.to_s
   end
   puts "Rank before sorting: #{rank}".yellow
-  rank.sort
-  {'status' => 'success', 'success' => 'true', 'ranked players' => rank}
+  if me.nil? || me.empty?
+    sorted_rank = rank.sort
+  else
+    sorted_rank = rank.sort_by {|r, us| me_rank > r ? 2 * (me_rank - r) + 1 : 2 * (r - me_rank)}.to_h
+  end
+  sorted_opps = []
+  puts "Rank after sorting: #{sorted_rank}".yellow
+  sorted_rank.each do |k, v|
+    sorted_opps = sorted_opps + v
+  end
+  puts "List of sorted opponents: #{sorted_opps}".yellow
+  {'status' => 'success', 'success' => 'true', 'opponents' => sorted_opps}
 end
 
 def matchmake(client, server)
@@ -94,10 +108,10 @@ def matchmake(client, server)
   res = case bobj['method']
   when 'create_tournament'
   puts "am matchmakimg lol".green
-    make_match(bobj['players'], bobj['mode'])
+    make_match bobj['players'], bobj['mode']
   when 'get_online_opponents'
-    get_online_opponents()
-  end  
+    get_online_opponents bobj
+  end
   
   
   puts res.to_json
