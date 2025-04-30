@@ -77,10 +77,16 @@ module BetterPG
       true
     end
 
+    def get_exisitng_columns
+      result = @pg.exec("SELECT column_name FROM information_schema.columns WHERE table_name = #{@name.to_s} ORDER BY ordinal_position")
+      result.map { |row| row['column_name'] }
+    end
+
     # add columns to current table. ELEMENTS MUST CONTAIN DATA TYPE
     def addColumns(*columns)
       print 'Creating columns ' # if Ports::DEBUG_MODE
-      columns.each do |c|
+      (columns - get_exisitng_columns).each do |c|
+        # (columns - get_exisitng_columns).each do |c|
         exec 'ALTER TABLE', @name, 'ADD', c
         print c, ' ' # if Ports::DEBUG_MODE
       rescue PG::DuplicateColumn
@@ -209,11 +215,11 @@ module BetterPG
       begin
         puts strs.join(' ')
         return @pg.exec(strs.join(' ').to_s) if strs.size != 0
+        return []
       rescue PG::InvalidTextRepresentation => r
         puts r.backtrace
-        return []
+        return nil
       end
-      []
     end
   end
 end
