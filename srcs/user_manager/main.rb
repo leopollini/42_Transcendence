@@ -29,7 +29,7 @@ LOGIN = BetterPG::SimplePG.new 'users',
                                 'created NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT', 'token TEXT']
 
 GUEST = GuestsList.new
-MANDATORY_DATA = %w[email display_name realname bio image token]
+MANDATORY_DATA = %w[realname token]
 GET_USER_SECURE_INFO = %w[display_name created image]
 NON_UPDATABLE_PARAMS = %w[realname created level entered token]
 
@@ -37,7 +37,8 @@ NON_UPDATABLE_PARAMS = %w[realname created level entered token]
 
 def user_creat(data, token)
   puts "Cteating new user as:".green, data
-  return DEFAULT_MISSING_PARAM.clone if (MANDATORY_DATA - data.keys).empty?
+  data.delete 'display_name';
+  return DEFAULT_MISSING_PARAM.clone unless (MANDATORY_DATA - data.keys).empty?
   LOGIN.addValues data
   return DEFAULT_SUCCESS_RES.merge({'token' => token, 'user' => (LOGIN.select_specific 'realname', data['realname'].to_s, [], false)})
 end
@@ -128,11 +129,11 @@ def get_user(_client, obj = nil)
     user = LOGIN.select(['display_name'], [name])
     if user.empty?
       guest = GUEST.get_by_name(name)
-      return DEFAULT_SUCCESS_RES.merge({'guest' => [guest.except('token')]}) if guest
+      return DEFAULT_SUCCESS_RES.merge({'guest' => guest.except('token')}) if guest
       return {'status' => 'no user found', 'success' => 'false'} 
     end
     user = user[0].to_h.except('token')
-    return DEFAULT_SUCCESS_RES.merge({'user' => [user]})
+    return DEFAULT_SUCCESS_RES.merge({'user' => user})
   end
   return get_user_by_token if params['token']
   DEFAULT_MISSING_PARAM.clone

@@ -69,7 +69,7 @@ export async function restore_user() {
             if (result.guest)
                 ref_user = set_user(result.guest, "guest");
             else
-                ref_user = set_user(result.user[0], "login");
+                ref_user = set_user(result.user, "login");
             updateProfileUI(ref_user);
             return ref_user;
         }
@@ -190,8 +190,8 @@ export async function another_user_info(name)
             body: data
         })
         let result = await response.json();
-        if (result.user && result.user[0])
-            return(result.user[0]);
+        if (result.user)
+            return(result.user);
         else if (result.guest)
         {
             let user = new profile(null,

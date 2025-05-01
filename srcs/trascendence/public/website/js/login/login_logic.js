@@ -21,35 +21,6 @@ export async function addCallbackPageHandlers() {
   }
 }
 
-async function checkAuthentication() {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    if (!code) {
-      showInfoModal("Missing OAuth parameters.", () => { });
-      return (1);
-    }
-    const response = await fetch('/api/callback?' + params.toString());
-    const data = await response.json();
-    console.log("response info = ", data);
-    if (data.success === "true") {
-      console.log("data = ", data);
-      save_global("name", data.display_name);
-      save_global("token", data.token);
-      if (await get_data() === 1)
-        return (1);
-      showInfoModal(data.message, () => { });
-      return (-1);
-    } else {
-      showInfoModal("Authentication failed: " + data.message, () => {});
-      return (1);
-    }
-  } catch (error) {
-    showInfoModal("ERROR handling in callback: " + error.message, () => { });
-    return (1);
-  }
-}
-
 async function update_with_new_name(name) {
   let data = JSON.stringify({
     "token": token,
@@ -75,52 +46,94 @@ async function update_with_new_name(name) {
     });
 }
 
-async function set_user(result) {
-  const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
-  const name = await promptModal("Inserisci il tuo nickname");
-  if ((await check_name(name)) !== true) {
+async function checkAuthentication() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    if (!code) {
+      showInfoModal("Missing OAuth parameters.", () => { });
+      return (1);
+    }
+    const response = await fetch('/api/callback?' + params.toString());
+    const data = await response.json();
+    if (data.success === "true") {
+      console.log("data = ", data);
+      if (await set_user(data) === 1)
+        return (1);
+      showInfoModal(data.message, () => { });
+      return (-1);
+    } else {
+      showInfoModal("Authentication failed: " + data.message, () => {});
+      return (1);
+    }
+  } catch (error) {
+    showInfoModal("ERROR handling in callback: " + error.message, () => { });
     return (1);
   }
+}
+
+// async function save_user_login_data(data) {
+//   try {
+//     save_global("name", data.display_name);
+//     save_global("token", data.token);
+    
+//     console.log("username = ", user_name);
+//     const data = JSON.stringify({ "params": { "display_name": user_name }, "token": token });
+//     const response = await fetch("http://localhost:8008", {
+//       method: "get_user",
+//       body: data
+//     })
+//     const result = await response.json();
+//     if (result && result.success === "true") {
+//       if (await set_user(result) === 1)
+//         return (1);
+//       return (0);
+//     }
+//     else {
+//       showInfoModal("ERROR Login GET_USER: An error has occured(\"" + result.status + "\")", () => { });;
+//       return (1);
+//     }
+//   }
+//   catch (error) {
+//     showInfoModal("Error during Login in get_user: " + error.message, () => { });
+//     return (1);
+//   }
+// }
+
+async function set_user(user) {
+  let name_changed = false
+  let display_name
+  // console.log("use data inside set user: ", user);
+  if (!user.display_name) {
+    const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
+    display_name = await promptModal("Inserisci il tuo nickname");
+    if ((await check_name(display_name)) !== true) {
+      return (1);
+    }
+    name_changed = true;
+  }
+  else {
+    display_name = user.display_name;
+  }
+  save_global("name", user.display_name);
+  save_global("token", user.token);
+  console.log("displayname from server or input: ", display_name);
   let new_user =
   {
-    email: result.user[0].email,
-    login_name: escapeHtml(String(name).trim()),
-    realname: result.user[0].realname,
-    image: result.user[0].image,
-    bio: result.user[0].bio,
+    email: user.email,
+    login_name: escapeHtml(String(display_name).trim()),
+    realname: user.realname,
+    image: user.image,
+    bio: user.bio,
     type: "login"
   };
   save_global("name", new_user.login_name);
   console.log("username after set = ", user_name);
-  await update_with_new_name(name);
+  if (name_changed)
+    await update_with_new_name(display_name);
   save_global("acess", true);
   change_name(new_user.login_name);
   update_image(new_user.image);
-}
-
-async function get_data() {
-  try {
-    console.log("username = ", user_name);
-    const data = JSON.stringify({ "params": { "display_name": user_name }, "token": token });
-    const response = await fetch("http://localhost:8008", {
-      method: "get_user",
-      body: data
-    })
-    const result = await response.json();
-    if (result && result.success === "true") {
-      if (await set_user(result) === 1)
-        return (1);
-      return (0);
-    }
-    else {
-      showInfoModal("ERROR Login GET_USER: An error has occured(\"" + result.status + "\")", () => { });;
-      return (1);
-    }
-  }
-  catch (error) {
-    showInfoModal("Error during Login in get_user: " + error.message, () => { });
-    return (1);
-  }
 }
 
 export async function performLogin() {
