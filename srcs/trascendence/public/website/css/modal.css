@@ -13,7 +13,7 @@
     visibility: hidden;
     transition: opacity 0.2s ease-out, visibility 0s linear 0.2s; /* Ritardo per evitare flash */
     will-change: opacity, visibility;
-    z-index: 1;
+    z-index: 999;
 }
 
 .modal {
@@ -105,4 +105,23 @@
 .modal-overlay.active .modal {
     transform: scale(1);
     opacity: 1;
+}
+
+/* Pulsante di chiusura stile .close-profile, .icon-button */
+.modal .icon-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 1.5rem;
+    font-size: 1.6rem;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.modal .icon-button:hover {
+    transform: scale(1.1);
 }

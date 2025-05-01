@@ -39,18 +39,23 @@
             </div>
         </div>
         
-        <!-- Modal per inserire il nickname -->
         <div class="modal-overlay" id="inputModal">
             <div class="modal">
-                <h2 id="inputModalTitle">Choose your nickname</h2>
-                <div class="modal-content">
-                    <input type="text" id="nicknameInput" placeholder="Your nickname is..." autocomplete="off" />
-                </div>
-                <div class="modal-actions">
+              <button class="icon-button" id="inputModalClose" aria-label="Close">&times;</button>
+              <h2 id="inputModalTitle">Choose your nickname</h2>
+              <div class="modal-content">
+                <input
+                  type="text"
+                  id="nicknameInput"
+                  placeholder="Your nickname is..."
+                  autocomplete="off"
+                />
+              </div>
+              <div class="modal-actions">
                     <button class="accept" id="inputConfirm">Confirm</button>
-                </div>
+              </div>
             </div>
-        </div>  
+        </div> 
         <script type="module" src="/website/js/main.js"></script>
     </body>
 </html>

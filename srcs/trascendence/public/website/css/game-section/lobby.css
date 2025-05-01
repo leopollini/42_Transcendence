@@ -79,7 +79,11 @@
     align-self: flex-start;
 }
 
-#onlinePlayers,
+#pongOnlinePlayers,
+#pongMatchPlayers,
+#f4OnlinePlayers,
+#f4MatchPlayers,
+#tournamentPlayers,
 #pongMatchPlayers {
     flex: 1;
     display: flex;
