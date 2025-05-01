@@ -1,6 +1,6 @@
 import { showConfirmModal, showInfoModal } from "../../modal.js";
 import { renderHtmlAsText } from "../../security/security.js";
-import { token } from "../../main.js";
+import { in_game, token } from "../../main.js";
 
 let socket;
 
@@ -10,9 +10,9 @@ export function closeSocket() {
 }
 
 function initSocket(username, chatAppInstance) {
-    let path = window.location.pathname;
     if (!socket)
         socket = new WebSocket('ws://localhost:6087');
+
     socket.onopen = () => {
         socket.send(JSON.stringify({ type: "join", 'username': username, 'token': token }));
 
@@ -116,13 +116,21 @@ function initSocket(username, chatAppInstance) {
             }
             chatAppInstance.addMessageToChat(chatAppInstance.currentChat, msg.data);
         }
-        else if (msg.type === "match_request" && path !== '/tournament/knockout/bracket/game'
-            && path !== '/tournament/knockout/bracket' && path !== "/tournament/roundrobin/robinranking"
-            && path !== "/tournament/roundrobin/robinranking/game") {
+        else if (msg.type === "match_request") {
             // L'utente ricevente visualizza la richiesta di partita tramite modal di conferma
             const sender = msg.data ? msg.data.from : msg.from; // "userA"
             const receiver = username; // "userB"
-           
+            console.log("in_game = ", in_game);
+            if (in_game !== 0) {
+                socket.send(JSON.stringify({
+                    type: "match_response",
+                    to: sender,
+                    from: receiver,
+                    accepted: "user unavailable"
+                }));
+                return;
+            }
+            
             showConfirmModal(
               `${sender} ti ha invitato a una partita. Accetti?`,
               () => { // onConfirm: utente conferma
@@ -130,7 +138,7 @@ function initSocket(username, chatAppInstance) {
                       type: "match_response",
                       to: sender,
                       from: receiver,
-                      accepted: true
+                      accepted: "true"
                   };
                   console.log("receiver", receiver);
                   console.log("⚡ Invio risposta all'invito:", response);
@@ -141,7 +149,7 @@ function initSocket(username, chatAppInstance) {
                       type: "match_response",
                       to: sender,
                       from: receiver,
-                      accepted: false
+                      accepted: "false"
                   };
                   console.log("⚡ Invio risposta all'invito:", response);
                   socket.send(JSON.stringify(response));
@@ -150,12 +158,16 @@ function initSocket(username, chatAppInstance) {
         }
         else if (msg.type === "match_response") {
             console.log("📩 Risposta ricevuta:", msg);
-            if (msg.data && msg.data.accepted)
+            if (!msg.data)
+                showInfoModal("bad response.", () => {});
+            if (msg.data.accepted === "true")
                 // Modal informativo: solo un pulsante OK
                 showInfoModal("the invite was accepted! you can start the match.", () => {});
+            else if (msg.data.accepted === "user unavailable")
+                showInfoModal(msg.data.accepted, () => {});
             else
                 showInfoModal("the invite was rejected.", () => {});
-        }                                  
+        }                              
     };
     return socket;
 }

@@ -48,8 +48,7 @@ export default function ClassicPongLobbyRoom() {
 }
 
 
-function update_data()
-{
+function update_data() {
   invitedPlayers = lobby_data.invitedPlayers;
   numPlayersAccepted = lobby_data.numPlayersAccepted;
   numPlayersLabel = lobby_data.numPlayersLabel;
@@ -58,56 +57,15 @@ function update_data()
   addedPlayer = lobby_data.addedPlayer;
 }
 
+
 export async function handleClassicPongLobby() {
   save_global("game", 0);
-
-
+  console.log("lobby = ", lobby_data);
   if (lobby_data)
     update_data();
-  // 1) Inizializza socket e listener per match_response
-  if (!socket && current_user) {
-    socket = initSocket(current_user.display_name);
-    socket.addEventListener("message", event => {
-      const msg = JSON.parse(event.data);
-      if (msg.type === "match_response" && msg.data.accepted) {
-        const from = msg.data.from;
-        const onlineEl = document.getElementById("pongOnlinePlayers");
-        const matchEl = document.getElementById("pongMatchPlayers");
-        const onlineBadge = document.getElementById("pongOnlinePlayersCount");
-        const startBtn = document.getElementById("pongToggleStartMatch");
-        numPlayersLabel = document.getElementById("pongNumPlayersLabel");
+  // 1) Inizializza socket e listener per match_respons
 
-        // **UPDATE IMMEDIATO** UI e stato (come in Forza4)
-        newPlayer = document.createElement("div");
-        newPlayer.classList.add("player");
-        newPlayer.textContent = from;
-        matchEl.appendChild(newPlayer);
-
-        onlineEl.querySelectorAll(".player").forEach(p => {
-          if (p.textContent === from) p.remove();
-        });
-
-        save_global("opponent", from);
-        let index = players.indexOf(msg.data.from);
-        if (index !== -1)
-          players.splice(index, 1);
-        addedPlayer.push(from);
-        invitedPlayers.push(from);
-        numPlayersAccepted++;
-        numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
-        onlineBadge.textContent = onlineEl.querySelectorAll(".player").length;
-
-        if (numPlayersAccepted === totalPlayers) {
-          startBtn.disabled = false;
-        }
-
-        // **POI** notifica con modal
-        showInfoModal(`${from} ha accettato l'invito a Classic Pong!`, () => { });
-        save_global("lobby_data", give_lobby_classic());
-      }
-    });
-  }
-
+  get_socket();
   // 2) Preleva elementi DOM
   const onlineEl = document.getElementById("pongOnlinePlayers");
   const matchEl = document.getElementById("pongMatchPlayers");
@@ -135,8 +93,7 @@ export async function handleClassicPongLobby() {
     matchEl.appendChild(me);
 
     invitedPlayers.push(current_user.display_name);
-    if (addedPlayer)
-    {
+    if (addedPlayer) {
       addedPlayer.forEach(e => {
         invitedPlayers.push(e)
         const playerDiv = document.createElement("div");
@@ -149,8 +106,7 @@ export async function handleClassicPongLobby() {
     }
     numPlayersAccepted++;
     numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
-    console.log(numPlayersAccepted + " === " +  totalPlayers);
-    if (numPlayersAccepted ===  totalPlayers) 
+    if (numPlayersAccepted === totalPlayers)
       startBtn.disabled = false;
   }
 
@@ -211,4 +167,53 @@ export function addClassicPongLobbyPageHandlers() {
       navigate("/classic", "Classic Pong Game", invitedPlayers);
     }
   });
+}
+
+function get_socket()
+{
+
+  if (current_user) {
+    socket = initSocket(current_user.display_name);
+    socket.addEventListener("message", event => {
+      const msg = JSON.parse(event.data);
+      if (msg.data.accepted !== "true")
+        return;
+      if (msg.type === "match_response" && msg.data.accepted) {
+        const from = msg.data.from;
+        const onlineEl = document.getElementById("pongOnlinePlayers");
+        const matchEl = document.getElementById("pongMatchPlayers");
+        const onlineBadge = document.getElementById("pongOnlinePlayersCount");
+        const startBtn = document.getElementById("pongToggleStartMatch");
+        numPlayersLabel = document.getElementById("pongNumPlayersLabel");
+
+        // **UPDATE IMMEDIATO** UI e stato (come in Forza4)
+        newPlayer = document.createElement("div");
+        newPlayer.classList.add("player");
+        newPlayer.textContent = from;
+        matchEl.appendChild(newPlayer);
+
+        onlineEl.querySelectorAll(".player").forEach(p => {
+          if (p.textContent === from) p.remove();
+        });
+
+        save_global("opponent", from);
+        let index = players.indexOf(msg.data.from);
+        if (index !== -1)
+          players.splice(index, 1);
+        addedPlayer.push(from);
+        invitedPlayers.push(from);
+        numPlayersAccepted++;
+        numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
+        onlineBadge.textContent = onlineEl.querySelectorAll(".player").length;
+
+        if (numPlayersAccepted === totalPlayers) {
+          startBtn.disabled = false;
+        }
+
+        // **POI** notifica con modal
+        showInfoModal(`${from} ha accettato l'invito a Classic Pong!`, () => { });
+        save_global("lobby_data", give_lobby_classic());
+      }
+    });
+  }
 }
