@@ -10,6 +10,8 @@ export function closeSocket() {
 }
 
 function initSocket(username, chatAppInstance) {
+    if (socket)
+        return;
     socket = new WebSocket('ws://localhost:6087');
 
     socket.onopen = () => {

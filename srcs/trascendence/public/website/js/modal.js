@@ -48,16 +48,21 @@ export function showInfoModal(message, onOk) {
   };
 }
 
-// Modal di input per il nickname
 export function showInputModal(title, onConfirm) {
-  const inputModal = document.getElementById("inputModal");
-  const inputModalTitle = document.getElementById("inputModalTitle");
-  const nicknameInput = document.getElementById("nicknameInput");
-  const inputConfirm = document.getElementById("inputConfirm");
+  const inputModal       = document.getElementById("inputModal");
+  const inputModalTitle  = document.getElementById("inputModalTitle");
+  const nicknameInput    = document.getElementById("nicknameInput");
+  const inputConfirm     = document.getElementById("inputConfirm");
+  const inputModalClose  = document.getElementById("inputModalClose");
 
   inputModalTitle.textContent = title || "Inserisci il tuo nickname";
   nicknameInput.value = "";
+
   inputModal.classList.add("active");
+
+  inputConfirm.onclick      = null;
+  inputModalClose.onclick   = null;
+  inputModal.onclick        = null;
 
   inputConfirm.onclick = () => {
     const nickname = nicknameInput.value.trim();
@@ -66,8 +71,16 @@ export function showInputModal(title, onConfirm) {
       return;
     }
     inputModal.classList.remove("active");
-    if (typeof onConfirm === "function") {
-      onConfirm(nickname);
+    if (typeof onConfirm === "function") onConfirm(nickname);
+  };
+
+  inputModalClose.onclick = () => {
+    inputModal.classList.remove("active");
+  };
+
+  inputModal.onclick = (e) => {
+    if (e.target === inputModal) {
+      inputModal.classList.remove("active");
     }
   };
 }
