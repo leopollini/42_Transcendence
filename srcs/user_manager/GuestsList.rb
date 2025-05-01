@@ -29,6 +29,7 @@ class GuestsList
   
     @index.delete(@guests[i]['username']) if @guests[i]
 
+    data['token'] = Digest::SHA256.hexdigest(Time.now.to_s + data.to_s)
     
     @guests[i] = {
       'username' => username,
