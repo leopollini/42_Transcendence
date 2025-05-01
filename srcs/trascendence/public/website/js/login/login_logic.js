@@ -31,8 +31,8 @@ async function checkAuthentication() {
     }
     const response = await fetch('/api/callback?' + params.toString());
     const data = await response.json();
-    console.log("data = ", data);
-    if (data.success) {
+    console.log("response info = ", data);
+    if (data.success === "true") {
       console.log("data = ", data);
       save_global("name", data.display_name);
       save_global("token", data.token);
@@ -41,7 +41,7 @@ async function checkAuthentication() {
       showInfoModal(data.message, () => { });
       return (-1);
     } else {
-      showInfoModal("Authentication failed: " + data.status, () => {});
+      showInfoModal("Authentication failed: " + data.message, () => {});
       return (1);
     }
   } catch (error) {

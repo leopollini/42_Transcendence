@@ -31,11 +31,19 @@ module Other_logic
     # realname = user['realname']
   
     response.content_type = 'application/json'
-    response.write({
-      success: res['success'].to_s,
-      message: (res['success'] == "true" ? "!!Authenticated Succesfully!!" : res[]),
-      token: token.token,
-    }.merge(user).to_json)
+    if res['success'].to_s == 'true'
+      response.write({
+        success: 'true',
+        message: "!!Authenticated Succesfully!!",
+        token: token.token,
+      }.merge(user.to_h).to_json)
+    else
+      response.write({
+        success: 'false',
+        message: res['status'],
+        token: 'hehelol'
+    }.to_json)
+    end
   end
   
   def get_user_data_from_oauth_provider(token)

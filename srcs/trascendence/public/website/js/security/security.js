@@ -1,5 +1,6 @@
 import { user_name } from "../main.js";
 import { showInfoModal } from "../modal.js";
+import { token } from "../main.js";
 export async function validateUploadedImage(file)
 {
     return new Promise((resolve, reject) =>
@@ -67,7 +68,7 @@ export function free_users()
 {
     try
     {
-        let data = JSON.stringify({"display_name" : user_name});
+        let data = JSON.stringify({"token" : token});
         fetch("http://localhost:8008",
         {
             method: "logout_user",

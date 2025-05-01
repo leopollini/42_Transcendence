@@ -213,8 +213,9 @@ module BetterPG
 
     def exec(*strs)
       begin
-        puts strs.join(' ')
-        return @pg.exec(strs.join(' ').to_s) if strs.size != 0
+        strs = strs.join(' ')
+        puts strs
+        return @pg.exec(strs) if strs.size != 0
         return []
       rescue PG::InvalidTextRepresentation => r
         puts r.backtrace

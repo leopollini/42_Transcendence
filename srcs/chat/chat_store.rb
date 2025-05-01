@@ -140,6 +140,7 @@ class ChatStore
       @@clients[requester].send_me({"accepted" => accepted, 'from' => accepter}, 'friend_response')
       @@clients[requester].get_waiting_friends.delete accepter
       @@clients[accepter].get_waiting_friends.delete requester
+      puts "ACCEPTED IS #{accepted}".green.bold
       if accepted == 'true'
         @@clients[requester].add_friend accepter
         @@clients[accepter].add_friend requester

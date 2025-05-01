@@ -65,8 +65,9 @@ def login_user(client, obj)
   # LOGGED_IN << data['display_name']
   # (update_user(client, {"new_params" => data})).merge({'token' => token})
 
+  puts "Found user: #{usr}".yellow.bold
   
-  return {'status' => 'user already online', 'success' => 'false'} if usr['token'].nil?
+  return {'status' => 'user already online', 'success' => 'false'} unless usr['token'].to_s.empty?
   
   LOGIN.updateValue('realname', usr['realname'], {'token' => data['token']})
   #SET TOKEN PLEASE
@@ -96,9 +97,10 @@ end
 
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
-  username = obj["display_name"]
-  return GUEST.del_guest(username) if GUEST.exists? username
-  LOGIN.updateValue 'display_name', username, {'token' => 'null'}
+  token = obj['token'].to_s
+  return {'status' => 'token not specified', 'success' => 'false'} if token.to_s.empty?
+  return GUEST.del_by_token(token) if GUEST.exists_token? token
+  LOGIN.updateValue 'token', token, {'token' => ''}
   # LOGGED_IN.delete username
   {"status"=>"success", "success"=>"true"}
 end
@@ -126,10 +128,11 @@ def get_user(_client, obj = nil)
     user = LOGIN.select(['display_name'], [name])
     if user.empty?
       guest = GUEST.get_by_name(name)
-      return DEFAULT_SUCCESS_RES.merge({'guest' => guest}) if guest
+      return DEFAULT_SUCCESS_RES.merge({'guest' => [guest.except('token')]}) if guest
       return {'status' => 'no user found', 'success' => 'false'} 
     end
-    return DEFAULT_SUCCESS_RES.merge({'user' => user})
+    user = user[0].to_h.except('token')
+    return DEFAULT_SUCCESS_RES.merge({'user' => [user]})
   end
   return get_user_by_token if params['token']
   DEFAULT_MISSING_PARAM.clone

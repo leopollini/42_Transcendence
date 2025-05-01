@@ -14,8 +14,9 @@ class GuestsList
   end
   
   def reset()
-    @guests = []
-    @index = {}
+    @guests = {}          # map of guest_di => user
+    @index = {}           # map of username => index of user
+    @tokens = {}          # map of token => index of user
     @counter_index = 0
   end
 
@@ -28,6 +29,7 @@ class GuestsList
     @counter_index = (@counter_index + 1) % MAX_GUEST_COUNT
   
     @index.delete(@guests[i]['username']) if @guests[i]
+    @tokens.delete(@guests[i]['username']) if @guests[i]
 
     
     @guests[i] = {
@@ -40,6 +42,7 @@ class GuestsList
     }
     
     @index[username] = i
+    @tokens[data['token']] = i
 
     {
       'service' => 'user_manager',
@@ -49,18 +52,29 @@ class GuestsList
       'token' => data['token']
     }
   end
-  
-  def del_guest(username)
-    index = @index[username]
+
+  def del_by_index(index)
     return { 'status' => 'user not found', 'success' => 'false' } if index.nil?
+    return { 'status' => 'database empty', 'success' => 'false' } if @guests.empty?
   
     @guests[index] = nil
-    @index.delete(username)
   
     {
       'status' => 'success',
       'success' => 'true'
     }
+  end
+  
+  def del_guest(username)
+    index = @index[username]
+    @index[username] = nil if index
+    del_by_index index
+  end
+
+  def del_by_token(token)
+    index = @tokens[token]
+    @tokens[token] = nil if index
+    del_by_index index
   end
   
   def get_all_guests()
@@ -81,56 +95,40 @@ class GuestsList
     @guests[@index[name].to_i]
   end
   
-  def update_guest(username, new_data)
-    index = @index[username]
-    return { 'status' => "user not found (#{username})", 'success' => 'false' } if index.nil?
+  def update_guest(token, new_data)
+    index = @tokens[token]
+    return { 'status' => "user not found", 'success' => 'false' } if index.nil?
+    return { 'status' => 'database empty', 'success' => 'false' } if @guests.empty?
   
     guest = @guests[index]
-    puts "modifying #{username}'s info: #{new_data}".green
-    return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio', 'image', 'display_name']).empty?
-    # return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio', 'image']).empty?
+    puts "modifying #{guest['username']}'s info: #{new_data}".green
+    return { 'status' => 'changing invalid info', 'success' => 'false' } unless (new_data.keys - ['bio', 'image']).empty?
   
     guest['bio'] = new_data['bio'] if new_data['bio']
-    # guest['image'] = new_data['image'] if new_data['image']
+    guest['image'] = new_data['image'] if new_data['image']
     { 'status' => 'success', 'success' => 'true' }
   end
 
   def get_token_name(token)
     unless @guests.empty?
       return {'statuts' => 'bad token', 'success' => 'false'} if token.nil?
-      @guests[].each do |entry|
-        next if entry.nil?
-        if entry['token'].to_s.strip == token.to_s.strip
-          return {
-            'status' => 'success',
-            'success' => 'true',
-            'username' => entry['username'],
-            'bio' => entry['bio'],
-            'image' => entry['image'],
-            'type' => 'guest'
-          }
-        end
+      guest = @guests[@tokens[token]]
+      if guest
+        return {
+          'status' => 'success',
+          'success' => 'true',
+          'username' => guest['username'],
+          'bio' => guest['bio'],
+          'image' => guest['image'],
+          'type' => 'guest'
+        }
       end
       return {'status' => 'invalid token', 'success' => 'false'}
     else
-      return {'status' => 'no users found', 'success' => 'false'}
+      return {'status' => 'database empty', 'success' => 'false'}
     end
   end
 
-
-  def del_guest_by_token(token)
-    unless @guests.empty?
-      @guests[].each_with_index do |entry, index|
-        next if entry.nil?
-        if entry['token'].to_s.strip == token.to_s.strip
-          @guests.delete_at(index + 1)
-          @index.delete token
-          return {'service' => 'user_manager', 'status' => "guest deleted succesfully", 'success' => 'true'}
-        end
-      end
-      return {'service' => 'user_manager', 'status' => " guest does not exist", 'success' => 'false'}
-    end
-  end
 
   def exists?(username)
     if @index.key?(username)
@@ -141,9 +139,10 @@ class GuestsList
   end
 
   def exists_token?(token)
-    @guests.each do |g|
-      return g['username'] if g && g['token'].to_s == token.to_s
+    if @tokens.key?(token)
+      @guests[@tokens[tokenn].to_i] && @guests[@tokens[token].to_i]['deleted'].to_i == -1
+    else
+      false
     end
-      nil
   end
 end
