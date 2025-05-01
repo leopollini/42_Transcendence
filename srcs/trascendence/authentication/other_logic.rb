@@ -40,8 +40,7 @@ module Other_logic
     else
       response.write({
         success: 'false',
-        message: res['status'],
-        token: 'hehelol'
+        message: res['status']
     }.to_json)
     end
   end
