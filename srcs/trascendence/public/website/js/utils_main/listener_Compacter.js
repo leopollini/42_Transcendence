@@ -5,7 +5,8 @@ import {
     save_global, navigate,
     playerNames,
     tournament,
-    persist
+    persist,
+    lobby_data
 } from "../main.js";
 import { resetBracketState } from "../pages/tournament/bracket.js";
 import { showInfoModal } from "../modal.js";
@@ -33,6 +34,8 @@ export function save_at_exit() {
         to_string("player1", Player1, false);
     if (Player2)
         to_string("player2", Player2, false);
+    if (lobby_data)
+        to_string("lobby_data", lobby_data, true);
     if (Bracket_state)
         to_string("bracketState", Bracket_state, true);
     if (in_game)

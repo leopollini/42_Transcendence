@@ -66,10 +66,10 @@ export async function restore_user() {
         let result = await response.json();
         if (result && result.success === "true") {
             let ref_user;
-            if (result.guest)
-                ref_user = set_user(result.guest, "guest");
+            if (result.guest || result.guest[0])
+                ref_user = set_user(result.guest[0] || result.guest, "guest");
             else
-                ref_user = set_user(result.user[0], "login");
+                ref_user = set_user(result.user[0] || result.user, "login");
             updateProfileUI(ref_user);
             return ref_user;
         }

@@ -10,10 +10,9 @@ export function closeSocket() {
 }
 
 function initSocket(username, chatAppInstance) {
-    if (socket)
-        return;
-    socket = new WebSocket('ws://localhost:6087');
-
+    let path = window.location.pathname;
+    if (!socket)
+        socket = new WebSocket('ws://localhost:6087');
     socket.onopen = () => {
         socket.send(JSON.stringify({ type: "join", 'username': username, 'token': token }));
 
@@ -117,7 +116,9 @@ function initSocket(username, chatAppInstance) {
             }
             chatAppInstance.addMessageToChat(chatAppInstance.currentChat, msg.data);
         }
-        else if (msg.type === "match_request") {
+        else if (msg.type === "match_request" && path !== '/tournament/knockout/bracket/game'
+            && path !== '/tournament/knockout/bracket' && path !== "/tournament/roundrobin/robinranking"
+            && path !== "/tournament/roundrobin/robinranking/game") {
             // L'utente ricevente visualizza la richiesta di partita tramite modal di conferma
             const sender = msg.data ? msg.data.from : msg.from; // "userA"
             const receiver = username; // "userB"

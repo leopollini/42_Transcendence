@@ -43,6 +43,7 @@ async function not_home(path) {
     }
     if (!opponent && (path === "/classic" || path === "/forza4/game")) {
         navigate("/modes", "return to modes");
+        console.log("sos");
         showInfoModal("the operation you are doing is forbidden", () => { });
         return (1);
     }
@@ -141,6 +142,10 @@ async function refresh_reset() {
     if (sessionStorage.getItem("acess")) {
         save_global("acess", sessionStorage.getItem("acess"));
         sessionStorage.removeItem("acess");
+    }
+    if (sessionStorage.getItem("lobby_data")) {
+        save_global("lobby_data", sessionStorage.getItem("lobby_data"));
+        sessionStorage.removeItem("lobby_data");
     }
 }
 

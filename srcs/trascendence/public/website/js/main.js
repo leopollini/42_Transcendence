@@ -9,6 +9,7 @@ import { closeSocket } from "./pages/live-chat/socketHandler.js";
 
 export let Bracket_state = null,
     refresh = false,
+    lobby_data = null,
     current_user = null,
     tournament = null,
     user_name = null,
@@ -35,6 +36,7 @@ export function reset_all_let() {
     if (window.location.pathname === "/")
         refresh = null;
     Bracket_state = null,
+        lobby_data = null,
         current_user = null,
         tournament = null,
         user_name = null,
@@ -72,6 +74,8 @@ export function save_global(type, data) {
     let parsed_data = is_parsable(data, true);
     if (type === "pong")
         pong_save = parsed_data;
+    if (type === "lobby_data")
+        lobby_data = parsed_data;
     if (type === "name")
         user_name = parsed_data;
     if (type === "persist")
@@ -117,8 +121,7 @@ export function save_global(type, data) {
 window.addEventListener('beforeunload', () => {
     save_at_exit();
     if (refresh === false && window.location.pathname !== '/') {
-        if (acess)
-        {
+        if (acess) {
             remove_all();
             closeSocket();
             sessionStorage.setItem("invalid", 1);

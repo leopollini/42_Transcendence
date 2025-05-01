@@ -66,6 +66,7 @@ export function updateProfileUI(profile)
 
 export const addModesPageHandlers = () => {
     save_global("game", 0);
+    save_global("lobby_data", null);
     const classicButton = document.getElementById('classicButton');
     const aiButton = document.getElementById('aiButton');
     const tournamentButton = document.getElementById('tournamentButton');
