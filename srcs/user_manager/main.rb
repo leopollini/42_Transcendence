@@ -72,7 +72,7 @@ def login_user(client, obj)
   
   LOGIN.updateValue('realname', usr['realname'], {'token' => data['token']})
   #SET TOKEN PLEASE
-  DEFAULT_SUCCESS_RES.merge({'token' => token, 'user' => usr})
+  DEFAULT_SUCCESS_RES.merge({'user' => usr.merge({'token' => token})})
 end
 
 def update_user(client, obj = nil)

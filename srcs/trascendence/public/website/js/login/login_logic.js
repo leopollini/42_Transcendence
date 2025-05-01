@@ -3,6 +3,7 @@ import { remove_all } from "../utils_main/error_main.js";
 import { navigate, reset_all_let, save_global, token, user_name } from "../main.js";
 import { update_image, change_name } from "../pages/modes.js"
 import { check_name, escapeHtml } from "./user.js";
+import { free_users } from "../security/security.js";
 
 export default function Callback() {
   return `
@@ -64,6 +65,7 @@ async function checkAuthentication() {
       return (-1);
     } else {
       showInfoModal("Authentication failed: " + data.message, () => {});
+      free_users();
       return (1);
     }
   } catch (error) {
