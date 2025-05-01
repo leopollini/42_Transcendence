@@ -156,7 +156,7 @@ export async function remove_all() {
         else
             save_global("name", current_user.display_name);
     }
-    if (current_user && user_name)
+    if (token)
         free_users();
     reset_all_let();
     if (window.location.pathname !== "/")

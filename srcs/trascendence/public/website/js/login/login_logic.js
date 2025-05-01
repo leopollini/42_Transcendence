@@ -65,7 +65,6 @@ async function checkAuthentication() {
       return (-1);
     } else {
       showInfoModal("Authentication failed: " + data.message, () => {});
-      free_users();
       return (1);
     }
   } catch (error) {
@@ -89,7 +88,7 @@ async function set_user(user) {
   else {
     display_name = user.display_name;
   }
-  save_global("name", user.display_name);
+  save_global("name", display_name);
   save_global("token", user.token);
   console.log("displayname from server or input: ", display_name);
   let new_user =
