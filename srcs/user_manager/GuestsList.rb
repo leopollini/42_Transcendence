@@ -141,7 +141,7 @@ class GuestsList
 
   def exists_token?(token)
     if @tokens.key?(token)
-      @guests[@tokens[tokenn].to_i] && @guests[@tokens[token].to_i]['deleted'].to_i == -1
+      @guests[@tokens[token].to_i] && @guests[@tokens[token].to_i]['deleted'].to_i == -1
     else
       false
     end

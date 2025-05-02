@@ -325,10 +325,10 @@ async function getPongMatchesData() {
             }),
         });
         const data = await response.json();
-        console.log("Get Pong Game response: ", data);
+        //console.log("Get Pong Game response: ", data);
         if (data.games) {
             pongUserData = data.games;
-            console.log("pongUserData aggiornata: ", pongUserData);
+            //console.log("pongUserData aggiornata: ", pongUserData);
         }
     } catch (error) {
     console.error("Fetch error:", error);
@@ -434,7 +434,7 @@ export async function pongShowMatchDetails() {
 
 
 export function gameUserStatisticsPageHandlers() {
-    console.log("username = ", user_name);
+    //console.log("username = ", user_name);
     const backImageButton = document.getElementById('backImageButton');
     const pongChartsCheckbox = document.getElementById('pongChartsCheckbox');
     const pongMatchesCheckbox = document.getElementById('pongMatchesCheckbox');
@@ -458,7 +458,7 @@ export function gameUserStatisticsPageHandlers() {
 
     pongMatchesCheckbox?.addEventListener('change', () => {
         if (pongMatchesCheckbox.checked) {
-            console.log("pong matches");
+            //console.log("pong matches");
             document.getElementById('pongMatchDetailsContainer').classList.remove('hidden1');
             document.getElementById('pongChartsSection').classList.add('hidden1');
             document.getElementById('forza4StatsSection').classList.add('hidden1');

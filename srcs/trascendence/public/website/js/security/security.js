@@ -77,6 +77,7 @@ export function free_users()
         .then(response => response.json())
         .then(data =>
         {
+            console.log("logout = ", data);
             if (data)
             {
                 if (data.status === " (guest) does not exist")

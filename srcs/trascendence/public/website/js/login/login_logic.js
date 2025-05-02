@@ -1,8 +1,8 @@
 import { showInfoModal, showInputModal } from "../modal.js";
 import { remove_all } from "../utils_main/error_main.js";
-import { navigate, reset_all_let, save_global, token, user_name } from "../main.js";
+import {navigate, save_global, token, user_name } from "../main.js";
 import { update_image, change_name } from "../pages/modes.js"
-import { check_name, escapeHtml } from "./user.js";
+import { check_name, login_with_token, escapeHtml } from "./user.js";
 
 export default function Callback() {
   return `
@@ -56,9 +56,9 @@ async function checkAuthentication() {
     }
     const response = await fetch('/api/callback?' + params.toString());
     const data = await response.json();
-    console.log("data = ", data);
+    //console.log("data = ", data);
     if (data.success === "true") {
-      console.log("data = ", data);
+      //console.log("data = ", data);
       if (await set_user(data) === 1)
         return (1);
       showInfoModal(data.message, () => { });
@@ -79,7 +79,7 @@ async function set_user(user) {
   // console.log("use data inside set user: ", user);
   if (!user.display_name) {
     const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
-    display_name = await promptModal("Inserisci il tuo nickname");
+    display_name = await promptModal("Insert your nickname");
     if ((await check_name(display_name)) !== true) {
       return (1);
     }
@@ -90,7 +90,7 @@ async function set_user(user) {
   }
   save_global("name", display_name);
   save_global("token", user.token);
-  console.log("displayname from server or input: ", display_name);
+  //console.log("displayname from server or input: ", display_name);
   let new_user =
   {
     email: user.email,
@@ -101,7 +101,7 @@ async function set_user(user) {
     type: "login"
   };
   save_global("name", new_user.login_name);
-  console.log("username after set = ", user_name);
+  //console.log("username after set = ", user_name);
   if (name_changed)
     await update_with_new_name(display_name);
   save_global("acess", true);
@@ -111,6 +111,20 @@ async function set_user(user) {
 
 export async function performLogin() {
   try {
+    if (token)
+    {
+      let result = await login_with_token();
+      if (result === 0)
+      {
+        showInfoModal("Session restored", () => {});
+        navigate("/modes", "Modalità di gioco");
+      }
+      else if (result === 1)
+        showInfoModal(user_name + " must finish the game", () => {});
+      else
+        remove_all();
+      return;
+    }
     const response = await fetch('/auth/login');
     const data = await response.json();
     if (data.auth_url)
