@@ -99,7 +99,7 @@ module BetterPG
       return [] if obj.nil?
       
       obj.each do |lol|
-        lol = lol.slice(['token']) if hide_token
+        lol = lol.slice ['token'] if hide_token
         reslst.append lol
       rescue StandardError
         puts r.to_s.red
@@ -123,7 +123,7 @@ module BetterPG
       raise "invalid select request: requesting a column which exists not" unless (cols - @columns).empty?
       req = []
       begin
-        req = ['SELECT * FROM', @name]
+        req = ['SELECT ' + @columns.join(', ') + ' FROM', @name]
         t = []
         keys.each_with_index do |k, i|
           t.append cols[i] + "='" + (k.is_a?(String) ? @pg.escape_string(k) : k.to_s) + "'" if i < cols.count && cols[i] && k && !k.to_s.empty?

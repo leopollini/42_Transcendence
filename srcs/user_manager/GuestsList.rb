@@ -89,7 +89,7 @@ class GuestsList
         g = g.slice(g.keys - ['token'])
       end
     end
-    t
+    t.values
   end
 
   def get_by_name(name)
