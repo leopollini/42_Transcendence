@@ -3,7 +3,6 @@ import { remove_all } from "../utils_main/error_main.js";
 import { navigate, reset_all_let, save_global, token, user_name } from "../main.js";
 import { update_image, change_name } from "../pages/modes.js"
 import { check_name, escapeHtml } from "./user.js";
-import { free_users } from "../security/security.js";
 
 export default function Callback() {
   return `
@@ -57,6 +56,7 @@ async function checkAuthentication() {
     }
     const response = await fetch('/api/callback?' + params.toString());
     const data = await response.json();
+    console.log("data = ", data);
     if (data.success === "true") {
       console.log("data = ", data);
       if (await set_user(data) === 1)
