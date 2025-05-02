@@ -99,7 +99,7 @@ module BetterPG
       return [] if obj.nil?
       
       obj.each do |lol|
-        lol = lol.slice ['token'] if hide_token
+        # lol.slice! ['token'] if hide_token
         reslst.append lol
       rescue StandardError
         puts r.to_s.red
@@ -109,12 +109,12 @@ module BetterPG
       reslst
     end
 
-    def select_specific(key, val, cols = nil, hide_token = true)
-      cols = @columns if cols.nil?
+    def select_specific(key, val, cols, hide_token = true)
+      cols = @columns if cols.size == 0
       t = (better_return exec("SELECT #{@columns.join(', ')} FROM #{@name} WHERE #{key} = '#{val}'"))
       sel = better_return t, hide_token
       return nil if sel.empty?
-      sel[0].to_h
+      sel[0]
     end
 
     # perform select for data fetching
