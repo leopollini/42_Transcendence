@@ -57,6 +57,14 @@ volumes:
       o: bind
       device: ./srcs/common_tools/tools
       type: none
+  
+  certs:
+    driver: local
+    name: certs
+    driver_opts:
+      o: bind
+      device: ./srcs/trascendence/authentication/ssl_certs
+      type: none
 
 
 services:
@@ -80,6 +88,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./srcs/common_tools/tools:/var/common
+      - ./srcs/trascendence/authentication/ssl_certs:/var/www/ssl_certs
       - ./srcs/receiver:/var/www
     depends_on:
       - postgres
@@ -173,6 +182,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./srcs/common_tools/tools:/var/common
+      - ./srcs/trascendence/authentication/ssl_certs:/var/www/ssl_certs
       - ./srcs/chat:/var/www
     networks:
       - app-network

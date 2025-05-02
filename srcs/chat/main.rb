@@ -146,6 +146,7 @@ def internal_call(client, server)
 end
 
 puts 'Starting internal_chat_support at port ' + PORT_1.to_s + '!'
+
 Thread.start{(SimpleServer::SimplerTCP.new PORT_1, :internal_call).start_loop}
 
 server.start
