@@ -180,6 +180,10 @@ class ChatStore
     @@clients
   end
 
+  def self.exists?(username)
+    @@clients[username] && @@clients[username].alive?
+  end
+
   def self.close_client(username)
     @@clients[username].close_sock
   end

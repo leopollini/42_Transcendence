@@ -39,7 +39,8 @@ class GuestsList
       'deleted' => -1,
       'bio' => data['bio'].to_s,
       'image' => data['image'].to_s,
-      'token' => data['token']
+      'token' => data['token'],
+      'is_playing' => false
     }
     
     @index[username] = i
@@ -145,5 +146,17 @@ class GuestsList
     else
       false
     end
+  end
+
+  def set_playing(token, value)
+    guest = @guests[@tokens[token].to_s]
+    return nil if guest.nil?
+    guest['is_playing'] = value
+  end
+
+  def is_playing?(username)
+    guest = @guests[@index[username].to_s]
+    return nil if guest.nil?
+    guest['is_playing'] == 'true'
   end
 end

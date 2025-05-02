@@ -26,7 +26,8 @@ PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
                                ['display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-                                'created NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT', 'token TEXT']
+                                'created NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT', 'token TEXT',
+                               'is_playing TEXT']
 
 GUEST = GuestsList.new
 MANDATORY_DATA = %w[realname token]
@@ -38,9 +39,10 @@ NON_UPDATABLE_PARAMS = %w[realname created level entered token]
 def user_creat(data, token)
   puts "Cteating new user as:".green, data
   data.delete 'display_name';
+  data['is_playing'] = 'false'
   return DEFAULT_MISSING_PARAM.clone unless (MANDATORY_DATA - data.keys).empty?
   LOGIN.addValues data
-  return DEFAULT_SUCCESS_RES.merge({'token' => token, 'user' => (LOGIN.select_specific 'realname', data['realname'].to_s, [], false)})
+  return DEFAULT_SUCCESS_RES.merge({'token' => token, 'user' => (LOGIN.select_specific 'realname', data['realname'].to_s, nil, false)})
 end
 
 def login_user(client, obj)
@@ -55,7 +57,7 @@ def login_user(client, obj)
     return {"status" => "username taken", "success" => "false"} if res['success'].to_s == 'true'
     return GUEST.add_guest(data)
   end
-  usr = data['realname'] ? (LOGIN.select_specific 'realname', data['realname'].to_s, [], false) : nil
+  usr = data['realname'] ? (LOGIN.select_specific 'realname', data['realname'].to_s, ['realname'], false) : nil
   puts "found: #{usr}".yellow
   if usr.nil?
     return user_creat(data, token) if obj['do_create'].to_s == 'true'
@@ -67,16 +69,38 @@ def login_user(client, obj)
   # (update_user(client, {"new_params" => data})).merge({'token' => token})
 
   puts "Found user: #{usr}".yellow.bold
-  
-  return {'status' => 'user already online', 'success' => 'false'} unless usr['token'].to_s.empty?
+
+  if usr['token'].to_s != ""
+    online_in_chat = JSON.parse(SimpleServer::method_req('is_online', {'username' => data['display_name']}))
+    puts "Online in chat: #{online_in_chat}"
+    return {'status' => 'user already online', 'success' => 'false'} if online_in_chat['success'] == 'true'
+  end
   
   LOGIN.updateValue('realname', usr['realname'], {'token' => data['token']})
   #SET TOKEN PLEASE
   DEFAULT_SUCCESS_RES.merge({'user' => usr.merge({'token' => token})})
 end
 
-def update_user(client, obj = nil)
-  puts 'update_user called'.green if DEBUG_MODE
+def login_with_token(client, obj = {})
+  puts "login with token called".green
+  if GUEST.exists_token? obj['token'].to_s
+    if GUEST.is_playing? token
+      return {'status' => 'match in progress', 'success' => 'false'}
+    end
+    return {'status' => 'success', 'success' => 'true', 'user' => user}
+  end
+  user = LOGIN.select_specific('token', obj['token'].to_s)
+  if user
+    if user['is_playing'].to_s == 'true'
+      return {'status' => 'match in progress', 'success' => 'false'}
+    end
+    return {'status' => 'success', 'success' => 'true', 'user' => user}
+  end
+  return {'status' => 'user not found', 'success' => 'false'}
+end
+
+def update_user(client, obj = {})
+  puts 'update_user called'.green
   puts "Obj " + obj.to_s.gray
 
   if (obj && obj['new_params'])
@@ -108,12 +132,17 @@ end
 
 # used to get ALL stored info about a 42login user
 def get_user_by_token(client, obj)
-  user = LOGIN.select_specific 'token', obj['token']
+  token = obj['token'].to_s
+  user = if GEUST.exists_token? token
+    GUEST.get_user_by_token token
+  else
+    LOGIN.select_specific 'token', obj['token']
+  end
   return {'status' => 'invalid token', 'success' => 'false'} if user.nil?
   {'status' => 'success', 'success' => 'true', 'user' => user}
 end
 
-def get_user(_client, obj = nil)
+def get_user(_client, obj = {})
   puts 'get_user called'.green if DEBUG_MODE
   params = obj['params']
   if params.nil? || params.empty?
@@ -137,6 +166,35 @@ def get_user(_client, obj = nil)
   end
   return get_user_by_token if params['token']
   DEFAULT_MISSING_PARAM.clone
+end
+
+def game_state(client, obj)
+  new_state = obj['set_state']
+  name = obj['username'].to_s
+  return {'status' => 'bad request', 'success' => ' false'} if name.empty?
+  if GUEST.exists? name
+    if new_state
+      GUEST.set_playing(obj['username'].to_s, new_state)
+      state = new_state
+    else
+      state = GUEST.is_playing? token
+    end
+    puts "#{name}'s game state is now #{state}".green.bold
+    return {'status' => 'success', 'success' => 'true', 'is_playing' => state}
+  end
+  user = LOGIN.select_specific 'display_name', name, ['is_playing']
+  if user
+    if new_state
+      LOGIN.updateValue 'display_name', name, {'is_playing' => new_state}
+      state = new_state
+    else
+      state = user['is_playing']
+    end
+    puts "#{name}'s game state is now #{state}".green.bold
+    return {'status' => 'success', 'success' => 'true', 'is_playing' => state}
+  end
+  return {'status' => 'user not found', 'success' => 'false'}
+  
 end
 
 def user_manager(client, _server)
@@ -164,6 +222,10 @@ def user_manager(client, _server)
     when 'drop_users'
       LOGIN.dropTable
       GUEST.reset
+    when 'login_with_token'
+      login_with_token client, bobj
+    when 'game_state'
+      game_state client, bobj
     else
       {'service' => 'user_manager', 'status' => "unknown method: #{bobj['method'].to_s}", 'success' => 'false'}
     end

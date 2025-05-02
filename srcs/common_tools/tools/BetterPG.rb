@@ -99,7 +99,7 @@ module BetterPG
       return [] if obj.nil?
       
       obj.each do |lol|
-        # lol.slice! ['token'] if hide_token
+        lol = lol.slice(['token']) if hide_token
         reslst.append lol
       rescue StandardError
         puts r.to_s.red
@@ -109,12 +109,12 @@ module BetterPG
       reslst
     end
 
-    def select_specific(key, val, cols, hide_token = true)
-      cols = @columns if cols.size == 0
+    def select_specific(key, val, cols = nil, hide_token = true)
+      cols = @columns if cols.nil?
       t = (better_return exec("SELECT #{@columns.join(', ')} FROM #{@name} WHERE #{key} = '#{val}'"))
       sel = better_return t, hide_token
       return nil if sel.empty?
-      sel[0]
+      sel[0].to_h
     end
 
     # perform select for data fetching
@@ -123,7 +123,7 @@ module BetterPG
       raise "invalid select request: requesting a column which exists not" unless (cols - @columns).empty?
       req = []
       begin
-        req = ['SELECT ' + @columns.join(', ') + ' FROM', @name]
+        req = ['SELECT * FROM', @name]
         t = []
         keys.each_with_index do |k, i|
           t.append cols[i] + "='" + (k.is_a?(String) ? @pg.escape_string(k) : k.to_s) + "'" if i < cols.count && cols[i] && k && !k.to_s.empty?

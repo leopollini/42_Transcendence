@@ -23,7 +23,7 @@ class ChatService < WEBrick::Websocket::Servlet
   def socket_close(sock)
     ChatStore.close_client(@username) if @username
     puts "#{@username} left the chat, loggin out..."
-    # SimpleServer::method_req('logout_user', {'display_name' => @username, 'token' => @token})
+    SimpleServer::method_req('logout_user', {'display_name' => @username, 'token' => @token}) if @token && @username
   end
   
   def socket_text(sock, text)
@@ -39,6 +39,11 @@ class ChatService < WEBrick::Websocket::Servlet
       case data["type"].to_s
       when "join"
         @username = data["username"].to_s
+        if ChatStore.exists? @username
+          sock.puts({'status' => 'another user with the same username is already connected', 'succes' => 'false', 'type' => 'kick'}.to_json)
+          socket_close(sock)
+          return
+        end
         @token = data["token"].to_s
         ChatStore.joined @username, sock
         ChatStore.sys_broadcast "#{@username} joined the chat!", @username
@@ -87,6 +92,9 @@ class ChatService < WEBrick::Websocket::Servlet
 
       when 'match_response'
         ChatStore.clients[data['to'].to_s].send_me({'from' => @username, 'accepted' => data['accepted'].to_s}, "match_response")
+        if data['accepted'].to_s == ' true'
+          
+        end
 
       when 'get_online_users'
         ChatStore.clients[@username].send_me({'users' => ChatStore.clients.filter{|c| c.alive?}}, 'online_users_list')
@@ -127,6 +135,10 @@ def internal_call(client, server)
     client.puts
   when 'get_online'
     client.puts ChatStore.get_online(bobj['include_guests']).to_json
+  when 'is_online'
+    puts "Is #{bobj['username']} online? Online users: "
+    found = ChatStore.exists? bobj['username'].to_s
+    client.puts({'status' => (found ? 'success' : 'no user found'), 'success' => found}.to_json)
   else
     puts "Unknown method called (#{bobj['method']})"
   end

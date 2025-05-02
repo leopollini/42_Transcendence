@@ -1,6 +1,7 @@
 import { showConfirmModal, showInfoModal } from "../../modal.js";
-import { renderHtmlAsText } from "../../security/security.js";
+import { free_users, renderHtmlAsText } from "../../security/security.js";
 import { in_game, token } from "../../main.js";
+import { remove_all } from "../../utils_main/error_main.js";
 
 let socket;
 
@@ -11,7 +12,16 @@ export function closeSocket() {
 
 function initSocket(username, chatAppInstance) {
     if (!socket)
-        socket = new WebSocket('ws://localhost:6087');
+    {
+        try {
+            socket = new WebSocket('ws://localhost:6087');
+        }
+        catch(error) {
+            showInfoModal("Socket creation error: " + error);
+            remove_all();
+            return null;
+        }
+    }
 
     socket.onopen = () => {
         socket.send(JSON.stringify({ type: "join", 'username': username, 'token': token }));
@@ -21,8 +31,10 @@ function initSocket(username, chatAppInstance) {
 
     socket.onmessage = (event) => {
         let msg = JSON.parse(event.data);
-        msg.data.content = decodeURIComponent(msg.data.content);
-        msg.data.content = renderHtmlAsText(msg.data.content);
+        if (msg.data && msg.data.content) {
+            msg.data.content = decodeURIComponent(msg.data.content);
+            msg.data.content = renderHtmlAsText(msg.data.content);
+        }
         if (msg.type === "state") {
             const friends = msg.data.friends
             const friendRequests = msg.data.friend_requests
@@ -167,7 +179,11 @@ function initSocket(username, chatAppInstance) {
                 showInfoModal(msg.data.accepted, () => {});
             else
                 showInfoModal("the invite was rejected.", () => {});
-        }                              
+        }
+        else if (msg.type === "kick") {
+            showInfoModal("Chat closed: " + msg.status);
+            remove_all();
+        }
     };
     return socket;
 }
