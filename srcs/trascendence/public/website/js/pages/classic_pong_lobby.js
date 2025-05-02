@@ -6,6 +6,7 @@ import { fetchOnlineUsers } from "./get_online_users.js";
 
 let players;
 let invitedPlayers = [];
+export let acceptedUsers = [];
 let selectedPlayer = null;
 let numPlayersLabel;
 let numPlayersAccepted = 0;
@@ -189,6 +190,9 @@ function get_socket()
       if (msg.type === "match_response" && msg.data.accepted) {
         inviteSended = 0;
         const from = msg.data.from;
+        if (!acceptedUsers.includes(from)) {
+          acceptedUsers.push(from);
+        }
         const onlineEl = document.getElementById("pongOnlinePlayers");
         const matchEl = document.getElementById("pongMatchPlayers");
         const onlineBadge = document.getElementById("pongOnlinePlayersCount");

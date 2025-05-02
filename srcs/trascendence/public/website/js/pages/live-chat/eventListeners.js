@@ -1,3 +1,6 @@
+import { sendMessage } from '../live-chat/socketHandler.js';
+import { navigate } from '../../main.js';
+
 function setupEventListeners(chatApp) {
     const elems = chatApp.elements;
 
@@ -64,8 +67,33 @@ function setupEventListeners(chatApp) {
     });
 
     elems.contextMenu.addEventListener('click', (e) => {
-        if (e.target.dataset.action) {
-            chatApp.handleContextAction(e.target.dataset.action);
+        const action = e.target.dataset.action;
+        if (!action) return;
+    
+        if (action === 'invite') {
+          const userToInvite = chatApp.selectedUser;
+          if (!userToInvite) return;
+
+          if (window.location.pathname !== '/classic/lobby') {
+            navigate('/classic/lobby', 'Classic Pong Lobby');
+          }
+
+          sendMessage({
+            type: "match_request",
+            to: userToInvite
+          });
+    
+          const ctxInvite = elems.contextMenu.querySelector('[data-action="invite"]');
+          ctxInvite.style.pointerEvents = 'none';
+          ctxInvite.classList.add('disabled');
+    
+          const lobbyInviteBtn = document.getElementById('pongInviteButton');
+          if (lobbyInviteBtn) lobbyInviteBtn.disabled = true;
+    
+          chatApp.hideContextMenu();
+        }
+        else {
+          chatApp.handleContextAction(action);
         }
     });
 

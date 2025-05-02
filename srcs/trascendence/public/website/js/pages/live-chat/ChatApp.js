@@ -4,6 +4,7 @@ import { setupEventListeners } from './eventListeners.js';
 import { current_user } from '../../main.js';
 import { another_user_info, is_online, } from '../../login/user.js';
 import { showInfoModal } from '../../modal.js';
+import { acceptedUsers } from "../classic_pong_lobby.js";
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -16,6 +17,7 @@ class ChatApp {
         this.username = null;
         this.blockedUsers = new Set();
         this.disabledChats = {};
+        this.acceptedUsers = acceptedUsers;
         this.initialize();
     }
 
@@ -530,7 +532,14 @@ class ChatApp {
             }
         }
 
-        if (inviteItem) inviteItem.style.display = 'block';
+        if (inviteItem) {
+            if (this.acceptedUsers && this.acceptedUsers.includes(user)) {
+                inviteItem.style.display = 'none';
+            } else {
+                inviteItem.style.display = 'block';
+            }
+        }
+
         profileItem.style.display = 'block';
         blockItem.style.display = 'block';
         blockItem.textContent = 'Block User';

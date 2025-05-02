@@ -25,84 +25,52 @@ SERVICE_NAME = 'user_manager'
 PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
-                               ['display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
+                               ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
                                 'created NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT', 'token TEXT']
 
 GUEST = GuestsList.new
-MANDATORY_DATA = %w[realname token]
-GET_USER_SECURE_INFO = %w[display_name created image]
-NON_UPDATABLE_PARAMS = %w[realname created level entered token]
+MANDATORY_DATA = %w[email display_name realname bio image]
+GET_USER_SECURE_INFO = %w[display_name, created, image]
+UPDATABLE_PARAMS = %w[display_name, email, image, bio]
 
-# LOGGED_IN = []
-
-def user_creat(data, token)
+def user_creat(data)
   puts "Cteating new user as:".green, data
-  data.delete 'display_name';
-  return DEFAULT_MISSING_PARAM.clone unless (MANDATORY_DATA - data.keys).empty?
+  return DEFAULT_MISSING_PARAM.clone if (MANDATORY_DATA - data.keys).empty?
   LOGIN.addValues data
-  return DEFAULT_SUCCESS_RES.merge({'token' => token, 'user' => (LOGIN.select_specific 'realname', data['realname'].to_s, [], false)})
+  return DEFAULT_SUCCESS_RES.merge({'token' => 'loltoken'})
 end
 
 def login_user(client, obj)
   puts "login_user called".green
   data = obj['data']
-  return {"status"=> "bad request", 'success' => 'fase'} if data.nil?
-  token = data['token']
+  data['token'] = Digest::SHA256.hexdigest(Time.now.to_s)
 
-  # return {'status' => 'another user with this username is already playing', 'success' => 'false'} if 
-  if data['login_as_guest'].to_s == 'true'
-    res = get_user(client, {"params" => {"display_name" => data['display_name']}})
-    return {"status" => "username taken", "success" => "false"} if res['success'].to_s == 'true'
-    return GUEST.add_guest(data)
-  end
-  usr = data['realname'] ? (LOGIN.select_specific 'realname', data['realname'].to_s, [], false) : nil
-  puts "found: #{usr}".yellow
+  return GUEST.add_guest(data) if data['login_as_guest'].to_s == 'true'
+
+  usr = LOGIN.select_specific 'realname', data['realname'].to_s, [], false
   if usr.nil?
-    return user_creat(data, token) if obj['do_create'].to_s == 'true'
+    return user_creat(data) if obj['do_create'].to_s == 'true'
     return {'status' => 'user not found', 'success' => 'false', 'service' => 'user_manager'}
   end
-
-  # puts "user already in database, updating with new info".yellow
-  # LOGGED_IN << data['display_name']
-  # (update_user(client, {"new_params" => data})).merge({'token' => token})
-
-  puts "Found user: #{usr}".yellow.bold
-  
-  return {'status' => 'user already online', 'success' => 'false'} unless usr['token'].to_s.empty?
-  
-  LOGIN.updateValue('realname', usr['realname'], {'token' => data['token']})
-  #SET TOKEN PLEASE
-  DEFAULT_SUCCESS_RES.merge({'user' => usr.merge({'token' => token})})
+  puts "user already in database, updating with new info".yellow
+  (update_user(client, {"new_params" => data})).merge({'token' => 'loltoken'})
 end
 
-def update_user(client, obj = nil)
+def update_user(_client, obj = nil)
   puts 'update_user called'.green if DEBUG_MODE
-  puts "Obj " + obj.to_s.gray
+  puts "Diomerds " + obj.to_s.grey
 
-  if (obj && obj['new_params'])
-    puts "new params = #{obj['new_params']}".yellow
-    puts "avoiding by   #{NON_UPDATABLE_PARAMS}".yellow
-    new_params = obj['new_params'].except NON_UPDATABLE_PARAMS
-    puts "updated params = #{new_params}".yellow
-  else
-    return {'status' => 'missing new params', 'success' => 'false'}.clone
-  end
-  return {'status' => 'username taken', 'success' => 'false'} if get_user(client, {'params' => {'display_name' => new_params['display_name']}})['success'].to_s == "true"
-  return DEFAULT_MISSING_PARAM.clone if new_params.empty?
-  guest = GUEST.exists_token? obj['token']
-  return GUEST.update_guest(guest, new_params) if guest
-
-  LOGIN.updateValue 'token', obj['token'].to_s, new_params
+  new_params = obj['new_params'].slice(UPDATABLE_PARAMS)
+  return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['display_name'].to_s == ""
+  LOGIN.valueManipulation 'display_name', obj['display_name'].to_s, new_params
   return DEFAULT_SUCCESS_RES.clone
 end
 
 def logout_user(client, obj)
   puts 'logout_user called'.green if DEBUG_MODE
-  token = obj['token'].to_s
-  return {'status' => 'token not specified', 'success' => 'false'} if token.to_s.empty?
-  return GUEST.del_by_token(token) if GUEST.exists_token? token
-  LOGIN.updateValue 'token', token, {'token' => ''}
-  # LOGGED_IN.delete username
+  username = obj["display_name"]
+  return GUEST.del_guest(username) if GUEST.exists? username
+  LOGIN.updateValue 'display_name', username, {'token' => 'null'}
   {"status"=>"success", "success"=>"true"}
 end
 
@@ -117,30 +85,28 @@ def get_user(_client, obj = nil)
   puts 'get_user called'.green if DEBUG_MODE
   params = obj['params']
   if params.nil? || params.empty?
-    users =  (obj['avoid_logins'] == 'true' ? [] : LOGIN.select )
-    users.each {| u | u = u.slice(GET_USER_SECURE_INFO) if u}
-    guests = (obj['avoid_guests'] == 'true' ? [] : GUEST.get_all_guests)
-    guests.each {| u | u = u.slice(GET_USER_SECURE_INFO) if u}
+    users = LOGIN.select
+    users.each {| u | u = u.slice(GET_USER_SECURE_INFO)}
+    guests = GUEST.get_all_guests
+    guests.each {| u | u = u.slice(GET_USER_SECURE_INFO)}
     return {'status' => (users.empty? && guests.empty? ? 'no user found' : 'returning whole database'), 'success' => 'true', 
               'guest' => guests, 'user' => users}
   end
-  name = params['display_name']
-  if name
+  if name = params['display_name']
     user = LOGIN.select(['display_name'], [name])
     if user.empty?
       guest = GUEST.get_by_name(name)
-      return DEFAULT_SUCCESS_RES.merge({'guest' => guest.except('token')}) if guest
+      return DEFAULT_SUCCESS_RES.merge({'guest' => guest}) if guest
       return {'status' => 'no user found', 'success' => 'false'} 
     end
-    user = user[0].to_h.except('token')
     return DEFAULT_SUCCESS_RES.merge({'user' => user})
   end
-  return get_user_by_token if params['token']
+  get_user_by_token if params['token']
   DEFAULT_MISSING_PARAM.clone
 end
 
 def user_manager(client, _server)
-  # puts "user manager called".yellow, "oline users: #{LOGGED_IN}"
+  puts "user manager called"
   res = DEFAULT_ERROR_RES.clone
   t = select [client], [], [], 20 # waits for client, a few seconds
   return if t.nil? || t[0].empty? || client.closed?
@@ -163,7 +129,7 @@ def user_manager(client, _server)
       get_user_by_token client, bobj
     when 'drop_users'
       LOGIN.dropTable
-      GUEST.reset
+      GUEST.new
     else
       {'service' => 'user_manager', 'status' => "unknown method: #{bobj['method'].to_s}", 'success' => 'false'}
     end

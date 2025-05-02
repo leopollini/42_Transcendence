@@ -6,7 +6,7 @@ export default function LiveChat() {
             <div class="context-menu-item" data-action="addFriend">Add Friend</div>
             <div class="context-menu-item" data-action="block">Block User</div>
             <div class="context-menu-item" data-action="profile">View Profile</div>
-            <div class="context-menu-item" data-action="invite">Invite To The Game</div>
+            <div class="context-menu-item" id="contextInvite" data-action="invite">Invite To The Game</div>
         </div>
         <div class="profile-modal" id="profileModal">
             <div class="profile-header">
