@@ -25,8 +25,9 @@ SERVICE_NAME = 'user_manager'
 PORT = PortFinder::FindPort.new(SERVICE_NAME).getPort
 
 LOGIN = BetterPG::SimplePG.new 'users',
-                               ['id INT', 'display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
-                                'created NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT', 'token TEXT']
+                               ['display_name TEXT', 'realname TEXT', 'email TEXT', 'image TEXT', 'bio TEXT',
+                                'created NUMERIC', 'friends_list TEXT[]', 'level FLOAT', 'entered TEXT', 'token TEXT',
+                               'is_playing TEXT']
 
 GUEST = GuestsList.new
 MANDATORY_DATA = %w[email display_name realname bio image]
@@ -35,30 +36,70 @@ UPDATABLE_PARAMS = %w[display_name, email, image, bio]
 
 def user_creat(data)
   puts "Cteating new user as:".green, data
-  return DEFAULT_MISSING_PARAM.clone if (MANDATORY_DATA - data.keys).empty?
+  data.delete 'display_name';
+  data['is_playing'] = 'false'
+  return DEFAULT_MISSING_PARAM.clone unless (MANDATORY_DATA - data.keys).empty?
   LOGIN.addValues data
-  return DEFAULT_SUCCESS_RES.merge({'token' => 'loltoken'})
+  return DEFAULT_SUCCESS_RES.merge({'token' => token, 'user' => (LOGIN.select_specific 'realname', data['realname'].to_s, nil, false)})
 end
 
 def login_user(client, obj)
   puts "login_user called".green
   data = obj['data']
-  data['token'] = Digest::SHA256.hexdigest(Time.now.to_s)
+  return {"status"=> "bad request", 'success' => 'fase'} if data.nil?
+  token = data['token']
 
-  return GUEST.add_guest(data) if data['login_as_guest'].to_s == 'true'
-
-  usr = LOGIN.select_specific 'realname', data['realname'].to_s, [], false
+  # return {'status' => 'another user with this username is already playing', 'success' => 'false'} if 
+  if data['login_as_guest'].to_s == 'true'
+    res = get_user(client, {"params" => {"display_name" => data['display_name']}})
+    return {"status" => "username taken", "success" => "false"} if res['success'].to_s == 'true'
+    return GUEST.add_guest(data)
+  end
+  usr = data['realname'] ? (LOGIN.select_specific 'realname', data['realname'].to_s, ['realname'], false) : nil
+  puts "found: #{usr}".yellow
   if usr.nil?
     return user_creat(data) if obj['do_create'].to_s == 'true'
     return {'status' => 'user not found', 'success' => 'false', 'service' => 'user_manager'}
   end
-  puts "user already in database, updating with new info".yellow
-  (update_user(client, {"new_params" => data})).merge({'token' => 'loltoken'})
+
+  # puts "user already in database, updating with new info".yellow
+  # LOGGED_IN << data['display_name']
+  # (update_user(client, {"new_params" => data})).merge({'token' => token})
+
+  puts "Found user: #{usr}".yellow.bold
+
+  if usr['token'].to_s != ""
+    online_in_chat = JSON.parse(SimpleServer::method_req('is_online', {'username' => data['display_name']}))
+    puts "Online in chat: #{online_in_chat}"
+    return {'status' => 'user already online', 'success' => 'false'} if online_in_chat['success'] == 'true'
+  end
+  
+  LOGIN.updateValue('realname', usr['realname'], {'token' => data['token']})
+  #SET TOKEN PLEASE
+  DEFAULT_SUCCESS_RES.merge({'user' => usr.merge({'token' => token})})
 end
 
-def update_user(_client, obj = nil)
-  puts 'update_user called'.green if DEBUG_MODE
-  puts "Diomerds " + obj.to_s.grey
+def login_with_token(client, obj = {})
+  puts "login with token called".green
+  if GUEST.exists_token? obj['token'].to_s
+    if GUEST.is_playing? token
+      return {'status' => 'match in progress', 'success' => 'false'}
+    end
+    return {'status' => 'success', 'success' => 'true', 'user' => user}
+  end
+  user = LOGIN.select_specific('token', obj['token'].to_s)
+  if user
+    if user['is_playing'].to_s == 'true'
+      return {'status' => 'match in progress', 'success' => 'false'}
+    end
+    return {'status' => 'success', 'success' => 'true', 'user' => user}
+  end
+  return {'status' => 'user not found', 'success' => 'false'}
+end
+
+def update_user(client, obj = {})
+  puts 'update_user called'.green
+  puts "Obj " + obj.to_s.gray
 
   new_params = obj['new_params'].slice(UPDATABLE_PARAMS)
   return DEFAULT_MISSING_PARAM.clone if new_params.empty? || obj['display_name'].to_s == ""
@@ -76,12 +117,17 @@ end
 
 # used to get ALL stored info about a 42login user
 def get_user_by_token(client, obj)
-  user = LOGIN.select_specific 'token', obj['token']
+  token = obj['token'].to_s
+  user = if GEUST.exists_token? token
+    GUEST.get_user_by_token token
+  else
+    LOGIN.select_specific 'token', obj['token']
+  end
   return {'status' => 'invalid token', 'success' => 'false'} if user.nil?
   {'status' => 'success', 'success' => 'true', 'user' => user}
 end
 
-def get_user(_client, obj = nil)
+def get_user(_client, obj = {})
   puts 'get_user called'.green if DEBUG_MODE
   params = obj['params']
   if params.nil? || params.empty?
@@ -103,6 +149,35 @@ def get_user(_client, obj = nil)
   end
   get_user_by_token if params['token']
   DEFAULT_MISSING_PARAM.clone
+end
+
+def game_state(client, obj)
+  new_state = obj['set_state']
+  name = obj['username'].to_s
+  return {'status' => 'bad request', 'success' => ' false'} if name.empty?
+  if GUEST.exists? name
+    if new_state
+      GUEST.set_playing(obj['username'].to_s, new_state)
+      state = new_state
+    else
+      state = GUEST.is_playing? token
+    end
+    puts "#{name}'s game state is now #{state}".green.bold
+    return {'status' => 'success', 'success' => 'true', 'is_playing' => state}
+  end
+  user = LOGIN.select_specific 'display_name', name, ['is_playing']
+  if user
+    if new_state
+      LOGIN.updateValue 'display_name', name, {'is_playing' => new_state}
+      state = new_state
+    else
+      state = user['is_playing']
+    end
+    puts "#{name}'s game state is now #{state}".green.bold
+    return {'status' => 'success', 'success' => 'true', 'is_playing' => state}
+  end
+  return {'status' => 'user not found', 'success' => 'false'}
+  
 end
 
 def user_manager(client, _server)
@@ -129,7 +204,11 @@ def user_manager(client, _server)
       get_user_by_token client, bobj
     when 'drop_users'
       LOGIN.dropTable
-      GUEST.new
+      GUEST.reset
+    when 'login_with_token'
+      login_with_token client, bobj
+    when 'game_state'
+      game_state client, bobj
     else
       {'service' => 'user_manager', 'status' => "unknown method: #{bobj['method'].to_s}", 'success' => 'false'}
     end

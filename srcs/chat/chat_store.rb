@@ -35,7 +35,7 @@ class Client
     msg = {'type' => type, 'data'=>content}.to_json
     r = nil
     if alive?
-      @socket.puts msg
+      @socket.send msg
     else
       @unread << msg
       @unread = @unread[10..] if @unread.size > MAX_UNREAD_SIZE
@@ -49,7 +49,7 @@ class Client
 
   def load_unread
     @unread.each do | msg |
-      @socket.puts msg
+      @socket.send msg
     end
   end
 
@@ -178,6 +178,10 @@ class ChatStore
 
   def self.clients
     @@clients
+  end
+
+  def self.exists?(username)
+    @@clients[username] && @@clients[username].alive?
   end
 
   def self.close_client(username)

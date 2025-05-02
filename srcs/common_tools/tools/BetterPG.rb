@@ -103,9 +103,9 @@ module BetterPG
       reslst
     end
 
-    def select_specific(key, val, cols, hide_token = true)
-      cols = @columns if cols.size == 0
-      t = (better_return exec("SELECT #{@columns.join(', ')} FROM #{@name} WHERE #{key} = '#{val}'"))
+    def select_specific(key, val, cols = nil, hide_token = true)
+      cols = @columns if cols.nil? || cols.size == 0
+      t = (better_return exec("SELECT #{@columns.join(', ')} FROM #{@name} WHERE #{key} = '#{@pg.escape_string(val)}'"))
       sel = better_return t, hide_token
       return nil if sel.empty?
       sel[0]
@@ -120,7 +120,7 @@ module BetterPG
         req = ['SELECT ' + @columns.join(', ') + ' FROM', @name]
         t = []
         keys.each_with_index do |k, i|
-          t.append cols[i] + "='" + k.to_s + "'" if i < cols.count && cols[i] && k && !k.to_s.empty?
+          t.append cols[i] + "='" + @pg.escape_string(k.to_s) + "'" if i < cols.count && cols[i] && k && !k.to_s.empty?
         end
         req.append('WHERE ' + t.join(' ' + logic + ' ')) unless t.empty?
         fullkeys.each do |k|
@@ -138,7 +138,7 @@ module BetterPG
       begin
         req = ['DELETE FROM', @name]
         keys.each_with_index do |k, i|
-          req.append 'WHERE ' + cols[i] + '=' + k if k
+          req.append 'WHERE ' + cols[i] + '=' + @pg.escape_string(k.to_s) if k
         end
         fullkeys.each do |k|
           req.append 'WHERE ' + k
@@ -155,6 +155,9 @@ module BetterPG
     def addValues(content)
       return if content.nil? || content.empty?
       raise "invalid addValues request: requesting a column which exists not" unless (content.keys - @columns).empty?
+      content.each do |k, v|
+        v = @pg.escape_string(v.to_s) 
+      end
       exec 'INSERT INTO', @name, (content.keys.size != 0 ? '(' + content.keys.join(', ') + ')' : ''), 'VALUES',
            "('" + content.values.join("', '") + "')"
       puts 'Added ' + content.values.to_s + ' as ' + content.keys.to_s + ' to ' + @name
@@ -167,18 +170,17 @@ module BetterPG
       t = []
       raise "invalid updateValue request: changing a column which exists not" unless (set.keys - @columns).empty?
       set.each do |k, v|
-        t << "#{k} = '#{v}'" if k && v
+        t << "#{k} = '#{@pg.escape_string(v).to_s}'" if k && v
       end
       req << t.join(',')
-      req.append ['WHERE', key.to_s, '=', "'#{val.to_s}'"]
+      req.append ['WHERE', key.to_s, '=', "'#{@pg.escape_string(val.to_s)}'"]
       exec req
     end
 
     # send a query like this: 'UPDATE table SET #{string} WHERE key = val'. KEY VAL PAIR MUST BE UNIVOQUE
     def valueManipulation(key, val, string = "")
-      return [{}] if string.nil? || string.empty?
-
-      exec ['UPDATE', @name, 'SET', string, 'WHERE', key, '=', "'#{val}'"]
+      return [] if string.nil? || string.empty?
+      exec ['UPDATE', @name, 'SET', string.to_s, 'WHERE', key.to_s, '=', @pg.escape_string(val.to_s)]
     end
 
     # drop column from current table

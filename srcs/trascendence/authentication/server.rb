@@ -68,7 +68,7 @@ class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
     "style-src 'self' https://fonts.googleapis.com; " \
     "font-src 'self' https://fonts.gstatic.com; " \
     "img-src 'self' data: https://cdn.intra.42.fr; " \
-    "connect-src 'self' http://localhost:8008 ws://localhost:6087 http://localhost:6088; " \
+    "connect-src 'self' http://localhost:8008 wss://localhost:6087 http://localhost:6088; " \
     "object-src 'none'";    
   
     headers.each { |k, v| res[k] = v }

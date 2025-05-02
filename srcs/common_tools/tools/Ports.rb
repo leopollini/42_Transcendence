@@ -22,10 +22,15 @@ module Ports
     'logout_user' => ['user_manager', 7080, 2],         # CALLED BY CHAT AT LOGOUT
     'drop_users' => ['user_manager', 7080, 2],         # CALLED BY CHAT AT LOGOUT
     'get_user_by_token' => ['user_manager', 7080, 1],
+    'login_with_token' => ['user_manager', 7080, 1],
+    'game_state' => ['user_manager', 7080, 1],
 
     'chat' => ['chat', 6087, 1],
+
     'broadcast' => ['internal_chat_support', 6088, 1],
     'send_msg' => ['internal_chat_support', 6088, 1],
+    'get_online' => ['internal_chat_support', 6088, 1],
+    'is_online' => ['internal_chat_support', 6088, 1],
 
     'save_pong_game' => ['game_data_manager', 8790, 1],
     'get_pong_games' => ['game_data_manager', 8790, 1],

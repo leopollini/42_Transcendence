@@ -21,6 +21,7 @@ echo -e "${GREEN}\n\n(gli indirizzi ip usabili sono $(hostname -I))\n\n${RESET}"
 echo -e "\n${YELLOW}Configurando il firewall per consentire il traffico sulla porta 443...\n${RESET}"
 sudo ufw allow 443
 sudo ufw allow 8008
+sudo ufw allow 6087
 sudo ufw reload
 
 if ! sudo ufw status | grep -q "active"
@@ -44,5 +45,10 @@ openssl req -new -x509 -days 365 -nodes \
   -out "$CERT_DIR/server.crt" \
   -keyout "$CERT_DIR/server.key" \
   -subj "/C=IT/ST=F/L=MyCity/O=MyOrg/OU=MyDept/CN=localhost"
+
+# mkcert localhost
+
+# mv localhost.pem $CERT_DIR/server.crt
+# mv localhost-key.pem $CERT_DIR/server.key
 
 sudo ufw status verbose

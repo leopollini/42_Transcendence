@@ -31,7 +31,8 @@ class GuestsList
       'deleted' => -1,
       'bio' => data['bio'].to_s,
       'image' => data['image'].to_s,
-      'token' => data['token']
+      'token' => data['token'],
+      'is_playing' => false
     }
     
     @index[username] = i
@@ -68,7 +69,7 @@ class GuestsList
         g.slice!(g.keys - ['token'])
       end
     end
-    t
+    t.values
   end
 
   def get_by_name(name)
@@ -127,5 +128,17 @@ class GuestsList
 
   def exists?(username)
     @guest[@index[username]]['deleted'] == -1 if @index[username]
+  end
+
+  def set_playing(token, value)
+    guest = @guests[@tokens[token].to_s]
+    return nil if guest.nil?
+    guest['is_playing'] = value
+  end
+
+  def is_playing?(username)
+    guest = @guests[@index[username].to_s]
+    return nil if guest.nil?
+    guest['is_playing'] == 'true'
   end
 end
