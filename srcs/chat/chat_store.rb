@@ -159,6 +159,7 @@ class ChatStore
   def self.block(target, user)
     ChatStore.remove_friend(target, user)
     @@clients[user].send_sys "You have blocked #{target}"
+    @@clients[target].send_me({ 'from' => user }, 'block_user') 
     @@clients[target].send_sys "You have been blocked by #{user}"
     @@clients[user].block_usr target
 
