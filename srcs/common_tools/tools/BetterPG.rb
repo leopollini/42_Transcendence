@@ -65,7 +65,7 @@ module BetterPG
         dropTable
       end
       begin
-        exec 'CREATE TABLE ', @name, ' (', columns.join(', '), ');'
+        exec 'CREATE TABLE', @name, '(', columns.join(', '), ');'
       rescue PG::DuplicateTable
         addColumns(*columns)
         @columns = better_columns columns
@@ -77,10 +77,16 @@ module BetterPG
       true
     end
 
+    def get_exisitng_columns
+      result = @pg.exec("SELECT column_name FROM information_schema.columns WHERE table_name = #{@name.to_s} ORDER BY ordinal_position")
+      result.map { |row| row['column_name'] }
+    end
+
     # add columns to current table. ELEMENTS MUST CONTAIN DATA TYPE
     def addColumns(*columns)
       print 'Creating columns ' # if Ports::DEBUG_MODE
       columns.each do |c|
+        # (columns - get_exisitng_columns).each do |c|
         exec 'ALTER TABLE', @name, 'ADD', c
         print c, ' ' # if Ports::DEBUG_MODE
       rescue PG::DuplicateColumn
@@ -148,7 +154,7 @@ module BetterPG
         res if res
       rescue PG::UndefinedColumn, IndexError => e
         puts e
-        []
+        return []
       end
     end
 
@@ -165,10 +171,10 @@ module BetterPG
 
     # send a query like this: 'UPDATE table SET set_key1 = set_val1, set_key2 = set_val2, ... WHERE key = val'. KEY VAL PAIR MUST BE UNIVOQUE
     def updateValue(key = '', val = '', set = {})
+      raise "invalid updateValue request: changing a column which exists not" unless (set.keys - @columns).empty?
       return [] if set.nil? || set.empty?
       req = ['UPDATE', @name, 'SET']
       t = []
-      raise "invalid updateValue request: changing a column which exists not" unless (set.keys - @columns).empty?
       set.each do |k, v|
         t << "#{k} = '#{@pg.escape_string(v).to_s}'" if k && v
       end
@@ -198,6 +204,7 @@ module BetterPG
       raise RiskOfFullDeletion if @name.include?('*') && !iamsure
 
       exec 'DROP TABLE', @name
+      createTable @original_cols
     end
 
     def zeroTable
@@ -205,9 +212,15 @@ module BetterPG
     end
 
     def exec(*strs)
-      puts strs.join(' ')
-      return @pg.exec(strs.join(' ')) if strs.size != 0
-      [{}]
+      begin
+        strs = strs.join(' ')
+        puts strs
+        return @pg.exec(strs) if strs.size != 0
+        return []
+      rescue PG::InvalidTextRepresentation => r
+        puts r.backtrace
+        return nil
+      end
     end
   end
 end

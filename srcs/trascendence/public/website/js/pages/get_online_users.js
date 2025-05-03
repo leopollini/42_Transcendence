@@ -1,3 +1,5 @@
+import { showInfoModal } from "../modal.js"
+
 export async function fetchOnlineUsers(current_user) {
     try {
         const response = await fetch("http://localhost:8008", {
@@ -12,13 +14,12 @@ export async function fetchOnlineUsers(current_user) {
         //console.log("data = ", data);
         let users_online = [];
         data.online_users.forEach(user => {
-                if (user !== current_user)
-                    users_online.push(user);    
-        }); 
+            if (user !== current_user)
+                users_online.push(user);
+        });
         //console.log("users online =>", users_online);
-        return users_online; 
+        return users_online;
     } catch (error) {
-        console.error("Fetch error:", error);
-        throw error;
+        showInfoModal("Fetch error:", error);
     }
 }

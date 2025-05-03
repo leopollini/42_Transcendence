@@ -1,7 +1,7 @@
 import { profile } from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
 import { showInfoModal } from "../../modal.js";
-import { navigate, current_user, token } from "../../main.js";
+import { navigate, current_user, token, save_global } from "../../main.js";
 import { remove_all } from "../../utils_main/error_main.js";
 
 export default function Profile() {
@@ -136,14 +136,15 @@ async function saveProfile(infoContainer) {
     current_user.image = me.image;
   }
   saving += savebio(me, infoContainer, current_user);
-  if (current_user.type === "login")
+  if (current_user.type === "login")ww
     saving += await savename(me, infoContainer, current_user);
   if (current_user.type === "guest")
     updateGuest(current_user);
   else
     updateLogin(current_user);
   showInfoModal(saving, () => { });
-  history.back();
+  save_global("user", current_user);
+  navigate("/modes", "modalita");
 }
 
 function updateDisplayNames(infoContainer) {

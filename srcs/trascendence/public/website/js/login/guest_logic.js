@@ -54,11 +54,12 @@ function update_guest(curr_guest) {
         save_global("acess", true);
         save_global("token", data.token);
         save_global("name", guest_user.display_name);
+        save_global("user", guest_user);
         navigate("/modes", "Modalità di gioco");
       }
       else {
         guest_user = null;
-        if (data.status === "no users found")
+        if (data.status === "username taken")
           showInfoModal("ERROR: Name already taken, try a different one", () => { });
         else
           showInfoModal("ERROR in LOGIN_USER: An error has occured(\"" + data.status + "\")", () => { });

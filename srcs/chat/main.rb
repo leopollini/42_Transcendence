@@ -136,7 +136,6 @@ EM::WebSocket.start({
       when "unblock_user"
         ChatStore.clients[@username].send_sys "You have unblocked #{target}"
         ChatStore.clients[@username].unblock_user target
-        ChatStore.clients[target].send_me({ 'from' => @username }, 'unblock_user')
 
       when 'match_request'
         ChatStore.clients[data['to'].to_s].send_me({'from' => @username, 'data' => data['data']}, "match_request")
@@ -162,3 +161,42 @@ EM::WebSocket.start({
   end
 end
 
+server.mount('/', ChatService)
+
+def internal_call(client, server)
+  puts "internal call called"
+  t = select [client], [], [], 20 # waits for client, a few seconds
+  return if t.nil? || t[0].empty? || client.closed?
+
+  msg = client.read_nonblock Ports::MAX_MSG_LEN
+  # bobj = JSON.parse(msg)
+  bobj = RequestUnpacker::Unpacker.new.unpack msg
+
+  r = nil
+  case bobj['method']
+  when 'broadcast'
+    puts "Broadcast called from non client"
+    ChatStore.sys_broadcast bobj['content'] if bobj['content'] rescue r
+    client.puts
+  when 'send_msg'
+    puts "Sending message to #{bobj['to']}: #{bobj['content']}"
+    r = "missing params" unless (['content', 'to'] - bobj.keys).empty?
+    ChatStore.clients[bobj['to']].send_me({'date' => Time.now.iso8601, 'from' => 'sys', 'content' => bobj['content']}, bobj['type'] ? bobj['type'] : 'message') rescue r
+    client.puts
+  when 'get_online'
+    client.puts ChatStore.get_online(bobj['include_guests']).to_json
+  when 'is_online'
+    puts "Is #{bobj['username']} online? Online users: "
+    found = ChatStore.exists? bobj['username'].to_s
+    client.puts({'status' => (found ? 'success' : 'no user found'), 'success' => found}.to_json)
+  else
+    puts "Unknown method called (#{bobj['method']})"
+  end
+  puts r if r
+end
+
+puts 'Starting internal_chat_support at port ' + PORT_1.to_s + '!'
+
+Thread.start{(SimpleServer::SimplerTCP.new PORT_1, :internal_call).start_loop}
+
+server.start

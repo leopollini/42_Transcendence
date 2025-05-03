@@ -6,7 +6,8 @@ import {
     playerNames,
     tournament,
     persist,
-    lobby_data
+    lobby_data,
+    current_user
 } from "../main.js";
 import { resetBracketState } from "../pages/tournament/bracket.js";
 import { showInfoModal } from "../modal.js";
@@ -60,6 +61,8 @@ export function save_at_exit() {
         to_string("prev_path", prev_path, false);
     if (playerNames)
         to_string("PlayerName", playerNames, true);
+    if (current_user)
+        to_string("user", current_user, true);
 }
 
 export function reset_tournament_data() {

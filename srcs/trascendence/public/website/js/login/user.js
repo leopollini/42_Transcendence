@@ -1,5 +1,4 @@
-import { navigate, user_name, token } from "../main.js";
-import { updateProfileUI } from "../pages/modes.js";
+import { navigate, token } from "../main.js";
 import { showInfoModal } from "../modal.js";
 import { remove_all } from "../utils_main/error_main.js";
 
@@ -49,41 +48,6 @@ function set_user(user, type)
         type
     );
     return new_user;
-}
-
-export async function restore_user() {
-    try {
-        if (window.location.pathname === '/')
-            return null;
-        let data = JSON.stringify({ "params": { "display_name": user_name, "token": token } });
-        //console.log("username: ", user_name);
-        const response = await fetch("http://localhost:8008",
-        {
-            method: "get_user",
-            body: data
-        })
-
-        let result = await response.json();
-        if (result && result.success === "true") {
-            let ref_user;
-            if (result.guest)
-                ref_user = set_user(result.guest, "guest");
-            else
-                ref_user = set_user(result.user, "login");
-            updateProfileUI(ref_user);
-            return ref_user;
-        }
-        else {
-            remove_all();
-            showInfoModal("ERROR GET_USER IN RESTORE USER: An error has occured(\"" + result.status + "\")", () => { });
-            return null;
-        }
-    }
-    catch (error) {
-        remove_all();
-        showInfoModal("ERROR GET_USER IN RESTORE USER CATCHED:" + error, () => {});
-        return null;
-    }
 }
 
 export async function exist(name)
@@ -169,12 +133,6 @@ export async function check_name(name)
     
     if (name.length >= 15) {
         showInfoModal("Name too long.", () => {});
-        return false;
-    }
-    let it_exist = await exist(name);
-    if (it_exist === false)
-    {
-        showInfoModal("Name already taken", () => {});
         return false;
     }
     return true;
