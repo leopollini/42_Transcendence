@@ -7,12 +7,16 @@ GEM
     colorize (1.1.0)
     did_you_mean (2.0.0)
     dotenv (3.1.7)
+    eventmachine (1.2.7)
     faraday (2.13.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
     faraday-net_http (3.4.0)
       net-http (>= 0.5.0)
+    faye-websocket (0.11.3)
+      eventmachine (>= 0.12.0)
+      websocket-driver (>= 0.5.1)
     hashie (5.0.0)
     json (2.10.2)
     jwt (2.10.1)
@@ -42,6 +46,10 @@ GEM
     uri (1.0.3)
     version_gem (1.1.7)
     webrick (1.9.1)
+    websocket-driver (0.7.7)
+      base64
+      websocket-extensions (>= 0.1.0)
+    websocket-extensions (0.1.5)
 
 PLATFORMS
   ruby
@@ -53,6 +61,7 @@ DEPENDENCIES
   colorize (= 1.1.0)
   did_you_mean
   dotenv (= 3.1.7)
+  faye-websocket
   json (= 2.10.2)
   oauth2
   openssl

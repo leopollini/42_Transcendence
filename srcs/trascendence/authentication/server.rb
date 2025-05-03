@@ -1,6 +1,7 @@
 require 'webrick/https'
 require 'colorize'
 require 'openssl'
+# require 'faye/websocket'
 require_relative 'Oauth'
 require_relative 'session'
 require_relative 'error_logger'
@@ -68,8 +69,8 @@ class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
     "style-src 'self' https://fonts.googleapis.com; " \
     "font-src 'self' https://fonts.gstatic.com; " \
     "img-src 'self' data: https://cdn.intra.42.fr; " \
-    "connect-src 'self' http://localhost:8008 wss://localhost:6087 http://localhost:6088; " \
-    "object-src 'none'";    
+    "connect-src 'self' http://localhost:8008 ws://localhost:6087; " \
+    "object-src 'none'";
   
     headers.each { |k, v| res[k] = v }
     log_error_details(req, status, body, LOGGER)
@@ -87,6 +88,71 @@ class RootDirManager < WEBrick::HTTPServlet::AbstractServlet
 end
 
 server.mount '/', RootDirManager
+
+# server.mount_proc '/ws' do |req, res|
+#   puts "websocket creation request"
+#   if Faye::WebSocket.websocket?(req.meta_vars)
+#     ws = Faye::WebSocket.new(req.meta_vars, nil, { ping: 15 })
+
+#     ws.on :open do |event|
+#       puts "created lol!"
+#     end
+
+#     ws.on :message do |event|
+#       puts "received lol!"
+#     end
+
+#     ws.on :close do |event|
+#     end
+
+#     # Hand over control to WebSocket — don't send normal HTTP response
+#     throw :async
+#   else
+#     res.status = 400
+#     res.body = '{"status":"not a websocket", "success":"false"}'
+#   end
+# end
+
+
+
+# app = lambda do |env|
+#   if Faye::WebSocket.websocket?(env)
+#     ws = Faye::WebSocket.new(env, nil)
+
+#     ws.on :open do |event|
+#       puts "WebSocket opened"
+#     end
+
+#     ws.on :message do |event|
+#       puts "Received: #{event.data}"
+#       ws.send("Echo: #{event.data}")
+#     end
+
+#     ws.on :close do |event|
+#       puts "WebSocket closed"
+#     end
+
+#     return ws.rack_response
+#   else
+#     req = Rack::Request.new(env)
+#     if req.path == '/ws'
+#       puts "Non-WebSocket request to /ws"
+#     end
+
+#     return [200, { 'Content-Type' => 'text/plain' }, ['Fallback response']]
+#   end
+# end
+
+# ssl_opts = {
+#   SSLEnable: true,
+#   SSLCertificate: OpenSSL::X509::Certificate.new(File.read('server.crt')),
+#   SSLPrivateKey: OpenSSL::PKey::RSA.new(File.read('server.key')),
+#   SSLVerifyClient: OpenSSL::SSL::VERIFY_NONE
+# }
+
+# Thread.start {Rack::Handler::WEBrick.run app, Host: '0.0.0.0', Port: 453, **ssl_opts}
+
+
 
 set_routes(server)
 
