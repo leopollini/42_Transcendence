@@ -59,7 +59,7 @@ function update_guest(curr_guest) {
       }
       else {
         guest_user = null;
-        if (data.status === "no users found")
+        if (data.status === "username taken")
           showInfoModal("ERROR: Name already taken, try a different one", () => { });
         else
           showInfoModal("ERROR in LOGIN_USER: An error has occured(\"" + data.status + "\")", () => { });
