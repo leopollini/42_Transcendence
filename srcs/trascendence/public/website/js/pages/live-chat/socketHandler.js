@@ -15,7 +15,7 @@ function initSocket(username, chatAppInstance) {
     if (!socket)
     {
         try {
-            socket = new WebSocket('wss://localhost:6087');
+            socket = new WebSocket('ws://localhost:6087');
         }
         catch(error) {
             showInfoModal("Socket creation error: " + error);
@@ -66,7 +66,7 @@ function initSocket(username, chatAppInstance) {
             }
         } 
         else if (msg.type === "friend_response") {
-            if (msg.data.accepted) {
+            if (msg.data.accepted === "true") {
                 chatAppInstance.friends.add(msg.data.from);
                 const chatId = chatAppInstance.getPrivateChatId(chatAppInstance.username, msg.data.from);
                 if (chatAppInstance.disabledChats[chatId]) {
