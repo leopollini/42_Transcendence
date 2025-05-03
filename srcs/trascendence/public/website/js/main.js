@@ -166,7 +166,7 @@ export const loadContent = async () => {
         handlerMap[path]();
     }
 
-    if (path !== "/classic" && path !== "/forza4/game"
+    if (path !== "/classic" && path !== "/forza4/game" && path !== "/VS_AI"
         && path !== "/tournament/knockout/bracket/game" && path !== "/tournament/roundrobin/robinranking/game" && path !== "/") {
         initChat();
     } else {

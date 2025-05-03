@@ -97,15 +97,15 @@ class ChatStore
 
   def self.purge
     @@mutex.synchronize do
-      @clients = @clients.filter {| usr, cli | cli.alive?}
+      @clients = @clients.filter {| user, cli | cli.alive?}
     end
   end
 
   def self.sys_broadcast(msg, avoid = "")
     puts "broadcasting message: #{msg}"
     @@mutex.synchronize do
-      @@clients.each do | usr, cli |
-        cli.send_me({ 'content' => msg }, 'system') unless usr == avoid
+      @@clients.each do | user, cli |
+        cli.send_me({ 'content' => msg }, 'system') unless user == avoid
       end
     end
   end
@@ -113,8 +113,8 @@ class ChatStore
   def self.broadcast(content, type, avoid = "")
     puts "broadcasting message: #{content}"
     @@mutex.synchronize do
-      @@clients.each do | usr, cli |
-        cli.send_me(content, type) unless usr == avoid
+      @@clients.each do | user, cli |
+        cli.send_me(content, type) unless user == avoid
       end
     end
   end
@@ -159,8 +159,9 @@ class ChatStore
   def self.block(target, user)
     ChatStore.remove_friend(target, user)
     @@clients[user].send_sys "You have blocked #{target}"
+    @@clients[target].send_me({ 'from' => user }, 'block_user') 
     @@clients[target].send_sys "You have been blocked by #{user}"
-    @@clients[user].block_usr target
+    @@clients[user].block_user target
 
     remove_friend target, user
   end

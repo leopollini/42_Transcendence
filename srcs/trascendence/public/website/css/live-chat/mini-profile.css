@@ -130,18 +130,21 @@
 }
 
 /* Bio utente: testo a fianco della label 'Bio:' */
-.profile-details p span#userBio {
+.profile-details p span#userBio,
+#realname, 
+#userEmail {
   display: block;
   flex: 1;                  /* Occupiamo lo spazio rimanente */
   max-height: 8rem;
   overflow-y: auto;
-  margin-left: 0.5rem;      /* Spazio tra label e testo */
   line-height: 1.4;
   font-size: 0.9rem;
   color: #fff;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: anywhere;
+  text-shadow: none;
+  font-weight: bold;
 }
 
 /* Personalizzazione scrollbar (solo WebKit) */

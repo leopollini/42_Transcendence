@@ -56,7 +56,7 @@ export async function restore_user() {
         if (window.location.pathname === '/')
             return null;
         let data = JSON.stringify({ "params": { "display_name": user_name, "token": token } });
-        console.log("username: ", user_name);
+        //console.log("username: ", user_name);
         const response = await fetch("http://localhost:8008",
         {
             method: "get_user",
@@ -215,4 +215,30 @@ export async function another_user_info(name)
             navigate("/", "home");
         showInfoModal("catched this error = (" +  error + ")", () => {});
     }
+}
+
+export async function login_with_token()
+{
+    console.log("ciao");
+    return true;
+    try
+    {
+        let data = JSON.stringify({ "token": token });
+        const response = await fetch("http://localhost:8008",
+            {
+                method: "login_with_token",
+                body: data
+            })
+            let result = await response.json();
+            console.log("resutl = ", result);
+            if (result.success === "true")
+                return 0;
+            return 1;
+    }
+    catch (error)
+    {
+        showInfoModal("Error in LOGIN_WITH_TOKEN (" + error + ")", () =>  {});
+        return -1;
+    }
+
 }

@@ -107,33 +107,10 @@ function initSocket(username, chatAppInstance) {
                 content: `Private chat with ${msg.data.from.charAt(0) + msg.data.from.slice(1)} started.`
             });
         }        
-        else if (msg.type === "system") {
-            if (msg.data.content && msg.data.content.includes("You cannot send a friend request")) {
-                let regex = /you're blocked from ([^.]+)\./i;
-                let match = msg.data.content.match(regex);
-                if (!match) {
-                    regex = /You cannot send a friend request to([^.]+) because he blocked you\./i;
-                    match = msg.data.content.match(regex);
-                }
-                if (match && match[1]) {
-                    const blockingUser = match[1].trim();
-                    chatAppInstance.pendingRequests.delete(blockingUser);
-                    if (chatAppInstance.selectedUser && chatAppInstance.selectedUser === blockingUser) {
-                        const addFriendItem = chatAppInstance.elements.contextMenu.querySelector('[data-action="addFriend"]');
-                        if (addFriendItem) {
-                            addFriendItem.textContent = 'Add Friend';
-                            addFriendItem.style.opacity = '1';
-                        }
-                    }
-                }
-            }
-            chatAppInstance.addMessageToChat(chatAppInstance.currentChat, msg.data);
-        }
         else if (msg.type === "match_request") {
             // L'utente ricevente visualizza la richiesta di partita tramite modal di conferma
             const sender = msg.data ? msg.data.from : msg.from; // "userA"
             const receiver = username; // "userB"
-            console.log("in_game = ", in_game);
             if (in_game !== 0) {
                 socket.send(JSON.stringify({
                     type: "match_response",
@@ -145,7 +122,7 @@ function initSocket(username, chatAppInstance) {
             }
             
             showConfirmModal(
-              `${sender} ti ha invitato a una partita. Accetti?`,
+              `${sender} has invited you to a match. do you accept?`,
               () => { // onConfirm: utente conferma
                   const response = {
                       type: "match_response",
@@ -153,8 +130,8 @@ function initSocket(username, chatAppInstance) {
                       from: receiver,
                       accepted: "true"
                   };
-                  console.log("receiver", receiver);
-                  console.log("⚡ Invio risposta all'invito:", response);
+                  //console.log("receiver", receiver);
+                  //console.log("⚡ Invio risposta all'invito:", response);
                   socket.send(JSON.stringify(response));
               },
               () => { // onReject: utente rifiuta
@@ -164,13 +141,13 @@ function initSocket(username, chatAppInstance) {
                       from: receiver,
                       accepted: "false"
                   };
-                  console.log("⚡ Invio risposta all'invito:", response);
+                  //console.log("⚡ Invio risposta all'invito:", response);
                   socket.send(JSON.stringify(response));
               }
             );
         }
         else if (msg.type === "match_response") {
-            console.log("📩 Risposta ricevuta:", msg);
+            //console.log("📩 Risposta ricevuta:", msg);
             if (!msg.data)
                 showInfoModal("bad response.", () => {});
             if (msg.data.accepted === "true")
@@ -190,11 +167,8 @@ function initSocket(username, chatAppInstance) {
 }
 
 function sendMessage(message) {
-    if (socket && socket.readyState === WebSocket.OPEN) {
+    if (socket && socket.readyState === WebSocket.OPEN)
         socket.send(JSON.stringify(message));
-    } else {
-        console.log("Socket non è connesso o non pronto.");
-    }
 }
 
 export { initSocket, sendMessage };

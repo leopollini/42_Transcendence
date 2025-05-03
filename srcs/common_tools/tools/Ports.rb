@@ -9,33 +9,18 @@ module Ports
     #  1 -> user wfqew
     #  2 -> API key
     
-    # '' => ['receiver', 8008],
-    # 'GET' => ['auth', 443],
-    # 'POST' => ['request_manager', 9000],
-    # 'HEAD' => ['request_manager', 9000],
-    # 'show_users' => ['request_manager', 9000],
-    # 'tokenizer' => ['tokenizer', 7890],
-
-    # "method" => ["service_to_call", port_to_service, securiy_level]
-    # SECURITY LEVELS:
-    #  0 -> none
-    #  1 -> user wfqew
-    #  2 -> API key
-    
     # 'POST' => ['request_manager', 9000],
     # 'HEAD' => ['request_manager', 9000],
     # 'show_users' => ['request_manager', 9000],
     # 'tokenizer' => ['tokenizer', 7890],
     
     '' => ['receiver', 8008],
-    
     'GET' => ['auth', 443],
-
     'get_user' => ['user_manager', 7080, 1],
     'update_user' => ['user_manager', 7080, 1],
     'login_user' => ['user_manager', 7080, 0],
     'logout_user' => ['user_manager', 7080, 2],         # CALLED BY CHAT AT LOGOUT
-    'drop_users' => ['user_manager', 7080, 2],          # CALLED BY CHAT AT LOGOUT
+    'drop_users' => ['user_manager', 7080, 2],         # CALLED BY CHAT AT LOGOUT
     'get_user_by_token' => ['user_manager', 7080, 1],
     'login_with_token' => ['user_manager', 7080, 1],
     'game_state' => ['user_manager', 7080, 1],
@@ -47,19 +32,13 @@ module Ports
     'get_online' => ['internal_chat_support', 6088, 1],
     'is_online' => ['internal_chat_support', 6088, 1],
 
-    'match_invitation_request' => ['matchmaking', 6009, 1],
     'save_pong_game' => ['game_data_manager', 8790, 1],
     'get_pong_games' => ['game_data_manager', 8790, 1],
     'save_f4_game' => ['game_data_manager', 8790, 1],
     'get_f4_games' => ['game_data_manager', 8790, 1],
     'get_all_games' => ['game_data_manager', 8790, 1],
-    'drop_games' => ['game_data_manager', 8790, 2],
 
-    'create_tournament' => ['matchmaking', 6009, 1],
-    'get_online_opponents' => ['matchmaking', 6009, 1]
-  }
-  ROUTES = {
-    "internal_chat_support" => "chat"
+    'match_invitation_request' => ['matchmaking', 6009, 1]
   }
   MAX_MSG_LEN = 100_000
 end
@@ -111,11 +90,9 @@ module SimpleServer
   # JSON object (not in string form)
   def self.method_req(method, msg = {}, do_close = true)
     raise "Bad method request (#{method})" if Ports::HASH[method].nil?
-    service = Ports::HASH[method][0]
-    host = (Ports::ROUTES[service].nil? ? service : Ports::ROUTES[service])
-    puts "Resolving host: #{host}"
+    puts "Resolving host: #{Ports::HASH[method][0]}"
     begin
-      service = TCPSocket.new host, Ports::HASH[method][1]
+      service = TCPSocket.new Ports::HASH[method][0], Ports::HASH[method][1]
     rescue => r
       return {'status' => "connection failed. Maybe service closed? (#{r.to_s})", 'success' => 'false'}.to_s
     end
@@ -143,9 +120,8 @@ module SimpleServer
         Thread.start(@@server.accept) do |client|
           begin
             method(@@function).call(client, self)
-          rescue => r
-            puts "Catched: " + r.to_s + "(" + r.class.to_s + ")\n" + r.backtrace.join("\n") if DEBUG_MODE
-            raise r
+            # rescue => r
+            # 	puts "Catched: " + r.to_s + "(" + r.class.to_s + ")\n" + r.backtrace.join("\n") if DEBUG_MODE
           end
           client.close if @@close && !client.closed?
           puts 'Connection concluded' if DEBUG_MODE

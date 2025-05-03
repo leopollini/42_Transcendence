@@ -4,6 +4,7 @@ import { setupEventListeners } from './eventListeners.js';
 import { current_user } from '../../main.js';
 import { another_user_info, is_online, } from '../../login/user.js';
 import { showInfoModal } from '../../modal.js';
+import { acceptedUsers } from "../classic_pong_lobby.js";
 class ChatApp {
     constructor() {
         this.chats = new Map();
@@ -15,7 +16,9 @@ class ChatApp {
         this.selectedUser = null;
         this.username = null;
         this.blockedUsers = new Set();
+        this.blockedBy = new Set();  
         this.disabledChats = {};
+        this.acceptedUsers = acceptedUsers;
         this.initialize();
     }
 
@@ -472,46 +475,42 @@ class ChatApp {
         const menu = this.elements.contextMenu;
         menu.style.display = 'block';
         menu.style.left = `${x}px`;
-        menu.style.top = `${y}px`;
+        menu.style.top  = `${y}px`;
 
-        const chatItem = menu.querySelector('[data-action="chat"]');
+        const chatItem      = menu.querySelector('[data-action="chat"]');
         const addFriendItem = menu.querySelector('[data-action="addFriend"]');
-        const inviteItem = menu.querySelector('[data-action="invite"]');
-        const profileItem = menu.querySelector('[data-action="profile"]');
-        const blockItem = menu.querySelector('[data-action="block"]');
+        const inviteItem    = menu.querySelector('[data-action="invite"]');
+        const profileItem   = menu.querySelector('[data-action="profile"]');
+        const blockItem     = menu.querySelector('[data-action="block"]');
 
-        //controllar login
-        // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
-        const online = await is_online(user);
-        if ((user === this.username) || (user !== this.username && online === false)) {
-            chatItem.style.display = 'none';
+        const isBlocked   = this.blockedUsers.has(user);
+        const isBlockedBy = this.blockedBy.has(user);
+        const online      = await is_online(user);
+    
+        // 1) Se è me stesso o offline: niente chat, niente friend, niente invite
+        if (user === this.username || (!online && user !== this.username)) {
+            chatItem     .style.display = 'none';
             addFriendItem.style.display = 'none';
-            if (inviteItem) inviteItem.style.display = 'none';
-            profileItem.style.display = 'block';
-            blockItem.style.display = 'none';
+            inviteItem   .style.display = 'none';
+            profileItem  .style.display = 'block';
+            blockItem    .style.display = 'none';
             return;
         }
 
-        if (this.blockedUsers.has(user)) {
-            chatItem.style.display = 'none';
-            if (inviteItem) inviteItem.style.display = 'none';
-            addFriendItem.style.display = 'block';
-            if (this.friends.has(user)) {
-                addFriendItem.textContent = 'Remove Friend';
-                addFriendItem.style.opacity = '1';
-            } else if (this.pendingRequests.has(user)) {
-                addFriendItem.textContent = 'Request Sent';
-                addFriendItem.style.opacity = '0.6';
-            } else {
-                addFriendItem.textContent = 'Add Friend';
-                addFriendItem.style.opacity = '1';
-            }
-            profileItem.style.display = 'block';
-            blockItem.style.display = 'block';
-            blockItem.textContent = 'Unblock User';
+        // 2) Se ho bloccato o sono stato bloccato: solo profile + unblock/block + NO invite
+        if (isBlocked || isBlockedBy) {
+            chatItem     .style.display = 'none';
+            addFriendItem.style.display = 'none';
+            inviteItem   .style.display = 'none';
+            profileItem  .style.display = 'block';
+            blockItem    .style.display = isBlocked
+                                  ? 'block'  // io l’ho bloccato → glielo mostro per poter sbloccare
+                                  : 'none';  // è lui che mi ha bloccato → non voglio nemmeno il pulsante block
+            blockItem.textContent = isBlocked ? 'Unblock User' : 'Block User';
             return;
         }
 
+        // 3) Caso normale: gestisco chat/addFriend/invite…
         chatItem.style.display = this.friends.has(user) ? 'block' : 'none';
 
         if (user === 'general') {
@@ -530,9 +529,10 @@ class ChatApp {
             }
         }
 
-        if (inviteItem) inviteItem.style.display = 'block';
-        profileItem.style.display = 'block';
-        blockItem.style.display = 'block';
+        // **invito** visibile solo in questo ramo “normale”
+        inviteItem  .style.display = 'block';
+        profileItem .style.display = 'block';
+        blockItem   .style.display = 'block';
         blockItem.textContent = 'Block User';
     }
 
