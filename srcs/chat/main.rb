@@ -1,6 +1,7 @@
 require 'socket'
 require 'timeout'
 require 'em-websocket'
+require 'colorize'
 require_relative 'chat_store'
 
 load(File.file?('/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')
@@ -90,7 +91,7 @@ EM::WebSocket.start({
       when "join"
         @username = data["username"].to_s
         if ChatStore.exists? @username
-          sock.puts({'status' => 'another user with the same username is already connected', 'succes' => 'false', 'type' => 'kick'}.to_json)
+          sock.send({'status' => 'another user with the same username is already connected', 'succes' => 'false', 'type' => 'kick'}.to_json)
           socket_close(sock)
           return
         end
