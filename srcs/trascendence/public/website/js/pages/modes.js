@@ -80,14 +80,15 @@ export const addModesPageHandlers = () => {
     history, logout);
 };
 
-export function update_image(image)
-{
+export function update_image(image) {
     const checkImageInterval = setInterval(() => {
         const avatarImage = document.getElementById('avatarImage');
-        if (avatarImage)
-        {
-            avatarImage.src = image;
-            clearInterval(checkImageInterval);
+        if (avatarImage) {
+            if (avatarImage.src !== image) {
+
+                avatarImage.src = image;
+                clearInterval(checkImageInterval);
+            }
         }
     }, 100);
 }
@@ -95,10 +96,12 @@ export function update_image(image)
 export async function change_name(name) {
     const checknameInterval = setInterval(() => {
         const avatarName = document.getElementById('avatarName');
-        if (avatarName)
-        {
-            avatarName.textContent = name;
-            clearInterval(checknameInterval);
+        if (avatarName) {
+            if (avatarName.textContent !== name) {
+
+                avatarName.textContent = name;
+                clearInterval(checknameInterval);
+            }
         }
     }, 100);
 }
