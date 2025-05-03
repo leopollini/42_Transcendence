@@ -42,7 +42,7 @@ def user_creat(data, token)
   data['is_playing'] = 'false'
   return DEFAULT_MISSING_PARAM.clone unless (MANDATORY_DATA - data.keys).empty?
   LOGIN.addValues data
-  return DEFAULT_SUCCESS_RES.merge({'token' => token, 'user' => (LOGIN.select_specific 'realname', data['realname'].to_s, nil, false)})
+  return DEFAULT_SUCCESS_RES.merge({'token' => token, 'user' => data.slice(['is_playing'])})
 end
 
 def login_user(client, obj)

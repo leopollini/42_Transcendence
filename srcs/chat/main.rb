@@ -55,7 +55,6 @@ puts 'Starting internal_chat_support at port ' + PORT_1.to_s + '!'
 Thread.start{(SimpleServer::SimplerTCP.new PORT_1, :internal_call).start_loop}
 
 
-
 puts "starting machine"
 EM::WebSocket.start({
   :host => "0.0.0.0",
