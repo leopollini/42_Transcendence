@@ -84,8 +84,11 @@ export function free_users()
                     return;
                 if (data.status && data.success)
                 {
+                    console.log("data = ", data);
                     if (data.success !== "true")
                         showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
+                    else
+                        console.log("logut esecuted succesfully")
                 }
             }
         })
