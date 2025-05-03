@@ -146,6 +146,10 @@ async function refresh_reset() {
         save_global("lobby_data", sessionStorage.getItem("lobby_data"));
         sessionStorage.removeItem("lobby_data");
     }
+    if (sessionStorage.getItem("user")) {
+        save_global("user", sessionStorage.getItem("user"));
+        sessionStorage.removeItem("user");
+    }
 }
 
 export async function remove_all() {

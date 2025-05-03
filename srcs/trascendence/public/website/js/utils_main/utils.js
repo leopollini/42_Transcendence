@@ -34,8 +34,8 @@ export async function util_main(path, component, app) {
     if (path !== "/classic/lobby" && path !== "/classic")
         save_global("lobby_data", null);
     //console.log("lobby_data", lobby_data);
-    if (window.location.pathname !== "/" && acess === true) 
-        save_global("user", await restore_user());
+    /*if (window.location.pathname !== "/" && acess === true) 
+        save_global("user", await restore_user());*/
     if (/^Robin[4-8]$/.test(buttonTitle) || /^Bracket(4|8|16)$/.test(buttonTitle))
         save_global("numP", parseInt(buttonTitle.replace(/\D/g, ""), 10));
     if (!players)

@@ -100,6 +100,7 @@ async function set_user(user) {
     bio: user.bio,
     type: "login"
   };
+  save_global("user", new_user);
   save_global("name", new_user.login_name);
   //console.log("username after set = ", user_name);
   if (name_changed)
