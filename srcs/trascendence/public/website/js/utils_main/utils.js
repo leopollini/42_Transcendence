@@ -1,7 +1,6 @@
 import { save_global, buttonTitle, players, numPlayers, acess, user_name, lobby_data } from "../main.js";
 import { check_valid_operation } from "./error_main.js";
 import { initializeGameCanvas } from "../game/pong/main/handling_Canvas.js";
-import { restore_user} from "../login/user.js";
 
 const gamePaths = [
     "/classic",

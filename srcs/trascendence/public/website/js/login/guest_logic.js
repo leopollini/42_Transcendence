@@ -54,6 +54,7 @@ function update_guest(curr_guest) {
         save_global("acess", true);
         save_global("token", data.token);
         save_global("name", guest_user.display_name);
+        save_global("user", guest_user);
         navigate("/modes", "Modalità di gioco");
       }
       else {

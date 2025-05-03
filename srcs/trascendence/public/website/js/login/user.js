@@ -51,7 +51,7 @@ function set_user(user, type)
     return new_user;
 }
 
-export async function restore_user() {
+/*export async function restore_user() {
     try {
         if (window.location.pathname === '/')
             return null;
@@ -84,7 +84,7 @@ export async function restore_user() {
         showInfoModal("ERROR GET_USER IN RESTORE USER CATCHED:" + error, () => {});
         return null;
     }
-}
+}*/
 
 export async function exist(name)
 {
