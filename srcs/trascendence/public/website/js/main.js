@@ -1,6 +1,5 @@
 import LiveChat from "./pages/live-chat.js";
 import ChatApp from "./pages/live-chat/ChatApp.js";
-
 import { remove_all } from "./utils_main/error_main.js";
 import { routes, handlerMap } from "./utils_main/router.js"
 import { handle_popstate, save_at_exit } from "./utils_main/listener_Compacter.js";
