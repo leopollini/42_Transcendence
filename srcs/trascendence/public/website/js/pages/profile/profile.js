@@ -2,7 +2,6 @@ import { profile } from "../../login/user.js";
 import { savebio, saveimage, savename } from "../../game/pong/other/profile_logic.js";
 import { showInfoModal } from "../../modal.js";
 import { navigate, current_user, token, save_global } from "../../main.js";
-import { remove_all } from "../../utils_main/error_main.js";
 
 export default function Profile() {
   return `

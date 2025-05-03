@@ -54,7 +54,7 @@ export async function exist(name)
 {
     try
     {
-        let data = JSON.stringify({"params": {"display_name": name}});
+        let data = JSON.stringify({ "params": { "display_name": name }});
         const response = await fetch("http://localhost:8008",
         {
             method: "get_user",
@@ -63,10 +63,10 @@ export async function exist(name)
         const result = await response.json();
         //console.log("result = ", result);
         if (result.status === "no user found")
-            return true;
+            return false;
         else
         {
-            return false;
+            return true;
         }
     }
     catch (error)
@@ -163,7 +163,6 @@ export async function another_user_info(name)
         else
         {
             showInfoModal("Error: Unknown user", () => {});
-            remove_all();
             return null;
         }
     }

@@ -136,7 +136,7 @@ class ChatStore
 
   def self.friend_res(requester, accepter, accepted)
     @@mutex.synchronize do
-      @@clients[accepter].send_sys("You have #{accepted ? "accepted" : "denied"} #{requester}'s friend request!")
+      @@clients[accepter].send_sys("You have #{accepted == 'true' ? "accepted" : "denied"} #{requester}'s friend request!")
       @@clients[requester].send_me({"accepted" => accepted, 'from' => accepter}, 'friend_response')
       @@clients[requester].get_waiting_friends.delete accepter
       @@clients[accepter].get_waiting_friends.delete requester
@@ -168,7 +168,7 @@ class ChatStore
 
   def self.get_client_state(user)
     client = ChatStore.clients[user]
-    info = {"friends" => client.friends, "friend_requests" => client.get_waiting_friends, "blocked_users" => client.blocked, "pending_requests" => ["ASDASD"]}
+    info = {"friends" => client.friends, "friend_requests" => client.get_waiting_friends, "blocked_users" => client.blocked, "pending_requests" => []}
     puts "sending state info: #{info}"
     client.send_me(info, "state")
   end

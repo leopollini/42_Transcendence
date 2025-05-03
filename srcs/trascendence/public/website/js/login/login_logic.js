@@ -11,13 +11,12 @@ export default function Callback() {
 
 export async function addCallbackPageHandlers() {
   let let_me_in = await checkAuthentication(window.location.pathname);
+  console.log("lemme in: ", let_me_in);
   if (let_me_in === 1) {
     remove_all();
-    return (1);
   }
   else if (let_me_in === -1) {
     await navigate("/modes", "Return to Game Mode");
-    return (1);
   }
 }
 
@@ -37,11 +36,13 @@ async function update_with_new_name(name) {
     .then(data => {
       if (data) {
         if (data.success !== "true") {
+          remove_all();
           showInfoModal("ERROR UPDATE_USER: An error has occured(\"" + data.status + "\")", () => { });
         }
       }
     })
     .catch(error => {
+      remove_all();
       showInfoModal("Error with update_user:" + error, () => { });
     });
 }
@@ -65,7 +66,13 @@ async function checkAuthentication() {
       return (-1);
     } else {
       console.log("data = ", data);
-      showInfoModal("Authentication failed: " + data.message, () => {});
+      if (data.message === "user already online") {
+        showInfoModal("Username taken", () => {});
+        navigate("/", "home");
+        return (0);
+      }
+      else
+        showInfoModal("Authentication failed", () => {});
       return (1);
     }
   } catch (error) {

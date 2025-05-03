@@ -1,3 +1,5 @@
+import { navigate } from "./main.js";
+
 // Modal di conferma: con due bottoni (Accept e Reject)
 export function showConfirmModal(message, onConfirm, onReject) {
   const confirmModal = document.getElementById("confirmModal");
@@ -75,12 +77,18 @@ export function showInputModal(title, onConfirm) {
   };
 
   inputModalClose.onclick = () => {
+    console.log("current path: ", window.location.pathname)
     inputModal.classList.remove("active");
-  };
-
-  inputModal.onclick = (e) => {
-    if (e.target === inputModal) {
-      inputModal.classList.remove("active");
+    console.log("current path: ", window.location.pathname)
+    if (window.location.pathname === "/callback") {
+      console.log("current path: ", window.location.pathname)
+      navigate("/", "home");
     }
   };
+
+  // inputModal.onclick = (e) => {
+  //   if (e.target === inputModal) {
+  //     inputModal.classList.remove("active");
+  //   }
+  // };
 }

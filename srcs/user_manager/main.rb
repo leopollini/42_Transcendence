@@ -52,12 +52,12 @@ def login_user(client, obj)
   token = data['token']
 
   # return {'status' => 'another user with this username is already playing', 'success' => 'false'} if 
+  usr = data['realname'] ? (LOGIN.select_specific 'realname', data['realname'].to_s, ['realname', 'token'], false) : nil
   if data['login_as_guest'].to_s == 'true'
     res = get_user(client, {"params" => {"display_name" => data['display_name']}})
-    return {"status" => "username taken", "success" => "false"} if res['success'].to_s == 'true'
+    return {"status" => "username taken", "success" => "false"} if res['status'].to_s == 'success'
     return GUEST.add_guest(data)
   end
-  usr = data['realname'] ? (LOGIN.select_specific 'realname', data['realname'].to_s, ['realname'], false) : nil
   puts "found: #{usr}".yellow
   if usr.nil?
     return user_creat(data, token) if obj['do_create'].to_s == 'true'
@@ -73,6 +73,7 @@ def login_user(client, obj)
   if usr['token'].to_s != ""
     online_in_chat = JSON.parse(SimpleServer::method_req('is_online', {'username' => data['display_name']}))
     puts "Online in chat: #{online_in_chat}"
+    # return {'status' => 'user already online', 'success' => 'false'}
     return {'status' => 'user already online', 'success' => 'false'} if online_in_chat['success'] == 'true'
   end
   
@@ -111,7 +112,7 @@ def update_user(client, obj = {})
   else
     return {'status' => 'missing new params', 'success' => 'false'}.clone
   end
-  return {'status' => 'username taken', 'success' => 'false'} if get_user(client, {'params' => {'display_name' => new_params['display_name']}})['success'].to_s == "true"
+  return {'status' => 'username taken', 'success' => 'false'} if get_user(client, {'params' => {'display_name' => new_params['display_name']}})['status'].to_s == "success"
   return DEFAULT_MISSING_PARAM.clone if new_params.empty?
   guest = GUEST.exists_token? obj['token']
   return GUEST.update_guest(guest, new_params) if guest
@@ -145,35 +146,39 @@ end
 def get_user(_client, obj = {})
   puts 'get_user called'.green if DEBUG_MODE
   params = obj['params']
-  if params.nil? || params.empty?
+
+  
+  if (!params.is_a? Hash) || params.empty?
     users =  (obj['avoid_logins'] == 'true' ? [] : LOGIN.select )
     users.each {| u | u = u.slice(GET_USER_SECURE_INFO) if u}
     guests = (obj['avoid_guests'] == 'true' ? [] : GUEST.get_all_guests)
     guests.each {| u | u = u.slice(GET_USER_SECURE_INFO) if u}
     return {'status' => (users.empty? && guests.empty? ? 'no user found' : 'returning whole database'), 'success' => 'true', 
-              'guest' => guests, 'user' => users}
+    'guest' => guests, 'user' => users}
   end
+
+  return get_user_by_token if params['token']
+
   name = params['display_name']
   if name
     user = LOGIN.select(['display_name'], [name])
     if user.empty?
       guest = GUEST.get_by_name(name)
       return DEFAULT_SUCCESS_RES.merge({'guest' => guest.except('token')}) if guest
-      return {'status' => 'no user found', 'success' => 'false'} 
+      return {'status' => 'no user found', 'success' => 'true'}
     end
     user = user[0].to_h.except('token')
     return DEFAULT_SUCCESS_RES.merge({'user' => user})
   end
-  return get_user_by_token if params['token']
   DEFAULT_MISSING_PARAM.clone
 end
 
 def game_state(client, obj)
-  new_state = obj['set_state']
+  new_state = obj['set_state'].to_s
   name = obj['username'].to_s
-  return {'status' => 'bad request', 'success' => ' false'} if name.empty?
+  return {'status' => 'bad request', 'success' => ' false'} if name.empty? || new_state.empty?
   if GUEST.exists? name
-    if new_state
+    if new_state == "true"
       GUEST.set_playing(obj['username'].to_s, new_state)
       state = new_state
     else
@@ -184,7 +189,7 @@ def game_state(client, obj)
   end
   user = LOGIN.select_specific 'display_name', name, ['is_playing']
   if user
-    if new_state
+    if new_state == "true"
       LOGIN.updateValue 'display_name', name, {'is_playing' => new_state}
       state = new_state
     else
@@ -194,7 +199,6 @@ def game_state(client, obj)
     return {'status' => 'success', 'success' => 'true', 'is_playing' => state}
   end
   return {'status' => 'user not found', 'success' => 'false'}
-  
 end
 
 def user_manager(client, _server)

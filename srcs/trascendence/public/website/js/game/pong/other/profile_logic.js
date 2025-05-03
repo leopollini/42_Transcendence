@@ -46,7 +46,7 @@ export async function savename(me, yourDataSection, current_user) {
     if (newname === me.display_name)
         return ("⚠️No change in name have been made\n");
     let result = await exist(newname);
-    if (result === true && me.display_name !== newname) {
+    if (!result && me.display_name !== newname) {
         me.display_name = escapeHtml(newname.trim()); 
         current_user.display_name = me.display_name;
         return ("✅Saved name successfully(" + newname + ")\n");

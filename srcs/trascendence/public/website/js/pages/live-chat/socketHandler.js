@@ -10,7 +10,6 @@ export function closeSocket() {
         socket.close();
 }
 
-
 function initSocket(username, chatAppInstance) {
     if (!socket)
     {
@@ -24,18 +23,24 @@ function initSocket(username, chatAppInstance) {
         }
     }
 
+    socket.onclose = () => {
+        socket = null;
+    };
+
     socket.onopen = () => {
         socket.send(JSON.stringify({ type: "join", 'username': username, 'token': token }));
 
         socket.send(JSON.stringify({ type: "get_state", 'username': username }));
     };
 
+    
     socket.onmessage = (event) => {
         let msg = JSON.parse(event.data);
         if (msg.data && msg.data.content) {
             msg.data.content = decodeURIComponent(msg.data.content);
             msg.data.content = renderHtmlAsText(msg.data.content);
         }
+        console.log("message from socket: ", msg)
         if (msg.type === "state") {
             const friends = msg.data.friends
             const friendRequests = msg.data.friend_requests
@@ -181,7 +186,9 @@ function initSocket(username, chatAppInstance) {
                 showInfoModal("the invite was rejected.", () => {});
         }
         else if (msg.type === "kick") {
+            console.log("kicked from chat because ", msg.status)
             showInfoModal("Chat closed: " + msg.status);
+            socket.close();
             remove_all();
         }
     };
