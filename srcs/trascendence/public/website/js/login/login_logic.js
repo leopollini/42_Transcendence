@@ -95,20 +95,19 @@ async function set_user(user) {
   let new_user =
   {
     email: user.email,
-    login_name: escapeHtml(String(display_name).trim()),
+    display_name: escapeHtml(String(display_name).trim()),
     realname: user.realname,
     image: user.image,
     bio: user.bio,
     type: "login"
   };
-  save_global("user", new_user);
   save_global("name", new_user.login_name);
   //console.log("username after set = ", user_name);
   if (name_changed)
     await update_with_new_name(display_name);
+  save_global("user", new_user);
   save_global("acess", true);
-  change_name(new_user.login_name);
-  update_image(new_user.image);
+  console.log("name = ", new_user.login_name);
 }
 
 export async function performLogin() {

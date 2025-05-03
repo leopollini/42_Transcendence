@@ -35,6 +35,7 @@ export async function util_main(path, component, app) {
         save_global("lobby_data", null);
     if (path === "/modes")
     {
+        console.log("utente = ", current_user);
         change_name(current_user.display_name);
         update_image(current_user.image);
     }
