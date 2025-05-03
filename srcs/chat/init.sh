@@ -2,7 +2,8 @@
 
 /var/common/setup_tools.sh
 
-GEMS=('webrick-websocket' 'colorize' 'json' 'faye-websocket')
+
+GEMS=('em-websocket' 'colorize' 'json')
 
 for gm in "${GEMS[@]}"
 do

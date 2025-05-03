@@ -111,6 +111,7 @@ services:
       - ./srcs/trascendence/authentication/ssl_certs:/ssl_certs
       - ./srcs/common_tools/tools:/var/common
       - ./srcs/trascendence:/var/www
+      - ./srcs/trascendence/.bundle:/usr/local/bundle
     depends_on:
       - postgres
     networks:

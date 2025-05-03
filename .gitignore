@@ -3,3 +3,7 @@
 *.DS_Store
 srcs/trascendence/authentication/ssl_certs/
 srcs/trascendence/authentication/Gemfile.lock
+
+*/.bundle
+*/*/.bundle
+*/*/*/.bundle
