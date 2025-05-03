@@ -132,7 +132,6 @@ function setupEventListeners(chatApp) {
         });
     }
 
-    // Gestione del tab "Blocked Users" in modo analogo
     if (elems.blockedUsersButton) {
         elems.blockedUsersButton.addEventListener('click', () => {
             elems.friendsList.style.display = 'none';

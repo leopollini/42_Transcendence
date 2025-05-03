@@ -86,6 +86,7 @@ class ChatService < WEBrick::Websocket::Servlet
       when "unblock_user"
         ChatStore.clients[@username].send_sys "You have unblocked #{target}"
         ChatStore.clients[@username].unblock_user target
+        ChatStore.clients[target].send_me({ 'from' => @username }, 'unblock_user')
 
       when 'match_request'
         ChatStore.clients[data['to'].to_s].send_me({'from' => @username, 'data' => data['data']}, "match_request")

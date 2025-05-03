@@ -476,13 +476,13 @@ class ChatApp {
         menu.style.display = 'block';
         menu.style.left = `${x}px`;
         menu.style.top  = `${y}px`;
-
+    
         const chatItem      = menu.querySelector('[data-action="chat"]');
         const addFriendItem = menu.querySelector('[data-action="addFriend"]');
         const inviteItem    = menu.querySelector('[data-action="invite"]');
         const profileItem   = menu.querySelector('[data-action="profile"]');
         const blockItem     = menu.querySelector('[data-action="block"]');
-
+    
         const isBlocked   = this.blockedUsers.has(user);
         const isBlockedBy = this.blockedBy.has(user);
         const online      = await is_online(user);
@@ -496,7 +496,7 @@ class ChatApp {
             blockItem    .style.display = 'none';
             return;
         }
-
+    
         // 2) Se ho bloccato o sono stato bloccato: solo profile + unblock/block + NO invite
         if (isBlocked || isBlockedBy) {
             chatItem     .style.display = 'none';
@@ -509,10 +509,10 @@ class ChatApp {
             blockItem.textContent = isBlocked ? 'Unblock User' : 'Block User';
             return;
         }
-
+    
         // 3) Caso normale: gestisco chat/addFriend/invite…
         chatItem.style.display = this.friends.has(user) ? 'block' : 'none';
-
+    
         if (user === 'general') {
             addFriendItem.style.display = 'none';
         } else {
@@ -528,7 +528,7 @@ class ChatApp {
                 addFriendItem.style.opacity = '1';
             }
         }
-
+    
         // **invito** visibile solo in questo ramo “normale”
         inviteItem  .style.display = 'block';
         profileItem .style.display = 'block';
