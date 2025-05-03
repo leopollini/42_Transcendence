@@ -107,28 +107,6 @@ function initSocket(username, chatAppInstance) {
                 content: `Private chat with ${msg.data.from.charAt(0) + msg.data.from.slice(1)} started.`
             });
         }        
-        else if (msg.type === "system") {
-            if (msg.data.content && msg.data.content.includes("You cannot send a friend request")) {
-                let regex = /you're blocked from ([^.]+)\./i;
-                let match = msg.data.content.match(regex);
-                if (!match) {
-                    regex = /You cannot send a friend request to([^.]+) because he blocked you\./i;
-                    match = msg.data.content.match(regex);
-                }
-                if (match && match[1]) {
-                    const blockingUser = match[1].trim();
-                    chatAppInstance.pendingRequests.delete(blockingUser);
-                    if (chatAppInstance.selectedUser && chatAppInstance.selectedUser === blockingUser) {
-                        const addFriendItem = chatAppInstance.elements.contextMenu.querySelector('[data-action="addFriend"]');
-                        if (addFriendItem) {
-                            addFriendItem.textContent = 'Add Friend';
-                            addFriendItem.style.opacity = '1';
-                        }
-                    }
-                }
-            }
-            chatAppInstance.addMessageToChat(chatAppInstance.currentChat, msg.data);
-        }
         else if (msg.type === "match_request") {
             // L'utente ricevente visualizza la richiesta di partita tramite modal di conferma
             const sender = msg.data ? msg.data.from : msg.from; // "userA"
