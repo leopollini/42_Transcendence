@@ -64,6 +64,7 @@ async function checkAuthentication() {
       showInfoModal(data.message, () => { });
       return (-1);
     } else {
+      console.log("data = ", data);
       showInfoModal("Authentication failed: " + data.message, () => {});
       return (1);
     }
