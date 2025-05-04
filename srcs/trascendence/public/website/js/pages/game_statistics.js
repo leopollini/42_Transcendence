@@ -320,6 +320,7 @@ export function forza4ShowMatchDetails() {
 }
 
 async function getPongMatchesData() {
+    res = null;
     try {
         if (!current_user.display_name) {
             return;
@@ -333,18 +334,19 @@ async function getPongMatchesData() {
         const data = await response.json();
         //console.log("Get Pong Game response: ", data);
         if (data.games) {
-            pongUserData = data.games;
+            res = data.games;
             //console.log("pongUserData aggiornata: ", pongUserData);
         }
     } catch (error) {
     console.error("Fetch error:", error);
     }
+    return res;
 }
 
 export async function pongShowMatchDetails() {
     const pongMatchDetailsContainer = document.getElementById("pongMatchDetailsContainer");
     
-    await getPongMatchesData();
+    pongUserData = await getPongMatchesData();
 
     // if (!pongUserData) {
     //     return null;

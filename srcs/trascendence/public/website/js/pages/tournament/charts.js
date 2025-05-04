@@ -236,23 +236,7 @@ function matchesTimeRank() {
 }
 
 export async function showCharts() {
-  //playerName = user_name;
-  try {
-    const response = await fetch("http://localhost:8008", {
-      method: "get_pong_games",
-      body: JSON.stringify({
-        username: current_user.display_name,
-      }),
-    });
-    const data = await response.json();
-    //console.log("Get Pong Game response: ", data);
-    if (data.games) {
-      userData = data.games;
-      //console.log("userData aggiornata: ", userData);
-    }
-  } catch (error) {
-    console.error("Fetch error:", error);
-  }
+  userData = await getPongMatchesData();
 
   const noMatchesMessage = document.getElementById("noMatchesMessage");
   const chartsContainer = document.querySelector(".charts-container");
