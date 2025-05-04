@@ -18,7 +18,7 @@ export async function guest_login() {
     return;
   }
   showInputModal("Insert your nickname", async (name) => {
-    if (await check_name(name) === true) {
+    if (check_name(name) === true) {
       name = escapeHtml(String(name).trim());
       addGuest(name);
     }

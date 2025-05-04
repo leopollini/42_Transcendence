@@ -86,7 +86,7 @@ async function set_user(user) {
   if (!user.display_name) {
     const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
     display_name = await promptModal("Insert your nickname");
-    if ((await check_name(display_name)) !== true) {
+    if (check_name(display_name) !== true) {
       return (1);
     }
     name_changed = true;

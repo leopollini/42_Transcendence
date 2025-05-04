@@ -1,7 +1,9 @@
 import { validateUploadedImage } from "../../../security/security.js";
 import { showInfoModal } from "../../../modal.js";
-import { exist } from "../../../login/user.js";
+import { exist, hasNoSpaces, alphanum} from "../../../login/user.js";
 import { escapeHtml } from "../../../login/user.js";
+import { restartSocket } from "../../../pages/live-chat/socketHandler.js";
+
 function formatBio(bio) {
     let str = typeof bio === 'string' ? bio : JSON.stringify(bio);
     str = str
@@ -29,7 +31,6 @@ export function savebio(me, yourDataSection, current_user) {
     return ("✅saved bio successfully\n");
 }
 
-
 export async function savename(me, yourDataSection, current_user) {
     const changeName = yourDataSection.querySelector('#displayNameInput');
     const newname = changeName.value;
@@ -45,10 +46,15 @@ export async function savename(me, yourDataSection, current_user) {
         return ("🚨Error: Name too long(" + newname + ")\n");
     if (newname === me.display_name)
         return ("⚠️No change in name have been made\n");
+    if (hasNoSpaces(newname) === false)
+        return("🚨Name cannot have spaces", () => {});
+    if (alphanum(newname) === false)
+        return("🚨Invalid name format(please try again)...", () => {});
     let result = await exist(newname);
     if (!result && me.display_name !== newname) {
         me.display_name = escapeHtml(newname.trim()); 
         current_user.display_name = me.display_name;
+        restartSocket();
         return ("✅Saved name successfully(" + newname + ")\n");
     }
     else
