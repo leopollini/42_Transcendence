@@ -67,7 +67,7 @@ re: clean prep_dirs
 	make -C srcs/common_tools/ re
 	@sudo docker ps -qa | xargs -r docker stop
 	@sudo docker ps -qa | xargs -r docker rm
-	@sudo docker-compose -f ./docdockerker-compose.yml up --build
+	@sudo docker-compose -f ./docker-compose.yml up --build
 
 prep_dirs:
 	@echo -e "${YELLOW}Creating directories...${NC}"
