@@ -28,7 +28,6 @@ async function not_home(path) {
         await addCallbackPageHandlers();
         return (1);
     }
-    console.log("not exited :(");
     if (in_game && path === "/tournament/knockout/lobby")
         save_global("game", null);
     if (path === "/tournament/knockout/lobby" || path === "/tournament/roundrobin/lobby") {
