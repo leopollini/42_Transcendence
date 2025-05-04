@@ -29,14 +29,11 @@ export function set_prev_path() {
 export async function util_main(path, component, app) {
     if (await check_valid_operation(path, component) === 1)
         return (-2);
-    //console.log("path = ", path);
 
     if (path !== "/classic/lobby" && path !== "/classic")
         save_global("lobby_data", null);
-    console.log("utente = ", current_user);
     if (path === "/modes")
     {
-        console.log("update user....");
         change_name(current_user.display_name);
         update_image(current_user.image);
     }

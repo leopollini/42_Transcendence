@@ -50,15 +50,20 @@ export async function savename(me, yourDataSection, current_user) {
         return("🚨Name cannot have spaces", () => {});
     if (alphanum(newname) === false)
         return("🚨Invalid name format(please try again)...", () => {});
-    let result = await exist(newname);
-    if (!result && me.display_name !== newname) {
-        me.display_name = escapeHtml(newname.trim()); 
-        current_user.display_name = me.display_name;
-        restartSocket();
-        return ("✅Saved name successfully(" + newname + ")\n");
+    if (me.display_name !== newname) {
+        let result = await exist(newname);
+        console.log("foudn = ", result)
+        if (!result)
+        {
+            me.display_name = escapeHtml(newname.trim()); 
+            current_user.display_name = me.display_name;
+            restartSocket();
+            return ("✅Saved name successfully(" + newname + ")\n");
+        }
+        return ("🚨Error: name already taken(" + newname + ")\n");
     }
     else
-        return ("🚨Error: name already taken(" + newname + ")\n");
+        return ("🚨Error: cannot change with same name");
 }
 
 export async function saveimage(me, yourDataSection, current_user) {
