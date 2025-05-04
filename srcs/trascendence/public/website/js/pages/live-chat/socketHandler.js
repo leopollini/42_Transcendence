@@ -4,13 +4,23 @@ import { in_game, token } from "../../main.js";
 import { remove_all } from "../../utils_main/error_main.js";
 
 let socket;
+let _username;
 
 export function closeSocket() {
     if (socket)
         socket.close();
 }
 
+function restoreChatState() {
+    if (socket && _username)
+        socket.send(JSON.stringify({ type: "get_state", 'username': _username }));
+    else
+        showInfoModal("restoreChatState failed: socket closed");
+}
+
 function initSocket(username, chatAppInstance) {
+    _username = username;
+
     if (!socket)
     {
         try {
@@ -30,7 +40,7 @@ function initSocket(username, chatAppInstance) {
     socket.onopen = () => {
         socket.send(JSON.stringify({ type: "join", 'username': username, 'token': token }));
 
-        socket.send(JSON.stringify({ type: "get_state", 'username': username }));
+        restoreChatState();
     };
 
     
@@ -40,7 +50,7 @@ function initSocket(username, chatAppInstance) {
             msg.data.content = decodeURIComponent(msg.data.content);
             msg.data.content = renderHtmlAsText(msg.data.content);
         }
-        console.log("message from socket: ", msg)
+        // console.log("message from socket: ", msg)
         if (msg.type === "state") {
             const friends = msg.data.friends
             const friendRequests = msg.data.friend_requests

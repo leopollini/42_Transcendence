@@ -45,7 +45,7 @@ def internal_call(client, server)
   when 'is_online'
     found = ChatStore.exists? bobj['username'].to_s
     puts "Is #{bobj['username'].to_s} online: #{found}"
-    client.puts({'status' => (found ? 'success' : 'no user found'), 'success' => found}.to_json)
+    client.puts({'status' => (found ? 'success' : 'no user found'), 'success' => "true", "online" => found.to_s}.to_json)
   else
     puts "Unknown method called (#{bobj['method']})"
   end
@@ -69,7 +69,6 @@ EM::WebSocket.start({
 }) do |sock|
   
   username = nil
-  token = nil
   kicked = false
 
   sock.onopen do |handshake|

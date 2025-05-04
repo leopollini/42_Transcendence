@@ -161,7 +161,7 @@ class ChatStore
     @@clients[user].send_sys "You have blocked #{target}"
     @@clients[target].send_me({ 'from' => user }, 'block_user') 
     @@clients[target].send_sys "You have been blocked by #{user}"
-    @@clients[user].block_usr target
+    @@clients[user].block_user target
 
     remove_friend target, user
   end

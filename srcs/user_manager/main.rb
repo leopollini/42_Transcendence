@@ -54,7 +54,8 @@ def login_user(client, obj)
   # return {'status' => 'another user with this username is already playing', 'success' => 'false'} if 
   usr = data['realname'] ? (LOGIN.select_specific 'realname', data['realname'].to_s, ['realname', 'token'], false) : nil
   if data['login_as_guest'].to_s == 'true'
-    res = get_user(client, {"params" => {"display_name" => data['display_name']}})
+    res = get_user(client, {"params" => {"display_name" => data['username']}})
+    puts "res: #{res}".yellow.bold
     return {"status" => "username taken", "success" => "false"} if res['status'].to_s == 'success'
     return GUEST.add_guest(data)
   end
@@ -74,7 +75,7 @@ def login_user(client, obj)
     online_in_chat = JSON.parse(SimpleServer::method_req('is_online', {'username' => data['display_name']}))
     puts "Online in chat: #{online_in_chat}"
     # return {'status' => 'user already online', 'success' => 'false'}
-    return {'status' => 'user already online', 'success' => 'false'} if online_in_chat['success'] == 'true'
+    return {'status' => 'user already online', 'success' => 'false'} if online_in_chat['online'] == 'true'
   end
   
   LOGIN.updateValue('realname', usr['realname'], {'token' => data['token']})
