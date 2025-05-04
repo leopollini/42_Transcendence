@@ -71,14 +71,28 @@ export async function profileHandler() {
 }
 
 function updateLogin(current_user) {
-  let data = JSON.stringify({
-    "token": token,
-    "new_params": {
-      "display_name": current_user.display_name,
-      "bio": current_user.bio,
-      "image": current_user.image
-    }
-  });
+  let data;
+  if (me.display_name === current_user.display_name)
+  {
+    data = JSON.stringify({
+      "token": token,
+      "new_params": {
+        "bio": current_user.bio,
+        "image": current_user.image
+      }
+    });
+  }
+  else
+  {
+    data = JSON.stringify({
+      "token": token,
+      "new_params": {
+        "display_name": current_user.display_name,
+        "bio": current_user.bio,
+        "image": current_user.image
+      }
+    });
+  }
   fetch("http://localhost:8008",
     {
       method: "update_user",

@@ -1,14 +1,24 @@
-import { navigate, current_user, save_global } from "../../main.js";
+import { navigate, current_user, save_global, lobby_data} from "../../main.js";
 import { initSocket, sendMessage } from "../live-chat/socketHandler.js";
 import { showInfoModal } from "../../modal.js";
 import { fetchOnlineUsers } from "../get_online_users.js";
 
+let players;
 let invitedPlayers = [];
-let selectedPlayer;
+export let acceptedUsers = [];
+let selectedPlayer = null;
 let numPlayersLabel;
 let numPlayersAccepted = 0;
 const totalPlayers = 2;
+let addedPlayer = [];
 let socket;
+let newPlayer;
+let onlineEl;
+let matchEl;
+let inviteBtn;
+let onlineBadge;
+let startBtn;
+let backBtn;
 
 export default function Forza4LobbyRoom() {
   return `
@@ -45,112 +55,117 @@ export default function Forza4LobbyRoom() {
   `;
 }
 
+function update_data() {
+  invitedPlayers = lobby_data.invitedPlayers;
+  numPlayersAccepted = lobby_data.numPlayersAccepted;
+  numPlayersLabel = lobby_data.numPlayersLabel;
+  players = lobby_data.players;
+  newPlayer = lobby_data.newPlayer;
+  addedPlayer = lobby_data.addedPlayer;
+}
+
 export async function handleForza4Lobby() {
-  save_global("game", 0);
-
-  // Inizializza socket se serve
-  if (!socket && current_user) {
-    socket = initSocket(current_user.display_name);
-    socket.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      if (msg.type === "match_response" && (msg.data.accepted === true || msg.data.accepted === "true")) {
-        showInfoModal(`${msg.data.from} ha accettato l'invito!`, () => {
-          const matchPlayers = document.getElementById("f4MatchPlayers");
-          const numPlayersLabel = document.getElementById("f4NumPlayersLabel");
-          const toggleStartMatch = document.getElementById("f4ToggleStartMatch");
-
-          // Aggiungi ai partecipanti
-          const newPlayer = document.createElement("div");
-          newPlayer.classList.add("player");
-          newPlayer.textContent = msg.data.from;
-          matchPlayers.appendChild(newPlayer);
-
-          // Stato partita
-          save_global("opponent", msg.data.from);
-          invitedPlayers.push(msg.data.from);
-          numPlayersAccepted++;
-          numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
-
-          // Rimuovi dalla lista online
-          const onlineContainer = document.getElementById("f4OnlinePlayers");
-          onlineContainer.querySelectorAll(".player")
-            .forEach(el => { if (el.textContent === msg.data.from) el.remove(); });
-
-          // Aggiorna badge online
-          document.getElementById("f4OnlinePlayersCount")
-                  .textContent = onlineContainer.querySelectorAll(".player").length.toString();
-
-          // Abilita Start Match
-          if (numPlayersAccepted === totalPlayers) {
-            toggleStartMatch.disabled = false;
-          }
-        });
-      }
-    };
-  }
-
   // Elementi DOM
-  const onlinePlayersContainer = document.getElementById("f4OnlinePlayers");
-  const matchPlayers          = document.getElementById("f4MatchPlayers");
-  const inviteButton          = document.getElementById("f4InviteButton");
-  const onlineCountBadge      = document.getElementById("f4OnlinePlayersCount");
-  numPlayersLabel             = document.getElementById("f4NumPlayersLabel");
+  onlineEl = document.getElementById("f4OnlinePlayers");
+  matchEl = document.getElementById("f4MatchPlayers");
+  inviteBtn = document.getElementById("f4InviteButton");
+  onlineBadge = document.getElementById("f4OnlinePlayersCount");
+  startBtn = document.getElementById("f4ToggleStartMatch");
+  backBtn = document.getElementById("backImageButton");
+  
+  get_socket();
+  save_global("game", 0);
+  console.log("lobby = ", lobby_data);
+  if (lobby_data)
+    update_data();
+  else {
+    players = null;
+    invitedPlayers = [];
+    numPlayersLabel = 0;
+    numPlayersAccepted = 0;
+    addedPlayer = [];
+    socket = null;
+    newPlayer = null;
+  }
+  
+  numPlayersLabel = document.getElementById("f4NumPlayersLabel");
 
-  // RESET
-  invitedPlayers = [];
   selectedPlayer = null;
-  numPlayersAccepted = 0;
-  matchPlayers.innerHTML = "";
-  onlinePlayersContainer.innerHTML = "";
+  inviteBtn.disabled = true;
+  startBtn.disabled = true;
   numPlayersLabel.textContent = `0/${totalPlayers}`;
 
-  // Aggiungi creator (te stesso)
   if (current_user) {
     const me = document.createElement("div");
     me.classList.add("player");
     me.textContent = current_user.display_name;
-    matchPlayers.appendChild(me);
+    matchEl.appendChild(me);
 
-    invitedPlayers.push(current_user.display_name);
-    numPlayersAccepted++;
+
+    if (!invitedPlayers.includes(current_user.display_name))
+      invitedPlayers.push(current_user.display_name);
+    if (addedPlayer) {
+      addedPlayer.forEach(e => {
+        if (!invitedPlayers.includes(e))
+          invitedPlayers.push(e);
+        const playerDiv = document.createElement("div");
+        playerDiv.classList.add("player");
+        playerDiv.textContent = e;
+        matchEl.appendChild(playerDiv);
+        save_global("opponent", e);
+      });
+    }
+    numPlayersAccepted = invitedPlayers.length;
     numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
+    if (numPlayersAccepted === totalPlayers)
+      startBtn.disabled = false;
   }
-
-  // Carica la lista degli online, crea i div e abilita selezione/invito
-  const players = await fetchOnlineUsers(current_user.display_name);
-  players.forEach(player => {
-    const div = document.createElement("div");
-    div.classList.add("player");
-    div.textContent = player;
-    div.onclick = () => {
-      onlinePlayersContainer.querySelectorAll(".player")
-        .forEach(el => { el.style.background = ""; el.style.color = ""; });
-      div.style.background = "#007bff";
-      div.style.color = "white";
-      selectedPlayer = div;
-      inviteButton.disabled = false;
-    };
-    onlinePlayersContainer.appendChild(div);
+  if (!players)
+    players = await fetchOnlineUsers(current_user.display_name);
+  players.forEach(name => {
+    const p = document.createElement("div");
+    p.classList.add("player");
+    p.textContent = name;
+    p.addEventListener("click", () => {
+      onlineEl.querySelectorAll(".player").forEach(c => {
+        c.style.background = "";
+        c.style.color = "";
+      });
+      p.style.background = "#007bff";
+      p.style.color = "white";
+      selectedPlayer = p;
+      inviteBtn.disabled = false;
+    });
+    onlineEl.appendChild(p);
   });
-  onlineCountBadge.textContent = players.length.toString();
+  onlineBadge.textContent = players.length.toString();
+}
+
+function give_lobby_forza4() {
+  let all_data_to_be_saved =
+  {
+    players,
+    invitedPlayers,
+    numPlayersAccepted,
+    numPlayersLabel,
+    newPlayer,
+    addedPlayer
+  };
+  return all_data_to_be_saved;
 }
 
 export function addForza4LobbyPageHandlers() {
-  const inviteButton     = document.getElementById("f4InviteButton");
-  const toggleStartMatch = document.getElementById("f4ToggleStartMatch");
-  const backImageButton  = document.getElementById("backImageButton");
-
-  inviteButton.onclick = () => {
+  inviteBtn.onclick = () => {
     if (selectedPlayer && numPlayersAccepted < totalPlayers) {
       sendMessage({
         type: "match_request",
         to: selectedPlayer.textContent
       });
-      inviteButton.disabled = true;
+      inviteBtn.disabled = true;
     }
   };
 
-  toggleStartMatch.addEventListener('click', () => {
+  startBtn.addEventListener('click', () => {
     save_global("game", 1);
     navigate("/forza4/game", "Forza 4 Game", invitedPlayers);
   });
@@ -158,4 +173,51 @@ export function addForza4LobbyPageHandlers() {
   backImageButton.addEventListener('click', () => {
     navigate("/modes", "Return to Game Mode");
   });
+}
+
+function match_response_event(event) {
+  const msg = JSON.parse(event.data)
+  if (msg.data.accepted !== "true")
+    return;
+  if (msg.type === "match_response" && msg.data.accepted) {
+    const from = msg.data.from;
+    if (!acceptedUsers.includes(from)) {
+      acceptedUsers.push(from);
+    }
+    numPlayersLabel = document.getElementById("f4NumPlayersLabel");
+
+    // **UPDATE IMMEDIATO** UI e stato (come in Forza4)
+    newPlayer = document.createElement("div");
+    newPlayer.classList.add("player");
+    newPlayer.textContent = from;
+    matchEl = document.getElementById("f4MatchPlayers");
+    matchEl.appendChild(newPlayer);
+
+    onlineEl.querySelectorAll(".player").forEach(p => {
+      if (p.textContent === from) p.remove();
+    });
+    save_global("opponent", from);
+    let index = players.indexOf(msg.data.from);
+    if (index !== -1)
+      players.splice(index, 1);
+    addedPlayer.push(from);
+    invitedPlayers.push(from);
+    numPlayersAccepted = invitedPlayers.length;
+    numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
+    onlineBadge.textContent = onlineEl.querySelectorAll(".player").length;
+
+    if (numPlayersAccepted === totalPlayers) {
+      startBtn.disabled = false;
+    }
+    // **POI** notifica con modal
+    showInfoModal(`${from} has accepted the invite to classic Pong!`, () => { });
+    if (!lobby_data)
+      save_global("lobby_data", give_lobby_forza4());
+  }
+  removeEventListener("message", match_response_event);
+}
+
+function get_socket() {
+  socket = initSocket(current_user.display_name);
+  socket.addEventListener("message", match_response_event);
 }

@@ -103,16 +103,16 @@ export async function is_online(name)
     }
 }
 
-function hasNoSpaces(str)
+export function hasNoSpaces(str)
 {
   return !/\s/.test(str);
 }
 
-function alphanum(str) {
+export function alphanum(str) {
   return /^[a-zA-Z0-9]+$/.test(str);
 }
 
-export async function check_name(name)
+export function check_name(name)
 {
     name = escapeHtml(String(name).trim());
     if (alphanum(name) === false)
