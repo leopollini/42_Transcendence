@@ -73,6 +73,10 @@ class Client
     @blocked.delete who
   end
 
+  def is_blocked?(user)
+    @blocked.include? user
+  end
+
   def get_waiting_friends
     @waiting_friends
   end

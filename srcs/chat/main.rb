@@ -144,10 +144,20 @@ EM::WebSocket.start({
       ChatStore.clients[target].send_me({ 'from' => username }, 'unblock_user')
 
     when 'match_request'
-      ChatStore.clients[data['to'].to_s].send_me({'from' => username, 'data' => data['data']}, "match_request")
+      if ChatStore.clients[target].is_blocked?(@username)
+        # puts "user is blocked".yellow
+        ChatStore.clients[@username].send_sys "#{target} has blocked you: you cannot challenge him!"
+        ChatStore.clients[@username].send_me({'from' => username, 'accepted' => "false"}, "match_response")
+        next
+      end
+      if SimpleServer::method_req('game_state', {'display_name' => target})['is_playing'] == 'true'
+        ChatStore.clients[@username].send_sys "#{target} is already playing another match!"
+        next
+      end
+      ChatStore.clients[target].send_me({'from' => username, 'data' => data['data']}, "match_request")
 
     when 'match_response'
-      ChatStore.clients[data['to'].to_s].send_me({'from' => username, 'accepted' => data['accepted'].to_s}, "match_response")
+      ChatStore.clients[target].send_me({'from' => username, 'accepted' => data['accepted'].to_s}, "match_response")
       if data['accepted'].to_s == ' true'
         
       end
