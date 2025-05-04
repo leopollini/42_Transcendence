@@ -2,7 +2,7 @@ import { showInfoModal, showInputModal } from "../modal.js";
 import { remove_all } from "../utils_main/error_main.js";
 import {navigate, save_global, token, user_name } from "../main.js";
 import { update_image, change_name } from "../pages/modes.js"
-import { check_name, login_with_token, escapeHtml } from "./user.js";
+import { check_name, escapeHtml } from "./user.js";
 
 export default function Callback() {
   return `
@@ -96,11 +96,10 @@ async function set_user(user) {
     }
     name_changed = true;
   }
-  else {
+  else
     display_name = user.display_name;
-  }
-  save_global("name", display_name);
-  save_global("token", user.token);
+  if (name_changed)
+    await update_with_new_name(display_name);
   let new_user =
   {
     email: user.email,
@@ -110,13 +109,12 @@ async function set_user(user) {
     bio: user.bio,
     type: "login"
   };
-  save_global("name", new_user.login_name);
-  if (name_changed)
-    await update_with_new_name(display_name);
-  update_image(new_user.image);
-  change_name(new_user.display_name);
+  save_global("name", display_name);
+  save_global("token", user.token);
   save_global("user", new_user);
   save_global("acess", true);
+  /*update_image(new_user.image);
+  change_name(new_user.display_name);*/
 }
 
 export async function performLogin() {

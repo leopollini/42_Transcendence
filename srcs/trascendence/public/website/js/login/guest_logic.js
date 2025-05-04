@@ -1,22 +1,10 @@
 import { navigate, save_global, token, user_name } from "../main.js";
-import { user, login_with_token, profile, check_name, escapeHtml } from "./user.js";
+import { user, profile, check_name, escapeHtml } from "./user.js";
 import { update_image, change_name } from "../pages/modes.js";
 import { showInputModal, showInfoModal } from "../modal.js"
 import { remove_all } from "../utils_main/error_main.js";
 
 export async function guest_login() {
-  if (token) {
-    let result = await login_with_token();
-    if (result === 0) {
-      showInfoModal("Session restored", () => { });
-      navigate("/modes", "Modalità di gioco");
-    }
-    else if (result === 1)
-      showInfoModal(user_name + " must finish the game", () => { });
-    else
-      remove_all();
-    return;
-  }
   showInputModal("Insert your nickname", async (name) => {
     if (check_name(name) === true) {
       name = escapeHtml(String(name).trim());

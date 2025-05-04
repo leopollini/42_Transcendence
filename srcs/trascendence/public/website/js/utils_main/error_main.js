@@ -40,7 +40,7 @@ async function not_home(path) {
         resetBracketState();
         resetMatchStatsData();
         save_global("lobby_data", null);
-        save_global("numP", null);
+        save_global("numP", null);  
         change_name(current_user.display_name);
         update_image(current_user.image);
     }
