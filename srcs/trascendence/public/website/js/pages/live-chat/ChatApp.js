@@ -1,7 +1,7 @@
-import { initSocket } from './socketHandler.js';
+import { initSocket, socket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
-import { current_user } from '../../main.js';
+import { current_user, user_name } from '../../main.js';
 import { another_user_info, is_online, } from '../../login/user.js';
 import { showInfoModal } from '../../modal.js';
 import { acceptedUsers } from "../classic_pong_lobby.js";
@@ -20,6 +20,17 @@ class ChatApp {
         this.disabledChats = {};
         this.acceptedUsers = acceptedUsers;
         this.initialize();
+        this.sendStateRequest();
+    }
+
+    sendStateRequest() {
+        if (socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: "get_state", username: user_name }));
+        } else {
+            socket.addEventListener("open", () => {
+                socket.send(JSON.stringify({ type: "get_state", username: user_name }));
+            }, { once: true });
+        }
     }
 
     // Returns the chat partner for a private chat

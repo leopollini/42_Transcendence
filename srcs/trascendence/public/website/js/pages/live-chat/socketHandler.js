@@ -3,7 +3,7 @@ import { free_users, renderHtmlAsText } from "../../security/security.js";
 import { in_game, token } from "../../main.js";
 import { remove_all } from "../../utils_main/error_main.js";
 
-let socket;
+export let socket;
 let _username;
 let _chatApp
 
