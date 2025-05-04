@@ -70,6 +70,11 @@ async function checkAuthentication() {
         navigate("/", "home");
         return (0);
       }
+      else if (data.message === 'game in progress') {
+        showInfoModal("Game in progress", () => {});
+        navigate("/", "home");
+        return (0);
+      }
       else
         showInfoModal("Authentication failed", () => {});
       return (1);

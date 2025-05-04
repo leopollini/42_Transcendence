@@ -1,4 +1,4 @@
-import { navigate, user_name } from "../../main.js";
+import { current_user, navigate, user_name } from "../../main.js";
 import { formatTime } from "../../game/pong/other/timer.js";
 
 let userData;
@@ -241,7 +241,7 @@ export async function showCharts() {
     const response = await fetch("http://localhost:8008", {
       method: "get_pong_games",
       body: JSON.stringify({
-        display_name: user_name,
+        username: current_user.display_name,
       }),
     });
     const data = await response.json();

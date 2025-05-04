@@ -56,5 +56,7 @@ export async function util_main(path, component, app) {
         else
             document.getElementById('app').classList.remove('no-background');
     }
+    if (current_user && current_user.display_name)
+        save_global("name", current_user.display_name);
     return 0;
 }

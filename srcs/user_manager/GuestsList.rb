@@ -96,6 +96,11 @@ class GuestsList
     return nil if @index[name].nil?
     @guests[@index[name].to_i]
   end
+
+  def get_by_token(token)
+    return nil if @tokens[token].nil?
+    @guests[@tokens[token].to_i]
+  end
   
   def update_guest(token, new_data)
     index = @tokens[token]

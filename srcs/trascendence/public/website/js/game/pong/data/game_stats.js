@@ -38,22 +38,22 @@ function saveUserStatsData(matchData) {
         }
         return response.status === 204 ? {} : response.json();
     })
-    .then(data => {
-        //console.log("saving...");
-        //console.log("Save Pong Game response: ", data);
+    // .then(data => {
+    //     //console.log("saving...");
+    //     //console.log("Save Pong Game response: ", data);
 
-        // Second fetch call (only if first fetch was successful)   
-        return fetch("http://localhost:8008", {
-            method: "get_pong_games",
-            body: JSON.stringify({
-                display_name: player1,
-            }),
-        });
-    })
-    .then(response => response.json())
-    .then(data => {
-        //console.log("Get Pong Game response: ", data);
-    })
+    //     // Second fetch call (only if first fetch was successful)   
+    //     return fetch("http://localhost:8008", {
+    //         method: "get_pong_games",
+    //         body: JSON.stringify({
+    //             display_name: player1,
+    //         }),
+    //     });
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //     //console.log("Get Pong Game response: ", data);
+    // })
     .catch(error => console.error("Fetch error:", error));
 }
 

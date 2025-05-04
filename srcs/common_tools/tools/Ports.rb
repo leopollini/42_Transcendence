@@ -54,6 +54,7 @@ module Ports
     'get_f4_games' => ['game_data_manager', 8790, 1],
     'get_all_games' => ['game_data_manager', 8790, 1],
     'drop_games' => ['game_data_manager', 8790, 2],
+    'username_change' => ['game_data_manager', 8790, 2],
 
     'create_tournament' => ['matchmaking', 6009, 1],
     'get_online_opponents' => ['matchmaking', 6009, 1]

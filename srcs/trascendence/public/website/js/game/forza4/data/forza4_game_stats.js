@@ -30,22 +30,22 @@ export function savef4StatsData(game, isTie) {
         }
         return response.status === 204 ? {} : response.json();
     })
-    .then(data => {
-        //console.log("Save Forza4 Game response: ", data);
+    // .then(data => {
+    //     //console.log("Save Forza4 Game response: ", data);
 
-        // Second fetch call (only if first fetch was successful)   
-        return fetch("http://localhost:8008", {
-            method: "get_f4_games",
-            body: JSON.stringify({
-                //realname: current_user.realname
-                realname: user_name,
-            }),
-        });
-    })
-    .then(response => response.json())
-    .then(data => {
-        //console.log("Get Forza4 Game response: ", data);
-    })
+    //     // Second fetch call (only if first fetch was successful)   
+    //     return fetch("http://localhost:8008", {
+    //         method: "get_f4_games",
+    //         body: JSON.stringify({
+    //             //realname: current_user.realname
+    //             realname: user_name,
+    //         }),
+    //     });
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //     //console.log("Get Forza4 Game response: ", data);
+    // })
     .catch(error => console.error("Fetch error:", error));
 }
 

@@ -1,6 +1,7 @@
-import { navigate, save_global, user_name } from "../main.js";
+import { current_user, navigate, save_global, user_name } from "../main.js";
 import { formatTime } from "../game/pong/other/timer.js";
 import { showCharts } from "./tournament/charts.js";
+import { showInfoModal } from "../modal.js";
 
 let wins = 0;
 let losses = 0;
@@ -134,15 +135,19 @@ async function forza4CalculateUserStatistics() {
         const response = await fetch("http://localhost:8008", {
             method: "get_f4_games",
             body: JSON.stringify({
-            realname: user_name,
+            username: current_user.display_name,
             }),
         });
         const data = await response.json();
-        //console.log("Get Pong Game response: ", data);
-        if (data.games) {
-            f4UserData = data.games;
-            //console.log("f4UserData aggiornata: ", f4UserData);
+        if (data.success === "true") {
+            //console.log("Get Pong Game response: ", data);
+            if (data.games) {
+                f4UserData = data.games;
+                //console.log("f4UserData aggiornata: ", f4UserData);
+            }
         }
+        else
+            showInfoModal("Could not get history");
     } catch (error) {
     console.error("Fetch error:", error);
     }
@@ -316,13 +321,14 @@ export function forza4ShowMatchDetails() {
 
 async function getPongMatchesData() {
     try {
-        if (!user_name)
+        if (!current_user.display_name) {
             return;
+        }
         const response = await fetch("http://localhost:8008", {
             method: "get_pong_games",
             body: JSON.stringify({
-            display_name: user_name,
-            }),
+                username: current_user.display_name
+            })
         });
         const data = await response.json();
         //console.log("Get Pong Game response: ", data);
