@@ -65,7 +65,7 @@ DEPENDENCIES
   json (= 2.10.2)
   oauth2
   openssl
-  pg (= 1.5.9)
+  pg
   rack (= 3.1.12)
   rack-session (= 2.1.0)
   securerandom

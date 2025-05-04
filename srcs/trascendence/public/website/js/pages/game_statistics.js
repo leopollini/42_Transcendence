@@ -319,8 +319,8 @@ export function forza4ShowMatchDetails() {
 
 }
 
-async function getPongMatchesData() {
-    res = null;
+export async function getPongMatchesData() {
+    let res = null;
     try {
         if (!current_user.display_name) {
             return;

@@ -145,7 +145,7 @@ EM::WebSocket.start({
 
     when 'match_request'
       if ChatStore.clients[target].is_blocked?(@username)
-        # puts "user is blocked".yellow
+        puts "user is blocked".yellow
         ChatStore.clients[@username].send_sys "#{target} has blocked you: you cannot challenge him!"
         ChatStore.clients[@username].send_me({'from' => username, 'accepted' => "false"}, "match_response")
         next

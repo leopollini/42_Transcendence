@@ -1,5 +1,6 @@
 import { current_user, navigate, user_name } from "../../main.js";
 import { formatTime } from "../../game/pong/other/timer.js";
+import { getPongMatchesData } from "../game_statistics.js";
 
 let userData;
 let wins = 0;

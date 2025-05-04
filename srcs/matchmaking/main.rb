@@ -2,7 +2,7 @@
 
 # require 'timeout'
 require 'json'
-require 'digest'
+# require 'digest'
 require 'colorize'
 
 # load ((File.file? '/var/common/Ports.rb') ? '/var/common/Ports.rb' : '../common_tools/tools/Ports.rb')

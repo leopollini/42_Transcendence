@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+
+gem 'bundler'
+gem 'digest'
+gem 'pg'
+gem 'colorize', '1.1.0'

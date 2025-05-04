@@ -2,13 +2,17 @@
 
 /var/common/setup_tools.sh
 
-GEMS=('webrick')
+gem install bundler
 
-for gm in $GEMS
-do
-    if [ -z "$(gem list | grep $gm)" ]; then
-        gem install $gm
-    fi
-done
+bundle install --jobs=4
+
+# GEMS=('webrick')
+
+# for gm in $GEMS
+# do
+#     if [ -z "$(gem list | grep $gm)" ]; then
+#         gem install $gm
+#     fi
+# done
 
 ruby main.rb
