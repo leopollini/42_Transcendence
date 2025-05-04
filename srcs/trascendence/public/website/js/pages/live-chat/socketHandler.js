@@ -5,6 +5,19 @@ import { remove_all } from "../../utils_main/error_main.js";
 
 let socket;
 let _username;
+let _chatApp
+
+export function restartSocket(username) {
+    _username = username;
+    if (_chatApp) {
+        socket.close();
+        socket = null;
+        initSocket(username, _chatApp);
+        return (1);
+    }
+    showInfoModal("Chat was not restored: chatApp not assigned");
+    return (0);
+}
 
 export function closeSocket() {
     if (socket)
@@ -20,6 +33,7 @@ function restoreChatState() {
 
 function initSocket(username, chatAppInstance) {
     _username = username;
+    _chatApp = chatAppInstance;
 
     if (!socket)
     {

@@ -99,7 +99,7 @@ EM::WebSocket.start({
         kicked = true
         next
       end
-      token = data["token"].to_s
+      # token = data["token"].to_s
       ChatStore.joined username, sock
       ChatStore.sys_broadcast "#{username} joined the chat!", username
       puts "joined: #{username}"
