@@ -28,8 +28,8 @@ async function not_home(path) {
         await addCallbackPageHandlers();
         return (1);
     }
-    if (in_game && path === "/tournament/knockout/lobby")
-        save_global("game", null);
+    if (in_game != 0 && path === "/tournament/knockout/lobby")
+        save_global("game", 0);
     if (path === "/tournament/knockout/lobby" || path === "/tournament/roundrobin/lobby") {
         save_global("bracket", null);
         save_global("players", null);
@@ -45,6 +45,7 @@ async function not_home(path) {
         update_image(current_user.image);
     }
     if (path !== "/classic" && path !== "/forza4/game" &&
+            path !== "/tournament/knockout/bracket" && path !== "/tournament/roundrobin/robinranking" &&
             path !== "/tournament/knockout/bracket/game" && path !== "/tournament/roundrobin/robinranking/game") {
         reset_tournament_data();
     }

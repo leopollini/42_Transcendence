@@ -28,8 +28,9 @@ export function set_prev_path() {
 export async function util_main(path, component, app) {
     if (await check_valid_operation(path, component) === 1)
         return (-2);
-    if (/^Robin[4-8]$/.test(buttonTitle) || /^Bracket(4|8|16)$/.test(buttonTitle))
+    if (/^roundrobin[4-8]$/.test(buttonTitle) || /^knockout(4|8|16)$/.test(buttonTitle)) {
         save_global("numP", parseInt(buttonTitle.replace(/\D/g, ""), 10));
+    }
     if (!players)
         save_global("players", createPlayersArray(numPlayers));
     save_global("PlayerName", players);

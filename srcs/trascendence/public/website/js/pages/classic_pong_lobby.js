@@ -19,7 +19,6 @@ let matchEl;
 let inviteBtn;
 let onlineBadge;
 let startBtn;
-let backBtn;
 
 export default function ClassicPongLobbyRoom() {
   return `
@@ -65,13 +64,16 @@ function update_data() {
   addedPlayer = lobby_data.addedPlayer;
 }
 
+
+
+
+
 export async function handleClassicPongLobby() {
   onlineEl = document.getElementById("pongOnlinePlayers");
   matchEl = document.getElementById("pongMatchPlayers");
   inviteBtn = document.getElementById("pongInviteButton");
   onlineBadge = document.getElementById("pongOnlinePlayersCount");
   startBtn = document.getElementById("pongToggleStartMatch");
-  backBtn = document.getElementById("backImageButton");
   get_socket();
   save_global("game", 0);
   if (lobby_data)
@@ -118,7 +120,6 @@ export async function handleClassicPongLobby() {
     if (numPlayersAccepted === totalPlayers)
       startBtn.disabled = false;
   }
-
   if (!players)
     players = await fetchOnlineUsers(current_user.display_name);
   players.forEach(name => {
@@ -138,10 +139,6 @@ export async function handleClassicPongLobby() {
     onlineEl.appendChild(p);
   });
   onlineBadge.textContent = players.length.toString();
-
-  backBtn.addEventListener("click", () => {
-    navigate("/modes", "Return to Game Mode");
-  });
 }
 
 function give_lobby_classic() {
@@ -158,12 +155,16 @@ function give_lobby_classic() {
 }
 
 export function addClassicPongLobbyPageHandlers() {
+  const backBtn = document.getElementById("backImageButton");
   const inviteBtn = document.getElementById("pongInviteButton");
   const startBtn = document.getElementById("pongToggleStartMatch");
 
   inviteBtn.addEventListener("click", () => {
     if (selectedPlayer && numPlayersAccepted < totalPlayers) {
-      sendMessage({ type: "match_request", to: selectedPlayer.textContent });
+      sendMessage({
+        type: "match_request",
+        to: selectedPlayer.textContent
+      });
       inviteBtn.disabled = true;
     }
   });

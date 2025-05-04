@@ -64,7 +64,7 @@ export function setupRoundRobinPlayers() {
     const playerSelection = document.getElementById('playerSelectionRobin');
 
     if (!startRobinTournamentButton || !playerSelection || !playerNamesRobin || !nameInputRobin) {
-        console.error("Missing required elements for Round Robin setup.");
+        console.error("Missing required elements for Roundrobin setup.");
         return;
     }
 
@@ -104,7 +104,7 @@ export const addRoundRobinPageHandlers = () => {
     save_global("numP", null);
     radioButtons.forEach(radioButton => {
         radioButton.addEventListener('change', () => {
-            navigate("/tournament/roundrobin/lobby", "Robin"+radioButton.value);  
+            navigate("/tournament/roundrobin/lobby", "roundrobin"+radioButton.value);  
         });
     });
 

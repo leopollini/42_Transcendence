@@ -255,10 +255,13 @@ function you_win(match_winner)
 }
 
 export function backToBracket(match_winner) {
+    console.log("bracketPlayers ", bracketPlayers);
     if (match_winner === null) {
         drawBracket(bracketPlayers[0], initialPlayersCount);
         return;
     }
+    console.log("last match was won by ", match_winner);
+    console.log("current round", currentRound, "; rounds", rounds);
     if (currentRound < rounds - 1) {
         if (!bracketPlayers[currentRound + 1]) {
             bracketPlayers[currentRound + 1] = [];
@@ -273,7 +276,8 @@ export function backToBracket(match_winner) {
             matchesThisRound = Math.floor(matchesThisRound / 2);
         }
         drawBracket(bracketPlayers[0], initialPlayersCount);
-    } else
+    }
+    else
         you_win(match_winner);
     save_global("bracket", give_data());
 }
@@ -285,9 +289,8 @@ export const addBracketPageHandlers = async () => {
     const savedState = loadBracketState();
     if (in_game !== 1 && window.location.pathname)
     {
-        navigate("/tournament/knockout/lobby", "return to modes");
-        showInfoModal("the operation you are doing is forbidden", () => { });
-        return (1);   
+        reset_tournament_data();
+        return (1);
     }
     if (match_ended === 1)
     {

@@ -66,6 +66,7 @@ export function save_at_exit() {
 }
 
 export function reset_tournament_data() {
+    console.log("RESETTING TOURNAMENT DATA");
     save_global("bracket", null);
     save_global("robinranked", null);
     save_global("game", 0);
@@ -77,6 +78,7 @@ export function reset_tournament_data() {
     save_global("p2", null);
     save_global("players", null);
     save_global("winner", null);
+    save_global("end", null); //che smerd
     resetBracketState();
 }
 
@@ -88,9 +90,12 @@ export async function handle_popstate() {
         showInfoModal("you have quitted the active session", () => { });
         await remove_all();
     }
-    if (in_game === 1 && path !== '/tournament/knockout/bracket/game'
+    // if ()
+
+    if (//path === "/localhost/tournament/knockout/lobby" || path === "/localhost/tournament/roundrobin/lobby" ||
+        (in_game === 1 && path !== '/tournament/knockout/bracket/game'
         && path !== '/tournament/knockout/bracket' && path !== "/tournament/roundrobin/robinranking"
-        && path !== "/tournament/roundrobin/robinranking/game") {
+        && path !== "/tournament/roundrobin/robinranking/game")) {
         reset_tournament_data();
         showInfoModal("you successfully exited the game", () => { });
         await loadContent();

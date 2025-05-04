@@ -203,7 +203,7 @@ function initSocket(username, chatAppInstance) {
                 showInfoModal("bad response.", () => {});
             if (msg.data.accepted === "true")
                 // Modal informativo: solo un pulsante OK
-                showInfoModal("the invite was accepted! you can start the match.", () => {});
+                showInfoModal(msg.data.from + " accepted your invitation!", () => {});
             else if (msg.data.accepted === "user unavailable")
                 showInfoModal(msg.data.accepted, () => {});
             else

@@ -71,6 +71,7 @@ function is_parsable(value, to_parse) {
 
 export function save_global(type, data) {
     let parsed_data = is_parsable(data, true);
+    // console.log("saving state of ", type, ": ", parsed_data);
     if (type === "pong")
         pong_save = parsed_data;
     if (type === "lobby_data")

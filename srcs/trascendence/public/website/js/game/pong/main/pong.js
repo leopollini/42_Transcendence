@@ -285,6 +285,7 @@ export class PongGame {
     backToBracketButton.addEventListener("click", () => {
       gameCanvas.style.display = "none";
       backToBracketButton.hidden = true;
+      // console.log("saving winner: ", this.winner);
       save_global("winner", this.winner);
       saveMatchStatsData(this.p1Name, this.p2Name, this.scoreP1, this.scoreP2);
       //resetMatchStatsData();
@@ -295,6 +296,7 @@ export class PongGame {
     backToRobinButton.addEventListener("click", () => {
       gameCanvas.style.display = "none";
       backToRobinButton.hidden = true;
+      // console.log("saving winner: ", this.winner);
       save_global("winner", this.winner);
       saveMatchStatsData(this.p1Name, this.p2Name, this.scoreP1, this.scoreP2);
       //resetMatchStatsData();

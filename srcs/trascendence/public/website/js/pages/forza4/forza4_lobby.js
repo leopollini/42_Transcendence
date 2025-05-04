@@ -159,7 +159,8 @@ export function addForza4LobbyPageHandlers() {
     if (selectedPlayer && numPlayersAccepted < totalPlayers) {
       sendMessage({
         type: "match_request",
-        to: selectedPlayer.textContent
+        to: selectedPlayer.textContent,
+        mode: "forza4"
       });
       inviteBtn.disabled = true;
     }

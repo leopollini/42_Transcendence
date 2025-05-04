@@ -154,7 +154,7 @@ EM::WebSocket.start({
         ChatStore.clients[username].send_sys "#{target} is already playing another match!"
         next
       end
-      ChatStore.clients[target].send_me({'from' => username, 'data' => data['data']}, "match_request")
+      ChatStore.clients[target].send_me({'from' => username, 'data' => data['data'], 'mode' => data['mode'].to_s}, "match_request")
 
     when 'match_response'
       ChatStore.clients[target].send_me({'from' => username, 'accepted' => data['accepted'].to_s}, "match_response")

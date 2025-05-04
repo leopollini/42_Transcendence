@@ -1,4 +1,4 @@
-import { buttonTitle, playerNames, save_global, winner} from "../main.js";
+import { buttonTitle, playerNames, players, save_global, winner} from "../main.js";
 import Login, { addLoginPageHandlers }from "../pages/profile/login.js";
 import Callback from "../login/login_logic.js";
 import Modes, { addModesPageHandlers } from "../pages/modes.js";
@@ -14,7 +14,7 @@ import Forza4LobbyRoom, {handleForza4Lobby, addForza4LobbyPageHandlers} from "..
 import Tournament, {addTournamentPageHandlers} from "../pages/tournament/tournament.js";
 import Knockout , {addKnockoutPageHandlers} from "../pages/tournament/knockout.js";
 import Roundrobin, {addRoundRobinPageHandlers} from "../pages/tournament/roundrobin.js";
-import LobbyRoom, {addLobbyPageHandlers, handleLobby } from "../pages/tournament/tournament_lobby.js";
+import LobbyRoom, {addLobbyPageHandlers, handleTournamentLobby } from "../pages/tournament/tournament_lobby.js";
 import Bracket, {resetBracketState, addBracketPageHandlers, backToBracket} from "../pages/tournament/bracket.js";
 import RobinRanking, {addRobinRankingPageHandlers, robinDraw, assignPointsToPlayer} from "../pages/tournament/robindraw.js";
 
@@ -69,25 +69,31 @@ export const handlerMap = {
         resetBracketState();
     },
     "/tournament/knockout/lobby": () => {
-        handleLobby("Bracket");
+        handleTournamentLobby("knockout");
         addLobbyPageHandlers();
         resetBracketState();
     },
     "/tournament/roundrobin/lobby": () => {
         addLobbyPageHandlers();
-        handleLobby("Robin");
+        handleTournamentLobby("roundrobin");
     },
     "/tournament/knockout/bracket": () => {
         addBracketPageHandlers();
-        if (buttonTitle === "Return from Match") backToBracket(winner);
+        if (buttonTitle === "Return from Match") {
+        	console.log("loading winner: ", winner);
+            backToBracket(winner);
+        }
     },
     "/tournament/roundrobin": () => {
         addRoundRobinPageHandlers();
     },
     "/tournament/roundrobin/robinranking": () => {
         addRobinRankingPageHandlers();
-        if (buttonTitle === "Return from Match") assignPointsToPlayer(winner);
-        robinDraw(playerNames);
+        if (buttonTitle === "Return from Match") {
+            console.log("loading winner winner: ", winner);
+            assignPointsToPlayer(winner);
+        }
+        robinDraw(players);
     },
     "/settings": () => {
         addSettingsPageHandlers();
