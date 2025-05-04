@@ -21,7 +21,7 @@ function saveUserStatsData(matchData) {
     const matchTime = matchData.seconds;
     const longestRally = matchData.longestRally;
 
-    fetch("http://localhost:8008", {
+    fetch("https://" + window.location.hostname + ":8008", {
         method: "save_pong_game",
         body: JSON.stringify({
             player1: player1,
@@ -43,7 +43,7 @@ function saveUserStatsData(matchData) {
     //     //console.log("Save Pong Game response: ", data);
 
     //     // Second fetch call (only if first fetch was successful)   
-    //     return fetch("http://localhost:8008", {
+    //     return fetch("https://" + window.location.hostname + ":8008", {
     //         method: "get_pong_games",
     //         body: JSON.stringify({
     //             display_name: player1,

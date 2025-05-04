@@ -2,7 +2,7 @@ import { showInfoModal } from "../modal.js"
 
 export async function fetchOnlineUsers(current_user) {
     try {
-        const response = await fetch("http://localhost:8008", {
+        const response = await fetch("https://" + window.location.hostname + ":8008", {
             method: "get_online",
             body: JSON.stringify({})
         });

@@ -44,8 +44,8 @@ async function not_home(path) {
         change_name(current_user.display_name);
         update_image(current_user.image);
     }
-    if (path !== "/classic" && path !== "/forza4/game"
-        && path !== "/tournament/knockout/bracket/game" && path !== "/tournament/roundrobin/robinranking/game") {
+    if (path !== "/classic" && path !== "/forza4/game" &&
+            path !== "/tournament/knockout/bracket/game" && path !== "/tournament/roundrobin/robinranking/game") {
         reset_tournament_data();
     }
     if (!opponent && (path === "/classic" || path === "/forza4/game")) {
@@ -54,12 +54,15 @@ async function not_home(path) {
         return (1);
     }
     if (in_game === 0 && (path === "/tournament/roundrobin/robinranking/game" ||
-        path === "/tournament/knockout/bracket/game" || path === "/tournament/knockout/bracket" ||
-        path === "/tournament/roundrobin/robinranking")) {
+            path === "/tournament/knockout/bracket/game" || path === "/tournament/knockout/bracket" ||
+            path === "/tournament/roundrobin/robinranking")) {
         navigate("/modes", "modes");
         showInfoModal("the operation you are doing is forbidden", () => { });
         return (1);
     }
+    if (path === "/tournament/roundrobin/robinranking/game" || path === "/tournament/roundrobin/robinranking" ||
+            path === "/tournament/knockout/bracket" || path === "/tournament/knockout/bracket/game")
+        save_global("lobby_data", null);
     if (acess === false && !token) {
         showInfoModal("ERROR: accessing unauthorized page...", () => { });
         await remove_all();

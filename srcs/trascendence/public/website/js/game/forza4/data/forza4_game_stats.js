@@ -14,7 +14,7 @@ export function savef4StatsData(game, isTie) {
             winner = game.p2;
     }
      //console.log("elapsed time: " + game.elapsedTime);
-    fetch("http://localhost:8008", {
+    fetch("https://" + window.location.hostname + ":8008", {
         method: "save_f4_game",
         body: JSON.stringify({
             player1: game.p1,

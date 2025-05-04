@@ -26,7 +26,7 @@ async function update_with_new_name(name) {
       "display_name": name
     }
   });
-  fetch("http://localhost:8008",
+  fetch("https://" + window.location.hostname + ":8008",
     {
       method: "update_user",
       body: data
@@ -66,7 +66,7 @@ async function checkAuthentication() {
     } else {
       console.log("data = ", data);
       if (data.message === "user already online") {
-        showInfoModal("Username taken", () => {});
+        showInfoModal("User already logged in", () => {});
         navigate("/", "home");
         return (0);
       }
@@ -86,6 +86,7 @@ async function checkAuthentication() {
 }
 
 async function set_user(user) {
+  save_global("token", user.token);
   let name_changed = false
   let display_name;
   if (!user.display_name) {
@@ -110,7 +111,6 @@ async function set_user(user) {
     type: "login"
   };
   save_global("name", display_name);
-  save_global("token", user.token);
   save_global("user", new_user);
   save_global("acess", true);
   /*update_image(new_user.image);
@@ -119,20 +119,20 @@ async function set_user(user) {
 
 export async function performLogin() {
   try {
-    if (token)
-    {
-      let result = await login_with_token();
-      if (result === 0)
-      {
-        showInfoModal("Session restored", () => {});
-        navigate("/modes", "Modalità di gioco");
-      }
-      else if (result === 1)
-        showInfoModal(user_name + " must finish the game", () => {});
-      else
-        remove_all();
-      return;
-    }
+    // if (token)
+    // {
+    //   let result = await login_with_token();
+    //   if (result === 0)
+    //   {
+    //     showInfoModal("Session restored", () => {});
+    //     navigate("/modes", "Modalità di gioco");
+    //   }
+    //   else if (result === 1)
+    //     showInfoModal(user_name + " must finish the game", () => {});
+    //   else
+    //     remove_all();
+    //   return;
+    // }
     const response = await fetch('/auth/login');
     const data = await response.json();
     if (data.auth_url)

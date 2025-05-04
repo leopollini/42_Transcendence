@@ -30,7 +30,7 @@ function update_guest(curr_guest) {
     "guest"
   );
   const data = JSON.stringify({ data: { username: guest_user.display_name, image: guest_user.image, login_as_guest: "true" } });
-  fetch("http://localhost:8008",
+  fetch("https://" + window.location.hostname + ":8008",
     {
       method: "login_user",
       body: data

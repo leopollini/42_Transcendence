@@ -124,15 +124,11 @@ export default function GameUserStatistics() {
     `;
 }
 
-async function forza4CalculateUserStatistics() {
-
-    let totalMoves;
-    let totalTime;
-    wins = 0;
-    losses = 0;
-    ties = 0;
+export async function getForza4MatchesData()
+{
+    let res = null;
     try {
-        const response = await fetch("http://localhost:8008", {
+        const response = await fetch("https://" + window.location.hostname + ":8008", {
             method: "get_f4_games",
             body: JSON.stringify({
             username: current_user.display_name,
@@ -142,15 +138,27 @@ async function forza4CalculateUserStatistics() {
         if (data.success === "true") {
             //console.log("Get Pong Game response: ", data);
             if (data.games) {
-                f4UserData = data.games;
+                res = data.games;
                 //console.log("f4UserData aggiornata: ", f4UserData);
             }
         }
         else
             showInfoModal("Could not get history");
     } catch (error) {
-    console.error("Fetch error:", error);
+        console.error("Fetch error:", error);
     }
+    return res;
+} 
+
+async function forza4CalculateUserStatistics() {
+
+    let totalMoves;
+    let totalTime;
+    wins = 0;
+    losses = 0;
+    ties = 0;
+
+    f4UserData = await getForza4MatchesData();
 
     if (!f4UserData) {
         return null;
@@ -222,10 +230,12 @@ export async function forza4ShowUserStatistics() {
 
 }
 
-export function forza4ShowMatchDetails() {
+export async function forza4ShowMatchDetails() {
     const f4MatchDetailsContainer = document.getElementById("f4MatchDetailsContainer");
     
     f4MatchDetailsContainer.textContent = "";
+    
+    f4UserData = await getForza4MatchesData();
 
     if (f4UserData && f4UserData.length > 0) {
         f4UserData.forEach(match => {
@@ -325,7 +335,7 @@ export async function getPongMatchesData() {
         if (!current_user.display_name) {
             return;
         }
-        const response = await fetch("http://localhost:8008", {
+        const response = await fetch("https://" + window.location.hostname + ":8008", {
             method: "get_pong_games",
             body: JSON.stringify({
                 username: current_user.display_name

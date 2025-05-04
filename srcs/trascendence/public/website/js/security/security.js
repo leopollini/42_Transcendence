@@ -69,7 +69,7 @@ export function free_users()
     try
     {
         let data = JSON.stringify({"token" : token});
-        fetch("http://localhost:8008",
+        fetch("https://" + window.location.hostname + ":8008",
         {
             method: "logout_user",
             body: data

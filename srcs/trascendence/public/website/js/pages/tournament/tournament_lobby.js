@@ -141,7 +141,7 @@ export async function handleLobby(type) {
 }
 
 function createKnockoutMatches() {
-    fetch("http://localhost:8008", {
+    fetch("https://" + window.location.hostname + ":8008", {
         method: "create_tournament",
         body: JSON.stringify({ players: invitedPlayers, mode: tournament }),
     })

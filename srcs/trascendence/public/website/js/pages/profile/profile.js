@@ -93,7 +93,7 @@ function updateLogin(current_user) {
       }
     });
   }
-  fetch("http://localhost:8008",
+  fetch("https://" + window.location.hostname + ":8008",
     {
       method: "update_user",
       body: data
@@ -121,7 +121,7 @@ function updateGuest(current_user) {
     },
     "token": token
   });
-  fetch("http://localhost:8008",
+  fetch("https://" + window.location.hostname + ":8008",
     {
       method: "update_user",
       body: data

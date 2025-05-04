@@ -32,6 +32,9 @@ module BetterPG
           @pg = PG.connect('host=' + DEBUG_PG_ADDRESS + ' port=5432 password=pwd_postgres user=databaser') if r.nil?
         end
       end
+      
+      raise 'Database was not created!' if @pg.nil?
+      
       @name = name
       puts 'Succesfully connected to database.'
       checkoutTable name, columns if name
@@ -215,7 +218,7 @@ module BetterPG
       begin
         strs = strs.join(' ')
         puts strs
-        return @pg.exec(strs) if strs.size != 0
+        return @pg.exec(strs) if strs.size != 0 && @pg
         return []
       rescue PG::InvalidTextRepresentation => r
         puts r.backtrace

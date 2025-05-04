@@ -195,22 +195,22 @@ def game_state(client, obj)
   name = obj['display_name'].to_s
   return {'status' => 'bad request', 'success' => ' false'} if name.empty?
   if GUEST.exists? name
-    if new_state
+    if new_state.empty?
+      state = GUEST.is_playing? name
+    else
       GUEST.set_playing(obj['username'].to_s, new_state)
       state = new_state
-    else
-      state = GUEST.is_playing? name
     end
     puts "#{name}'s game state is now #{state}".green.bold
     return {'status' => 'success', 'success' => 'true', 'is_playing' => state}
   end
   user = LOGIN.select_specific 'display_name', name, ['is_playing']
   if user
-    if new_state
+    if new_state.empty?
+      state = user['is_playing']
+    else
       LOGIN.updateValue 'display_name', name, {'is_playing' => new_state}
       state = new_state
-    else
-      state = user['is_playing']
     end
     puts "#{name}'s game state is now #{state}".green.bold
     return {'status' => 'success', 'success' => 'true', 'is_playing' => state}

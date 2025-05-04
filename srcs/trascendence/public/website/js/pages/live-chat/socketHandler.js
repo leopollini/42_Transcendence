@@ -38,7 +38,7 @@ function initSocket(username, chatAppInstance) {
     if (!socket)
     {
         try {
-            socket = new WebSocket('wss://localhost:6087');
+            socket = new WebSocket("wss://" + window.location.hostname + ":6087");
         }
         catch(error) {
             showInfoModal("Socket creation error: " + error);

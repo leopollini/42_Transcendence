@@ -55,7 +55,7 @@ export async function exist(name)
     try
     {
         let data = JSON.stringify({ "params": { "display_name": name }});
-        const response = await fetch("http://localhost:8008",
+        const response = await fetch("https://" + window.location.hostname + ":8008",
         {
             method: "get_user",
             body: data
@@ -89,7 +89,7 @@ export function escapeHtml(str)
 export async function is_online(name)
 {
     try {
-        const response = await fetch("http://localhost:8008", {
+        const response = await fetch("https://" + window.location.hostname + ":8008", {
             method: "get_online",
             body: JSON.stringify({})
         });
@@ -142,7 +142,7 @@ export async function another_user_info(name)
 {
     try {
         let data = JSON.stringify({ "params": { "display_name": name }});
-        const response = await fetch("http://localhost:8008",
+        const response = await fetch("https://" + window.location.hostname + ":8008",
         {
             method: "get_user",
             body: data

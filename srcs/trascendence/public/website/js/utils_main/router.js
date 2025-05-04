@@ -36,11 +36,11 @@ export const routes = {
     "/tournament/knockout": Knockout,
     "/tournament/knockout/lobby": LobbyRoom,
     "/tournament/roundrobin": Roundrobin,
-    "/tournament/roundrobin/robinranking": RobinRanking,
-    "/tournament/roundrobin/robinranking/game": PongGame,
+    "/tournament/roundrobin/robinranking": RobinRanking,        // lobby_data -> null
+    "/tournament/roundrobin/robinranking/game": PongGame,       // lobby_data -> null
     "/tournament/roundrobin/lobby": LobbyRoom,
-    "/tournament/knockout/bracket": Bracket,
-    "/tournament/knockout/bracket/game": PongGame,
+    "/tournament/knockout/bracket": Bracket,                    // lobby_data -> null
+    "/tournament/knockout/bracket/game": PongGame,              // lobby_data -> null
     "/profile": Profile
 };
 

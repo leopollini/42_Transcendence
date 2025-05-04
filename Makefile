@@ -96,6 +96,7 @@ clean:
 	$(call log_time, Pulizia base completata)
 
 fclean: clean
+	rm -fr ./*/*/.bundle
 	@if [ "$$(docker ps -a -q | wc -l)" -gt 0 ] || [ "$$(docker images -q | wc -l)" -gt 0 ] || [ "$$(docker volume ls -q | wc -l)" -gt 0 ]; then \
 		echo -e "Risorse Docker trovate, avvio la pulizia profonda..."; \
 		sudo docker-compose down -v --remove-orphans; \
