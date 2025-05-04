@@ -1,4 +1,4 @@
-import { buttonTitle, playerNames, winner} from "../main.js";
+import { buttonTitle, playerNames, save_global, winner} from "../main.js";
 import Login, { addLoginPageHandlers }from "../pages/profile/login.js";
 import Callback from "../login/login_logic.js";
 import Modes, { addModesPageHandlers } from "../pages/modes.js";
@@ -50,6 +50,9 @@ export const handlerMap = {
     },
     "/profile": () => {
         profileHandler();
+    },
+    "/classic": () => {
+        save_global("lobby_data", null)
     },
     "/classic/lobby": () => {
         addClassicPongLobbyPageHandlers();
@@ -104,6 +107,7 @@ export const handlerMap = {
         addForza4LobbyPageHandlers();
     },
     "/forza4/game": () => {
+        save_global("lobby_data", null)
         startForza4Game();
     },
 };

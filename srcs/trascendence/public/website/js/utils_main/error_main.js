@@ -6,15 +6,15 @@ import { resetBracketState } from "../pages/tournament/bracket.js";
 import { addCallbackPageHandlers } from "../login/login_logic.js";
 import { reset_tournament_data } from "./listener_Compacter.js";
 import { closeSocket } from "../pages/live-chat/socketHandler.js";
+import { change_name, update_image } from "../pages/modes.js";
 
 export async function check_valid_operation(path) {
     await refresh_reset();
-    if (invalid === 1 && path === "/")
-    {
-        showInfoModal("Error: Session lost", () => {});
+    if (invalid === 1 && path === "/") {
+        showInfoModal("Error: Session lost", () => { });
         save_global("invalid", 0);
         navigate("/", "home");
-        return(1);
+        return (1);
     }
     if (path !== '/') {
         if (await not_home(path) === 1)
@@ -36,8 +36,14 @@ async function not_home(path) {
         save_global("robinranked", null);
         resetBracketState();
     }
-    if (path === "/modes")
+    if (path === "/modes") {
+        resetBracketState();
+        resetMatchStatsData();
+        save_global("lobby_data", null);
         save_global("numP", null);
+        change_name(current_user.display_name);
+        update_image(current_user.image);
+    }
     if (path !== "/classic" && path !== "/forza4/game"
         && path !== "/tournament/knockout/bracket/game" && path !== "/tournament/roundrobin/robinranking/game") {
         reset_tournament_data();
@@ -53,10 +59,6 @@ async function not_home(path) {
         navigate("/modes", "modes");
         showInfoModal("the operation you are doing is forbidden", () => { });
         return (1);
-    }
-    if (path === "/modes") {
-        resetBracketState();
-        resetMatchStatsData();
     }
     if (acess === false && !token) {
         showInfoModal("ERROR: accessing unauthorized page...", () => { });

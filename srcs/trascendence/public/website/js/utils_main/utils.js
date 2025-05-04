@@ -1,7 +1,6 @@
 import { save_global, buttonTitle, players, numPlayers, user_name, current_user } from "../main.js";
 import { check_valid_operation } from "./error_main.js";
 import { initializeGameCanvas } from "../game/pong/main/handling_Canvas.js";
-import { change_name, update_image } from "../pages/modes.js";
 
 const gamePaths = [
     "/classic",
@@ -29,14 +28,6 @@ export function set_prev_path() {
 export async function util_main(path, component, app) {
     if (await check_valid_operation(path, component) === 1)
         return (-2);
-
-    if (path !== "/classic/lobby" && path !== "/classic")
-        save_global("lobby_data", null);
-    if (path === "/modes")
-    {
-        change_name(current_user.display_name);
-        update_image(current_user.image);
-    }
     if (/^Robin[4-8]$/.test(buttonTitle) || /^Bracket(4|8|16)$/.test(buttonTitle))
         save_global("numP", parseInt(buttonTitle.replace(/\D/g, ""), 10));
     if (!players)
