@@ -135,7 +135,7 @@ async function saveProfile(infoContainer) {
     current_user.image = me.image;
   }
   saving += savebio(me, infoContainer, current_user);
-  if (current_user.type === "login")ww
+  if (current_user.type === "login")
     saving += await savename(me, infoContainer, current_user);
   if (current_user.type === "guest")
     updateGuest(current_user);

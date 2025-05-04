@@ -84,11 +84,8 @@ export function update_image(image) {
     const checkImageInterval = setInterval(() => {
         const avatarImage = document.getElementById('avatarImage');
         if (avatarImage) {
-            if (avatarImage.src !== image) {
-
-                avatarImage.src = image;
-                clearInterval(checkImageInterval);
-            }
+            avatarImage.src = image;
+            clearInterval(checkImageInterval);
         }
     }, 100);
 }
@@ -97,11 +94,8 @@ export async function change_name(name) {
     const checknameInterval = setInterval(() => {
         const avatarName = document.getElementById('avatarName');
         if (avatarName) {
-            if (avatarName.textContent !== name) {
-
-                avatarName.textContent = name;
-                clearInterval(checknameInterval);
-            }
+            avatarName.textContent = name;
+            clearInterval(checknameInterval);
         }
     }, 100);
 }

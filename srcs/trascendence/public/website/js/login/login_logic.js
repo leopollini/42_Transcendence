@@ -11,7 +11,6 @@ export default function Callback() {
 
 export async function addCallbackPageHandlers() {
   let let_me_in = await checkAuthentication(window.location.pathname);
-  console.log("lemme in: ", let_me_in);
   if (let_me_in === 1) {
     remove_all();
   }
@@ -83,8 +82,7 @@ async function checkAuthentication() {
 
 async function set_user(user) {
   let name_changed = false
-  let display_name
-  // console.log("use data inside set user: ", user);
+  let display_name;
   if (!user.display_name) {
     const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
     display_name = await promptModal("Insert your nickname");
@@ -98,7 +96,6 @@ async function set_user(user) {
   }
   save_global("name", display_name);
   save_global("token", user.token);
-  //console.log("displayname from server or input: ", display_name);
   let new_user =
   {
     email: user.email,
@@ -109,12 +106,12 @@ async function set_user(user) {
     type: "login"
   };
   save_global("name", new_user.login_name);
-  //console.log("username after set = ", user_name);
   if (name_changed)
     await update_with_new_name(display_name);
+  update_image(new_user.image);
+  change_name(new_user.display_name);
   save_global("user", new_user);
   save_global("acess", true);
-  console.log("name = ", new_user.login_name);
 }
 
 export async function performLogin() {
