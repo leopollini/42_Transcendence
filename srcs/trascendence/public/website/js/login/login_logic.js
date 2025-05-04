@@ -1,7 +1,6 @@
 import { showInfoModal, showInputModal } from "../modal.js";
 import { remove_all } from "../utils_main/error_main.js";
 import {navigate, save_global, token, user_name } from "../main.js";
-import { update_image, change_name } from "../pages/modes.js"
 import { check_name, escapeHtml } from "./user.js";
 
 export default function Callback() {
@@ -88,6 +87,7 @@ async function checkAuthentication() {
 async function set_user(user) {
   let name_changed = false
   let display_name;
+  save_global("token", user.token);
   if (!user.display_name) {
     const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
     display_name = await promptModal("Insert your nickname");
@@ -110,16 +110,13 @@ async function set_user(user) {
     type: "login"
   };
   save_global("name", display_name);
-  save_global("token", user.token);
   save_global("user", new_user);
   save_global("acess", true);
-  /*update_image(new_user.image);
-  change_name(new_user.display_name);*/
 }
 
 export async function performLogin() {
   try {
-    if (token)
+    /*if (token)
     {
       let result = await login_with_token();
       if (result === 0)
@@ -132,7 +129,7 @@ export async function performLogin() {
       else
         remove_all();
       return;
-    }
+    }*/
     const response = await fetch('/auth/login');
     const data = await response.json();
     if (data.auth_url)

@@ -36,7 +36,7 @@ async function not_home(path) {
         save_global("robinranked", null);
         resetBracketState();
     }
-    if (path === "/modes") {
+    if (path === "/modes" && current_user) {
         resetBracketState();
         resetMatchStatsData();
         save_global("lobby_data", null);
