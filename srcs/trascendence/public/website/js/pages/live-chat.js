@@ -47,12 +47,12 @@ export default function LiveChat() {
                     <div class="chat-tab active" data-chat="general">General Chat</div>
                 </div>
                 <div class="friends-tabs">
-                    <img id="friendsButton" class="active" src="website/images/friends.png" alt="Friends">
+                    <img id="friendsButton" class="active" src="../../website/images/friends.png" alt="Friends">
                     <div id="friendRequestsButtonContainer" class="friend-requests-container">
-                        <img id="friendRequestsButton" src="website/images/add-friend.png" alt="Requests">
+                        <img id="friendRequestsButton" src="../../website/images/add-friend.png" alt="Requests">
                           <span id="friendRequestsBadge" class="friend-badge"></span>
                     </div>                
-                    <img id="blockedUsersButton" src="website/images/block-user.png" alt="Blocked">
+                    <img id="blockedUsersButton" src="../../website/images/block-user.png" alt="Blocked">
                 </div>
                 <div class="friends-content">
                     <!-- Lista amici -->
