@@ -210,7 +210,7 @@ function match_response_event(event) {
       startBtn.disabled = false;
     }
     // **POI** notifica con modal
-    showInfoModal(`${from} has accepted the invite to classic Pong!`, () => { });
+    showInfoModal(`${from} has accepted the invite to Forza4!`, () => { });
     if (!lobby_data)
       save_global("lobby_data", give_lobby_forza4());
   }

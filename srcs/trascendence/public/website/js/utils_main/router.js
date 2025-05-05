@@ -80,7 +80,7 @@ export const handlerMap = {
     "/tournament/knockout/bracket": () => {
         addBracketPageHandlers();
         if (buttonTitle === "Return from Match") {
-        	console.log("loading winner: ", winner);
+        	//console.log("loading winner: ", winner);
             backToBracket(winner);
         }
     },
@@ -90,7 +90,7 @@ export const handlerMap = {
     "/tournament/roundrobin/robinranking": () => {
         addRobinRankingPageHandlers();
         if (buttonTitle === "Return from Match") {
-            console.log("loading winner winner: ", winner);
+            //console.log("loading winner winner: ", winner);
             assignPointsToPlayer(winner);
         }
         robinDraw(players);
