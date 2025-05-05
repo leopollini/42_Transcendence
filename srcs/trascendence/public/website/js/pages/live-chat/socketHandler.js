@@ -76,9 +76,11 @@ function initSocket(username, chatAppInstance) {
             const friends = msg.data.friends;
             const friendRequests = msg.data.friend_requests;
             const blockedUsers = msg.data.blocked_users;
+            const blockedBy = msg.data.blocked_by;
             chatAppInstance.friends = new Set(friends);
             chatAppInstance.receivedRequests = friendRequests;
             chatAppInstance.blockedUsers = new Set(blockedUsers);
+            chatAppInstance.blockedBy = new Set(blockedBy);
             chatAppInstance.updateFriendsList();
             chatAppInstance.updateFriendRequestsUI();
             chatAppInstance.updateBlockedUsersList();
