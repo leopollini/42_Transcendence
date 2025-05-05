@@ -42,7 +42,7 @@ export default function Bracket() {
             <canvas id="bracketCanvas"></canvas>
         </div>
         <div class="bracket-button-container">
-            <button class="button-style" id="knockoutMatchButton">Play Match</button>
+            <button class="button-style down" id="knockoutMatchButton">Play Match</button>
         </div>
     `;
 }
