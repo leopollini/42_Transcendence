@@ -73,7 +73,7 @@ function same_match(tiebreaker, nextMatch, rankingRobinCtx)
         rankingRobinCtx.fillText("Next Match (t): " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
 }
 
-function findNextMatch(rankingRobinCtx, existing_match) {
+function findNextMatch(rankingRobinCtx) {
     let attempts;
     let tiebreaker;
     attempts = 0;
@@ -130,12 +130,7 @@ function findNextMatch(rankingRobinCtx, existing_match) {
         rankingRobinCtx.font = '30px Liberty';
         rankingRobinCtx.textAlign = 'left';
         rankingRobinCtx.fillStyle = 'white';
-        if (existing_match)
-        {
-            same_match(tiebreaker, nextMatch, rankingRobinCtx);
-            return;
-        }
-        else if (!tiebreaker)
+        if (!tiebreaker)
             rankingRobinCtx.fillText("Next match: " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
         else 
             rankingRobinCtx.fillText("Next Match (t): " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
@@ -214,7 +209,7 @@ export function robinDraw(players) {
     }
 
     // Check next match to play
-    findNextMatch(rankingRobinCtx, nextMatch);
+    findNextMatch(rankingRobinCtx);
     save_global("robinranked", give_data());
 }
 

@@ -1,6 +1,6 @@
 import { free_users } from "../security/security.js";
 import { resetMatchStatsData } from "../game/pong/data/game_stats.js";
-import { navigate, reset_all_let, token, current_user, opponent, save_global, in_game, acess, invalid } from "../main.js";
+import { navigate, reset_all_let, token, current_user, opponent, save_global, in_game, acess, invalid, tournament } from "../main.js";
 import { showInfoModal } from "../modal.js";
 import { resetBracketState } from "../pages/tournament/bracket.js";
 import { addCallbackPageHandlers } from "../login/login_logic.js";
@@ -36,7 +36,8 @@ async function not_home(path) {
         save_global("robinranked", null);
         resetBracketState();
     }
-    if (path === "/modes" && current_user) {
+    if ((path === "/modes" || path === "/tournament/knockout" ||
+    path === "/tournament/roundrobin") && current_user) {
         resetBracketState();
         resetMatchStatsData();
         save_global("lobby_data", null);

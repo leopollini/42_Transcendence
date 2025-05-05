@@ -21,10 +21,6 @@ let inviteBtn;
 let onlineBadge;
 let startBtn;
 
-
-
-
-
 export default function LobbyRoom() {
     return `
     <div class="lobby">
@@ -106,8 +102,6 @@ export async function handleTournamentLobby(tournament_mode) {
     me.classList.add("player");
     me.textContent = current_user.display_name;
     matchEl.appendChild(me);
-
-
     if (!invitedPlayers.includes(current_user.display_name))
       invitedPlayers.push(current_user.display_name);
     if (addedPlayer) {
@@ -126,8 +120,8 @@ export async function handleTournamentLobby(tournament_mode) {
     if (numPlayersAccepted === totalPlayers)
       startBtn.disabled = false;
   }
-  if (!players)
-    players = await fetchOnlineUsers(current_user.display_name);
+  players = await fetchOnlineUsers(current_user.display_name);
+  players = players.filter(name => !invitedPlayers.includes(name));
   players.forEach(name => {
     const p = document.createElement("div");
     p.classList.add("player");

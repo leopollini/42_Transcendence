@@ -84,7 +84,8 @@
 #f4OnlinePlayers,
 #f4MatchPlayers,
 #tournamentPlayers,
-#pongMatchPlayers {
+#pongMatchPlayers,
+#onlinePlayers {
     flex: 1;
     display: flex;
     flex-direction: column;

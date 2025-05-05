@@ -16,7 +16,7 @@ else
     echo -e "\n${GREEN}ufw è già installato.\n${RESET}"
 fi
 
-echo -e "${GREEN}\n\n(gli indirizzi ip usabili sono $(hostname -I))\n\n${RESET}"
+#echo -e "${GREEN}\n\n(gli indirizzi ip usabili sono $(hostname -I))\n\n${RESET}"
 
 echo -e "\n${YELLOW}Configurando il firewall per consentire il traffico sulla porta 443...\n${RESET}"
 sudo ufw allow 443

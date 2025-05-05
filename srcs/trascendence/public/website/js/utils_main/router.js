@@ -54,6 +54,14 @@ export const handlerMap = {
     "/classic": () => {
         save_global("lobby_data", null)
     },
+    "/tournament/roundrobin/robinranking/game": () =>
+    {
+        save_global("lobby_data", null);
+    },
+    "/tournament/knockout/bracket/game": () =>
+    {
+        save_global("lobby_data", null);
+    },
     "/classic/lobby": () => {
         addClassicPongLobbyPageHandlers();
         handleClassicPongLobby();
@@ -78,6 +86,7 @@ export const handlerMap = {
         handleTournamentLobby("roundrobin");
     },
     "/tournament/knockout/bracket": () => {
+        save_global("lobby_data", null);
         addBracketPageHandlers();
         if (buttonTitle === "Return from Match") {
         	//console.log("loading winner: ", winner);
@@ -88,6 +97,7 @@ export const handlerMap = {
         addRoundRobinPageHandlers();
     },
     "/tournament/roundrobin/robinranking": () => {
+        save_global("lobby_data", null);
         addRobinRankingPageHandlers();
         if (buttonTitle === "Return from Match") {
             //console.log("loading winner winner: ", winner);

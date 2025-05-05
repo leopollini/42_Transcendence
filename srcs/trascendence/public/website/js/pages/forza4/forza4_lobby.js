@@ -119,8 +119,8 @@ export async function handleForza4Lobby() {
     if (numPlayersAccepted === totalPlayers)
       startBtn.disabled = false;
   }
-  if (!players)
-    players = await fetchOnlineUsers(current_user.display_name);
+  players = await fetchOnlineUsers(current_user.display_name);
+  players = players.filter(name => !invitedPlayers.includes(name));
   players.forEach(name => {
     const p = document.createElement("div");
     p.classList.add("player");
@@ -163,6 +163,8 @@ export function addForza4LobbyPageHandlers() {
       });
       inviteBtn.disabled = true;
     }
+    else
+      showInfoModal("the lobby is full", () => {});
   };
 
   startBtn.addEventListener('click', () => {

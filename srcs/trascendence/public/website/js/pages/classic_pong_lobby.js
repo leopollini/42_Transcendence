@@ -1,5 +1,5 @@
 // === ClassicPongLobby.js ===
-import { navigate, save_global, current_user, lobby_data, in_game} from "../main.js";
+import { navigate, save_global, current_user, lobby_data, in_game } from "../main.js";
 import { initSocket, sendMessage } from "./live-chat/socketHandler.js";
 import { showInfoModal } from "../modal.js";
 import { fetchOnlineUsers } from "./get_online_users.js";
@@ -120,8 +120,8 @@ export async function handleClassicPongLobby() {
     if (numPlayersAccepted === totalPlayers)
       startBtn.disabled = false;
   }
-  if (!players)
-    players = await fetchOnlineUsers(current_user.display_name);
+  players = await fetchOnlineUsers(current_user.display_name);
+  players = players.filter(name => !invitedPlayers.includes(name));
   players.forEach(name => {
     const p = document.createElement("div");
     p.classList.add("player");
@@ -167,6 +167,8 @@ export function addClassicPongLobbyPageHandlers() {
       });
       inviteBtn.disabled = true;
     }
+    else
+      showInfoModal("the lobby is full", () => {});
   });
 
   startBtn.addEventListener("click", () => {
@@ -175,7 +177,7 @@ export function addClassicPongLobbyPageHandlers() {
       navigate("/classic", "Classic Pong Game", invitedPlayers);
     }
   });
-  
+
   backBtn.addEventListener("click", () => {
     navigate("/modes", "Return to Game Mode");
   });
