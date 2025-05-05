@@ -101,7 +101,7 @@ EM::WebSocket.start({
       end
       # token = data["token"].to_s
       ChatStore.joined username, sock
-      ChatStore.sys_broadcast "#{username} joined the chat!", username
+      # ChatStore.sys_broadcast "#{username} joined the chat!", username
       puts "joined: #{username}"
     when "send_message"
       message = {

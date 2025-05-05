@@ -253,8 +253,6 @@ function tournament_response_event(event) {
   removeEventListener("message", tournament_response_event);
 }
 
-
-
 function get_socket() {
   socket = initSocket(current_user.display_name);
   socket.addEventListener("message", tournament_response_event);

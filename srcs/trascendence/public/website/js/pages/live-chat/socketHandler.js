@@ -1,13 +1,14 @@
 import { showConfirmModal, showInfoModal } from "../../modal.js";
 import { free_users, renderHtmlAsText } from "../../security/security.js";
-import { in_game, save_global, token } from "../../main.js";
+import { current_user, in_game, save_global, token } from "../../main.js";
 import { remove_all } from "../../utils_main/error_main.js";
 
-export let socket;
+export let socket = null;
 let _username;
 let _chatApp
 
 export function restartSocket(username) {
+    console.log("restarting socket. _chatApp set:", _chatApp);
     _username = username;
     if (_chatApp) {
         socket.close();
@@ -22,18 +23,20 @@ export function restartSocket(username) {
 export function closeSocket() {
     if (socket)
         socket.close();
+    socket = null;
 }
 
-function restoreChatState() {
-    if (socket && _username)
-        socket.send(JSON.stringify({ type: "get_state", 'username': _username }));
-    else
-        showInfoModal("restoreChatState failed: socket closed");
-}
+// function restoreChatState() {
+//     if (socket && _username)
+//         socket.send(JSON.stringify({ type: "get_state", 'username': _username }));
+//     else
+//         showInfoModal("restoreChatState failed: socket closed");
+// }
 
 function initSocket(username, chatAppInstance) {
     _username = username;
     _chatApp = chatAppInstance;
+    console.log("SOCKET INIT");
 
     if (!socket)
     {
@@ -48,13 +51,17 @@ function initSocket(username, chatAppInstance) {
     }
 
     socket.onclose = () => {
+        console.log("SOCKET CLOSED");
         socket = null;
     };
 
     socket.onopen = () => {
+        // if (!socket)
+        //     return
         socket.send(JSON.stringify({ type: "join", 'username': username, 'token': token }));
+        socket.send(JSON.stringify({ type: "get_state", username: username }));
 
-        restoreChatState();
+        // restoreChatState();
     };
 
     

@@ -23,11 +23,11 @@ class ChatApp {
     sendStateRequest() {
         if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({ type: "get_state", username: user_name }));
-        } else {
-            socket.addEventListener("open", () => {
-                socket.send(JSON.stringify({ type: "get_state", username: user_name }));
-            }, { once: true });
-        }
+        } //else {
+        //     socket.addEventListener("open", () => {
+        //         socket.send(JSON.stringify({ type: "get_state", username: user_name }));
+        //     }, { once: true });
+        // }
     }
 
     getChatPartner(chatId) {
@@ -43,7 +43,9 @@ class ChatApp {
         if (current_user && current_user.display_name)
             this.username = current_user.display_name;
         else
-        this.username = "default";
+            this.username = "default";
+
+        console.log("inside chatappinit",this.username);
         this.socket = initSocket(this.username, this);
         
         this.initializeElements();
