@@ -126,7 +126,7 @@ def update_user(client, obj = {})
 
   guest = GUEST.get_by_token obj['token'].to_s
   if guest
-    return GUEST.update_guest(guest, new_params)
+    return GUEST.update_guest(obj['token'].to_s, new_params)
   end
 
   user = LOGIN.select_specific 'token', obj['token'].to_s, ['display_name']

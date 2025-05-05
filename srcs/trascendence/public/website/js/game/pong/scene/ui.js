@@ -56,7 +56,7 @@ export class UI {
             this.ctx.fillText(countdownText, (this.canvas.width - countdownTextWidth) / 2, countdownTextY);
         }
         else if (pong.gameEnd) {
-            const winnerText = scoreP1 > scoreP2 ? this.player1Name + " WIN!" : this.player2Name + " WIN!";
+            const winnerText = scoreP1 > scoreP2 ? this.player1Name + " WINS!" : this.player2Name + " WINS!";
             const winnerTextWidth = this.ctx.measureText(winnerText).width;
             const winnerTextY = this.canvas.height / 2 + this.getTextHeight() / 2; // Centered
             this.ctx.fillText(winnerText, (this.canvas.width - winnerTextWidth) / 2, winnerTextY);

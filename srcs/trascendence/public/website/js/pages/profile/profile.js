@@ -72,8 +72,7 @@ export async function profileHandler() {
 
 function updateLogin(current_user) {
   let data;
-  if (me.display_name === current_user.display_name)
-  {
+  if (me.display_name === current_user.display_name) {
     data = JSON.stringify({
       "token": token,
       "new_params": {
@@ -82,8 +81,7 @@ function updateLogin(current_user) {
       }
     });
   }
-  else
-  {
+  else {
     data = JSON.stringify({
       "token": token,
       "new_params": {
@@ -114,11 +112,12 @@ function updateLogin(current_user) {
 }
 
 function updateGuest(current_user) {
+  console.log("UPDATEING GUEST");
   let data = JSON.stringify({
-    "token": token,
-    "new_params": {
-      "bio": current_user.bio,
-      "image": current_user.image
+    token: token,
+    new_params: {
+      bio: current_user.bio,
+      image: current_user.image
     },
     "token": token
   });

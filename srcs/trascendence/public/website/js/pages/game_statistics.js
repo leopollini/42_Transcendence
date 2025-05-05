@@ -102,11 +102,11 @@ export default function GameUserStatistics() {
                         <div class="chart-item"><canvas id="winLossChart"></canvas></div>
                         <div class="chart-item">
                             <h2>Matches Played</h2>
-                            <h1 id="matchesPlayed"></h1>
+                            <p id="matchesPlayed"></p>
                             <h2>Average Match Duration</h2>
-                            <h1 id="avgMatchTime"></h1>
+                            <p id="avgMatchTime"></p>
                             <h2>Points</h2>
-                            <h1 id="rankPointsLabel"></h1>
+                            <p id="rankPointsLabel"></p>
                         </div>
                         <div class="chart-item"><canvas id="xpProgressChart"></canvas></div>
                     </div>

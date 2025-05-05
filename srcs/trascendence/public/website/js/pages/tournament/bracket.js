@@ -1,6 +1,7 @@
 import { Bracket_state, in_game, navigate, save_global, players, match_ended, winner} from "../../main.js";
 import { showInfoModal } from "../../modal.js";
 import { reset_tournament_data } from "../../utils_main/listener_Compacter.js";
+import { sendMessage, socket } from "../live-chat/socketHandler.js";
 let boxColor = 'black';
 let matchBoxPos = [];
 let matchesPerRound = 8;
@@ -238,6 +239,22 @@ export function resetBracketState() {
     save_global("bracket", null);
 }
 
+
+
+function send_request_to_players()
+{
+    sendMessage({
+        type: "match_request",
+        to: bracketPlayers[currentRound][currentMatch * 2],
+        mode: "tournament match"
+    });
+    sendMessage({
+        type: "match_request",
+        to: bracketPlayers[currentRound][currentMatch * 2 + 1],
+        mode: "tournament match"
+    });
+}
+
 function you_win(match_winner)
 {
     drawBracket(bracketPlayers[0], initialPlayersCount);
@@ -276,6 +293,8 @@ export function backToBracket(match_winner) {
             matchesThisRound = Math.floor(matchesThisRound / 2);
         }
         drawBracket(bracketPlayers[0], initialPlayersCount);
+
+        send_request_to_players();
     }
     else
         you_win(match_winner);

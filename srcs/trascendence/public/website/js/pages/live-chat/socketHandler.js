@@ -197,30 +197,47 @@ function initSocket(username, chatAppInstance) {
                 return;
             }
             
-            showConfirmModal(
-              `${sender} has invited you to a match. do you accept?`,
-              () => { // onConfirm: utente conferma
-                  const response = {
-                      type: "match_response",
-                      to: sender,
-                      from: receiver,
-                      accepted: "true"
-                  };
-                  //console.log("receiver", receiver);
-                  //console.log("⚡ Invio risposta all'invito:", response);
-                  socket.send(JSON.stringify(response));
-              },
-              () => { // onReject: utente rifiuta
-                  const response = {
-                      type: "match_response",
-                      to: sender,
-                      from: receiver,
-                      accepted: "false"
-                  };
-                  //console.log("⚡ Invio risposta all'invito:", response);
-                  socket.send(JSON.stringify(response));
-              }
-            );
+            if (msg.mode === "tournament match") {
+                showInfoModal(
+                "you are required for the next match in the tournament!",
+                () => {
+                    const response = {
+                        type: "match_response",
+                        to: sender,
+                        from: receiver,
+                        accepted: "true"
+                    };
+                    //console.log("receiver", receiver);
+                    //console.log("⚡ Invio risposta all'invito:", response);
+                    socket.send(JSON.stringify(response));
+                });
+            }
+            else {
+                showConfirmModal(
+                `${sender} has invited you to a match. do you accept?`,
+                () => { // onConfirm: utente conferma
+                    const response = {
+                        type: "match_response",
+                        to: sender,
+                        from: receiver,
+                        accepted: "true"
+                    };
+                    //console.log("receiver", receiver);
+                    //console.log("⚡ Invio risposta all'invito:", response);
+                    socket.send(JSON.stringify(response));
+                },
+                () => { // onReject: utente rifiuta
+                    const response = {
+                        type: "match_response",
+                        to: sender,
+                        from: receiver,
+                        accepted: "false"
+                    };
+                    //console.log("⚡ Invio risposta all'invito:", response);
+                    socket.send(JSON.stringify(response));
+                }
+                );
+            }
         }
         else if (msg.type === "match_response") {
             //console.log("📩 Risposta ricevuta:", msg);

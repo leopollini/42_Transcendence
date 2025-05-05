@@ -1,5 +1,33 @@
-import { sendMessage } from '../live-chat/socketHandler.js';
-import { navigate } from '../../main.js';
+import { sendMessage, socket } from '../live-chat/socketHandler.js';
+import { current_user, navigate, save_global } from '../../main.js';
+import { showInfoModal } from '../../modal.js';
+import { saveMatchStatsData } from '../../game/pong/data/game_stats.js';
+
+let chat_match_opponent = null;
+
+function chat_match_response_event(event) {
+    const msg = JSON.parse(event.data)
+    console.log("received response", msg);
+    console.log("chat oppt", chat_match_opponent);
+    console.log("info data", msg.data);
+    if (msg.type === "match_response" && chat_match_opponent && msg.data.from === chat_match_opponent)
+    {
+        console.log("match response from ", chat_match_opponent);
+        if (msg.data.accepted === "true") {
+            console.log("invitation accepted!");
+            showInfoModal("match accepted! Press OK to start", () => {
+                save_global("game", 1);
+                save_global("p1", current_user.display_name);
+                save_global("p2", chat_match_opponent);
+                save_global("opponent", chat_match_opponent);
+                navigate("/classic", "Classic Pong Game", [current_user.display_name, chat_match_opponent]);
+            });
+        }
+        else
+            showInfoModal("match rejected!");
+    }
+    removeEventListener("message", chat_match_response_event);
+}
 
 function setupEventListeners(chatApp) {
     const elems = chatApp.elements;
@@ -71,29 +99,32 @@ function setupEventListeners(chatApp) {
         if (!action) return;
     
         if (action === 'invite') {
-          const userToInvite = chatApp.selectedUser;
-          if (!userToInvite) return;
+            const userToInvite = chatApp.selectedUser;
+            if (!userToInvite) return;
 
-          if (window.location.pathname !== '/classic/lobby') {
-            navigate('/classic/lobby', 'Classic Pong Lobby');
-          }
+        //   if (window.location.pathname !== '/classic/lobby') {
+        //     navigate('/classic/lobby', 'Classic Pong Lobby');
+        //   }
+            removeEventListener("message", chat_match_response_event);
+            chat_match_opponent = userToInvite;
+            socket.addEventListener("message", chat_match_response_event);
 
-          sendMessage({
-            type: "match_request",
-            to: userToInvite
-          });
+            sendMessage({
+                type: "match_request",
+                to: userToInvite
+            });
     
-          const ctxInvite = elems.contextMenu.querySelector('[data-action="invite"]');
-          ctxInvite.style.pointerEvents = 'none';
-          ctxInvite.classList.add('disabled');
+            // const ctxInvite = elems.contextMenu.querySelector('[data-action="invite"]');
+            // ctxInvite.style.pointerEvents = 'none';
+            // ctxInvite.classList.add('disabled');
     
-          const lobbyInviteBtn = document.getElementById('pongInviteButton');
-          if (lobbyInviteBtn) lobbyInviteBtn.disabled = true;
+            // const lobbyInviteBtn = document.getElementById('pongInviteButton');
+            // if (lobbyInviteBtn) lobbyInviteBtn.disabled = true;
     
-          chatApp.hideContextMenu();
+            chatApp.hideContextMenu();
         }
         else {
-          chatApp.handleContextAction(action);
+            chatApp.handleContextAction(action);
         }
     });
 
