@@ -1,5 +1,6 @@
 
 import { user_name } from "../../../main.js";
+import { showInfoModal } from "../../../modal.js";
 export function savef4StatsData(game, isTie) {
     
     let winner;
@@ -46,7 +47,7 @@ export function savef4StatsData(game, isTie) {
     // .then(data => {
     //     //console.log("Get Forza4 Game response: ", data);
     // })
-    .catch(error => console.error("Fetch error:", error));
+    .catch(error => showInfoModal("Fetch error:", error));
 }
 
 

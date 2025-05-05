@@ -1,5 +1,6 @@
 import { matchData } from './game_global.js';
 import { formatTime } from '../other/timer.js';
+import { showInfoModal } from '../../../modal.js';
 
 export function saveMatchStatsData(p1Name, p2Name, scoreP1, scoreP2) {
     matchData.player1 = p1Name;
@@ -54,7 +55,7 @@ function saveUserStatsData(matchData) {
     // .then(data => {
     //     //console.log("Get Pong Game response: ", data);
     // })
-    .catch(error => console.error("Fetch error:", error));
+    .catch(error => showInfoModal("Fetch error:", error));
 }
 
 export function resetMatchStatsData() {

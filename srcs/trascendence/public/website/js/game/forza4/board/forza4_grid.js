@@ -3,6 +3,7 @@ import { highlightColumn } from "./forza4_grid_visual.js";
 import { checkWin } from "./forza4_check_win.js";
 import { savef4StatsData } from "../data/forza4_game_stats.js";
 import { forza4_save } from "../../../main.js";
+import { showInfoModal } from "../../../modal.js";
 
 export function createGrid(game) {
     //console.log("Creo griglia Forza 4");
@@ -102,7 +103,7 @@ function checkGrid(event,game) {
                 if (game.f4BackToMenuButton) {
                     game.f4BackToMenuButton.style.display = 'block';
                 } else {
-                    console.error("I pulsanti Replay e Back to Menu non sono stati trovati nel DOM.");
+                    showInfoModal("I pulsanti Replay e Back to Menu non sono stati trovati nel DOM.", () => {});
                 }
                 clearInterval(game.timerInterval); // Stop timer
                 savef4StatsData(game, false);
@@ -115,7 +116,7 @@ function checkGrid(event,game) {
                 if (game.f4BackToMenuButton) {
                     game.f4BackToMenuButton.style.display = 'block';
                 } else {
-                    console.error("I pulsanti Replay e Back to Menu non sono stati trovati nel DOM.");
+                    showInfoModal("I pulsanti Replay e Back to Menu non sono stati trovati nel DOM.", () => {});
                 }
                 clearInterval(game.timerInterval); // Stop timer
                 savef4StatsData(game, true); // Save data for statistics (true indicates a tie)

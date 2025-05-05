@@ -1,7 +1,6 @@
 import { showInfoModal, showInputModal } from "../modal.js";
 import { remove_all } from "../utils_main/error_main.js";
 import {navigate, save_global, token, user_name } from "../main.js";
-import { update_image, change_name } from "../pages/modes.js"
 import { check_name, escapeHtml } from "./user.js";
 
 export default function Callback() {
@@ -64,7 +63,7 @@ async function checkAuthentication() {
       showInfoModal(data.message, () => { });
       return (-1);
     } else {
-      console.log("data = ", data);
+      //console.log("data = ", data);
       if (data.message === "user already online") {
         showInfoModal("User already logged in", () => {});
         navigate("/", "home");
@@ -89,6 +88,7 @@ async function set_user(user) {
   save_global("token", user.token);
   let name_changed = false
   let display_name;
+  save_global("token", user.token);
   if (!user.display_name) {
     const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
     display_name = await promptModal("Insert your nickname");
@@ -113,26 +113,24 @@ async function set_user(user) {
   save_global("name", display_name);
   save_global("user", new_user);
   save_global("acess", true);
-  /*update_image(new_user.image);
-  change_name(new_user.display_name);*/
 }
 
 export async function performLogin() {
   try {
-    // if (token)
-    // {
-    //   let result = await login_with_token();
-    //   if (result === 0)
-    //   {
-    //     showInfoModal("Session restored", () => {});
-    //     navigate("/modes", "Modalità di gioco");
-    //   }
-    //   else if (result === 1)
-    //     showInfoModal(user_name + " must finish the game", () => {});
-    //   else
-    //     remove_all();
-    //   return;
-    // }
+    /*if (token)
+    {
+      let result = await login_with_token();
+      if (result === 0)
+      {
+        showInfoModal("Session restored", () => {});
+        navigate("/modes", "Modalità di gioco");
+      }
+      else if (result === 1)
+        showInfoModal(user_name + " must finish the game", () => {});
+      else
+        remove_all();
+      return;
+    }*/
     const response = await fetch('/auth/login');
     const data = await response.json();
     if (data.auth_url)

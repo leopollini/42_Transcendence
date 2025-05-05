@@ -111,3 +111,8 @@ html, body {
 .hidden-button {
     display: none;
 }
+
+
+.pong-margin {
+    margin-top: 200px;
+}

@@ -75,7 +75,6 @@ export async function handleForza4Lobby() {
   
   get_socket();
   save_global("game", 0);
-  console.log("lobby = ", lobby_data);
   if (lobby_data)
     update_data();
   else {
