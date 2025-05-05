@@ -1,4 +1,4 @@
-import { initSocket, socket } from './socketHandler.js';
+import { initSocket, restartSocket, socket } from './socketHandler.js';
 import { makeDraggable } from './domUtils.js';
 import { setupEventListeners } from './eventListeners.js';
 import { current_user, user_name } from '../../main.js';
@@ -40,14 +40,15 @@ class ChatApp {
     }
 
     initialize() {
-        this.initializeElements();
-        setupEventListeners(this);
-        this.initializeGeneralChat();
         if (current_user && current_user.display_name)
             this.username = current_user.display_name;
         else
-            this.username = "default";
+        this.username = "default";
         this.socket = initSocket(this.username, this);
+        
+        this.initializeElements();
+        setupEventListeners(this);
+        this.initializeGeneralChat();
     }
 
     initializeElements() {

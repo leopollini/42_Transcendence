@@ -65,9 +65,7 @@ export async function exist(name)
         if (result.status === "no user found")
             return false;
         else
-        {
             return true;
-        }
     }
     catch (error)
     {

@@ -56,9 +56,8 @@ export async function savename(me, yourDataSection, current_user) {
     if (me.display_name !== newname) {
         let result = await exist(newname);
         if (!result) {
-            me.display_name = newname;
-            current_user.display_name = me.display_name;
-            restartSocket();
+            current_user.display_name = newname;
+            restartSocket(current_user.display_name);
             return ("✅Saved name successfully(" + newname + ")\n");
         }
         return ("🚨Error: name already taken(" + newname + ")\n");

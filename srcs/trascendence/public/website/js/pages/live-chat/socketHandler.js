@@ -1,6 +1,6 @@
 import { showConfirmModal, showInfoModal } from "../../modal.js";
 import { free_users, renderHtmlAsText } from "../../security/security.js";
-import { in_game, token } from "../../main.js";
+import { in_game, save_global, token } from "../../main.js";
 import { remove_all } from "../../utils_main/error_main.js";
 
 export let socket;
@@ -213,6 +213,7 @@ function initSocket(username, chatAppInstance) {
             //console.log("kicked from chat because ", msg.status)
             showInfoModal("Chat closed: " + msg.status);
             socket.close();
+            save_global("token", null);
             remove_all();
         }
     };

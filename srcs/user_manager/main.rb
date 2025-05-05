@@ -75,10 +75,10 @@ def login_user(client, obj)
   return {'status' => 'game in progress', 'success' => 'false'} if user['is_playing'] == "true"
   
   if user['token'].to_s != ""
-    # online_in_chat = JSON.parse(SimpleServer::method_req('is_online', {'username' => data['display_name']}))
-    # puts "Online in chat: #{online_in_chat}"
-    return {'status' => 'user already online', 'success' => 'false'}
-    # return {'status' => 'user already online', 'success' => 'false'} if online_in_chat['online'] == 'true'
+    online_in_chat = JSON.parse(SimpleServer::method_req('is_online', {'username' => data['display_name']}))
+    puts "Online in chat: #{online_in_chat}"
+    return {'status' => 'user already online', 'success' => 'false'} if online_in_chat['online'] == 'true'
+    # return {'status' => 'user already online', 'success' => 'false'}
   end
   
   LOGIN.updateValue('realname', user['realname'], {'token' => data['token']})

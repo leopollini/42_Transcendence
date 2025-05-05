@@ -93,6 +93,7 @@ function updateLogin(current_user) {
       }
     });
   }
+  console.log("Me:", me, "current_user:", current_user);
   fetch("https://" + window.location.hostname + ":8008",
     {
       method: "update_user",
