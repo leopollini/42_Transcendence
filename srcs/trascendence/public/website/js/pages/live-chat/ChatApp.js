@@ -324,7 +324,8 @@ class ChatApp {
         text = encodeURIComponent(text);
         let messagePayload = {
             content: text,
-            date: new Date().toISOString()
+            date: new Date().toISOString(),
+            from: this.username
         };
 
         if (this.currentChat.startsWith('private-')) {
@@ -335,7 +336,8 @@ class ChatApp {
             messagePayload.chat = 'general';
             messagePayload.to = 'general';
         }
-        this.socket.send(JSON.stringify({ type: "send_message", ...messagePayload }));
+        console.log("SENDING AS", this.username);
+        this.socket.send(JSON.stringify({type: "send_message", ...messagePayload }));
         this.elements.messageInput.value = '';
     }
 

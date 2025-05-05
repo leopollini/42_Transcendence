@@ -196,7 +196,7 @@ class ChatStore
   end
 
   def self.close_client(username)
-    @@clients[username].close_sock
+    @@clients[username].close_sock if @@clients[username]
   end
 
   def self.get_online(include_guests)
