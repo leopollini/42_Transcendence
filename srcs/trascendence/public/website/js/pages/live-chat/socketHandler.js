@@ -56,8 +56,8 @@ function initSocket(username, chatAppInstance) {
     };
 
     socket.onopen = () => {
-        // if (!socket)
-        //     return
+        if (!socket)
+            initSocket(username, chatAppInstance);
         socket.send(JSON.stringify({ type: "join", 'username': username, 'token': token }));
         socket.send(JSON.stringify({ type: "get_state", username: username }));
 

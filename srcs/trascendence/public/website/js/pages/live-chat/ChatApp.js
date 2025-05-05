@@ -15,7 +15,7 @@ class ChatApp {
         this.selectedUser = null;
         this.username = null;
         this.blockedUsers = new Set();
-        this.blockedBy    = new Set() 
+        this.blockedBy    = new Set();
         this.disabledChats = {};
         this.initialize();
         this.sendStateRequest();
