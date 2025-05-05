@@ -66,7 +66,7 @@ export function save_at_exit() {
 }
 
 export function reset_tournament_data() {
-    console.log("RESETTING TOURNAMENT DATA");
+    //console.log("RESETTING TOURNAMENT DATA");
     save_global("bracket", null);
     save_global("robinranked", null);
     save_global("game", 0);

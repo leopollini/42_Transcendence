@@ -77,7 +77,7 @@ export async function handleTournamentLobby(tournament_mode) {
   onlineBadge = document.getElementById("onlinePlayersCount");
   startBtn = document.getElementById("toggleStartTournament");
   tournament = tournament_mode;
-  console.log("tournament mode: ", tournament);
+  //console.log("tournament mode: ", tournament);
   totalPlayers = numPlayers;
   
   get_socket();
@@ -188,7 +188,7 @@ export function addLobbyPageHandlers() {
           createKnockoutMatches();
         const path = (tournament === "knockout" ? "/tournament/knockout/bracket" : "/tournament/roundrobin/robinranking");
 
-        console.log("Invited players: ", invitedPlayers);
+        //console.log("Invited players: ", invitedPlayers);
         save_global("players", invitedPlayers);
         navigate(path, "Starting tournament", invitedPlayers);
     });

@@ -175,6 +175,10 @@ export function addClassicPongLobbyPageHandlers() {
       navigate("/classic", "Classic Pong Game", invitedPlayers);
     }
   });
+  
+  backBtn.addEventListener("click", () => {
+    navigate("/modes", "Return to Game Mode");
+  });
 }
 
 function match_response_event(event) {

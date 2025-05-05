@@ -255,13 +255,13 @@ function you_win(match_winner)
 }
 
 export function backToBracket(match_winner) {
-    console.log("bracketPlayers ", bracketPlayers);
+    //console.log("bracketPlayers ", bracketPlayers);
     if (match_winner === null) {
         drawBracket(bracketPlayers[0], initialPlayersCount);
         return;
     }
-    console.log("last match was won by ", match_winner);
-    console.log("current round", currentRound, "; rounds", rounds);
+    /*console.log("last match was won by ", match_winner);
+    console.log("current round", currentRound, "; rounds", rounds);*/
     if (currentRound < rounds - 1) {
         if (!bracketPlayers[currentRound + 1]) {
             bracketPlayers[currentRound + 1] = [];
