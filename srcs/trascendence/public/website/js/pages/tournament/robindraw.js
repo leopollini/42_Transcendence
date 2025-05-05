@@ -1,5 +1,6 @@
 import { navigate, robinranking, save_global, match_ended} from "../../main.js";
 import { showInfoModal } from "../../modal.js";
+import { send_request_to_players } from "./bracket.js";
 let playerList;
 let playerNames = [];
 let matchesListRobin = [];
@@ -100,6 +101,12 @@ function findNextMatch(rankingRobinCtx) {
             if (robinBackToMenuButton)
                 robinBackToMenuButton.style.display = "block";
             tiebreaker = false;
+            sendMessage({
+                type: "send_message",
+                mode: "system",
+                content:  playerList[0].name + " has won the tournament!",
+                chat: "general"
+            });
             return;
         }
     }
@@ -123,7 +130,7 @@ function findNextMatch(rankingRobinCtx) {
     }
 
     if (!nextMatch)
-        nextMatch = matchesListRobin.shift(); 
+        nextMatch = matchesListRobin.shift();
 
     if (nextMatch) {
         // Draw the next match to play
@@ -134,7 +141,8 @@ function findNextMatch(rankingRobinCtx) {
             rankingRobinCtx.fillText("Next match: " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
         else 
             rankingRobinCtx.fillText("Next Match (t): " + nextMatch.player1 + "  vs  " + nextMatch.player2, 50, 500);
-        
+
+        send_request_to_players(nextMatch.player1, nextMatch.player2);
         // Update last match played
         lastMatch = nextMatch;
     }

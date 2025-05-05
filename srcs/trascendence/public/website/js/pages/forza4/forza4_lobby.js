@@ -1,7 +1,7 @@
 import { navigate, current_user, save_global, lobby_data} from "../../main.js";
 import { initSocket, sendMessage } from "../live-chat/socketHandler.js";
 import { showInfoModal } from "../../modal.js";
-import { fetchOnlineUsers } from "../get_online_users.js";
+import { fetchOnlineOpponents, fetchOnlineUsers } from "../get_online_users.js";
 
 let players;
 let invitedPlayers = [];
@@ -119,7 +119,7 @@ export async function handleForza4Lobby() {
     if (numPlayersAccepted === totalPlayers)
       startBtn.disabled = false;
   }
-  players = await fetchOnlineUsers(current_user.display_name);
+  players = await fetchOnlineOpponents(current_user.display_name, 'f4');
   players = players.filter(name => !invitedPlayers.includes(name));
   players.forEach(name => {
     const p = document.createElement("div");

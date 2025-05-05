@@ -24,14 +24,16 @@ GAMES_F4 = BetterPG::SimplePG.new 'forza4_games_history', ['player1 TEXT', 'play
 
 def get_pong(obj)
   puts 'get_pong called'
-  name = obj['username']
-  return {'status' => 'returning whole database', 'success' => 'true', "games" => GAMES_PONG.select} if name.nil? || name.empty?
+  name = obj['username'].to_s
+  return {'status' => 'username not specifies', 'success' => 'false'} if name.empty?
+  puts "get_rank: #{obj['get_rank']}"
   games = GAMES_PONG.select(['player1', 'player2'], [name, name], [], 'OR')
   return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'rank'=> -games.size * 6 + (games.filter {|g| g['winner'] == name}).size * 17  } if obj['get_rank'] == 'true'
   if obj['get_stats'].to_s == 'true'
     wins = (games.filter {|g| g['winner'] == name}).size
     return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'wins'=> wins, 'losses' => games.size - wins}
   end
+  return {'status' => 'returning whole database', 'success' => 'true', "games" => GAMES_PONG.select} if name.nil? || name.empty?
   return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'games'=> games }
 end
 
@@ -54,9 +56,17 @@ end
 
 def get_f4(obj)
   puts 'get_f4 called'
-  name = obj['username']
+  name = obj['username'].to_s
+  return {'status' => 'username not specifies', 'success' => 'false'} if name.empty?
+  puts "get_rank: #{obj['get_rank']}"
   games = GAMES_F4.select(['player1', 'player2'], [name, name], [], 'OR')
-  return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'games'=>games }
+  return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'rank'=> -games.size * 6 + (games.filter {|g| g['winner'] == name}).size * 17  } if obj['get_rank'] == 'true'
+  if obj['get_stats'].to_s == 'true'
+    wins = (games.filter {|g| g['winner'] == name}).size
+    return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'wins'=> wins, 'losses' => games.size - wins}
+  end
+  return {'status' => 'returning whole database', 'success' => 'true', "games" => GAMES_F4.select} if name.nil? || name.empty?
+  return { 'status'=> (games.empty? ? 'no games ever played' : 'success'), 'success'=>'true', 'games'=> games }
 end
 
 def save_f4(obj)

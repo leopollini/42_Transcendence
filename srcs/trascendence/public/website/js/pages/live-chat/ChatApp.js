@@ -646,7 +646,7 @@ class ChatApp {
           get_stats: "true"
         });
       
-        fetch("https://localhost:8008/", {
+        fetch("https://" + window.location.hostname + ":8008/", {
           method: "get_pong_games",
           body:   data
         })

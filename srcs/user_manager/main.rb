@@ -56,7 +56,7 @@ def login_user(client, obj)
   if data['login_as_guest'].to_s == 'true'
     res = get_user(client, {"params" => {"display_name" => data['username']}})
     puts "res: #{res}".yellow.bold
-    return {"status" => "username taken", "success" => "false"} if res['status'].to_s == 'success'
+    return {"status" => "username taken", "success" => "false"} if res['status'] != 'no user found'
     return GUEST.add_guest(data)
   end
   puts "found: #{user}".yellow

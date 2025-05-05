@@ -137,6 +137,8 @@ function give_data()
 
 // Main function
 export function drawBracket(match_players) {
+    
+
     if (!initialPlayersCount)
         initialPlayersCount = match_players.length;
     bracketCanvas = document.getElementById('bracketCanvas');
@@ -168,11 +170,16 @@ export function drawBracket(match_players) {
     let yStart = padding;
 
     if (firstDraw) {
+        
+        
         firstDraw = false;
         document.getElementById('knockoutMatchButton').style.display = 'block';
         matchesThisRound = matchesPerRound;
         initializeBracket();
         bracketPlayers[0] = match_players.slice(); // Create array match_players copy
+        currentRound = 0;
+        currentMatch = 0;
+        send_request_to_players(bracketPlayers[currentRound][currentMatch * 2], bracketPlayers[currentRound][currentMatch * 2 + 1]);
     }
     matchBoxPos[0] = [];
 
@@ -239,25 +246,25 @@ export function resetBracketState() {
     save_global("bracket", null);
 }
 
-
-
-function send_request_to_players()
+export function send_request_to_players(p1, p2)
 {
     sendMessage({
-        type: "match_request",
-        to: bracketPlayers[currentRound][currentMatch * 2],
-        mode: "tournament match"
-    });
-    sendMessage({
-        type: "match_request",
-        to: bracketPlayers[currentRound][currentMatch * 2 + 1],
-        mode: "tournament match"
+        type: "send_message",
+        mode: "system",
+        content:  p1 + " and " + p2 + " are required for the next match!",
+        chat: "general"
     });
 }
 
 function you_win(match_winner)
 {
     drawBracket(bracketPlayers[0], initialPlayersCount);
+    sendMessage({
+        type: "send_message",
+        mode: "system",
+        content:  match_winner + " has won the tournament!",
+        chat: "general"
+    });
     const button = document.getElementById('knockoutMatchButton');
     if (button) {
         button.hidden = true;
@@ -294,7 +301,7 @@ export function backToBracket(match_winner) {
         }
         drawBracket(bracketPlayers[0], initialPlayersCount);
 
-        send_request_to_players();
+        send_request_to_players(bracketPlayers[currentRound][currentMatch * 2], bracketPlayers[currentRound][currentMatch * 2 + 1]);
     }
     else
         you_win(match_winner);

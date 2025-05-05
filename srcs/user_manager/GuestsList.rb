@@ -23,7 +23,6 @@ class GuestsList
   def add_guest(data)
     username = data['username']
     return DEFAULT_MISSING_PARAM.clone unless username.is_a?(String)
-    return { 'status' => 'username taken', 'success' => 'false' } if @index.key?(username)
   
     i = @counter_index
     @counter_index = (@counter_index + 1) % MAX_GUEST_COUNT
@@ -59,7 +58,7 @@ class GuestsList
     return { 'status' => 'user not found', 'success' => 'false' } if index.nil?
     return { 'status' => 'database empty', 'success' => 'false' } if @guests.empty?
   
-    @guests[index] = nil
+    @guests[index]['deleted'] = Time.now.to_i
   
     {
       'status' => 'success',
@@ -80,12 +79,11 @@ class GuestsList
   end
   
   def get_all_guests()
-    t = @guests.clone    #watch out! Could be deleting original object
+    t = @guests.clone
     t.each do |i, g|
-      if g.nil?
-        t.delete g 
+      if g.nil? || g['deleted'] != '-1'
+        t.delete g
       else
-        puts "ASLIHASDHKAJSDH SLICING!"
         g = g.slice(g.keys - ['token'])
       end
     end
@@ -93,12 +91,12 @@ class GuestsList
   end
 
   def get_by_name(name)
-    return nil if @index[name].nil?
+    return nil if @index[name].nil? || @guests[@index[name].to_i]['deleted'] != -1
     @guests[@index[name].to_i]
   end
 
   def get_by_token(token)
-    return nil if @tokens[token].nil?
+    return nil if @tokens[token].nil? || @guests[@tokens[token].to_i]['deleted'] != -1
     @guests[@tokens[token].to_i]
   end
   

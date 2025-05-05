@@ -6,12 +6,12 @@ export class Ball {
         this.y = y;
         this.canvas = canvas;
         this.ctx = ctx;
-        this.speedPercentage = 0.2;
+        this.speedPercentage = 0.4;
         this.speedX = canvas.width * this.speedPercentage;
         this.speedY = canvas.width * this.speedPercentage;
         this.prevSpeedX = 0;
         this.prevSpeedY = 0;
-        this.maxSpeedPercentage = 0.6;
+        this.maxSpeedPercentage = 0.8;
         this.maxSpeed = canvas.width * this.maxSpeedPercentage;
         this.speedIncreaseFactor = canvas.width * 0.0001;
         this.radius = canvas.width * 0.006;

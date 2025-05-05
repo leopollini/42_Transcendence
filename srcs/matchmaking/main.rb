@@ -29,7 +29,7 @@ def make_match(players, mode)
   victories = {}
   players.each_with_index do |p, i|
     return {'status' => 'duplicate username', 'success' => 'false'} if players[(i + 1)..].include? p
-    t = JSON.parse SimpleServer.method_req('get_pong_games', {'display_name' => p, 'get_rank' => 'true'})
+    t = JSON.parse SimpleServer.method_req('get_pong_games', {'username' => p, 'get_rank' => 'true'})
     return DEFAULT_ERROR_RES.clone if t['success'].to_s != 'true'
     wins = t['rank']
     puts wins
@@ -63,7 +63,8 @@ def make_match(players, mode)
   return {'status' => 'success', 'success' => 'true', 'matches' => matches}
 end
 
-def get_online_opponents(obj)
+def get_online_opponents(obj, game)
+  puts "Fetching #{game} matches"
   online_users = JSON.parse(SimpleServer::method_req('get_online'))
   puts "online users response: #{online_users}"
   puts "online users: #{online_users} (#{online_users['success'].to_s})"
@@ -74,11 +75,11 @@ def get_online_opponents(obj)
   me = obj['username']
   me_rank = 0
   online_users.each do |p|
-    rk = JSON.parse SimpleServer.method_req('get_pong_games', {'display_name' => p, 'get_rank' => 'true'})
+    rk = JSON.parse SimpleServer.method_req("get_#{game}_games", {'username' => p, 'get_rank' => 'true'})
     puts "Response for Rank of #{p}: #{rk}"
     return DEFAULT_ERROR_RES.clone if rk['success'].to_s != 'true'
-    rank[rk['rank']] ||= []
-    rank[rk['rank']] << p
+    rank[rk['rank'].to_i] ||= []
+    rank[rk['rank'].to_i] << p
     me_rank = rk['rank'].to_i if me && p == me.to_s
   end
   puts "Rank before sorting: #{rank}".yellow
@@ -107,10 +108,13 @@ def matchmake(client, server)
   
   res = case bobj['method']
   when 'create_tournament'
-  puts "am matchmakimg lol".green
     make_match bobj['players'], bobj['mode']
   when 'get_online_opponents'
-    get_online_opponents bobj
+    if bobj['game'].to_s.empty?
+      {'status' => 'game mode not specified', 'success' => "false"} 
+    else
+      get_online_opponents bobj, bobj['game']
+    end
   end
   
   

@@ -107,11 +107,19 @@ EM::WebSocket.start({
       puts "joined: #{username}"
     when "send_message"
       puts "I AM #{username}".yellow.bold
-      message = {
-        "date"    => Time.now.iso8601,
-        "from"    => username,
-        "content" => data["content"].to_s
-      }
+      if (data['mode'] == 'system')
+        message = {
+          "date"    => Time.now.iso8601,
+          "from"    => 'system',
+          "content" => data["content"].to_s
+        }
+      else
+        message = {
+          "date"    => Time.now.iso8601,
+          "from"    => username,
+          "content" => data["content"].to_s
+        }
+      end
       if data["chat"].to_s == "general"
         message['to'] = 'general'
         ChatStore.broadcast message, 'message'

@@ -133,8 +133,11 @@ export async function performLogin() {
     }*/
     const response = await fetch('/auth/login');
     const data = await response.json();
-    if (data.auth_url)
+    if (data.auth_url) {
       window.location.href = data.auth_url;
+      // console.log("whref", window.location.href);
+      // console.log("window location", window.location);
+    } 
     else
       throw new Error("No auth_url received");
   } catch (error) {

@@ -23,3 +23,27 @@ export async function fetchOnlineUsers(current_user) {
         showInfoModal("Fetch error:", error);
     }
 }
+
+export async function fetchOnlineOpponents(current_user, game) {
+    try {
+        const response = await fetch("https://" + window.location.hostname + ":8008", {
+            method: "get_online_opponents",
+            body: JSON.stringify({game: game})
+        });
+
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status} - ${response.statusText}`);
+        }
+        const data = await response.json();
+        //console.log("data = ", data);
+        let users_online = [];
+        data.opponents.forEach(user => {
+            if (user !== current_user)
+                users_online.push(user);
+        });
+        //console.log("users online =>", users_online);
+        return users_online;
+    } catch (error) {
+        showInfoModal("Fetch error:", error);
+    }
+}

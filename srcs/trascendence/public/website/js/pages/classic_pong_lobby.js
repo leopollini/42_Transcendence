@@ -2,7 +2,7 @@
 import { navigate, save_global, current_user, lobby_data, in_game } from "../main.js";
 import { initSocket, sendMessage } from "./live-chat/socketHandler.js";
 import { showInfoModal } from "../modal.js";
-import { fetchOnlineUsers } from "./get_online_users.js";
+import { fetchOnlineOpponents, fetchOnlineUsers } from "./get_online_users.js";
 
 let players;
 let invitedPlayers = [];
@@ -120,7 +120,7 @@ export async function handleClassicPongLobby() {
     if (numPlayersAccepted === totalPlayers)
       startBtn.disabled = false;
   }
-  players = await fetchOnlineUsers(current_user.display_name);
+  players = await fetchOnlineOpponents(current_user.display_name, 'pong');
   players = players.filter(name => !invitedPlayers.includes(name));
   players.forEach(name => {
     const p = document.createElement("div");
