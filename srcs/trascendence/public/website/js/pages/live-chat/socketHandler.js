@@ -210,7 +210,7 @@ function initSocket(username, chatAppInstance) {
                 showInfoModal("the invite was rejected.", () => {});
         }
         else if (msg.type === "kick") {
-            console.log("kicked from chat because ", msg.status)
+            //console.log("kicked from chat because ", msg.status)
             showInfoModal("Chat closed: " + msg.status);
             socket.close();
             remove_all();

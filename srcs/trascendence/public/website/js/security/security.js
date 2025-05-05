@@ -77,18 +77,18 @@ export function free_users()
         .then(response => response.json())
         .then(data =>
         {
-            console.log("logout = ", data);
+            //console.log("logout = ", data);
             if (data)
             {
                 if (data.status === " (guest) does not exist")
                     return;
                 if (data.status && data.success)
                 {
-                    console.log("data = ", data);
+                    //console.log("data = ", data);
                     if (data.success !== "true")
                         showInfoModal("ERROR LOGOUT: An error has occured(\"" + data.status + "\")", () => {});
-                    else
-                        console.log("logut esecuted succesfully")
+                    //else
+                        //console.log("logut esecuted succesfully")
                 }
             }
         })

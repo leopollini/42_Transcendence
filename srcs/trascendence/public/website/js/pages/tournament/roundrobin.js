@@ -64,7 +64,7 @@ export function setupRoundRobinPlayers() {
     const playerSelection = document.getElementById('playerSelectionRobin');
 
     if (!startRobinTournamentButton || !playerSelection || !playerNamesRobin || !nameInputRobin) {
-        console.error("Missing required elements for Round Robin setup.");
+        showInfoModal("Missing required elements for Round Robin setup.");
         return;
     }
 
@@ -91,7 +91,7 @@ export function setupRoundRobinPlayers() {
                 playerNamesRobin.appendChild(input);
             }
         } else {
-            console.error("No radio button selected");
+            showInfoModal("No radio button selected");
             showInfoModal('Please select the number of players.', () => {});
         }
     });

@@ -47,12 +47,12 @@ export async function savename(me, yourDataSection, current_user) {
         return ("🚨Error: Name too long(" + newname + ")\n");
     if (newname === me.display_name)
         return ("⚠️No change in name have been made\n");
-    console.log("has space = ", hasNoSpaces(newname));
+    //console.log("has space = ", hasNoSpaces(newname));
     if (hasNoSpaces(newname) === false)
         return ("🚨Name cannot have spaces(" + newname + ")\n");
     if (alphanum(newname) === false)
         return ("🚨Invalid name format(" + newname + ")\n");
-    console.log(me.display_name + " !== " + newname);
+    //console.log(me.display_name + " !== " + newname);
     if (me.display_name !== newname) {
         let result = await exist(newname);
         if (!result) {

@@ -1,5 +1,6 @@
 import { startPongGame, PongGame } from "./pong.js";
 import { current_user} from "../../../main.js";
+import { showInfoModal } from "../../../modal.js";
 let gameInstance;
 
 export function initializeGameCanvas() {
@@ -10,7 +11,7 @@ export function initializeGameCanvas() {
     //console.log("PATH =>" +path);
     const gameCanvas = document.getElementById('gameCanvas');
     if (!gameCanvas) {
-        console.error("Canvas non trovato nel DOM!");
+        showInfoModal("Canvas non trovato nel DOM!");
         return;
     }
     gameCanvas.width = window.innerWidth;

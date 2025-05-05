@@ -52,12 +52,10 @@ export class PongGame {
     // Create Canvas and Context
     this.canvas = document.getElementById("gameCanvas");
     if (!this.canvas) {
-      //console.error("Canvas not found.");
       return;
     }
     this.ctx = this.canvas.getContext("2d");
     if (!this.ctx) {
-      //console.error("Canvas context not found.");
       return;
     }
 

@@ -63,7 +63,7 @@ async function checkAuthentication() {
       showInfoModal(data.message, () => { });
       return (-1);
     } else {
-      console.log("data = ", data);
+      //console.log("data = ", data);
       if (data.message === "user already online") {
         showInfoModal("Username taken", () => {});
         navigate("/", "home");

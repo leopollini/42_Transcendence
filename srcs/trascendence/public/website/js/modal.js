@@ -77,11 +77,11 @@ export function showInputModal(title, onConfirm) {
   };
 
   inputModalClose.onclick = () => {
-    console.log("current path: ", window.location.pathname)
+    //console.log("current path: ", window.location.pathname)
     inputModal.classList.remove("active");
-    console.log("current path: ", window.location.pathname)
+    //console.log("current path: ", window.location.pathname)
     if (window.location.pathname === "/callback") {
-      console.log("current path: ", window.location.pathname)
+      //console.log("current path: ", window.location.pathname)
       navigate("/", "home");
     }
   };

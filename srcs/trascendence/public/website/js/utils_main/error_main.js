@@ -156,7 +156,7 @@ async function refresh_reset() {
 }
 
 export async function remove_all() {
-    console.log("path: ", window.location.pathname);
+    //console.log("path: ", window.location.pathname);
     closeSocket();
     if (current_user && (current_user.display_name || current_user.realname)) {
         if (current_user.type === "login")

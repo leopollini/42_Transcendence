@@ -7,11 +7,11 @@ import { showInfoModal } from '../../modal.js';
 class ChatApp {
     constructor() {
         this.chats = new Map();
-        this.unreadCounts = {}; // { chatId: number of unread messages }
+        this.unreadCounts = {};
         this.currentChat = 'general';
         this.friends = new Set();
         this.pendingRequests = new Set();
-        this.receivedRequests = []; // Array of objects { from }
+        this.receivedRequests = [];
         this.selectedUser = null;
         this.username = null;
         this.blockedUsers = new Set(); 
@@ -30,13 +30,11 @@ class ChatApp {
         }
     }
 
-    // Returns the chat partner for a private chat
     getChatPartner(chatId) {
         const parts = chatId.replace('private-', '').split('-');
         return parts[0] === this.username ? parts[1] : parts[0];
     }
 
-    // Generates the private chat ID based on the usernames
     getPrivateChatId(user1, user2) {
         return user1 < user2 ? `private-${user1}-${user2}` : `private-${user2}-${user1}`;
     }
@@ -45,7 +43,6 @@ class ChatApp {
         this.initializeElements();
         setupEventListeners(this);
         this.initializeGeneralChat();
-        //console.log("current_user in chat lol: ", current_user);
         if (current_user && current_user.display_name)
             this.username = current_user.display_name;
         else
@@ -74,25 +71,19 @@ class ChatApp {
             blockedUsersButton: document.getElementById('blockedUsersButton')
         };
 
-        // Rendi il menu contestuale draggable
         makeDraggable(this.elements.contextMenu);
 
-        // Event listener per passare a “blocked users”
         this.elements.blockedUsersButton.addEventListener('click', () => {
             this.switchToBlockedUsers();
         });
 
-        // ——— Blocca le liste in stato di default ———
-        // Mostra solo Friends, nascondi le altre due
         this.elements.friendsList.style.display = 'block';
         this.elements.friendRequestsList.style.display = 'none';
         this.elements.blockedUsersList.style.display = 'none';
 
-        // Evidenzia il pulsante “Friends” come attivo
         this.elements.friendsButton.classList.add('active');
         this.elements.friendRequestsButton.classList.remove('active');
         this.elements.blockedUsersButton.classList.remove('active');
-        // ——— Fine blocco di default ———
     }
 
     initializeGeneralChat() {
@@ -323,8 +314,6 @@ class ChatApp {
         }
     }
 
-    //Non crederai mai a cosa mi è successo! <script>alert('XSS');</script>
-    //escapare in ruby. (errore in send_message)
     sendMessage() {
         let text = this.elements.messageInput.value;
         if (!text) return;
@@ -362,28 +351,22 @@ class ChatApp {
     updateFriendRequestsUI() {
         if (!this.elements.friendRequestsList) return;
 
-        // Pulisce la lista
         this.elements.friendRequestsList.textContent = '';
 
         this.receivedRequests.forEach((req, index) => {
-            // Fallback: se req.from è undefined, considera req come stringa username
             const fromUser = (req && typeof req === 'object' && req.from)
                 ? req.from
                 : String(req);
             const formattedName = fromUser.charAt(0) + fromUser.slice(1);
 
-            // Crea il container della richiesta
             const item = document.createElement('div');
             item.className = 'friend-request-item';
 
-            // Nome
             const nameSpan = document.createElement('span');
             nameSpan.textContent = formattedName;
             item.appendChild(nameSpan);
 
-            // Bottoni
             const buttonsDiv = document.createElement('div');
-
             const acceptButton = document.createElement('button');
             acceptButton.className = 'accept-request';
             acceptButton.dataset.index = index;
@@ -399,7 +382,6 @@ class ChatApp {
             this.elements.friendRequestsList.appendChild(item);
         });
 
-        // Attacca gli handler dopo aver creato i bottoni
         document.querySelectorAll('.accept-request').forEach(btn => {
             btn.onclick = e => {
                 const idx = e.currentTarget.dataset.index;
@@ -443,7 +425,6 @@ class ChatApp {
             };
         });
 
-        // Aggiorna badge richieste
         const badge = document.getElementById('friendRequestsBadge');
         if (badge) {
             if (this.receivedRequests.length > 0) {
@@ -491,8 +472,6 @@ class ChatApp {
         const profileItem = menu.querySelector('[data-action="profile"]');
         const blockItem = menu.querySelector('[data-action="block"]');
 
-        //controllar login
-        // Se l'utente è l'utente corrente, nascondi opzioni non rilevanti
         const online = await is_online(user);
         if ((user === this.username) || (user !== this.username && online === false)) {
             chatItem.style.display = 'none';
@@ -632,21 +611,57 @@ class ChatApp {
     async set_profile_info(user_in_chat) {
         const profileDetails = document.querySelector('.profile-details');
         const statusIndicator = profileDetails?.querySelector('#statusIndicator');
-        const lastOnline = profileDetails?.querySelector('#lastOnline');
+        const lastOnline     = profileDetails?.querySelector('#lastOnline');
 
         const userimage = document.querySelector("#profileAvatar");
-        const realname = document.getElementById('realname');
+        const realname  = document.getElementById('realname');
         const userEmail = document.getElementById('userEmail');
-        const userBio = document.getElementById('userBio');
-        if (current_user) {
-            let online = await is_online(user_in_chat);
+        const userBio   = document.getElementById('userBio');
+    
+        if (!current_user) return;
+    
+        const online = await is_online(user_in_chat);
             lastOnline.textContent = online ? 'ONLINE' : 'OFFLINE';
-            if (online)
-                this.set_online_data(userimage, statusIndicator, realname, userEmail, userBio, user_in_chat);
-            else
-                this.set_offline_data(userimage, statusIndicator, realname, userEmail, userBio, user_in_chat);
+    
+        if (online) {
+            await this.set_online_data(
+                userimage, statusIndicator, realname, userEmail, userBio, user_in_chat
+            );
+            this.requestUserStats(user_in_chat);
+        } else {
+            this.set_offline_data(
+                userimage, statusIndicator, realname, userEmail, userBio, user_in_chat
+            );
         }
     }
+
+    requestUserStats(user) {
+        const data = JSON.stringify({
+          username:  user,
+          get_stats: "true"
+        });
+      
+        fetch("http://localhost:8008/", {
+          method: "get_pong_games",
+          body:   data
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success === "true") {
+            this.updateProfileStats(data.wins, data.losses);
+          } else {
+            showInfoModal("Error stats:", data.status);
+          }
+        })
+        .catch(err => {
+          showInfoModal("Network error:", err);
+        });
+    }
+      
+    updateProfileStats(wins, losses) {
+        document.getElementById("userWins").textContent   = wins;
+        document.getElementById("userLosses").textContent = losses;
+    }   
 
     async set_online_data(userimage, statusIndicator, realname, userEmail, userBio, user_in_chat) {
         statusIndicator.classList.replace('offline', 'online');
@@ -661,33 +676,30 @@ class ChatApp {
         if (user_selected.realname)
             realname.textContent = user_selected.realname;
         else
-            realname.textContent = "Nessun Nome Reale per questo utente";
+            realname.textContent = "No Realname for this user";
 
         if (user_selected.email)
             userEmail.textContent = user_selected.email;
         else
-            userEmail.textContent = "Nessuna Email per questo utente";
+            userEmail.textContent = "No Email for this user";
 
 
         if (user_selected.bio)
             userBio.textContent = user_selected.bio;
         else
         {
-            //userBio.textContent = "Indicates the desired height of glyphs from the font. For scalable fonts, the font-size is a scale factor applied to the EM unit of the font. (Note that certain glyphs may bleed outside their EM box.) For non-scalable fonts, the font-size is converted into absolute units and matched against the declared font-size of the font, using the same absolute coordinate space for both of the matched values.";
-            userBio.textContent = "Nessuna bio per questo utente";
+            userBio.textContent = "No Bio for this user";
         }
         userimage.src = user_selected.image;
     }
 
     set_offline_data(userimage, statusIndicator, realname, userEmail, userBio) {
-        realname.textContent = "Nessun informazione per questo utente";
-        userEmail.textContent = "Nessun informazione per questo utente";
-        userBio.textContent = "Nessun informazione per questo utente";
+        realname.textContent = "No Realname for this user";
+        userEmail.textContent = "No Email for this user";
+        userBio.textContent = "No Bio for this user";
         userimage.src = "../website/images/offline.png";
         statusIndicator.classList.replace('online', 'offline');
-
     }
-
 }
 
 export default ChatApp;

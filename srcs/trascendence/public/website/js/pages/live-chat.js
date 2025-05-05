@@ -11,26 +11,21 @@ export default function LiveChat() {
         <div class="profile-modal" id="profileModal">
             <div class="profile-header">
                 <div class="header-left">
-                    <!-- Avatar Profilo e Info Utente -->
                     <img src="test.png" alt="Avatar" class="profile-avatar" id="profileAvatar">
                     <div class="profile-info">
                         <div class="profile-title-wrapper">
-                            <!-- Nome utente -->
                             <h3 class="chat-title" id="profileName">Nome Utente</h3>
                             <div class="profile-stats" id="profileStats">
-                                <!-- Statistiche del profilo -->
-                            W: <span id="userWins">0</span> | L: <span id="userLosses">0</span>
+                                W: <span id="userWins">0</span> | 
+                                L: <span id="userLosses">0</span>
                             </div>
                         </div>
-                        <!-- Stato dell'utente (Online/Offline) -->
                         <div class="friend-status" id="profileStatus">Stato Amico</div>
                     </div>
                 </div>
-                <!-- Pulsante chiudi -->
                 <button class="close-profile" id="closeProfile">&times;</button>
             </div>
             <div class="profile-details">
-                <!-- Dettagli utente -->
                 <p>
                     <strong>Stato:</strong>
                     <span id="lastOnline" class="status-text offline">Offline</span>
@@ -55,11 +50,8 @@ export default function LiveChat() {
                     <img id="blockedUsersButton" src="../../website/images/block-user.png" alt="Blocked">
                 </div>
                 <div class="friends-content">
-                    <!-- Lista amici -->
                     <div class="friends-list" id="friendsList"></div>
-                    <!-- Lista richieste di amicizia -->
                     <div id="friendRequestsList" class="friend-requests-list"></div>
-                    <!-- Lista utenti bloccati -->
                     <div id="blockedUsersList" class="blocked-users-list"></div>
                 </div>
             </div>

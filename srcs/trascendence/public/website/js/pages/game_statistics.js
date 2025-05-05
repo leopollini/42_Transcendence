@@ -135,7 +135,7 @@ async function forza4CalculateUserStatistics() {
         const response = await fetch("http://localhost:8008", {
             method: "get_f4_games",
             body: JSON.stringify({
-            username: current_user.display_name,
+                username: current_user.display_name,
             }),
         });
         const data = await response.json();
@@ -143,25 +143,26 @@ async function forza4CalculateUserStatistics() {
             //console.log("Get Pong Game response: ", data);
             if (data.games) {
                 f4UserData = data.games;
-                //console.log("f4UserData aggiornata: ", f4UserData);
+                console.log("f4UserData aggiornata: ", f4UserData);
             }
         }
         else
             showInfoModal("Could not get history");
     } catch (error) {
-    console.error("Fetch error:", error);
+        showInfoModal("Fetch error:", error);
     }
 
     if (!f4UserData) {
         return null;
     }
-      totalMoves = 0;
-      totalTime = 0;
-      f4UserData.forEach(game => {
+    
+    totalMoves = 0;
+    totalTime = 0;
+    f4UserData.forEach(game => {
         if (game.player1 === user_name || game.player2 === user_name) {
             if (game.winner === user_name)
                 wins++;
-            else if (game.winner === 'tie') 
+            else if (game.winner === 'tie')
                 ties++;
             else
                 losses++;
@@ -181,7 +182,7 @@ async function forza4CalculateUserStatistics() {
         rankPoints = 0;
 
     const averageMoves = totalMatches > 0 ? (totalMoves / totalMatches).toFixed(1) : 0;
-    
+
     //console.log("total time = " +totalTime);
     const averageTime = totalMatches > 0 ? (totalTime / totalMatches).toFixed(2) : 0;
     //console.log("average time = " + averageTime);
@@ -203,14 +204,14 @@ export async function forza4ShowUserStatistics() {
     const stats = await forza4CalculateUserStatistics();
 
     if (!stats) {
-        //showInfoModal("No statistics available for this player.", () => {});
+        showInfoModal("No statistics available for this player.", () => { });
         return;
     }
 
     //console.log("stats total matches" + stats.totalMatches);
 
     // Popola il template con i dati
-    
+
     document.getElementById('totalMatches').textContent = stats.totalMatches;
     document.getElementById('totalWins').textContent = stats.totalWins;
     document.getElementById('totalLosses').textContent = stats.totalLosses;
@@ -218,15 +219,15 @@ export async function forza4ShowUserStatistics() {
     document.getElementById('victoryRate').textContent = stats.victoryRate + '%';
     document.getElementById('averageMoves').textContent = stats.averageMoves;
     document.getElementById('averageTime').textContent = formatTime(stats.averageTime);
-    document.getElementById('points').textContent = stats.rankPoints; 
+    document.getElementById('points').textContent = stats.rankPoints;
 
 }
 
-export function forza4ShowMatchDetails() {
+export async function forza4ShowMatchDetails() {
     const f4MatchDetailsContainer = document.getElementById("f4MatchDetailsContainer");
-    
     f4MatchDetailsContainer.textContent = "";
-
+    f4UserData = JSON.stringify(await forza4CalculateUserStatistics());
+    console.log("forza 4 user data => " + f4UserData + " length => " + f4UserData.length);
     if (f4UserData && f4UserData.length > 0) {
         f4UserData.forEach(match => {
             const opponent = match.player1 === user_name ? match.player2 : match.player1;
@@ -246,7 +247,7 @@ export function forza4ShowMatchDetails() {
 
             const matchTime = formatTime(match.begin_time);
 
-           
+
             const matchCard = document.createElement('div');
             matchCard.classList.add('match-card', 'collapsed');
 
@@ -268,7 +269,7 @@ export function forza4ShowMatchDetails() {
             matchSummary.appendChild(playersDiv);
             matchSummary.appendChild(matchInfoDiv);
 
-           
+
             const matchDetails = document.createElement('div');
             matchDetails.classList.add('match-details');
 
@@ -296,19 +297,18 @@ export function forza4ShowMatchDetails() {
             matchCard.appendChild(matchSummary);
             matchCard.appendChild(matchDetails);
 
-           
+
             f4MatchDetailsContainer.appendChild(matchCard);
         });
 
-       
+
         document.querySelectorAll('.match-card').forEach(card => {
-            card.addEventListener('click', function() {
+            card.addEventListener('click', function () {
                 this.classList.toggle('collapsed');
             });
         });
     }
-    else
-    {
+    else {
         f4MatchDetailsContainer.textContent = '';
 
         const p = document.createElement('p');
@@ -338,14 +338,14 @@ export async function getPongMatchesData() {
             //console.log("pongUserData aggiornata: ", pongUserData);
         }
     } catch (error) {
-    console.error("Fetch error:", error);
+        showInfoModal("Fetch error:", error);
     }
     return res;
 }
 
 export async function pongShowMatchDetails() {
     const pongMatchDetailsContainer = document.getElementById("pongMatchDetailsContainer");
-    
+
     pongUserData = await getPongMatchesData();
 
     // if (!pongUserData) {
@@ -367,7 +367,7 @@ export async function pongShowMatchDetails() {
 
             const matchTime = formatTime(match.begin_time);
 
-           
+
             const matchCard = document.createElement('div');
             matchCard.classList.add('match-card', 'collapsed');
 
@@ -389,7 +389,7 @@ export async function pongShowMatchDetails() {
             matchSummary.appendChild(playersDiv);
             matchSummary.appendChild(matchInfoDiv);
 
-           
+
             const matchDetails = document.createElement('div');
             matchDetails.classList.add('match-details');
 
@@ -417,19 +417,18 @@ export async function pongShowMatchDetails() {
             matchCard.appendChild(matchSummary);
             matchCard.appendChild(matchDetails);
 
-           
+
             pongMatchDetailsContainer.appendChild(matchCard);
         });
 
-       
+
         document.querySelectorAll('.match-card').forEach(card => {
-            card.addEventListener('click', function() {
+            card.addEventListener('click', function () {
                 this.classList.toggle('collapsed');
             });
         });
     }
-    else
-    {
+    else {
         pongMatchDetailsContainer.textContent = '';
 
         const p = document.createElement('p');
@@ -448,7 +447,7 @@ export function gameUserStatisticsPageHandlers() {
     const pongMatchesCheckbox = document.getElementById('pongMatchesCheckbox');
     const forza4StatsCheckbox = document.getElementById('forza4StatsCheckbox');
     const forza4MatchesCheckbox = document.getElementById('forza4MatchesCheckbox');
-    
+
     backImageButton?.addEventListener('click', () => {
         navigate("/modes", "Return to Game Mode");
     });
@@ -472,7 +471,7 @@ export function gameUserStatisticsPageHandlers() {
             document.getElementById('forza4StatsSection').classList.add('hidden1');
             document.getElementById('f4MatchDetailsContainer').classList.add('hidden1');
             pongShowMatchDetails();
-        } 
+        }
     });
 
     forza4StatsCheckbox?.addEventListener('change', () => {
@@ -483,18 +482,17 @@ export function gameUserStatisticsPageHandlers() {
             document.getElementById('pongMatchDetailsContainer').classList.add('hidden1');
             document.getElementById('f4MatchDetailsContainer').classList.add('hidden1');
             forza4ShowUserStatistics();
-        } 
+        }
     });
 
-    forza4MatchesCheckbox?.addEventListener('change', () => {
+    forza4MatchesCheckbox?.addEventListener('change', async () => {
         if (forza4MatchesCheckbox.checked) {
-            //console.log("forza4 matches");
             document.getElementById('f4MatchDetailsContainer').classList.remove('hidden1');
             document.getElementById('pongChartsSection').classList.add('hidden1');
             document.getElementById('pongMatchDetailsContainer').classList.add('hidden1');
             document.getElementById('forza4StatsSection').classList.add('hidden1');
             forza4ShowMatchDetails();
-        } 
+        }
     });
 
 

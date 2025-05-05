@@ -150,7 +150,7 @@ function createKnockoutMatches() {
         invitedPlayers = [];
         data.matches.forEach(match => invitedPlayers.push(match.player1, match.player2));
     })
-    .catch(error => console.error("Fetch error:", error));
+    .catch(error => showInfoModal("Fetch error:", error));
 }
 
 export function addLobbyPageHandlers() {
