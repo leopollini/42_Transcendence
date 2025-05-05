@@ -5,7 +5,7 @@ require 'time'
 MAX_UNREAD_SIZE = 100
 
 class Client
-  attr_reader :blocked, :friends
+  attr_reader :blocked, :friends, :blocked_by
   def initialize(username, sock)
     @username = username
     @unread = []
@@ -13,7 +13,7 @@ class Client
     @friends = []
     @waiting_friends = []
     @blocked = []
-    @be_blocked = []
+    @blocked_by = []
     @open_chats = []
     @socket = sock
     send_me({"content" => "Welcome #{@username}!"}, "system")
@@ -75,11 +75,11 @@ class Client
   end
 
   def be_blocked(who)
-    @be_blocked << who
+    @blocked_by << who
   end
 
   def be_unblocked(who)
-    @be_blocked.delete who
+    @blocked_by.delete who
   end
 
   def get_waiting_friends

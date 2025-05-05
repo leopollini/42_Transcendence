@@ -244,6 +244,8 @@ function initSocket(username, chatAppInstance) {
 }
 
 function sendMessage(message) {
+    message.from = _username;
+    console.log("username", _username);
     if (socket && socket.readyState === WebSocket.OPEN)
         socket.send(JSON.stringify(message));
 }

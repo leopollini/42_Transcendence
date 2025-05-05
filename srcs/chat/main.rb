@@ -86,6 +86,8 @@ EM::WebSocket.start({
       puts "####", text
     puts "request: #{data['type'].to_s}"
 
+    username = text['from'].to_s if username.to_s.empty?
+
     next sock.close if data['username'].to_s == 'default'
 
     target = data["to"].to_s
