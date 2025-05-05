@@ -19,19 +19,28 @@ module BetterPG
   end
 
   class SimplePG
+
+    def connect()
+      Timeout.timeout(20) do
+        while true
+          begin
+            @pg = PG.connect('host=postgres port=5432 password=pwd_postgres user=databaser')
+            return
+          rescue StandardError => r
+            # @pg = PG.connect('host=' + DEBUG_PG_ADDRESS + ' port=5432 password=pwd_postgres user=databaser') if r.nil?
+          end
+        end
+      end
+    end
+
     def initialize(name = '', columns = [])
       @original_cols = columns
       name ||= ''
-      Timeout.timeout(5) do
-        r = nil
-        begin
-          Timeout.timeout(1) do
-            @pg = PG.connect('host=postgres port=5432 password=pwd_postgres user=databaser')
-          end
-        rescue StandardError => r
-          @pg = PG.connect('host=' + DEBUG_PG_ADDRESS + ' port=5432 password=pwd_postgres user=databaser') if r.nil?
-        end
-      end
+      
+      connect()
+
+      r = nil
+    
       
       raise 'Database was not created!' if @pg.nil?
       
