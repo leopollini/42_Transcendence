@@ -115,7 +115,23 @@ function initSocket(username, chatAppInstance) {
                 chatAppInstance.pendingRequests.delete(msg.data.from);
             }
             chatAppInstance.updateFriendsList();
-        }        
+        }
+        else if (msg.type === "block_user") {
+            chatAppInstance.blockedBy.add(msg.data.from);
+            chatAppInstance.addMessageToChat(chatAppInstance.currentChat, {
+                date: new Date().toISOString(),
+                from: 'system',
+                content: `You have been blocked by ${msg.data.from}`
+            });
+        }
+        else if (msg.type === "unblock_user") {
+            chatAppInstance.blockedBy.delete(msg.data.from);
+            chatAppInstance.addMessageToChat(chatAppInstance.currentChat, {
+                date: new Date().toISOString(),
+                from: 'system',
+                content: `You have been unblocked by ${msg.data.from} `
+            });
+        }   
         else if (msg.type === "friend_removed") {
             chatAppInstance.friends.delete(msg.data.from);
             chatAppInstance.pendingRequests.delete(msg.data.from);

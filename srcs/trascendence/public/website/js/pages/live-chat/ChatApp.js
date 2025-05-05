@@ -14,7 +14,8 @@ class ChatApp {
         this.receivedRequests = [];
         this.selectedUser = null;
         this.username = null;
-        this.blockedUsers = new Set(); 
+        this.blockedUsers = new Set();
+        this.blockedBy    = new Set() 
         this.disabledChats = {};
         this.initialize();
         this.sendStateRequest();
@@ -485,23 +486,22 @@ class ChatApp {
             return;
         }
 
-        if (this.blockedUsers.has(user)) {
-            chatItem.style.display = 'none';
+        if (this.blockedUsers.has(user) || this.blockedBy.has(user)) {
+            // niente chat/invite/friend-request
+            chatItem.style.display      = 'none';
+            addFriendItem.style.display = 'none';
             if (inviteItem) inviteItem.style.display = 'none';
-            addFriendItem.style.display = 'block';
-            if (this.friends.has(user)) {
-                addFriendItem.textContent = 'Remove Friend';
-                addFriendItem.style.opacity = '1';
-            } else if (this.pendingRequests.has(user)) {
-                addFriendItem.textContent = 'Request Sent';
-                addFriendItem.style.opacity = '0.6';
-            } else {
-                addFriendItem.textContent = 'Add Friend';
-                addFriendItem.style.opacity = '1';
-            }
+        
+            // view profile sempre ok...
             profileItem.style.display = 'block';
-            blockItem.style.display = 'block';
-            blockItem.textContent = 'Unblock User';
+        
+            // Se sono io a bloccarlo → posso sbloccarlo; altrimenti no
+            if (this.blockedUsers.has(user)) {
+              blockItem.style.display   = 'block';
+              blockItem.textContent     = 'Unblock User';
+            } else {
+              blockItem.style.display   = 'none';
+            }
             return;
         }
 

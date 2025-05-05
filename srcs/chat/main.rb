@@ -138,7 +138,7 @@ EM::WebSocket.start({
     when "block_user"
       ChatStore.block target, username
     when "unblock_user"
-      ChatStore.clients[username].send_sys "You have unblocked #{target}"
+      ChatStore.clients[username].send_sys "You have unblock #{target}"
       ChatStore.clients[username].unblock_user target
       ChatStore.clients[target].send_me({ 'from' => username }, 'unblock_user')
 
