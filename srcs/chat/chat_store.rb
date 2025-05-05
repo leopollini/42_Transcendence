@@ -13,6 +13,7 @@ class Client
     @friends = []
     @waiting_friends = []
     @blocked = []
+    @be_blocked = []
     @open_chats = []
     @socket = sock
     send_me({"content" => "Welcome #{@username}!"}, "system")
@@ -71,6 +72,14 @@ class Client
 
   def unblock_user(who)
     @blocked.delete who
+  end
+
+  def be_blocked(who)
+    @be_blocked << who
+  end
+
+  def be_unblocked(who)
+    @be_blocked.delete who
   end
 
   def get_waiting_friends
@@ -161,13 +170,15 @@ class ChatStore
     @@clients[user].send_sys "You have block #{target}"
     @@clients[target].send_me({ 'from' => user }, 'block_user') 
     @@clients[user].block_user target
+    @@clients[target].be_blocked user
 
     remove_friend target, user
   end
 
   def self.get_client_state(user)
     client = ChatStore.clients[user]
-    info = {"friends" => client.friends, "friend_requests" => client.get_waiting_friends, "blocked_users" => client.blocked, "pending_requests" => []}
+    info = {"friends" => client.friends, "friend_requests" => client.get_waiting_friends,
+            "blocked_users" => client.blocked, "pending_requests" => [], "blocked_by" => client.blocked_by}
     puts "sending state info: #{info}"
     client.send_me(info, "state")
   end

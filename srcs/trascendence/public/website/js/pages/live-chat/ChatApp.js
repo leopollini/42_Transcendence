@@ -322,7 +322,7 @@ class ChatApp {
         let text = this.elements.messageInput.value;
         if (!text) return;
         text = encodeURIComponent(text);
-        const messagePayload = {
+        let messagePayload = {
             content: text,
             date: new Date().toISOString()
         };

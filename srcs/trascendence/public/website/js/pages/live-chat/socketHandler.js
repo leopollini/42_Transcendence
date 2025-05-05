@@ -36,7 +36,7 @@ export function closeSocket() {
 function initSocket(username, chatAppInstance) {
     _username = username;
     _chatApp = chatAppInstance;
-    console.log("SOCKET INIT");
+    console.log("SOCKET INIT. Username:", username);
 
     if (!socket)
     {
@@ -73,9 +73,9 @@ function initSocket(username, chatAppInstance) {
         }
         // console.log("message from socket: ", msg)
         if (msg.type === "state") {
-            const friends = msg.data.friends
-            const friendRequests = msg.data.friend_requests
-            const blockedUsers = msg.data.blocked_users
+            const friends = msg.data.friends;
+            const friendRequests = msg.data.friend_requests;
+            const blockedUsers = msg.data.blocked_users;
             chatAppInstance.friends = new Set(friends);
             chatAppInstance.receivedRequests = friendRequests;
             chatAppInstance.blockedUsers = new Set(blockedUsers);

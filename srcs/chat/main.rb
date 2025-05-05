@@ -104,6 +104,7 @@ EM::WebSocket.start({
       # ChatStore.sys_broadcast "#{username} joined the chat!", username
       puts "joined: #{username}"
     when "send_message"
+      puts "I AM #{username}".yellow.bold
       message = {
         "date"    => Time.now.iso8601,
         "from"    => username,
@@ -140,6 +141,7 @@ EM::WebSocket.start({
     when "unblock_user"
       ChatStore.clients[username].send_sys "You have unblock #{target}"
       ChatStore.clients[username].unblock_user target
+      ChatStore.clients[target].be_unblocked username
       ChatStore.clients[target].send_me({ 'from' => username }, 'unblock_user')
 
     when 'match_request'
