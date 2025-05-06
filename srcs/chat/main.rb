@@ -41,11 +41,27 @@ def internal_call(client, server)
     ChatStore.clients[bobj['to']].send_me({'date' => Time.now.iso8601, 'from' => 'sys', 'content' => bobj['content']}, bobj['type'] ? bobj['type'] : 'message') rescue r
     client.puts
   when 'get_online'
-    client.puts ChatStore.get_online(bobj['include_guests']).to_json
+    client.puts ChatStore.get_online().to_json
   when 'is_online'
     found = ChatStore.exists? bobj['username'].to_s
     puts "Is #{bobj['username'].to_s} online: #{found}"
     client.puts({'status' => (found ? 'success' : 'no user found'), 'success' => "true", "online" => found.to_s}.to_json)
+  when 'update_username'
+    old_username = bobj['old_name'].to_s
+    new_username = bobj['new_name'].to_s
+    if old_username.empty? || new_username.empty?
+      client.puts ({'status' => 'missing params', 'success' => 'false'})
+    else
+      client.puts ChatStore.update_username old_username, new_username
+    end
+  when 'clear_user'
+    puts 'clear user called'
+    user = bobj['username'].to_s
+    if user.empty?
+      client.puts({'status' => 'missing params', 'success' => 'false'})
+    else
+      client.puts ChatStore.clear_user user
+    end
   else
     puts "Unknown method called (#{bobj['method']})"
   end
@@ -96,6 +112,7 @@ EM::WebSocket.start({
     when "join"
       username = data["username"].to_s
       if ChatStore.exists? username
+        # puts "online users: #{ChatStore.get_online}"
         sock.send({'status' => 'another user with the same username is already connected', 'succes' => 'false', 'type' => 'kick'}.to_json)
         puts "kicked #{username}".yellow.bold
         kicked = true
@@ -106,7 +123,6 @@ EM::WebSocket.start({
       # ChatStore.sys_broadcast "#{username} joined the chat!", username
       puts "joined: #{username}"
     when "send_message"
-      puts "I AM #{username}".yellow.bold
       if (data['mode'] == 'system')
         message = {
           "date"    => Time.now.iso8601,

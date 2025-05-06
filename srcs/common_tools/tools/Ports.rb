@@ -46,6 +46,8 @@ module Ports
     'send_msg' => ['internal_chat_support', 6088, 1],
     'get_online' => ['internal_chat_support', 6088, 1],
     'is_online' => ['internal_chat_support', 6088, 1],
+    'update_username' => ['internal_chat_support', 6088, 1],
+    'clear_user' => ['internal_chat_support', 6088, 1],
 
     'match_invitation_request' => ['matchmaking', 6009, 1],
     'save_pong_game' => ['game_data_manager', 8790, 1],

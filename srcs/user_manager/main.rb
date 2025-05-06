@@ -56,7 +56,11 @@ def login_user(client, obj)
   if data['login_as_guest'].to_s == 'true'
     res = get_user(client, {"params" => {"display_name" => data['username']}})
     puts "res: #{res}".yellow.bold
-    return {"status" => "username taken", "success" => "false"} if res['status'] != 'no user found'
+    if res['status'] != 'no user found'
+      # online_in_chat = JSON.parse(SimpleServer::method_req('is_online', {'username' => data['display_name']}))
+      # puts "Online in chat: #{online_in_chat}"
+      return {"status" => "username taken", "success" => "false"} # if online_in_chat['online'] == 'true'
+    end
     return GUEST.add_guest(data)
   end
   puts "found: #{user}".yellow
@@ -132,7 +136,7 @@ def update_user(client, obj = {})
   user = LOGIN.select_specific 'token', obj['token'].to_s, ['display_name']
   return {'status' => 'invalid token', 'success' => 'false'} if user.nil?
 
-  SimpleServer::method_req('username_change', {'old_name' => user['display_name'].to_s, 'new_name' => new_params['display_name'].to_s}) unless new_params['display_name'].to_s.empty?
+  puts "username change in chat: ", SimpleServer::method_req('update_username', {'old_name' => user['display_name'].to_s, 'new_name' => new_params['display_name'].to_s}) unless new_params['display_name'].to_s.empty?
 
   LOGIN.updateValue 'token', obj['token'].to_s, new_params
   return DEFAULT_SUCCESS_RES.clone

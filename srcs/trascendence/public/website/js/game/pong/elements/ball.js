@@ -320,7 +320,7 @@ export class Ball {
         this.x = this.canvas.width / 2; 
         this.y = this.canvas.height / 2; 
         this.hits = 0;
-        bounceAngle = Math.random() * 0.5;
+        bounceAngle = Math.random() * 1;
 
         this.speedX = (Math.abs(this.canvas.width * this.speedPercentage) * (scorer === 1 ? 1 : -1));
         this.speedY = Math.sin(bounceAngle) * Math.abs(this.speedX);
