@@ -7,14 +7,14 @@ let chat_match_opponent = null;
 
 function chat_match_response_event(event) {
     const msg = JSON.parse(event.data)
-    console.log("received response", msg);
+    /*console.log("received response", msg);
     console.log("chat oppt", chat_match_opponent);
-    console.log("info data", msg.data);
+    console.log("info data", msg.data);*/
     if (msg.type === "match_response" && chat_match_opponent && msg.data.from === chat_match_opponent)
     {
-        console.log("match response from ", chat_match_opponent);
+        //console.log("match response from ", chat_match_opponent);
         if (msg.data.accepted === "true") {
-            console.log("invitation accepted!");
+           //console.log("invitation accepted!");
             showInfoModal("match accepted! Press OK to start", () => {
                 save_global("game", 1);
                 save_global("p1", current_user.display_name);

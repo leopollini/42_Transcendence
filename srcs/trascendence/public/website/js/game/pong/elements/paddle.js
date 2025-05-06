@@ -97,8 +97,8 @@ export class Paddle {
             this._targetY = this.predictBallY(ball);
         }
 
-        if (ball.speedX <= 0)
-            return;
+        /*if (ball.speedX <= 0)
+            return;*/
 
         const centerY = this.y + this.height / 2;
         const distance = this._targetY - centerY;

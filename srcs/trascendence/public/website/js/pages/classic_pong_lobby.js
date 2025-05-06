@@ -168,7 +168,7 @@ export function addClassicPongLobbyPageHandlers() {
       inviteBtn.disabled = true;
     }
     else
-      showInfoModal("the lobby is full", () => {});
+      showInfoModal("the lobby is full", () => { });
   });
 
   startBtn.addEventListener("click", () => {
@@ -198,12 +198,14 @@ function match_response_event(event) {
     newPlayer = document.createElement("div");
     newPlayer.classList.add("player");
     newPlayer.textContent = from;
-    matchEl = document.getElementById("pongMatchPlayers");
-    matchEl.appendChild(newPlayer);
+    if (matchEl)
+      matchEl.appendChild(newPlayer);
 
-    onlineEl.querySelectorAll(".player").forEach(p => {
-      if (p.textContent === from) p.remove();
-    });
+    if (onlineEl) {
+      onlineEl.querySelectorAll(".player").forEach(p => {
+        if (p.textContent === from) p.remove();
+      });
+    }
     save_global("opponent", from);
     let index = players.indexOf(msg.data.from);
     if (index !== -1)
@@ -211,7 +213,8 @@ function match_response_event(event) {
     addedPlayer.push(from);
     invitedPlayers.push(from);
     numPlayersAccepted = invitedPlayers.length;
-    numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
+    if (numPlayersLabel)
+      numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
     onlineBadge.textContent = onlineEl.querySelectorAll(".player").length;
 
     if (numPlayersAccepted === totalPlayers) {

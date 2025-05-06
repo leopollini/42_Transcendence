@@ -7,6 +7,7 @@ import { addCallbackPageHandlers } from "../login/login_logic.js";
 import { reset_tournament_data } from "./listener_Compacter.js";
 import { closeSocket } from "../pages/live-chat/socketHandler.js";
 import { change_name, update_image } from "../pages/modes.js";
+import { destroy_game } from "../game/pong/main/handling_Canvas.js";
 
 export async function check_valid_operation(path) {
     await refresh_reset();
@@ -28,6 +29,10 @@ async function not_home(path) {
         await addCallbackPageHandlers();
         return (1);
     }
+    if (path === "/modes" || path === "/classic" || path === "/forza4/game" ||
+        path === "/tournament/knockout/bracket" || path === "/tournament/roundrobin/robinranking" ||
+        path === "/tournament/knockout/bracket/game" || path === "/tournament/roundrobin/robinranking/game")
+        destroy_game();
     if (in_game != 0 && path === "/tournament/knockout/lobby")
         save_global("game", 0);
     if (path === "/tournament/knockout/lobby" || path === "/tournament/roundrobin/lobby") {

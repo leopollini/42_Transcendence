@@ -1,4 +1,4 @@
-import { navigate, current_user, save_global, lobby_data} from "../../main.js";
+import { navigate, current_user, save_global, lobby_data } from "../../main.js";
 import { initSocket, sendMessage } from "../live-chat/socketHandler.js";
 import { showInfoModal } from "../../modal.js";
 import { fetchOnlineOpponents, fetchOnlineUsers } from "../get_online_users.js";
@@ -72,7 +72,7 @@ export async function handleForza4Lobby() {
   onlineBadge = document.getElementById("f4OnlinePlayersCount");
   startBtn = document.getElementById("f4ToggleStartMatch");
   backBtn = document.getElementById("backImageButton");
-  
+
   get_socket();
   save_global("game", 0);
   if (lobby_data)
@@ -86,7 +86,7 @@ export async function handleForza4Lobby() {
     socket = null;
     newPlayer = null;
   }
-  
+
   numPlayersLabel = document.getElementById("f4NumPlayersLabel");
 
   selectedPlayer = null;
@@ -164,7 +164,7 @@ export function addForza4LobbyPageHandlers() {
       inviteBtn.disabled = true;
     }
     else
-      showInfoModal("the lobby is full", () => {});
+      showInfoModal("the lobby is full", () => { });
   };
 
   startBtn.addEventListener('click', () => {
@@ -177,7 +177,7 @@ export function addForza4LobbyPageHandlers() {
   });
 }
 
-function match_response_event(event) {
+function match_response_event_forza4(event) {
   const msg = JSON.parse(event.data)
   if (msg.data.accepted !== "true")
     return;
@@ -193,11 +193,14 @@ function match_response_event(event) {
     newPlayer.classList.add("player");
     newPlayer.textContent = from;
     matchEl = document.getElementById("f4MatchPlayers");
-    matchEl.appendChild(newPlayer);
+    if (matchEl)
+      matchEl.appendChild(newPlayer);
 
-    onlineEl.querySelectorAll(".player").forEach(p => {
-      if (p.textContent === from) p.remove();
-    });
+    if (onlineEl) {
+      onlineEl.querySelectorAll(".player").forEach(p => {
+        if (p.textContent === from) p.remove();
+      });
+    }
     save_global("opponent", from);
     let index = players.indexOf(msg.data.from);
     if (index !== -1)
@@ -205,7 +208,8 @@ function match_response_event(event) {
     addedPlayer.push(from);
     invitedPlayers.push(from);
     numPlayersAccepted = invitedPlayers.length;
-    numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
+    if (numPlayersLabel)
+      numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
     onlineBadge.textContent = onlineEl.querySelectorAll(".player").length;
 
     if (numPlayersAccepted === totalPlayers) {
@@ -216,10 +220,10 @@ function match_response_event(event) {
     if (!lobby_data)
       save_global("lobby_data", give_lobby_forza4());
   }
-  removeEventListener("message", match_response_event);
+  removeEventListener("message", match_response_event_forza4);
 }
 
 function get_socket() {
   socket = initSocket(current_user.display_name);
-  socket.addEventListener("message", match_response_event);
+  socket.addEventListener("message", match_response_event_forza4);
 }

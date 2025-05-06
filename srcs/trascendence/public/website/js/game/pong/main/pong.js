@@ -28,8 +28,6 @@ export function startPongGame(gameMode) {
   backToRobinButton = document.getElementById("backToRobinButton");
   backToMenuButton = document.getElementById("backToMenuButton");
 
-  console
-  // Hide the buttons when the game starts
   if (backToBracketButton)
     backToBracketButton.hidden = true;
   if (backToRobinButton)
@@ -163,9 +161,10 @@ export class PongGame {
       this.paddle1.update(this);
       if (mode === "ai") {
         //console.log("is AIII");
-        if (this.ball.x > window.innerWidth / 3 && !this.paddle2Paused) {
+        //if (this.ball.x > window.innerWidth / 3 && !this.paddle2Paused) {
+        if (!this.paddle2Paused)
           this.paddle2.move_ia(this.ball, this);
-        }
+        //}
       } else this.paddle2.update(this);
       updateParticles(this);
       //this.screenShake.update();
@@ -180,6 +179,7 @@ export class PongGame {
       }
     }
   }
+
   render() {
     if (this.ctx)
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);

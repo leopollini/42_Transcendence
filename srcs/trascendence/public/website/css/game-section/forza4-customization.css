@@ -38,29 +38,6 @@
     font-size: 1.2rem;
   }
   
-  .background-buttons {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 1rem;
-  }
-  
-  .bg-button {
-    flex: 1;
-    margin: 0 0.5rem;
-    padding: 0.75rem;
-    background: #491f1f;
-    border: none;
-    border-radius: 6px;
-    color: #ffffff;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .bg-button:hover {
-    background: #732a2a;
-  }
-  
   .background-selected {
     text-align: center;
     font-style: italic;

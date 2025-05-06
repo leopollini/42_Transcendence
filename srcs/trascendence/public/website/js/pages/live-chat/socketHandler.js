@@ -8,7 +8,7 @@ let _username;
 let _chatApp
 
 export function restartSocket(username) {
-    console.log("restarting socket. _chatApp set:", _chatApp);
+    //console.log("restarting socket. _chatApp set:", _chatApp);
     _username = username;
     if (_chatApp) {
         socket.close();
@@ -36,7 +36,7 @@ export function closeSocket() {
 function initSocket(username, chatAppInstance) {
     _username = username;
     _chatApp = chatAppInstance;
-    console.log("SOCKET INIT. Username:", username);
+    //console.log("SOCKET INIT. Username:", username);
 
     if (!socket)
     {
@@ -51,7 +51,7 @@ function initSocket(username, chatAppInstance) {
     }
 
     socket.onclose = () => {
-        console.log("SOCKET CLOSED");
+        //console.log("SOCKET CLOSED");
         socket = null;
     };
 
@@ -264,7 +264,7 @@ function initSocket(username, chatAppInstance) {
 
 function sendMessage(message) {
     message.from = _username;
-    console.log("SENDIN as", _username);
+    //console.log("SENDIN as", _username);
     if (socket && socket.readyState === WebSocket.OPEN)
         socket.send(JSON.stringify(message));
 }

@@ -1,7 +1,15 @@
 import { startPongGame, PongGame } from "./pong.js";
-import { current_user} from "../../../main.js";
+import { current_user, save_global} from "../../../main.js";
 import { showInfoModal } from "../../../modal.js";
 let gameInstance;
+
+export function destroy_game()
+{
+    if (gameInstance) {
+        gameInstance.destroy();
+        gameInstance = null;
+    }
+}
 
 export function initializeGameCanvas() {
     //console.log("Inizializzazione game canvas");
@@ -22,6 +30,7 @@ export function initializeGameCanvas() {
     {
         setTimeout(() => {
             if (path === "/VS_AI") {
+                save_global("ai_in", 1);
                 players_single = [current_user.display_name, "AI"];
                 startPongGame("ai");
             } 
@@ -34,7 +43,6 @@ export function initializeGameCanvas() {
                 const mode = path.includes("knockout") ? "knockout" : "roundrobin";
                 startPongGame(mode);
             }
-            
             gameInstance = new PongGame();
             gameInstance.start();
         }, 50);

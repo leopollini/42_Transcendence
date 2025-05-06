@@ -46,7 +46,7 @@ class ChatApp {
         else
             this.username = "default";
 
-        console.log("inside chatappinit",this.username);
+        //console.log("inside chatappinit",this.username);
         this.socket = initSocket(this.username, this);
         
         this.initializeElements();

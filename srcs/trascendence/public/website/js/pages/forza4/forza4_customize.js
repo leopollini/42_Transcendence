@@ -77,10 +77,6 @@ export function forza4Config() {
     else if (forza4Data.boardBackground == "bg3")
       f4BackgroundSelected.textContent = 'Background Selected: Faded 70\'s';
 
-    f4ButtonBackground1.style.width = '20%';
-    f4ButtonBackground2.style.width = '20%';
-    f4ButtonBackground3.style.width = '20%';
-
     forza4ApplyCustom.addEventListener('click', () => {
         // setToken1Color(token1ColorPicker.value);
         // setToken2Color(token2ColorPicker.value);

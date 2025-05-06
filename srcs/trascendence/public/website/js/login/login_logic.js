@@ -92,19 +92,20 @@ async function set_user(user) {
   if (!user.display_name) {
     const promptModal = msg => new Promise(resolve => showInputModal(msg, resolve));
     display_name = await promptModal("Insert your nickname");
+    display_name = escapeHtml(String(display_name).trim())
     if (check_name(display_name) !== true) {
       return (1);
     }
     name_changed = true;
   }
   else
-    display_name = user.display_name;
+    display_name = escapeHtml(String(user.display_name).trim());
   if (name_changed)
     await update_with_new_name(display_name);
   let new_user =
   {
     email: user.email,
-    display_name: escapeHtml(String(display_name).trim()),
+    display_name: display_name,
     realname: user.realname,
     image: user.image,
     bio: user.bio,

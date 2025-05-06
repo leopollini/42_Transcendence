@@ -1,4 +1,4 @@
-import { navigate, save_global, current_user, lobby_data, numPlayers} from "../../main.js";
+import { navigate, save_global, current_user, lobby_data, numPlayers } from "../../main.js";
 import { initSocket, sendMessage } from "../live-chat/socketHandler.js";
 import { showInfoModal } from "../../modal.js";
 import { fetchOnlineUsers } from "../get_online_users.js";
@@ -22,7 +22,7 @@ let onlineBadge;
 let startBtn;
 
 export default function LobbyRoom() {
-    return `
+  return `
     <div class="lobby">
       <div class="lobby__container">
 
@@ -75,7 +75,7 @@ export async function handleTournamentLobby(tournament_mode) {
   tournament = tournament_mode;
   //console.log("tournament mode: ", tournament);
   totalPlayers = numPlayers;
-  
+
   get_socket();
   save_global("game", 0);
   if (lobby_data)
@@ -142,54 +142,54 @@ export async function handleTournamentLobby(tournament_mode) {
 }
 
 function createKnockoutMatches() {
-    fetch("https://" + window.location.hostname + ":8008", {
-        method: "create_tournament",
-        body: JSON.stringify({ players: invitedPlayers, mode: tournament }),
-    })
+  fetch("https://" + window.location.hostname + ":8008", {
+    method: "create_tournament",
+    body: JSON.stringify({ players: invitedPlayers, mode: tournament }),
+  })
     .then(response => response.ok ? response.json() : Promise.reject(response))
     .then(data => {
-        invitedPlayers = [];
-        data.matches.forEach(match => invitedPlayers.push(match.player1, match.player2));
+      invitedPlayers = [];
+      data.matches.forEach(match => invitedPlayers.push(match.player1, match.player2));
     })
     .catch(error => showInfoModal("Fetch error:", error));
 }
 
 export function addLobbyPageHandlers() {
-    // save_global("end", null);
-    // save_global("game", null);
-    // save_global("players", null);
-    // save_global("robinranked", null);
+  // save_global("end", null);
+  // save_global("game", null);
+  // save_global("players", null);
+  // save_global("robinranked", null);
 
-    const toggleStartTournament = document.getElementById("toggleStartTournament");
-    const inviteButton = document.getElementById("inviteButton");
-    const backImageButton = document.getElementById("backImageButton");
+  const toggleStartTournament = document.getElementById("toggleStartTournament");
+  const inviteButton = document.getElementById("inviteButton");
+  const backImageButton = document.getElementById("backImageButton");
 
-    inviteButton.onclick = () => {
-        if (selectedPlayer && numPlayersAccepted < totalPlayers) {
-            sendMessage({
-              type: "match_request",
-              to: selectedPlayer.textContent,
-              mode: "tournament"
-            });
-            inviteButton.disabled = true;
-            // sendMessage({type: "match_response", to: current_user.display_name, from: selectedPlayer.textContent, accepted: "true"});
-        }
-    };
+  inviteButton.onclick = () => {
+    if (selectedPlayer && numPlayersAccepted < totalPlayers) {
+      sendMessage({
+        type: "match_request",
+        to: selectedPlayer.textContent,
+        mode: "tournament"
+      });
+      inviteButton.disabled = true;
+      // sendMessage({type: "match_response", to: current_user.display_name, from: selectedPlayer.textContent, accepted: "true"});
+    }
+  };
 
-    toggleStartTournament?.addEventListener('click', () => {
-        save_global("game", 1);
-        if (tournament === "knockout")
-          createKnockoutMatches();
-        const path = (tournament === "knockout" ? "/tournament/knockout/bracket" : "/tournament/roundrobin/robinranking");
+  toggleStartTournament?.addEventListener('click', () => {
+    save_global("game", 1);
+    if (tournament === "knockout")
+      createKnockoutMatches();
+    const path = (tournament === "knockout" ? "/tournament/knockout/bracket" : "/tournament/roundrobin/robinranking");
 
-        //console.log("Invited players: ", invitedPlayers);
-        save_global("players", invitedPlayers);
-        navigate(path, "Starting tournament", invitedPlayers);
-    });
+    //console.log("Invited players: ", invitedPlayers);
+    save_global("players", invitedPlayers);
+    navigate(path, "Starting tournament", invitedPlayers);
+  });
 
-    backImageButton?.addEventListener('click', () => {
-        navigate("/modes", "Return to Game Mode");
-    });
+  backImageButton?.addEventListener('click', () => {
+    navigate("/modes", "Return to Game Mode");
+  });
 }
 
 function give_lobby_tournament() {
@@ -221,11 +221,14 @@ function tournament_response_event(event) {
     newPlayer.classList.add("player");
     newPlayer.textContent = from;
     matchEl = document.getElementById("tournamentPlayers");
-    matchEl.appendChild(newPlayer);
+    if (matchEl)
+      matchEl.appendChild(newPlayer);
 
-    onlineEl.querySelectorAll(".player").forEach(p => {
-      if (p.textContent === from) p.remove();
-    });
+    if (onlineBadge) {
+      onlineEl.querySelectorAll(".player").forEach(p => {
+        if (p.textContent === from) p.remove();
+      });
+    }
     save_global("opponent", from);
     let index = players.indexOf(msg.data.from);
     if (index !== -1)
@@ -233,7 +236,8 @@ function tournament_response_event(event) {
     addedPlayer.push(from);
     invitedPlayers.push(from);
     numPlayersAccepted = invitedPlayers.length;
-    numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
+    if (numPlayersLabel)
+      numPlayersLabel.textContent = `${numPlayersAccepted}/${totalPlayers}`;
     onlineBadge.textContent = onlineEl.querySelectorAll(".player").length;
 
     if (numPlayersAccepted === totalPlayers) {
