@@ -143,7 +143,7 @@ function updateGuest(current_user) {
 async function saveProfile(infoContainer) {
   let saving;
   if (me.image === current_user.image)
-    saving = "⚠️no canges in image have been made\n";
+    saving = "⚠️no changes in image have been made\n";
   else {
     saving = "✅saved image successfully\n";
     current_user.image = me.image;

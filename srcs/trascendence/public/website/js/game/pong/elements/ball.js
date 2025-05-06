@@ -6,7 +6,7 @@ export class Ball {
         this.y = y;
         this.canvas = canvas;
         this.ctx = ctx;
-        this.speedPercentage = 0.3;
+        this.speedPercentage = 0.2;
         this.speedX = canvas.width * this.speedPercentage;
         this.speedY = canvas.width * this.speedPercentage;
         this.prevSpeedX = 0;

@@ -161,8 +161,8 @@ export class PongGame {
       this.paddle1.update(this);
       if (mode === "ai") {
         //console.log("is AIII");
-        //if (this.ball.x > window.innerWidth / 3 && !this.paddle2Paused) {
-        if (!this.paddle2Paused)
+        if (this.ball.x > window.innerWidth / 3 && !this.paddle2Paused)
+        // if (!this.paddle2Paused)
           this.paddle2.move_ia(this.ball, this);
         //}
       } else this.paddle2.update(this);

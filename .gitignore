@@ -11,6 +11,10 @@ srcs/trascendence/authentication/ssl_certs/
 */*/.bundle
 */*/*/.bundle
 
+*/.Gemfile.lock
+*/*/.Gemfile.lock
+*/*/*/.Gemfile.lock
+
 */.ssl_certs
 */*/.ssl_certs
 */*/*/.ssl_certs

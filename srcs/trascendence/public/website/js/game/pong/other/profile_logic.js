@@ -25,7 +25,7 @@ export function savebio(me, yourDataSection, current_user) {
     if (newBio.length >= 400)
         return ("🚨Error: Bio too big\n");
     if (current_user.bio === newBio)
-        return ("⚠️no canges in bio have been made\n")
+        return ("⚠️no changes in bio have been made\n")
     me.bio = newBio;
     current_user.bio = formatBio(me.bio);
     return ("✅saved bio successfully\n");
@@ -40,7 +40,7 @@ export async function savename(me, yourDataSection, current_user) {
 
     newname = escapeHtml(newname.trim());
     if (!newname)
-        return ("⚠️Error: No Name saved(Please enter a name next time)\n");
+        return ("⚠️No Name saved(Please enter a name next time)\n");
     if (newname.length < 4)
         return ("🚨Error: Name too short(" + newname + ")\n");
     if (newname.length >= 15)
@@ -97,7 +97,7 @@ export async function saveimage(me, yourDataSection, current_user) {
             }
         }
         else {
-            showInfoModal("🚨Error: No file selected.", () => { });
+            showInfoModal("🚨No file selected.", () => { });
             return;
         }
     });
