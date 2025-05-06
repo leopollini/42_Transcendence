@@ -5,8 +5,8 @@ require 'time'
 MAX_UNREAD_SIZE = 100
 
 class Client
-  attr_reader :blocked, :friends, :blocked_by
-  def initialize(username, sock)
+  attr_accessor :blocked, :friends, :blocked_by, :unread, :waiting_friends, :socket, :username, :socket_open
+  def initialize(username, sock, send_welcome = true)
     @username = username
     @unread = []
     @socket_open = true
@@ -14,9 +14,36 @@ class Client
     @waiting_friends = []
     @blocked = []
     @blocked_by = []
-    @open_chats = []
     @socket = sock
-    send_me({"content" => "Welcome #{@username}!"}, "system")
+    send_me({"content" => "Welcome #{@username}!"}, "system") if send_welcome
+  end
+
+  def clone(newname)
+    temp = Client.new(newname, nil, false)
+
+    temp.unread = @unread.map(&:clone) 
+    temp.friends = @friends.map(&:clone) 
+    temp.waiting_friends = @waiting_friends.map(&:clone) 
+    temp.blocked = @blocked.map(&:clone) 
+    temp.blocked_by = @blocked_by.map(&:clone)
+    temp.socket_open = false
+
+    return temp
+  end
+
+  def forget(name)
+    [@friends, @blocked, @blocked_by, @waiting_friends].each do |ls|
+      ls.delete name
+    end
+  end
+
+  def update_name(old, newname)
+    [@friends, @blocked, @blocked_by, @waiting_friends].each do |ls|
+      if ls.include? old
+        ls.delete old
+        ls << newname
+      end
+    end
   end
 
   def joined(sock)
@@ -106,7 +133,7 @@ class ChatStore
 
   def self.purge
     @@mutex.synchronize do
-      @clients = @clients.filter {| usr, cli | cli.alive?}
+      @@clients = @@clients.filter {| usr, cli | cli.alive?}
     end
   end
 
@@ -199,8 +226,9 @@ class ChatStore
     @@clients[username].close_sock if @@clients[username]
   end
 
-  def self.get_online(include_guests)
-    users = (@@clients.select {|u, c| c.alive?}).keys
+  def self.get_online()
+    self.purge
+    users = @@clients.keys
     puts "all connected users: " + users.to_s
     # if include_guests.to_s == 'false'
     #   login_users = []
@@ -212,5 +240,24 @@ class ChatStore
     #   puts "connected login users: " + users.to_s
     # end
     {"status" => (users.empty? ? "no online users" : "success"), "success" => "true", "online_users" => users}
+  end
+
+  def self.update_username(old, newname)
+    @@clients.each do |name, cli|
+      next if cli.nil? || name.to_s.empty? || name.to_s == old
+      cli.update_name old, newname
+    end
+    @@clients[newname] = @@clients[old].clone(newname)
+    @@clients.delete old
+    {'status' => 'success', 'success' => 'true'}
+  end
+
+  def self.clear_user(user)
+    puts "clearing #{user}"
+    @@clients.delete user if @@clients
+    @@clients.each do |name, cli|
+      cli.forget(user) if cli
+    end
+    {'status' => 'success', 'success' => 'true'}
   end
 end

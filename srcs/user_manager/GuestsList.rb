@@ -45,6 +45,8 @@ class GuestsList
     @index[username] = i
     @tokens[data['token']] = i
 
+    SimpleServer::method_req("clear_user", {'username' => username})
+
     {
       'service' => 'user_manager',
       'status' => 'success',

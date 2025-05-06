@@ -11,7 +11,7 @@ export class Ball {
         this.speedY = canvas.width * this.speedPercentage;
         this.prevSpeedX = 0;
         this.prevSpeedY = 0;
-        this.maxSpeedPercentage = 0.8;
+        this.maxSpeedPercentage = 0.6;
         this.maxSpeed = canvas.width * this.maxSpeedPercentage;
         this.speedIncreaseFactor = canvas.width * 0.0001;
         this.radius = canvas.width * 0.006;
@@ -19,7 +19,7 @@ export class Ball {
         this.trailColor = trailColor;
         this.maxAngle = Math.PI / 4;
         this.trail = [];
-        this.trailLength = 0;
+        this.trailLength = 4;
         this.hits = 0;
         this.hide = false;
         this.out = false;
@@ -186,8 +186,8 @@ export class Ball {
         this.x += this.speedX * game.deltaTime;
         this.y += this.speedY * game.deltaTime;
 
-         //this.trail.push({ x: this.x, y: this.y }); // Save ball trail position
-        //if (this.trail.length > this.trailLength) this.trail.shift(); // Remove old trail positions
+        this.trail.push({ x: this.x, y: this.y }); // Save ball trail position
+        if (this.trail.length > this.trailLength) this.trail.shift(); // Remove old trail positions
     
         // Wall collisions
         if (this.y + this.radius > canvasHeight - wallThickness) {
@@ -214,7 +214,7 @@ export class Ball {
                 this.speedY *= (1 + this.speedIncreaseFactor);
             }
         } else if (this.collidesWith(paddle2)) {
-            this.x = paddle2.x - this.radius;
+            this.x = paddle2.x - this.radius - paddle2.width;
             this.speedX *= -1;
             this.hits++;
             const relativeY = (this.y - (paddle2.y + paddle2.height / 2)) / (paddle2.height / 2);
@@ -280,7 +280,7 @@ export class Ball {
         this.radius = game.canvas.width * 0.006;
 
         // Calculate new trail length
-        //this.trailLength = Math.max(8, Math.floor(this.canvas.width * 0.01));
+        this.trailLength = Math.max(8, Math.floor(this.canvas.width * 0.01));
     }
 
     render(game) {

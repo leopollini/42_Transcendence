@@ -2,8 +2,18 @@
 .vscode
 *.DS_Store
 srcs/trascendence/authentication/ssl_certs/
-srcs/trascendence/authentication/Gemfile.lock
+
+.env
+*/.env
+*/*/.env
 
 */.bundle
 */*/.bundle
 */*/*/.bundle
+
+*/.ssl_certs
+*/*/.ssl_certs
+*/*/*/.ssl_certs
+
+
+
