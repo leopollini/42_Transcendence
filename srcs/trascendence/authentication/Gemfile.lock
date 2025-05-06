@@ -44,7 +44,7 @@ GEM
       hashie
       version_gem (~> 1.1, >= 1.1.1)
     uri (1.0.3)
-    version_gem (1.1.7)
+    version_gem (1.1.8)
     webrick (1.9.1)
     websocket-driver (0.7.7)
       base64

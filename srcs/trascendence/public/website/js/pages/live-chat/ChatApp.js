@@ -336,7 +336,6 @@ class ChatApp {
             messagePayload.chat = 'general';
             messagePayload.to = 'general';
         }
-        console.log("SENDING AS", this.username);
         this.socket.send(JSON.stringify({type: "send_message", ...messagePayload }));
         this.elements.messageInput.value = '';
     }
