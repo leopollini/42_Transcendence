@@ -97,6 +97,8 @@ clean:
 
 fclean: clean
 	rm -fr ./*/*/.bundle
+	rm -fr ./*/*/.ssl_certs
+	sudo rm -fr srcs/trascendence/authentication/ssl_certs/
 	@if [ "$$(docker ps -a -q | wc -l)" -gt 0 ] || [ "$$(docker images -q | wc -l)" -gt 0 ] || [ "$$(docker volume ls -q | wc -l)" -gt 0 ]; then \
 		echo -e "Risorse Docker trovate, avvio la pulizia profonda..."; \
 		sudo docker-compose down -v --remove-orphans; \
